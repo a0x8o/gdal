@@ -5578,6 +5578,30 @@ static bool NITFWriteCGMSegments( const char* pszFilename,
     bOK &= static_cast<int>(VSIFWriteL(pachLS, 1, nNUMS * nCgmHdrEntrySz, fpVSIL))
                 == nNUMS * nCgmHdrEntrySz;
 
+<<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
+=======
+    /* -------------------------------------------------------------------- */
+    /*      Update total file length.                                       */
+    /* -------------------------------------------------------------------- */
+    bOK &= VSIFSeekL(fpVSIL, 0, SEEK_END ) == 0;
+    GUIntBig nFileLen = VSIFTellL(fpVSIL);
+    // Offset to file length entry
+    bOK &= VSIFSeekL(fpVSIL, 342, SEEK_SET ) == 0;
+    if (nFileLen >= NITF_MAX_FILE_SIZE)
+    {
+        CPLError(CE_Failure, CPLE_AppDefined,
+                 "Too big file : " CPL_FRMT_GUIB ". Truncating to " CPL_FRMT_GUIB,
+                 nFileLen, NITF_MAX_FILE_SIZE - 1);
+        nFileLen = NITF_MAX_FILE_SIZE - 1;
+    }
+    CPLString osLen = CPLString().Printf("%012" CPL_FRMT_GB_WITHOUT_PREFIX "u",
+                    nFileLen);
+    bOK &= VSIFWriteL( reinterpret_cast<const void *>( osLen.c_str() ), 12, 1, fpVSIL) == 1;
+
+    if( VSIFCloseL(fpVSIL) != 0 )
+        bOK = false;
+
+>>>>>>> 65582e8834 (IVSIS3LikeFSHandler::Sync(): add missing lock):gdal/frmts/nitf/nitfdataset.cpp
     CPLFree(pachLS);
 
     if (strlen(errorMessage) != 0)
@@ -5832,6 +5856,29 @@ static bool NITFWriteTextSegments( const char* pszFilename,
     bOK &= VSIFSeekL( fpVSIL, nNumTOffset + 3, SEEK_SET ) == 0;
     bOK &= static_cast<int>(VSIFWriteL( pachLT, 1, nNUMT * 9, fpVSIL )) == nNUMT * 9;
 
+<<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
+=======
+/* -------------------------------------------------------------------- */
+/*      Update total file length.                                       */
+/* -------------------------------------------------------------------- */
+    bOK &= VSIFSeekL( fpVSIL, 0, SEEK_END ) == 0;
+    GUIntBig nFileLen = VSIFTellL( fpVSIL );
+
+    bOK &= VSIFSeekL( fpVSIL, 342, SEEK_SET ) == 0;
+    if (nFileLen >= NITF_MAX_FILE_SIZE)
+    {
+        CPLError(CE_Failure, CPLE_AppDefined,
+                 "Too big file : " CPL_FRMT_GUIB ". Truncating to " CPL_FRMT_GUIB,
+                 nFileLen, NITF_MAX_FILE_SIZE - 1);
+        nFileLen = NITF_MAX_FILE_SIZE - 1;
+    }
+    CPLString osLen = CPLString().Printf("%012" CPL_FRMT_GB_WITHOUT_PREFIX "u",nFileLen);
+    bOK &= VSIFWriteL( reinterpret_cast<const void *>( osLen.c_str() ),
+                12, 1, fpVSIL ) == 1;
+
+    if( VSIFCloseL( fpVSIL ) != 0 )
+        bOK = false;
+>>>>>>> 65582e8834 (IVSIS3LikeFSHandler::Sync(): add missing lock):gdal/frmts/nitf/nitfdataset.cpp
     CPLFree( pachLT );
 
     return bOK;
