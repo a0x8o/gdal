@@ -1772,7 +1772,11 @@ void MEMAbstractMDArray::ReadWrite(bool bIsWrite,
                 CPLAssert(false);
             }
             else if ( bBothAreNumericDT
+<<<<<<< HEAD:frmts/mem/memdataset.cpp
 #if SIZEOF_VOIDP >= 8
+=======
+#if SIZEOF_VOIDP == 8
+>>>>>>> 542a97ffd1 (PostgisRaster: hopuflly fix CSA warning):gdal/frmts/mem/memdataset.cpp
                       && src_inc_offset <= std::numeric_limits<int>::max()
                       && dst_inc_offset <= std::numeric_limits<int>::max()
 #endif
