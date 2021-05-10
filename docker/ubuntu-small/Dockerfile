@@ -142,8 +142,11 @@ ARG GDAL_REPOSITORY=OSGeo/gdal
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 120fe7f972 (Docker: update to use an alternate repo to OSGeo/gdal)
+=======
+>>>>>>> 692d436bbd (Docker: update to use an alternate repo to OSGeo/gdal)
 <<<<<<< HEAD:docker/ubuntu-small/Dockerfile
 RUN . /buildscripts/bh-set-envvars.sh \
     && if test "${GDAL_VERSION}" = "master"; then \
@@ -151,6 +154,9 @@ RUN . /buildscripts/bh-set-envvars.sh \
 RUN if test "${GDAL_VERSION}" = "master"; then \
 >>>>>>> 696a319c74 (Docker: update to use an alternate repo to OSGeo/gdal):gdal/docker/ubuntu-small/Dockerfile
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 692d436bbd (Docker: update to use an alternate repo to OSGeo/gdal)
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/docker/ubuntu-small/Dockerfile
@@ -168,8 +174,11 @@ RUN if test "${GDAL_VERSION}" = "master"; then \
 >>>>>>> 696a319c74 (Docker: update to use an alternate repo to OSGeo/gdal):gdal/docker/ubuntu-small/Dockerfile
 >>>>>>> 9457c72950 (Docker: update to use an alternate repo to OSGeo/gdal)
 >>>>>>> a20945fa20 (Docker: update to use an alternate repo to OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 120fe7f972 (Docker: update to use an alternate repo to OSGeo/gdal)
+=======
+>>>>>>> 692d436bbd (Docker: update to use an alternate repo to OSGeo/gdal)
         export GDAL_VERSION=$(curl -Ls https://api.github.com/repos/${GDAL_REPOSITORY}/commits/HEAD -H "Accept: application/vnd.github.VERSION.sha"); \
         export GDAL_RELEASE_DATE=$(date "+%Y%m%d"); \
     fi \
