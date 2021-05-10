@@ -140,8 +140,12 @@ ARG GDAL_RELEASE_DATE
 ARG GDAL_BUILD_IS_RELEASE
 ARG GDAL_REPOSITORY=OSGeo/gdal
 
+<<<<<<< HEAD:docker/ubuntu-small/Dockerfile
 RUN . /buildscripts/bh-set-envvars.sh \
     && if test "${GDAL_VERSION}" = "master"; then \
+=======
+RUN if test "${GDAL_VERSION}" = "master"; then \
+>>>>>>> 696a319c74 (Docker: update to use an alternate repo to OSGeo/gdal):gdal/docker/ubuntu-small/Dockerfile
         export GDAL_VERSION=$(curl -Ls https://api.github.com/repos/${GDAL_REPOSITORY}/commits/HEAD -H "Accept: application/vnd.github.VERSION.sha"); \
         export GDAL_RELEASE_DATE=$(date "+%Y%m%d"); \
     fi \
