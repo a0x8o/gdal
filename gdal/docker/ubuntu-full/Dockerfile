@@ -60,7 +60,11 @@ RUN wget -q https://github.com/ubarsc/kealib/archive/kealib-${KEA_VERSION}.zip \
     && for i in /build_thirdparty/usr/bin/*; do strip -s $i 2>/dev/null || /bin/true; done
 
 # Build mongo-c-driver
+<<<<<<< HEAD
 ARG MONGO_C_DRIVER_VERSION=1.17.6
+=======
+ARG MONGO_C_DRIVER_VERSION=1.17.5
+>>>>>>> 9457c72950 (Docker: update to use an alternate repo to OSGeo/gdal)
 RUN mkdir mongo-c-driver \
     && wget -q https://github.com/mongodb/mongo-c-driver/releases/download/${MONGO_C_DRIVER_VERSION}/mongo-c-driver-${MONGO_C_DRIVER_VERSION}.tar.gz -O - \
         | tar xz -C mongo-c-driver --strip-components=1 \
@@ -78,7 +82,11 @@ RUN mkdir mongo-c-driver \
     && for i in /build_thirdparty/usr/bin/*; do strip -s $i 2>/dev/null || /bin/true; done
 
 # Build mongocxx
+<<<<<<< HEAD
 ARG MONGOCXX_VERSION=3.6.5
+=======
+ARG MONGOCXX_VERSION=3.6.3
+>>>>>>> 9457c72950 (Docker: update to use an alternate repo to OSGeo/gdal)
 RUN mkdir mongocxx \
     && wget -q https://github.com/mongodb/mongo-cxx-driver/archive/r${MONGOCXX_VERSION}.tar.gz -O - \
         | tar xz -C mongocxx --strip-components=1 \
@@ -95,7 +103,11 @@ RUN mkdir mongocxx \
     && for i in /build_thirdparty/usr/bin/*; do strip -s $i 2>/dev/null || /bin/true; done
 
 # Build tiledb
+<<<<<<< HEAD
 ARG TILEDB_VERSION=2.3.0
+=======
+ARG TILEDB_VERSION=2.2.7
+>>>>>>> 9457c72950 (Docker: update to use an alternate repo to OSGeo/gdal)
 RUN mkdir tiledb \
     && wget -q https://github.com/TileDB-Inc/TileDB/archive/${TILEDB_VERSION}.tar.gz -O - \
         | tar xz -C tiledb --strip-components=1 \
@@ -158,12 +170,21 @@ RUN if echo "$WITH_FILEGDB" | grep -Eiq "^(y(es)?|1|true)$"  ; then ( \
 
 ARG WITH_PDFIUM=yes
 RUN if echo "$WITH_PDFIUM" | grep -Eiq "^(y(es)?|1|true)$"  ; then ( \
+<<<<<<< HEAD
   wget -q https://github.com/rouault/pdfium_build_gdal_3_4/releases/download/v1_pdfium_4538/install-ubuntu2004-rev4538.tar.gz \
   && tar -xzf install-ubuntu2004-rev4538.tar.gz \
   && chown -R root:root install \
   && mv install/lib/* /usr/lib/ \
   && mv install/include/* /usr/include/ \
   && rm -rf install-ubuntu2004-rev4538.tar.gz install \
+=======
+  wget -q https://github.com/rouault/pdfium_build_gdal_3_2/releases/download/v1_pdfium_4272/install-ubuntu2004-rev4272.tar.gz \
+  && tar -xzf install-ubuntu2004-rev4272.tar.gz \
+  && chown -R root:root install \
+  && mv install/lib/* /usr/lib/ \
+  && mv install/include/* /usr/include/ \
+  && rm -rf install-ubuntu2004-rev4272.tar.gz install \
+>>>>>>> 9457c72950 (Docker: update to use an alternate repo to OSGeo/gdal)
   && apt-get update -y \
   && apt-get install -y --fix-missing --no-install-recommends liblcms2-dev \
   && rm -rf /var/lib/apt/lists/* \

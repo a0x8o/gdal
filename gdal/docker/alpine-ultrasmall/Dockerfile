@@ -5,7 +5,11 @@
 # Public domain
 # or licensed under X/MIT (LICENSE.TXT) Copyright 2019 Even Rouault <even.rouault@spatialys.com>
 
+<<<<<<< HEAD
 ARG ALPINE_VERSION=3.14
+=======
+ARG ALPINE_VERSION=3.13
+>>>>>>> 9457c72950 (Docker: update to use an alternate repo to OSGeo/gdal)
 FROM alpine:${ALPINE_VERSION} as builder
 
 # Derived from osgeo/proj by Howard Butler <howard@hobu.co>
