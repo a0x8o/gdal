@@ -75,8 +75,11 @@ public:
     bool GetIsInIndexingVariable() const { return m_bIsInIndexingVariable; }
 
     const std::string& GetFilename() const { return m_osFilename; }
+<<<<<<< HEAD:frmts/netcdf/netcdfmultidim.cpp
 
     const std::shared_ptr<GDALPamMultiDim>& GetPAM() { return m_poPAM; }
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/frmts/netcdf/netcdfmultidim.cpp
 };
 
 /************************************************************************/
@@ -4118,7 +4121,12 @@ GDALDataset* netCDFDataset::CreateMultiDimensional( const char * pszFilename,
         return nullptr;
     }
 
+<<<<<<< HEAD:frmts/netcdf/netcdfmultidim.cpp
     auto poSharedResources(std::make_shared<netCDFSharedResources>(pszFilename));
+=======
+    auto poSharedResources(std::make_shared<netCDFSharedResources>());
+    poSharedResources->m_osFilename = pszFilename;
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/frmts/netcdf/netcdfmultidim.cpp
     poSharedResources->m_cdfid = cdfid;
     poSharedResources->m_bReadOnly = false;
     poSharedResources->m_bDefineMode = true;
