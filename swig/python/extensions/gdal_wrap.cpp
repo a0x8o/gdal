@@ -45591,11 +45591,15 @@ static PyMethodDef SwigMethods[] = {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 5d1d6dfdab (Merge pull request #3822 from rouault/gml_srs)
 	 { (char *)"MDArray_GetNoDataValueAsString", _wrap_MDArray_GetNoDataValueAsString, METH_VARARGS, (char *)"MDArray_GetNoDataValueAsString(MDArray self) -> retStringAndCPLFree *"},
 	 { (char *)"MDArray_SetNoDataValueDouble", _wrap_MDArray_SetNoDataValueDouble, METH_VARARGS, (char *)"MDArray_SetNoDataValueDouble(MDArray self, double d) -> CPLErr"},
 	 { (char *)"MDArray_SetNoDataValueString", _wrap_MDArray_SetNoDataValueString, METH_VARARGS, (char *)"MDArray_SetNoDataValueString(MDArray self, char const * nodata) -> CPLErr"},
 =======
 	 { (char *)"MDArray_SetNoDataValueDouble", _wrap_MDArray_SetNoDataValueDouble, METH_VARARGS, (char *)"MDArray_SetNoDataValueDouble(MDArray self, double d) -> CPLErr"},
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
 =======
@@ -45612,6 +45616,9 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"MDArray_SetNoDataValueDouble", _wrap_MDArray_SetNoDataValueDouble, METH_VARARGS, (char *)"MDArray_SetNoDataValueDouble(MDArray self, double d) -> CPLErr"},
 	 { (char *)"MDArray_SetNoDataValueString", _wrap_MDArray_SetNoDataValueString, METH_VARARGS, (char *)"MDArray_SetNoDataValueString(MDArray self, char const * nodata) -> CPLErr"},
 >>>>>>> af969e429b (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+=======
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> 5d1d6dfdab (Merge pull request #3822 from rouault/gml_srs)
 	 { (char *)"MDArray_SetNoDataValueRaw", _wrap_MDArray_SetNoDataValueRaw, METH_VARARGS, (char *)"MDArray_SetNoDataValueRaw(MDArray self, GIntBig nLen) -> CPLErr"},
 	 { (char *)"MDArray_DeleteNoDataValue", _wrap_MDArray_DeleteNoDataValue, METH_VARARGS, (char *)"MDArray_DeleteNoDataValue(MDArray self) -> CPLErr"},
 	 { (char *)"MDArray_GetOffset", _wrap_MDArray_GetOffset, METH_VARARGS, (char *)"MDArray_GetOffset(MDArray self)"},
@@ -45681,6 +45688,7 @@ static PyMethodDef SwigMethods[] = {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
 =======
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
@@ -45710,6 +45718,11 @@ static PyMethodDef SwigMethods[] = {
 =======
 	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
 >>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
+=======
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> 5d1d6dfdab (Merge pull request #3822 from rouault/gml_srs)
 	 { (char *)"ExtendedDataType_GetComponents", _wrap_ExtendedDataType_GetComponents, METH_VARARGS, (char *)"ExtendedDataType_GetComponents(ExtendedDataType self)"},
 	 { (char *)"ExtendedDataType_CanConvertTo", _wrap_ExtendedDataType_CanConvertTo, METH_VARARGS, (char *)"ExtendedDataType_CanConvertTo(ExtendedDataType self, ExtendedDataType other) -> bool"},
 	 { (char *)"ExtendedDataType_Equals", _wrap_ExtendedDataType_Equals, METH_VARARGS, (char *)"ExtendedDataType_Equals(ExtendedDataType self, ExtendedDataType other) -> bool"},

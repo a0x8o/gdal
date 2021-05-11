@@ -550,6 +550,7 @@ class OGRProjCT : public OGRCoordinateTransformation
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:ogr/ogrct.cpp
 =======
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
@@ -582,12 +583,18 @@ class OGRProjCT : public OGRCoordinateTransformation
 =======
 <<<<<<< HEAD:ogr/ogrct.cpp
 >>>>>>> bae1c396ad (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:ogr/ogrct.cpp
+=======
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> 5d1d6dfdab (Merge pull request #3822 from rouault/gml_srs)
             m_pj((other.m_pj != nullptr) ?
                  (proj_clone(OSRGetProjTLSContext(), other.m_pj)) :
 =======
             m_pj((other.m_pj != nullptr) ? 
                  (proj_clone(OSRGetProjTLSContext(), other.m_pj)) : 
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/ogr/ogrct.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -609,9 +616,12 @@ class OGRProjCT : public OGRCoordinateTransformation
 =======
 >>>>>>> bae1c396ad (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+>>>>>>> 5d1d6dfdab (Merge pull request #3822 from rouault/gml_srs)
+=======
             m_pj((other.m_pj != nullptr) ?
                  (proj_clone(OSRGetProjTLSContext(), other.m_pj)) :
 >>>>>>> b1792c641a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrct.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -647,6 +657,10 @@ class OGRProjCT : public OGRCoordinateTransformation
 >>>>>>> 6b318bd831 (Merge pull request #3822 from rouault/gml_srs)
 =======
 >>>>>>> bae1c396ad (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> 5d1d6dfdab (Merge pull request #3822 from rouault/gml_srs)
                  (nullptr))
         {}
         PjPtr(PjPtr&& other) :
@@ -666,6 +680,7 @@ class OGRProjCT : public OGRCoordinateTransformation
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:ogr/ogrct.cpp
 =======
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
@@ -698,12 +713,18 @@ class OGRProjCT : public OGRCoordinateTransformation
 =======
 <<<<<<< HEAD:ogr/ogrct.cpp
 >>>>>>> bae1c396ad (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:ogr/ogrct.cpp
+=======
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> 5d1d6dfdab (Merge pull request #3822 from rouault/gml_srs)
                 m_pj = (other.m_pj != nullptr) ?
                        (proj_clone(OSRGetProjTLSContext(), other.m_pj)) :
 =======
                 m_pj = (other.m_pj != nullptr) ? 
                        (proj_clone(OSRGetProjTLSContext(), other.m_pj)) : 
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/ogr/ogrct.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -725,9 +746,12 @@ class OGRProjCT : public OGRCoordinateTransformation
 =======
 >>>>>>> bae1c396ad (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+>>>>>>> 5d1d6dfdab (Merge pull request #3822 from rouault/gml_srs)
+=======
                 m_pj = (other.m_pj != nullptr) ?
                        (proj_clone(OSRGetProjTLSContext(), other.m_pj)) :
 >>>>>>> b1792c641a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrct.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -763,6 +787,10 @@ class OGRProjCT : public OGRCoordinateTransformation
 >>>>>>> 6b318bd831 (Merge pull request #3822 from rouault/gml_srs)
 =======
 >>>>>>> bae1c396ad (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> 5d1d6dfdab (Merge pull request #3822 from rouault/gml_srs)
                        (nullptr);
             }
             return *this;
@@ -1287,6 +1315,7 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
 =======
@@ -1490,10 +1519,15 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
  * Clone transformation object.
  *
  * This is the same as the C++ function OGRCreateCoordinateTransformation::Clone
+=======
+>>>>>>> 5d1d6dfdab (Merge pull request #3822 from rouault/gml_srs)
  *
  * @return handle to transformation's clone or NULL on error,
  *         must be freed with OCTDestroyCoordinateTransformation
  *
+=======
+
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
  * @since GDAL 3.4
  */
 
@@ -1507,6 +1541,7 @@ OCTClone(OGRCoordinateTransformationH hTransform)
 }
 
 /************************************************************************/
+<<<<<<< HEAD
 /*                             OCTGetSourceCS()                         */
 /************************************************************************/
 
@@ -1579,6 +1614,7 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
 
 /************************************************************************/
 =======
+<<<<<<< HEAD
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 >>>>>>> df05d90486 (Merge pull request #3822 from rouault/gml_srs)
@@ -1600,6 +1636,9 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
 >>>>>>> 6b318bd831 (Merge pull request #3822 from rouault/gml_srs)
 =======
 >>>>>>> ceea52d9e9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> 5d1d6dfdab (Merge pull request #3822 from rouault/gml_srs)
 /*                             OGRProjCT()                             */
 /************************************************************************/
 
