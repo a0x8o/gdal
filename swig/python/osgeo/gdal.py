@@ -2888,6 +2888,11 @@ class MDArray(object):
         r"""Cache(MDArray self, char ** options=None) -> bool"""
         return _gdal.MDArray_Cache(self, *args)
 
+    def Cache(self, *args):
+        """Cache(MDArray self, char ** options=None) -> bool"""
+        return _gdal.MDArray_Cache(self, *args)
+
+
     def Read(self,
              array_start_idx = None,
              count = None,
