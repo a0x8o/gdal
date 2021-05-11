@@ -45470,9 +45470,13 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"MDArray_CreateAttribute", _wrap_MDArray_CreateAttribute, METH_VARARGS, (char *)"MDArray_CreateAttribute(MDArray self, char const * name, int nDimensions, ExtendedDataType data_type, char ** options=None) -> Attribute"},
 	 { (char *)"MDArray_GetNoDataValueAsRaw", _wrap_MDArray_GetNoDataValueAsRaw, METH_VARARGS, (char *)"MDArray_GetNoDataValueAsRaw(MDArray self) -> CPLErr"},
 	 { (char *)"MDArray_GetNoDataValueAsDouble", _wrap_MDArray_GetNoDataValueAsDouble, METH_VARARGS, (char *)"MDArray_GetNoDataValueAsDouble(MDArray self)"},
+<<<<<<< HEAD
 	 { (char *)"MDArray_GetNoDataValueAsString", _wrap_MDArray_GetNoDataValueAsString, METH_VARARGS, (char *)"MDArray_GetNoDataValueAsString(MDArray self) -> retStringAndCPLFree *"},
 	 { (char *)"MDArray_SetNoDataValueDouble", _wrap_MDArray_SetNoDataValueDouble, METH_VARARGS, (char *)"MDArray_SetNoDataValueDouble(MDArray self, double d) -> CPLErr"},
 	 { (char *)"MDArray_SetNoDataValueString", _wrap_MDArray_SetNoDataValueString, METH_VARARGS, (char *)"MDArray_SetNoDataValueString(MDArray self, char const * nodata) -> CPLErr"},
+=======
+	 { (char *)"MDArray_SetNoDataValueDouble", _wrap_MDArray_SetNoDataValueDouble, METH_VARARGS, (char *)"MDArray_SetNoDataValueDouble(MDArray self, double d) -> CPLErr"},
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 	 { (char *)"MDArray_SetNoDataValueRaw", _wrap_MDArray_SetNoDataValueRaw, METH_VARARGS, (char *)"MDArray_SetNoDataValueRaw(MDArray self, GIntBig nLen) -> CPLErr"},
 	 { (char *)"MDArray_DeleteNoDataValue", _wrap_MDArray_DeleteNoDataValue, METH_VARARGS, (char *)"MDArray_DeleteNoDataValue(MDArray self) -> CPLErr"},
 	 { (char *)"MDArray_GetOffset", _wrap_MDArray_GetOffset, METH_VARARGS, (char *)"MDArray_GetOffset(MDArray self)"},
@@ -45534,7 +45538,10 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"ExtendedDataType_GetNumericDataType", _wrap_ExtendedDataType_GetNumericDataType, METH_VARARGS, (char *)"ExtendedDataType_GetNumericDataType(ExtendedDataType self) -> GDALDataType"},
 	 { (char *)"ExtendedDataType_GetSize", _wrap_ExtendedDataType_GetSize, METH_VARARGS, (char *)"ExtendedDataType_GetSize(ExtendedDataType self) -> size_t"},
 	 { (char *)"ExtendedDataType_GetMaxStringLength", _wrap_ExtendedDataType_GetMaxStringLength, METH_VARARGS, (char *)"ExtendedDataType_GetMaxStringLength(ExtendedDataType self) -> size_t"},
+<<<<<<< HEAD
 	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 	 { (char *)"ExtendedDataType_GetComponents", _wrap_ExtendedDataType_GetComponents, METH_VARARGS, (char *)"ExtendedDataType_GetComponents(ExtendedDataType self)"},
 	 { (char *)"ExtendedDataType_CanConvertTo", _wrap_ExtendedDataType_CanConvertTo, METH_VARARGS, (char *)"ExtendedDataType_CanConvertTo(ExtendedDataType self, ExtendedDataType other) -> bool"},
 	 { (char *)"ExtendedDataType_Equals", _wrap_ExtendedDataType_Equals, METH_VARARGS, (char *)"ExtendedDataType_Equals(ExtendedDataType self, ExtendedDataType other) -> bool"},
