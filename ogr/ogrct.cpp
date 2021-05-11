@@ -543,8 +543,13 @@ class OGRProjCT : public OGRCoordinateTransformation
             reset();
         }
         PjPtr(const PjPtr& other) :
+<<<<<<< HEAD:ogr/ogrct.cpp
             m_pj((other.m_pj != nullptr) ?
                  (proj_clone(OSRGetProjTLSContext(), other.m_pj)) :
+=======
+            m_pj((other.m_pj != nullptr) ? 
+                 (proj_clone(OSRGetProjTLSContext(), other.m_pj)) : 
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/ogr/ogrct.cpp
                  (nullptr))
         {}
         PjPtr(PjPtr&& other) :
@@ -557,8 +562,13 @@ class OGRProjCT : public OGRCoordinateTransformation
             if(this != &other)
             {
                 reset();
+<<<<<<< HEAD:ogr/ogrct.cpp
                 m_pj = (other.m_pj != nullptr) ?
                        (proj_clone(OSRGetProjTLSContext(), other.m_pj)) :
+=======
+                m_pj = (other.m_pj != nullptr) ? 
+                       (proj_clone(OSRGetProjTLSContext(), other.m_pj)) : 
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/ogr/ogrct.cpp
                        (nullptr);
             }
             return *this;
@@ -1068,6 +1078,27 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
 }
 
 /************************************************************************/
+/*                              OCTClone()                              */
+/************************************************************************/
+
+/**
+ * Clone transformation object.
+ *
+ * This is the same as the C++ function OGRCreateCoordinateTransformation::Clone
+
+ * @since GDAL 3.4
+ */
+
+OGRCoordinateTransformationH
+OCTClone(OGRCoordinateTransformationH hTransform)
+
+{
+    VALIDATE_POINTER1( hTransform, "OCTClone", nullptr );
+    return OGRCoordinateTransformation::ToHandle(
+        OGRCoordinateTransformation::FromHandle(hTransform)->Clone());
+}
+
+/************************************************************************/
 /*                             OGRProjCT()                             */
 /************************************************************************/
 
@@ -1080,19 +1111,29 @@ OGRProjCT::OGRProjCT()
 /*                  OGRProjCT(const OGRProjCT& other)                   */
 /************************************************************************/
 
+<<<<<<< HEAD:ogr/ogrct.cpp
+=======
+//! @cond Doxygen_Suppress
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/ogr/ogrct.cpp
 OGRProjCT::OGRProjCT(const OGRProjCT& other) :
     poSRSSource((other.poSRSSource != nullptr) ? (other.poSRSSource->Clone()) : (nullptr)),
     bSourceLatLong(other.bSourceLatLong),
     bSourceWrap(other.bSourceWrap),
     dfSourceWrapLong(other.dfSourceWrapLong),
+<<<<<<< HEAD:ogr/ogrct.cpp
     bSourceIsDynamicCRS(other.bSourceIsDynamicCRS),
     dfSourceCoordinateEpoch(other.dfSourceCoordinateEpoch),
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/ogr/ogrct.cpp
     poSRSTarget((other.poSRSTarget != nullptr) ? (other.poSRSTarget->Clone()) : (nullptr)),
     bTargetLatLong(other.bTargetLatLong),
     bTargetWrap(other.bTargetWrap),
     dfTargetWrapLong(other.dfTargetWrapLong),
+<<<<<<< HEAD:ogr/ogrct.cpp
     bTargetIsDynamicCRS(other.bTargetIsDynamicCRS),
     dfTargetCoordinateEpoch(other.dfTargetCoordinateEpoch),
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/ogr/ogrct.cpp
     bWebMercatorToWGS84LongLat(other.bWebMercatorToWGS84LongLat),
     nErrorCount(other.nErrorCount),
     dfThreshold(other.dfThreshold),
@@ -3109,6 +3150,30 @@ int OGRProjCT::TransformBounds(
     return true;
 }
 
+
+/************************************************************************/
+/*                               Clone()                                */
+/************************************************************************/
+
+OGRCoordinateTransformation* OGRProjCT::Clone() const
+{
+     std::unique_ptr<OGRProjCT> poNewCT(new OGRProjCT(*this));
+#if (PROJ_VERSION_MAJOR * 10000 + PROJ_VERSION_MINOR * 100 + PROJ_VERSION_PATCH) < 80001
+    // See https://github.com/OSGeo/PROJ/pull/2582
+    // This may fail before PROJ 8.0.1 if the m_pj object is a "meta"
+    // operation being a set of real operations
+    bool bCloneDone = ((m_pj == nullptr) == (poNewCT->m_pj == nullptr));
+    if(!bCloneDone)
+    {
+        poNewCT.reset(new OGRProjCT());
+        if(!poNewCT->Initialize(poSRSSource, poSRSTarget, m_options))
+        {
+            return nullptr;
+        }
+    }
+#endif //PROJ_VERSION
+    return poNewCT.release();
+}
 
 /************************************************************************/
 /*                               Clone()                                */

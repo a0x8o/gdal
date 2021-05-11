@@ -35,7 +35,10 @@ import gdaltest
 import os
 import pytest
 import shutil
+<<<<<<< HEAD
 import stat
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
 import struct
 import sys
 
@@ -1719,7 +1722,14 @@ def test_netcdf_multidim_getresampled_with_geoloc():
     assert warped_ds.ReadRaster() == resampled_ar.Read()
 
 
+<<<<<<< HEAD
 def test_netcdf_multidim_cache():
+=======
+def test_netcdf_multidim_cache(netcdf_setup):  # noqa
+
+    if not gdaltest.netcdf_drv_has_nc4:
+        pytest.skip()
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
 
     tmpfilename = 'tmp/test.nc'
     shutil.copy('data/netcdf/alldatatypes.nc', tmpfilename)
@@ -1788,6 +1798,7 @@ def test_netcdf_multidim_cache():
 
     gdal.Unlink(tmpfilename)
     gdal.Unlink(tmpfilename + ".gmac")
+<<<<<<< HEAD
 
 
 def test_netcdf_multidim_cache_pamproxydb():
@@ -1914,3 +1925,5 @@ def test_netcdf_multidim_open_char_2d_zero_dim():
     assert ar
     ar.GetNoDataValueAsRaw()
     ar.GetBlockSize()
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)

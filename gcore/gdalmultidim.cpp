@@ -35,7 +35,10 @@
 
 #include <ctype.h> // isalnum
 
+<<<<<<< HEAD:gcore/gdalmultidim.cpp
 #include "cpl_error_internal.h"
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/gcore/gdalmultidim.cpp
 #include "gdal_priv.h"
 #include "gdal_pam.h"
 #include "gdal_utils.h"
@@ -3598,8 +3601,12 @@ bool GDALMDArray::IAdviseRead(const GUInt64*, const size_t*, CSLConstList /* pap
 /*                            MassageName()                             */
 /************************************************************************/
 
+<<<<<<< HEAD:gcore/gdalmultidim.cpp
 //! @cond Doxygen_Suppress
 /*static*/ std::string GDALMDArray::MassageName(const std::string& inputName)
+=======
+static std::string MassageName(const std::string& inputName)
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/gcore/gdalmultidim.cpp
 {
     std::string ret;
     for( const char ch: inputName )
@@ -3611,6 +3618,7 @@ bool GDALMDArray::IAdviseRead(const GUInt64*, const size_t*, CSLConstList /* pap
     }
     return ret;
 }
+<<<<<<< HEAD:gcore/gdalmultidim.cpp
 //! @endcond
 
 /************************************************************************/
@@ -3692,6 +3700,8 @@ std::shared_ptr<GDALGroup> GDALMDArray::GetCacheRootGroup(bool bCanCreate,
     return nullptr;
 }
 //! @endcond
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/gcore/gdalmultidim.cpp
 
 /************************************************************************/
 /*                              Cache()                                 */
@@ -3705,11 +3715,14 @@ std::shared_ptr<GDALGroup> GDALMDArray::GetCacheRootGroup(bool bCanCreate,
  * The array will be stored in a file whose name is the one of
  * GetFilename(), with an extra .gmac extension (stands for GDAL Multidimensional
  * Array Cache). The cache is a netCDF dataset.
+<<<<<<< HEAD:gcore/gdalmultidim.cpp
  *
  * If the .gmac file cannot be written next to the dataset, the
  * GDAL_PAM_PROXY_DIR will be used, if set, to write the cache file into that
  * directory.
  *
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/gcore/gdalmultidim.cpp
  * The GDALMDArray::Read() method will automatically use the cache when it exists.
  * There is no timestamp checks between the source array and the cached array.
  * If the source arrays changes, the cache must be manually deleted.
@@ -3725,10 +3738,45 @@ std::shared_ptr<GDALGroup> GDALMDArray::GetCacheRootGroup(bool bCanCreate,
  */
 bool GDALMDArray::Cache( CSLConstList papszOptions ) const
 {
+<<<<<<< HEAD:gcore/gdalmultidim.cpp
     std::string osCacheFilename;
     auto poRG = GetCacheRootGroup(true, osCacheFilename);
     if( !poRG )
         return false;
+=======
+    const auto& osFilename = GetFilename();
+    if( osFilename.empty() )
+    {
+        CPLError(CE_Failure, CPLE_AppDefined,
+                 "Cannot cache an array with an empty filename");
+        return false;
+    }
+    const char* pszDrvName = "netCDF";
+    GDALDriver* poDrv = GetGDALDriverManager()->GetDriverByName(pszDrvName);
+    if( poDrv == nullptr )
+    {
+        CPLError(CE_Failure, CPLE_AppDefined,
+                 "Cannot get driver %s", pszDrvName);
+        return false;
+    }
+    const auto osCacheFilename = osFilename + ".gmac";
+    GDALOpenInfo oOpenInfo(osCacheFilename.c_str(),
+                           GDAL_OF_MULTIDIM_RASTER | GDAL_OF_UPDATE);
+    std::unique_ptr<GDALDataset> poDS(poDrv->pfnOpen( &oOpenInfo));
+    if( !poDS )
+    {
+        poDS.reset(poDrv->CreateMultiDimensional(osCacheFilename.c_str(),
+                                                 nullptr, nullptr));
+        if( !poDS )
+        {
+            CPLError(CE_Failure, CPLE_AppDefined,
+                     "Cannot create %s", osCacheFilename.c_str());
+            return false;
+        }
+    }
+    auto poRG = poDS->GetRootGroup();
+    assert( poRG );
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/gcore/gdalmultidim.cpp
 
     const std::string osCachedArrayName(MassageName(GetFullName()));
     if( poRG->OpenMDArray(osCachedArrayName) )
@@ -3810,6 +3858,7 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
                       const void* pDstBufferAllocStart,
                       size_t nDstBufferAllocSize) const
 {
+<<<<<<< HEAD:gcore/gdalmultidim.cpp
     if( !m_bHasTriedCachedArray )
     {
         m_bHasTriedCachedArray = true;
@@ -3852,6 +3901,44 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
                                      osCacheFilename.c_str());
                             m_poCachedArray.reset();
                         }
+=======
+    const auto& osFilename = GetFilename();
+    if( !m_bHasTriedCachedArray && !osFilename.empty() )
+    {
+        m_bHasTriedCachedArray = true;
+        if( !EQUAL(CPLGetExtension(osFilename.c_str()), "gmac") )
+        {
+            const auto osCacheFilename = osFilename + ".gmac";
+            std::unique_ptr<GDALDataset> poDS(GDALDataset::Open(
+                            osCacheFilename.c_str(), GDAL_OF_MULTIDIM_RASTER));
+            if( poDS )
+            {
+                auto poRG = poDS->GetRootGroup();
+                assert( poRG );
+
+                const std::string osCachedArrayName(MassageName(GetFullName()));
+                m_poCachedArray = poRG->OpenMDArray(osCachedArrayName);
+                if( m_poCachedArray )
+                {
+                    const auto& dims = GetDimensions();
+                    const auto& cachedDims = m_poCachedArray->GetDimensions();
+                    const size_t nDims = dims.size();
+                    bool ok =
+                        m_poCachedArray->GetDataType() == GetDataType() &&
+                        cachedDims.size() == nDims;
+                    for( size_t i = 0; ok && i < nDims; ++i )
+                    {
+                        ok = dims[i]->GetSize() == cachedDims[i]->GetSize();
+                    }
+                    if( !ok )
+                    {
+                        CPLError(CE_Warning, CPLE_AppDefined,
+                                 "Cached array %s in %s has incompatible "
+                                 "characteristics with current array.",
+                                 osCachedArrayName.c_str(),
+                                 osCacheFilename.c_str());
+                        m_poCachedArray.reset();
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/gcore/gdalmultidim.cpp
                     }
                 }
             }

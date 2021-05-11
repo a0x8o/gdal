@@ -6769,12 +6769,16 @@ NetCDFFormatEnum netCDFDataset::IdentifyFormat( GDALOpenInfo *poOpenInfo,
                   EQUAL(pszExtension, "nc2") || EQUAL(pszExtension, "nc4") ||
                   EQUAL(pszExtension, "nc3") || EQUAL(pszExtension, "grd") ||
                   EQUAL(pszExtension, "gmac") ) )
+<<<<<<< HEAD:frmts/netcdf/netcdfdataset.cpp
             {
                 if( GDALGetDriverByName("HDF5") != nullptr )
                 {
                     return NCDF_FORMAT_HDF5;
                 }
             }
+=======
+                return NCDF_FORMAT_HDF5;
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/frmts/netcdf/netcdfdataset.cpp
         }
 #endif
 
