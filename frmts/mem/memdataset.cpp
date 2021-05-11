@@ -1652,7 +1652,14 @@ public:
 >>>>>>> 5d1d6dfdab (Merge pull request #3822 from rouault/gml_srs)
 =======
 <<<<<<< HEAD:frmts/mem/memdataset.cpp
+<<<<<<< HEAD
 >>>>>>> a153e8e338 (Docker: alpine-normal: add lzma support [ci skip])
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD:frmts/mem/memdataset.cpp
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 =======
 /*                               MEMGroup                               */
 /************************************************************************/
@@ -1910,6 +1917,7 @@ public:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memdataset.cpp
 <<<<<<< HEAD
@@ -1947,6 +1955,8 @@ public:
 =======
 >>>>>>> fc56cc00f1 (Docker: alpine-normal: add lzma support [ci skip])
 =======
+>>>>>>> 10915dbdc5 (Merge pull request #3822 from rouault/gml_srs)
+=======
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memdataset.cpp
 =======
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
@@ -1957,7 +1967,20 @@ public:
 =======
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memdataset.cpp
 >>>>>>> a153e8e338 (Docker: alpine-normal: add lzma support [ci skip])
+<<<<<<< HEAD
 >>>>>>> fc56cc00f1 (Docker: alpine-normal: add lzma support [ci skip])
+=======
+=======
+=======
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memdataset.cpp
+<<<<<<< HEAD
+>>>>>>> OSGeo-master:frmts/mem/memdataset.cpp
+=======
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> df05d90486 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> 10915dbdc5 (Merge pull request #3822 from rouault/gml_srs)
 /*                           GetMDArrayNames()                          */
 /************************************************************************/
 
