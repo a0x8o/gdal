@@ -382,8 +382,11 @@ namespace tut
     }
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
 
     // Test OGRCoordinateTransformation in pure "C" API
     // OCTClone/OCTGetSourceCS/OCTGetTargetCS/OCTGetInverse
@@ -423,8 +426,13 @@ namespace tut
         OSRDestroySpatialReference(hTarget);
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
 =======
 >>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
 } // namespace tut
