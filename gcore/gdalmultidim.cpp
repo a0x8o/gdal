@@ -3866,7 +3866,18 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
 =======
 <<<<<<< HEAD:gcore/gdalmultidim.cpp
+<<<<<<< HEAD
 >>>>>>> a153e8e338 (Docker: alpine-normal: add lzma support [ci skip])
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD:gcore/gdalmultidim.cpp
+<<<<<<< HEAD
+>>>>>>> OSGeo-master:gcore/gdalmultidim.cpp
+=======
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> df05d90486 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
     if( !m_bHasTriedCachedArray )
     {
         m_bHasTriedCachedArray = true;
@@ -3914,6 +3925,9 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
     if( !m_bHasTriedCachedArray && !osFilename.empty() )
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
 =======
     if( !m_bHasTriedCachedArray )
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/gcore/gdalmultidim.cpp
@@ -3968,7 +3982,36 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
 =======
 <<<<<<< HEAD:gcore/gdalmultidim.cpp
+<<<<<<< HEAD
 >>>>>>> a153e8e338 (Docker: alpine-normal: add lzma support [ci skip])
+=======
+=======
+    {
+        m_bHasTriedCachedArray = true;
+        if( !EQUAL(CPLGetExtension(osFilename.c_str()), "gmac") )
+        {
+            const auto osCacheFilename = osFilename + ".gmac";
+            std::unique_ptr<GDALDataset> poDS(GDALDataset::Open(
+                            osCacheFilename.c_str(), GDAL_OF_MULTIDIM_RASTER));
+            if( poDS )
+            {
+                auto poRG = poDS->GetRootGroup();
+                assert( poRG );
+
+                const std::string osCachedArrayName(MassageName(GetFullName()));
+                m_poCachedArray = poRG->OpenMDArray(osCachedArrayName);
+                if( m_poCachedArray )
+                {
+                    const auto& dims = GetDimensions();
+                    const auto& cachedDims = m_poCachedArray->GetDimensions();
+                    const size_t nDims = dims.size();
+                    bool ok =
+                        m_poCachedArray->GetDataType() == GetDataType() &&
+                        cachedDims.size() == nDims;
+                    for( size_t i = 0; ok && i < nDims; ++i )
+                    {
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
                         ok = dims[i]->GetSize() == cachedDims[i]->GetSize();
                     }
                     if( !ok )
@@ -3982,8 +4025,11 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/gcore/gdalmultidim.cpp
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> a153e8e338 (Docker: alpine-normal: add lzma support [ci skip])
+=======
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
 =======
                         const auto& dims = GetDimensions();
                         const auto& cachedDims = m_poCachedArray->GetDimensions();
@@ -4006,10 +4052,18 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
                         }
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/gcore/gdalmultidim.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
 =======
 >>>>>>> a153e8e338 (Docker: alpine-normal: add lzma support [ci skip])
+=======
+>>>>>>> OSGeo-master:gcore/gdalmultidim.cpp
+=======
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> df05d90486 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
                     }
                 }
             }
