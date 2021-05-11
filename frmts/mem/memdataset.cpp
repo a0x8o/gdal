@@ -1333,6 +1333,7 @@ GDALDataset *MEMDataset::Create( const char * /* pszFilename */,
 <<<<<<< HEAD:frmts/mem/memdataset.cpp
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:frmts/mem/memdataset.cpp
 =======
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
@@ -1352,6 +1353,8 @@ GDALDataset *MEMDataset::Create( const char * /* pszFilename */,
 =======
 <<<<<<< HEAD:frmts/mem/memdataset.cpp
 >>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 =======
 /*                               MEMGroup                               */
 /************************************************************************/
@@ -1605,6 +1608,7 @@ public:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memdataset.cpp
 =======
@@ -1635,6 +1639,8 @@ public:
 >>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
 >>>>>>> d263d6ecd7 (Docker: alpine-normal: add lzma support [ci skip])
 >>>>>>> 9b650fdeac (Docker: alpine-normal: add lzma support [ci skip])
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 /*                           GetMDArrayNames()                          */
 /************************************************************************/
 

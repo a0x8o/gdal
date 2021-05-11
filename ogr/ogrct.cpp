@@ -546,6 +546,7 @@ class OGRProjCT : public OGRCoordinateTransformation
 <<<<<<< HEAD:ogr/ogrct.cpp
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:ogr/ogrct.cpp
 =======
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
@@ -568,12 +569,15 @@ class OGRProjCT : public OGRCoordinateTransformation
 <<<<<<< HEAD:ogr/ogrct.cpp
 >>>>>>> 4a3a424d06 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> d9b2222466 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
             m_pj((other.m_pj != nullptr) ?
                  (proj_clone(OSRGetProjTLSContext(), other.m_pj)) :
 =======
             m_pj((other.m_pj != nullptr) ? 
                  (proj_clone(OSRGetProjTLSContext(), other.m_pj)) : 
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/ogr/ogrct.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -615,6 +619,8 @@ class OGRProjCT : public OGRCoordinateTransformation
 >>>>>>> 4a3a424d06 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 15befc7cef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> d9b2222466 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
                  (nullptr))
         {}
         PjPtr(PjPtr&& other) :
@@ -630,6 +636,7 @@ class OGRProjCT : public OGRCoordinateTransformation
 <<<<<<< HEAD:ogr/ogrct.cpp
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:ogr/ogrct.cpp
 =======
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
@@ -652,12 +659,15 @@ class OGRProjCT : public OGRCoordinateTransformation
 <<<<<<< HEAD:ogr/ogrct.cpp
 >>>>>>> 4a3a424d06 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> d9b2222466 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
                 m_pj = (other.m_pj != nullptr) ?
                        (proj_clone(OSRGetProjTLSContext(), other.m_pj)) :
 =======
                 m_pj = (other.m_pj != nullptr) ? 
                        (proj_clone(OSRGetProjTLSContext(), other.m_pj)) : 
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/ogr/ogrct.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -699,6 +709,8 @@ class OGRProjCT : public OGRCoordinateTransformation
 >>>>>>> 4a3a424d06 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 15befc7cef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> d9b2222466 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
                        (nullptr);
             }
             return *this;
@@ -1219,6 +1231,7 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
 =======
@@ -1249,6 +1262,9 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
  *
 >>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
  * @since GDAL 3.4
  */
 
@@ -1262,6 +1278,7 @@ OCTClone(OGRCoordinateTransformationH hTransform)
 }
 
 /************************************************************************/
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1488,6 +1505,8 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
 >>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 913c3ef6c1 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 /*                             OGRProjCT()                             */
 /************************************************************************/
 
