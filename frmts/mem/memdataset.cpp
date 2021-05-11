@@ -1637,6 +1637,7 @@ public:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:frmts/mem/memdataset.cpp
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
@@ -1658,6 +1659,8 @@ public:
 =======
 =======
 >>>>>>> fc56cc00f1 (Docker: alpine-normal: add lzma support [ci skip])
+=======
+>>>>>>> 9bf6f4fb10 (Merge pull request #3822 from rouault/gml_srs)
 <<<<<<< HEAD:frmts/mem/memdataset.cpp
 =======
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
@@ -1678,6 +1681,8 @@ public:
 =======
 <<<<<<< HEAD:frmts/mem/memdataset.cpp
 >>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 =======
 /*                               MEMGroup                               */
 /************************************************************************/
@@ -1937,6 +1942,9 @@ public:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9bf6f4fb10 (Merge pull request #3822 from rouault/gml_srs)
 =======
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memdataset.cpp
 <<<<<<< HEAD
@@ -1960,6 +1968,7 @@ public:
 >>>>>>> 9b650fdeac (Docker: alpine-normal: add lzma support [ci skip])
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memdataset.cpp
@@ -2017,6 +2026,8 @@ public:
 >>>>>>> d263d6ecd7 (Docker: alpine-normal: add lzma support [ci skip])
 >>>>>>> 9b650fdeac (Docker: alpine-normal: add lzma support [ci skip])
 >>>>>>> 7c32ccac5a (Docker: alpine-normal: add lzma support [ci skip])
+=======
+>>>>>>> 9bf6f4fb10 (Merge pull request #3822 from rouault/gml_srs)
 /*                           GetMDArrayNames()                          */
 /************************************************************************/
 
