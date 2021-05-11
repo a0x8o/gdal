@@ -268,13 +268,21 @@ namespace tut
                            const double xSrc, const double ySrc)
     {
         ensure(poCT != nullptr);
+<<<<<<< HEAD
         ensure((poCT->GetSourceCS() == nullptr) ==
+=======
+        ensure((poCT->GetSourceCS() == nullptr) == 
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
                (poSRSSource == nullptr) );
         if(poSRSSource != nullptr)
         {
             ensure(poCT->GetSourceCS()->IsSame(poSRSSource));
         }
+<<<<<<< HEAD
         ensure((poCT->GetTargetCS() == nullptr) ==
+=======
+        ensure((poCT->GetTargetCS() == nullptr) == 
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
                (poSRSTarget == nullptr));
         if(poSRSTarget != nullptr)
         {
@@ -289,13 +297,21 @@ namespace tut
         auto poClone =std::unique_ptr<OGRCoordinateTransformation>(
             poCT->Clone());
         ensure(poClone != nullptr );
+<<<<<<< HEAD
         ensure((poClone->GetSourceCS() == nullptr) ==
+=======
+        ensure((poClone->GetSourceCS() == nullptr) == 
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
                (poSRSSource == nullptr));
         if(poSRSSource != nullptr)
         {
             ensure(poClone->GetSourceCS()->IsSame(poSRSSource));
         }
+<<<<<<< HEAD
         ensure((poClone->GetTargetCS() == nullptr) ==
+=======
+        ensure((poClone->GetTargetCS() == nullptr) == 
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
                (poSRSTarget == nullptr));
         if(poSRSTarget != nullptr)
         {
@@ -304,10 +320,17 @@ namespace tut
         x = xSrc;
         y = ySrc;
         ensure(poClone->Transform(1, &x, &y));
+<<<<<<< HEAD
         ensure(fabs(x - xTransformed) < 1e-15);
         ensure(fabs(y - yTransformed) < 1e-15);
     }
 
+=======
+        ensure(abs(x - xTransformed) < 1e-15);
+        ensure(abs(y - yTransformed) < 1e-15);
+    }
+    
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
     // Test OGRCoordinateTransformation::Clone() with usual case
     template<>
     template<>
@@ -357,6 +380,7 @@ namespace tut
 
         test_clone(poCT.get(), &oSRSSource, &oSRSTarget, 44, -60);
     }
+<<<<<<< HEAD
 
     // Test OGRCoordinateTransformation in pure "C" API
     // OCTClone/OCTGetSourceCS/OCTGetTargetCS/OCTGetInverse
@@ -395,4 +419,6 @@ namespace tut
         OSRDestroySpatialReference(hSource);
         OSRDestroySpatialReference(hTarget);
     }
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
 } // namespace tut

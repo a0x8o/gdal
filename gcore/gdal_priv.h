@@ -2434,6 +2434,9 @@ class CPL_DLL GDALMDArray: virtual public GDALAbstractMDArray, public GDALIHasAt
     mutable bool m_bHasTriedCachedArray = false;
     mutable std::shared_ptr<GDALMDArray> m_poCachedArray{};
 
+    mutable bool m_bHasTriedCachedArray = false;
+    mutable std::shared_ptr<GDALMDArray> m_poCachedArray{};
+
 protected:
 //! @cond Doxygen_Suppress
     GDALMDArray(const std::string& osParentName, const std::string& osName);
@@ -2474,10 +2477,14 @@ public:
      *
      * This is used in particular for caching.
      *
+<<<<<<< HEAD:gcore/gdal_priv.h
      * Might be empty if the array is not linked to a file.
      *
      * @since GDAL 3.4
      */
+=======
+     * Might be empty if the array is not linked to a file. */
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/gcore/gdal_priv.h
     virtual const std::string& GetFilename() const = 0;
 
     virtual CSLConstList GetStructuralInfo() const;

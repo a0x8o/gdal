@@ -1516,7 +1516,10 @@ struct GRIBSharedResource
     vsi_l_offset m_nOffsetCurData = static_cast<vsi_l_offset>(-1);
     std::vector<double> m_adfCurData{};
     std::string m_osFilename;
+<<<<<<< HEAD:frmts/grib/gribdataset.cpp
     std::shared_ptr<GDALPamMultiDim> m_poPAM{};
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/frmts/grib/gribdataset.cpp
 
     GRIBSharedResource(const std::string& osFilename,
                        VSILFILE* fp);
@@ -2173,8 +2176,13 @@ bool GRIBArray::IRead(const GUInt64* arrayStartIdx,
 GDALDataset *GRIBDataset::OpenMultiDim( GDALOpenInfo *poOpenInfo )
 
 {
+<<<<<<< HEAD:frmts/grib/gribdataset.cpp
     auto poShared = std::make_shared<GRIBSharedResource>(poOpenInfo->pszFilename,
                                                          poOpenInfo->fpL);
+=======
+    auto poShared = std::make_shared<GRIBSharedResource>(poOpenInfo->fpL);
+    poShared->m_osFilename = poOpenInfo->pszFilename;
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/frmts/grib/gribdataset.cpp
     auto poRootGroup = std::make_shared<GRIBGroup>(poShared);
     poOpenInfo->fpL = nullptr;
 
