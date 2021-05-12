@@ -198,6 +198,7 @@ the health of the project:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:doc/source/sponsors/index.rst
 =======
 >>>>>>> 0783563b99 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
@@ -218,6 +219,11 @@ the health of the project:
 =======
 <<<<<<< HEAD:doc/source/sponsors/index.rst
 >>>>>>> 1621b7e0e4 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:doc/source/sponsors/index.rst
+=======
+>>>>>>> 0783563b99 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
+>>>>>>> 725d808b16 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
         `Kaplan Open Source Consulting <https://kaplanopensource.co.il/>`__
 
     .. container:: horizontal-logo
@@ -232,11 +238,15 @@ the health of the project:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 725d808b16 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
 =======
         `Space Intelligence <https://www.space-intelligence.com>`__
 >>>>>>> f89730514c (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/sponsors/index.rst
 =======
 >>>>>>> 0783563b99 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 200c12544e (Merge pull request #3834 from talos-gis/locationinfo_fixes)
@@ -266,6 +276,8 @@ the health of the project:
         `Space Intelligence <https://www.space-intelligence.com>`__
 >>>>>>> f89730514c (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/sponsors/index.rst
 >>>>>>> 1621b7e0e4 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 725d808b16 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
 
     .. container:: horizontal-logo
 

@@ -370,11 +370,15 @@ def get_band_nums(ds: gdal.Dataset, band_nums: Optional[MaybeSequence[int]] = No
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 725d808b16 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 =======
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 =======
 >>>>>>> 0783563b99 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 =======
@@ -418,6 +422,8 @@ def get_band_nums(ds: gdal.Dataset, band_nums: Optional[MaybeSequence[int]] = No
 =======
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 >>>>>>> 7d85c89fbb (Docker: alpine-normal: add lzma support [ci skip])
+=======
+>>>>>>> 725d808b16 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
 def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] = None, ovr_idx: Optional[int] = None) \
             -> List[gdal.Band]:
     """
@@ -428,6 +434,7 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
            Note: uses different numbering then GDAL API itself. read docs of: `get_ovr_idx`
     :return:
     """
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -459,12 +466,15 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
 >>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
 =======
 >>>>>>> 7d85c89fbb (Docker: alpine-normal: add lzma support [ci skip])
+=======
+>>>>>>> 725d808b16 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 =======
 def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] = None, ovr_idx: Optional[int] = None) -> List[gdal.Band]:
 >>>>>>> b6b690a901 (Merge pull request #3834 from talos-gis/locationinfo_fixes):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 =======
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -479,9 +489,12 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
 =======
 >>>>>>> d263d6ecd7 (Docker: alpine-normal: add lzma support [ci skip])
 =======
+>>>>>>> 725d808b16 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
+=======
 =======
 def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] = None, ovr_idx: Optional[int] = None) -> List[gdal.Band]:
 >>>>>>> b6b690a901 (Merge pull request #3834 from talos-gis/locationinfo_fixes):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 0783563b99 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
 =======
@@ -512,6 +525,9 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
 >>>>>>> 15708956af (Merge pull request #3834 from talos-gis/locationinfo_fixes)
 =======
 >>>>>>> 7d85c89fbb (Docker: alpine-normal: add lzma support [ci skip])
+=======
+>>>>>>> 0783563b99 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
+>>>>>>> 725d808b16 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
     ds = open_ds(filename_or_ds)
     band_nums = get_band_nums(ds, band_nums)
     bands = []
