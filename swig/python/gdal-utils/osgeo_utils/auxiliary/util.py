@@ -32,6 +32,7 @@
 import os
 from numbers import Real
 from typing import Optional, Union, Sequence, Tuple, Dict, Any, Iterator, List
+from warnings import warn
 
 from osgeo import gdal, __version__ as gdal_version_str
 from osgeo_utils.auxiliary.base import get_extension, is_path_like, PathLikeOrStr, enum_to_str, OptionalBoolStr, \
@@ -360,6 +361,7 @@ def get_band_nums(ds: gdal.Dataset, band_nums: Optional[MaybeSequence[int]] = No
     return band_nums
 
 
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] = None, ovr_idx: Optional[int] = None) \
             -> List[gdal.Band]:
     """
@@ -370,6 +372,9 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
            Note: uses different numbering then GDAL API itself. read docs of: `get_ovr_idx`
     :return:
     """
+=======
+def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] = None, ovr_idx: Optional[int] = None) -> List[gdal.Band]:
+>>>>>>> b6b690a901 (Merge pull request #3834 from talos-gis/locationinfo_fixes):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
     ds = open_ds(filename_or_ds)
     band_nums = get_band_nums(ds, band_nums)
     bands = []
