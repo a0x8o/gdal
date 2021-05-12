@@ -138,11 +138,15 @@ the health of the project:
 
     .. container:: horizontal-logo
 
+<<<<<<< HEAD:doc/source/sponsors/index.rst
         `Kaplan Open Source Consulting <https://kaplanopensource.co.il/>`__
 
     .. container:: horizontal-logo
 
         `Space Intelligence <https://www.space-intelligence.com>`__
+=======
+        `Space Intelligence <https://www.space-intelligence.com//>`__
+>>>>>>> b6b690a901 (Merge pull request #3834 from talos-gis/locationinfo_fixes):gdal/doc/source/sponsors/index.rst
 
     .. container:: horizontal-logo
 
