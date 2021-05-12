@@ -364,10 +364,16 @@ def get_band_nums(ds: gdal.Dataset, band_nums: Optional[MaybeSequence[int]] = No
 <<<<<<< HEAD:gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 =======
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+<<<<<<< HEAD
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 =======
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+=======
+=======
+>>>>>>> f7763b4927 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
+>>>>>>> 480c356c32 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
 def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] = None, ovr_idx: Optional[int] = None) \
             -> List[gdal.Band]:
     """
@@ -378,15 +384,27 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
            Note: uses different numbering then GDAL API itself. read docs of: `get_ovr_idx`
     :return:
     """
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 =======
+=======
+<<<<<<< HEAD
+>>>>>>> 480c356c32 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 =======
 def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] = None, ovr_idx: Optional[int] = None) -> List[gdal.Band]:
 >>>>>>> b6b690a901 (Merge pull request #3834 from talos-gis/locationinfo_fixes):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 =======
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+=======
+=======
+=======
+def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] = None, ovr_idx: Optional[int] = None) -> List[gdal.Band]:
+>>>>>>> b6b690a901 (Merge pull request #3834 from talos-gis/locationinfo_fixes):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+>>>>>>> f7763b4927 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
+>>>>>>> 480c356c32 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
     ds = open_ds(filename_or_ds)
     band_nums = get_band_nums(ds, band_nums)
     bands = []
