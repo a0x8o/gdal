@@ -181,6 +181,7 @@ the health of the project:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:doc/source/sponsors/index.rst
 =======
 >>>>>>> 0783563b99 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
@@ -196,6 +197,8 @@ the health of the project:
 >>>>>>> 200c12544e (Merge pull request #3834 from talos-gis/locationinfo_fixes)
 =======
 >>>>>>> f7763b4927 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
+=======
+>>>>>>> 15708956af (Merge pull request #3834 from talos-gis/locationinfo_fixes)
         `Kaplan Open Source Consulting <https://kaplanopensource.co.il/>`__
 
     .. container:: horizontal-logo
@@ -204,6 +207,7 @@ the health of the project:
 =======
         `Space Intelligence <https://www.space-intelligence.com//>`__
 >>>>>>> b6b690a901 (Merge pull request #3834 from talos-gis/locationinfo_fixes):gdal/doc/source/sponsors/index.rst
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -235,6 +239,8 @@ the health of the project:
 >>>>>>> 200c12544e (Merge pull request #3834 from talos-gis/locationinfo_fixes)
 =======
 >>>>>>> f7763b4927 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
+=======
+>>>>>>> 15708956af (Merge pull request #3834 from talos-gis/locationinfo_fixes)
 
     .. container:: horizontal-logo
 
