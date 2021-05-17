@@ -3860,9 +3860,13 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
 {
 <<<<<<< HEAD:gcore/gdalmultidim.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gcore/gdalmultidim.cpp
 =======
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+=======
+<<<<<<< HEAD:gcore/gdalmultidim.cpp
+>>>>>>> a153e8e338 (Docker: alpine-normal: add lzma support [ci skip])
     if( !m_bHasTriedCachedArray )
     {
         m_bHasTriedCachedArray = true;
@@ -3909,6 +3913,7 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
     const auto& osFilename = GetFilename();
     if( !m_bHasTriedCachedArray && !osFilename.empty() )
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     if( !m_bHasTriedCachedArray )
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/gcore/gdalmultidim.cpp
@@ -3934,31 +3939,36 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
                     {
 <<<<<<< HEAD:gcore/gdalmultidim.cpp
 =======
+=======
+=======
+    if( !m_bHasTriedCachedArray )
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/gcore/gdalmultidim.cpp
+>>>>>>> a153e8e338 (Docker: alpine-normal: add lzma support [ci skip])
     {
         m_bHasTriedCachedArray = true;
-        if( !EQUAL(CPLGetExtension(osFilename.c_str()), "gmac") )
+        if( IsCacheable() )
         {
-            const auto osCacheFilename = osFilename + ".gmac";
-            std::unique_ptr<GDALDataset> poDS(GDALDataset::Open(
-                            osCacheFilename.c_str(), GDAL_OF_MULTIDIM_RASTER));
-            if( poDS )
+            const auto& osFilename = GetFilename();
+            if( !osFilename.empty() &&
+                !EQUAL(CPLGetExtension(osFilename.c_str()), "gmac") )
             {
-                auto poRG = poDS->GetRootGroup();
-                assert( poRG );
-
-                const std::string osCachedArrayName(MassageName(GetFullName()));
-                m_poCachedArray = poRG->OpenMDArray(osCachedArrayName);
-                if( m_poCachedArray )
+                const auto osCacheFilename = osFilename + ".gmac";
+                std::unique_ptr<GDALDataset> poDS(GDALDataset::Open(
+                                osCacheFilename.c_str(), GDAL_OF_MULTIDIM_RASTER));
+                if( poDS )
                 {
-                    const auto& dims = GetDimensions();
-                    const auto& cachedDims = m_poCachedArray->GetDimensions();
-                    const size_t nDims = dims.size();
-                    bool ok =
-                        m_poCachedArray->GetDataType() == GetDataType() &&
-                        cachedDims.size() == nDims;
-                    for( size_t i = 0; ok && i < nDims; ++i )
+                    auto poRG = poDS->GetRootGroup();
+                    assert( poRG );
+
+                    const std::string osCachedArrayName(MassageName(GetFullName()));
+                    m_poCachedArray = poRG->OpenMDArray(osCachedArrayName);
+                    if( m_poCachedArray )
                     {
+<<<<<<< HEAD
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+=======
+<<<<<<< HEAD:gcore/gdalmultidim.cpp
+>>>>>>> a153e8e338 (Docker: alpine-normal: add lzma support [ci skip])
                         ok = dims[i]->GetSize() == cachedDims[i]->GetSize();
                     }
                     if( !ok )
@@ -3971,6 +3981,9 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
                         m_poCachedArray.reset();
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/gcore/gdalmultidim.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> a153e8e338 (Docker: alpine-normal: add lzma support [ci skip])
 =======
                         const auto& dims = GetDimensions();
                         const auto& cachedDims = m_poCachedArray->GetDimensions();
@@ -3992,8 +4005,11 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
                             m_poCachedArray.reset();
                         }
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/gcore/gdalmultidim.cpp
+<<<<<<< HEAD
 =======
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> a153e8e338 (Docker: alpine-normal: add lzma support [ci skip])
                     }
                 }
             }
