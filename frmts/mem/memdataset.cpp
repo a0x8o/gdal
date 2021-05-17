@@ -1317,6 +1317,7 @@ MEMDataset *MEMDataset::Create( const char * /* pszFilename */,
     return poDS;
 }
 
+<<<<<<< HEAD:frmts/mem/memdataset.cpp
 GDALDataset *MEMDataset::CreateBase( const char * pszFilename,
                                  int nXSize,
                                  int nYSize,
@@ -1571,6 +1572,8 @@ public:
 };
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/frmts/mem/memdataset.cpp
 
+=======
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memdataset.cpp
 /************************************************************************/
 /*                           GetMDArrayNames()                          */
 /************************************************************************/

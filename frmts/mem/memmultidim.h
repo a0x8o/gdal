@@ -31,6 +31,7 @@
 
 #include "gdal_priv.h"
 
+<<<<<<< HEAD:frmts/mem/memmultidim.h
 // If modifying the below declaration, modify it in gdal_array.i too
 std::shared_ptr<GDALMDArray> CPL_DLL MEMGroupCreateMDArray(GDALGroup* poGroup,
                                                    const std::string& osName,
@@ -39,11 +40,17 @@ std::shared_ptr<GDALMDArray> CPL_DLL MEMGroupCreateMDArray(GDALGroup* poGroup,
                                                    void* pData,
                                                    CSLConstList papszOptions);
 
+=======
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memmultidim.h
 /************************************************************************/
 /*                               MEMGroup                               */
 /************************************************************************/
 
+<<<<<<< HEAD:frmts/mem/memmultidim.h
 class CPL_DLL MEMGroup CPL_NON_FINAL: public GDALGroup
+=======
+class MEMGroup CPL_NON_FINAL: public GDALGroup
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memmultidim.h
 {
     std::map<CPLString, std::shared_ptr<GDALGroup>> m_oMapGroups{};
     std::map<CPLString, std::shared_ptr<GDALMDArray>> m_oMapMDArrays{};
@@ -75,12 +82,15 @@ public:
                                                        const GDALExtendedDataType& oDataType,
                                                        CSLConstList papszOptions) override;
 
+<<<<<<< HEAD:frmts/mem/memmultidim.h
     std::shared_ptr<GDALMDArray> CreateMDArray(const std::string& osName,
                                                        const std::vector<std::shared_ptr<GDALDimension>>& aoDimensions,
                                                        const GDALExtendedDataType& oDataType,
                                                        void* pData,
                                                        CSLConstList papszOptions);
 
+=======
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memmultidim.h
     std::shared_ptr<GDALAttribute> GetAttribute(const std::string& osName) const override;
 
     std::vector<std::shared_ptr<GDALAttribute>> GetAttributes(CSLConstList papszOptions) const override;
@@ -98,7 +108,11 @@ public:
 /*                            MEMAbstractMDArray                        */
 /************************************************************************/
 
+<<<<<<< HEAD:frmts/mem/memmultidim.h
 class CPL_DLL MEMAbstractMDArray: virtual public GDALAbstractMDArray
+=======
+class MEMAbstractMDArray: virtual public GDALAbstractMDArray
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memmultidim.h
 {
     std::vector<std::shared_ptr<GDALDimension>> m_aoDims;
     size_t m_nTotalSize = 0;
@@ -141,9 +155,12 @@ protected:
                       const GDALExtendedDataType& bufferDataType,
                       const void* pSrcBuffer) override;
 
+<<<<<<< HEAD:frmts/mem/memmultidim.h
     bool m_bWritable = true;
     bool m_bModified = false;
 
+=======
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memmultidim.h
 public:
     MEMAbstractMDArray(const std::string& osParentName,
                        const std::string& osName,
@@ -157,12 +174,15 @@ public:
 
     bool Init(GByte* pData = nullptr,
               const std::vector<GPtrDiff_t>& anStrides = std::vector<GPtrDiff_t>());
+<<<<<<< HEAD:frmts/mem/memmultidim.h
 
     void SetWritable(bool bWritable) { m_bWritable = bWritable; }
 
     bool IsModified() const { return m_bModified; }
 
     void SetModified(bool bModified) { m_bModified = bModified; }
+=======
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memmultidim.h
 };
 
 /************************************************************************/
@@ -211,7 +231,11 @@ public:
     }
     ~MEMMDArray();
 
+<<<<<<< HEAD:frmts/mem/memmultidim.h
     bool IsWritable() const override { return m_bWritable; }
+=======
+    bool IsWritable() const override { return true; }
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memmultidim.h
 
     const std::string& GetFilename() const override { return m_osFilename; }
 

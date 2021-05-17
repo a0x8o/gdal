@@ -2466,6 +2466,7 @@ protected:
                              CSLConstList papszOptions) const;
 
     virtual bool IsCacheable() const { return true; }
+<<<<<<< HEAD:gcore/gdal_priv.h
 
     virtual bool SetStatistics( bool bApproxStats,
                                 double dfMin, double dfMax,
@@ -2476,6 +2477,8 @@ protected:
 
     std::shared_ptr<GDALGroup> GetCacheRootGroup(bool bCanCreate,
                                                  std::string& osCacheFilenameOut) const;
+=======
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/gcore/gdal_priv.h
 //! @endcond
 
 public:
