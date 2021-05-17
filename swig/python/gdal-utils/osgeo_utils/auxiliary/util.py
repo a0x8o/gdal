@@ -362,6 +362,9 @@ def get_band_nums(ds: gdal.Dataset, band_nums: Optional[MaybeSequence[int]] = No
 
 
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+=======
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] = None, ovr_idx: Optional[int] = None) \
             -> List[gdal.Band]:
     """
@@ -372,9 +375,12 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
            Note: uses different numbering then GDAL API itself. read docs of: `get_ovr_idx`
     :return:
     """
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 =======
 def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] = None, ovr_idx: Optional[int] = None) -> List[gdal.Band]:
 >>>>>>> b6b690a901 (Merge pull request #3834 from talos-gis/locationinfo_fixes):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+=======
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
     ds = open_ds(filename_or_ds)
     band_nums = get_band_nums(ds, band_nums)
     bands = []
@@ -384,8 +390,12 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
             raise Exception(f'Could not get band {band_num} from file {filename_or_ds}')
         if ovr_idx:
             ovr_idx = get_ovr_idx(ds, ovr_idx)
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
             if ovr_idx != 0:
                 band = band.GetOverview(ovr_idx-1)
+=======
+            band = band.GetOverview(ovr_idx-1)
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
             if band is None:
                 raise Exception(f'Could not get overview {ovr_idx} from band {band_num} of file {filename_or_ds}')
         bands.append(band)

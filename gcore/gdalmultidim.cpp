@@ -3859,6 +3859,7 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
                       size_t nDstBufferAllocSize) const
 {
 <<<<<<< HEAD:gcore/gdalmultidim.cpp
+<<<<<<< HEAD:gcore/gdalmultidim.cpp
     if( !m_bHasTriedCachedArray )
     {
         m_bHasTriedCachedArray = true;
@@ -3904,30 +3905,30 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
 =======
     const auto& osFilename = GetFilename();
     if( !m_bHasTriedCachedArray && !osFilename.empty() )
+=======
+    if( !m_bHasTriedCachedArray )
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/gcore/gdalmultidim.cpp
     {
         m_bHasTriedCachedArray = true;
-        if( !EQUAL(CPLGetExtension(osFilename.c_str()), "gmac") )
+        if( IsCacheable() )
         {
-            const auto osCacheFilename = osFilename + ".gmac";
-            std::unique_ptr<GDALDataset> poDS(GDALDataset::Open(
-                            osCacheFilename.c_str(), GDAL_OF_MULTIDIM_RASTER));
-            if( poDS )
+            const auto& osFilename = GetFilename();
+            if( !osFilename.empty() &&
+                !EQUAL(CPLGetExtension(osFilename.c_str()), "gmac") )
             {
-                auto poRG = poDS->GetRootGroup();
-                assert( poRG );
-
-                const std::string osCachedArrayName(MassageName(GetFullName()));
-                m_poCachedArray = poRG->OpenMDArray(osCachedArrayName);
-                if( m_poCachedArray )
+                const auto osCacheFilename = osFilename + ".gmac";
+                std::unique_ptr<GDALDataset> poDS(GDALDataset::Open(
+                                osCacheFilename.c_str(), GDAL_OF_MULTIDIM_RASTER));
+                if( poDS )
                 {
-                    const auto& dims = GetDimensions();
-                    const auto& cachedDims = m_poCachedArray->GetDimensions();
-                    const size_t nDims = dims.size();
-                    bool ok =
-                        m_poCachedArray->GetDataType() == GetDataType() &&
-                        cachedDims.size() == nDims;
-                    for( size_t i = 0; ok && i < nDims; ++i )
+                    auto poRG = poDS->GetRootGroup();
+                    assert( poRG );
+
+                    const std::string osCachedArrayName(MassageName(GetFullName()));
+                    m_poCachedArray = poRG->OpenMDArray(osCachedArrayName);
+                    if( m_poCachedArray )
                     {
+<<<<<<< HEAD:gcore/gdalmultidim.cpp
                         ok = dims[i]->GetSize() == cachedDims[i]->GetSize();
                     }
                     if( !ok )
@@ -3939,6 +3940,27 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
                                  osCacheFilename.c_str());
                         m_poCachedArray.reset();
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/gcore/gdalmultidim.cpp
+=======
+                        const auto& dims = GetDimensions();
+                        const auto& cachedDims = m_poCachedArray->GetDimensions();
+                        const size_t nDims = dims.size();
+                        bool ok =
+                            m_poCachedArray->GetDataType() == GetDataType() &&
+                            cachedDims.size() == nDims;
+                        for( size_t i = 0; ok && i < nDims; ++i )
+                        {
+                            ok = dims[i]->GetSize() == cachedDims[i]->GetSize();
+                        }
+                        if( !ok )
+                        {
+                            CPLError(CE_Warning, CPLE_AppDefined,
+                                     "Cached array %s in %s has incompatible "
+                                     "characteristics with current array.",
+                                     osCachedArrayName.c_str(),
+                                     osCacheFilename.c_str());
+                            m_poCachedArray.reset();
+                        }
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/gcore/gdalmultidim.cpp
                     }
                 }
             }
