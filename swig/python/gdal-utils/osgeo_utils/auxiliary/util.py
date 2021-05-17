@@ -365,6 +365,7 @@ def get_band_nums(ds: gdal.Dataset, band_nums: Optional[MaybeSequence[int]] = No
 =======
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 =======
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
@@ -373,7 +374,15 @@ def get_band_nums(ds: gdal.Dataset, band_nums: Optional[MaybeSequence[int]] = No
 =======
 =======
 >>>>>>> f7763b4927 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
+<<<<<<< HEAD
 >>>>>>> 480c356c32 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
+=======
+=======
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+=======
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+>>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
+>>>>>>> d263d6ecd7 (Docker: alpine-normal: add lzma support [ci skip])
 def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] = None, ovr_idx: Optional[int] = None) \
             -> List[gdal.Band]:
     """
@@ -385,11 +394,17 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
     :return:
     """
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 =======
 =======
 <<<<<<< HEAD
 >>>>>>> 480c356c32 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
+>>>>>>> d263d6ecd7 (Docker: alpine-normal: add lzma support [ci skip])
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 =======
 def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] = None, ovr_idx: Optional[int] = None) -> List[gdal.Band]:
@@ -397,14 +412,22 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
 =======
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 =======
+=======
+>>>>>>> d263d6ecd7 (Docker: alpine-normal: add lzma support [ci skip])
 =======
 =======
 def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] = None, ovr_idx: Optional[int] = None) -> List[gdal.Band]:
 >>>>>>> b6b690a901 (Merge pull request #3834 from talos-gis/locationinfo_fixes):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 >>>>>>> f7763b4927 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
+<<<<<<< HEAD
 >>>>>>> 480c356c32 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
+=======
+=======
+>>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
+>>>>>>> d263d6ecd7 (Docker: alpine-normal: add lzma support [ci skip])
     ds = open_ds(filename_or_ds)
     band_nums = get_band_nums(ds, band_nums)
     bands = []
@@ -419,17 +442,26 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
                 band = band.GetOverview(ovr_idx-1)
 =======
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+<<<<<<< HEAD
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+=======
+>>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
             if ovr_idx != 0:
                 band = band.GetOverview(ovr_idx-1)
 =======
             band = band.GetOverview(ovr_idx-1)
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+<<<<<<< HEAD
 =======
             if ovr_idx != 0:
                 band = band.GetOverview(ovr_idx-1)
 >>>>>>> bdb6ec92bf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+=======
+=======
+>>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
+>>>>>>> d263d6ecd7 (Docker: alpine-normal: add lzma support [ci skip])
             if band is None:
                 raise Exception(f'Could not get overview {ovr_idx} from band {band_num} of file {filename_or_ds}')
         bands.append(band)
