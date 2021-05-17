@@ -26,7 +26,11 @@ ARG POPPLER_DEV=poppler-dev
 RUN apk add --no-cache \
     linux-headers \
     curl-dev tiff-dev \
+<<<<<<< HEAD:docker/alpine-normal/Dockerfile
     zlib-dev zstd-dev xz-dev snappy-dev \
+=======
+    zlib-dev zstd-dev xz-dev \
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/docker/alpine-normal/Dockerfile
     libjpeg-turbo-dev libpng-dev openjpeg-dev libwebp-dev expat-dev \
     py3-numpy-dev python3-dev py3-setuptools py3-numpy \
     ${POPPLER_DEV} postgresql-dev \
@@ -258,6 +262,7 @@ RUN if test "${GDAL_VERSION}" = "master"; then \
         mkdir -p "$HOME/.ccache"; \
         ccache -M 1G; \
     fi \
+<<<<<<< HEAD:docker/alpine-normal/Dockerfile
     && mkdir build \
     && cd build \
     && cmake .. \
@@ -265,6 +270,17 @@ RUN if test "${GDAL_VERSION}" = "master"; then \
         -DCMAKE_BUILD_TYPE=Release \
         -DGDAL_USE_TIFF_INTERNAL=ON \
         -DGDAL_USE_GEOTIFF_INTERNAL=ON \
+=======
+    && ./configure --prefix=/usr --without-libtool \
+    --with-hide-internal-symbols \
+    --with-liblzma \
+    --with-proj=/usr \
+    --with-libtiff=internal --with-rename-internal-libtiff-symbols \
+    --with-geotiff=internal --with-rename-internal-libgeotiff-symbols \
+    # --enable-lto
+    ${GDAL_EXTRA_ARGS} \
+    --with-python \
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/docker/alpine-normal/Dockerfile
     && make -j$(nproc) \
     && make install DESTDIR="/build" \
     && (make -j$(nproc) multireadtest && cp apps/multireadtest /build/usr/bin) \
@@ -311,7 +327,11 @@ RUN apk add --no-cache \
         libstdc++ \
         sqlite-libs \
         libcurl tiff \
+<<<<<<< HEAD:docker/alpine-normal/Dockerfile
         zlib zstd-libs xz-libs snappy \
+=======
+        zlib zstd-libs xz-libs \
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/docker/alpine-normal/Dockerfile
         libjpeg-turbo libpng libwebp expat \
         icu-libs \
         python3 py3-numpy ${POPPLER} pcre libpq libxml2 portablexdr openjpeg \
