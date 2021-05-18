@@ -5797,15 +5797,24 @@ SWIGINTERN CPLErr GDALMDArrayHS_GetNoDataValueAsRaw(GDALMDArrayHS *self,void **b
 SWIGINTERN void GDALMDArrayHS_GetNoDataValueAsDouble(GDALMDArrayHS *self,double *val,int *hasval){
     *val = GDALMDArrayGetNoDataValueAsDouble( self, hasval );
   }
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
+=======
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
+>>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 SWIGINTERN void GDALMDArrayHS_GetNoDataValueAsInt64(GDALMDArrayHS *self,GIntBig *val,int *hasval){
     *val = GDALMDArrayGetNoDataValueAsInt64( self, hasval );
   }
 SWIGINTERN void GDALMDArrayHS_GetNoDataValueAsUInt64(GDALMDArrayHS *self,GUIntBig *val,int *hasval){
     *val = GDALMDArrayGetNoDataValueAsUInt64( self, hasval );
   }
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
+=======
+=======
+>>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
+>>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 SWIGINTERN retStringAndCPLFree *GDALMDArrayHS_GetNoDataValueAsString(GDALMDArrayHS *self){
     GDALExtendedDataTypeHS* selfType = GDALMDArrayGetDataType(self);
     const size_t typeClass = GDALExtendedDataTypeGetClass(selfType);
@@ -5829,15 +5838,24 @@ SWIGINTERN retStringAndCPLFree *GDALMDArrayHS_GetNoDataValueAsString(GDALMDArray
 SWIGINTERN CPLErr GDALMDArrayHS_SetNoDataValueDouble(GDALMDArrayHS *self,double d){
     return GDALMDArraySetNoDataValueAsDouble( self, d ) ? CE_None : CE_Failure;
   }
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
+=======
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
+>>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 SWIGINTERN CPLErr GDALMDArrayHS_SetNoDataValueInt64(GDALMDArrayHS *self,GIntBig v){
     return GDALMDArraySetNoDataValueAsInt64( self, v ) ? CE_None : CE_Failure;
   }
 SWIGINTERN CPLErr GDALMDArrayHS_SetNoDataValueUInt64(GDALMDArrayHS *self,GUIntBig v){
     return GDALMDArraySetNoDataValueAsUInt64( self, v ) ? CE_None : CE_Failure;
   }
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
+=======
+=======
+>>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
+>>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 SWIGINTERN CPLErr GDALMDArrayHS_SetNoDataValueString(GDALMDArrayHS *self,char const *nodata){
     GDALExtendedDataTypeHS* selfType = GDALMDArrayGetDataType(self);
     const size_t typeClass = GDALExtendedDataTypeGetClass(selfType);
@@ -25519,8 +25537,12 @@ fail:
 }
 
 
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
+=======
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
+>>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 SWIGINTERN PyObject *_wrap_MDArray_GetNoDataValueAsInt64(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0; int bLocalUseExceptionsCode = bUseExceptions;
   GDALMDArrayHS *arg1 = (GDALMDArrayHS *) 0 ;
@@ -25645,12 +25667,18 @@ fail:
 }
 
 
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
+=======
+=======
+>>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
+>>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 SWIGINTERN PyObject *_wrap_MDArray_GetNoDataValueAsString(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0; int bLocalUseExceptionsCode = bUseExceptions;
   GDALMDArrayHS *arg1 = (GDALMDArrayHS *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
   PyObject * obj0 = 0 ;
   retStringAndCPLFree *result = 0 ;
@@ -25658,13 +25686,26 @@ SWIGINTERN PyObject *_wrap_MDArray_GetNoDataValueAsString(PyObject *SWIGUNUSEDPA
   if (!PyArg_ParseTuple(args,(char *)"O:MDArray_GetNoDataValueAsString",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
 =======
+=======
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
+>>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
   PyObject *swig_obj[1] ;
   retStringAndCPLFree *result = 0 ;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
+=======
+=======
+  PyObject * obj0 = 0 ;
+  retStringAndCPLFree *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:MDArray_GetNoDataValueAsString",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
+>>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
+>>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "MDArray_GetNoDataValueAsString" "', argument " "1"" of type '" "GDALMDArrayHS *""'"); 
   }
@@ -25756,8 +25797,12 @@ fail:
 }
 
 
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
+=======
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
+>>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueInt64(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0; int bLocalUseExceptionsCode = bUseExceptions;
   GDALMDArrayHS *arg1 = (GDALMDArrayHS *) 0 ;
@@ -25846,7 +25891,12 @@ fail:
 }
 
 
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
+=======
+=======
+>>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
+>>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueString(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0; int bLocalUseExceptionsCode = bUseExceptions;
   GDALMDArrayHS *arg1 = (GDALMDArrayHS *) 0 ;
@@ -25856,6 +25906,7 @@ SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueString(PyObject *SWIGUNUSEDPARM
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -25864,21 +25915,43 @@ SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueString(PyObject *SWIGUNUSEDPARM
   if (!PyArg_ParseTuple(args,(char *)"OO:MDArray_SetNoDataValueString",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
 =======
+=======
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
+>>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
   PyObject *swig_obj[2] ;
   CPLErr result;
   
   if (!SWIG_Python_UnpackTuple(args, "MDArray_SetNoDataValueString", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
+=======
+=======
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  CPLErr result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:MDArray_SetNoDataValueString",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
+>>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
+>>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "MDArray_SetNoDataValueString" "', argument " "1"" of type '" "GDALMDArrayHS *""'"); 
   }
   arg1 = reinterpret_cast< GDALMDArrayHS * >(argp1);
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
   res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
 =======
   res2 = SWIG_AsCharPtrAndSize(swig_obj[1], &buf2, NULL, &alloc2);
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
+=======
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
+  res2 = SWIG_AsCharPtrAndSize(swig_obj[1], &buf2, NULL, &alloc2);
+=======
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+>>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
+>>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "MDArray_SetNoDataValueString" "', argument " "2"" of type '" "char const *""'");
   }
