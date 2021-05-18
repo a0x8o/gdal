@@ -5798,6 +5798,7 @@ SWIGINTERN void GDALMDArrayHS_GetNoDataValueAsDouble(GDALMDArrayHS *self,double 
     *val = GDALMDArrayGetNoDataValueAsDouble( self, hasval );
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
 =======
 <<<<<<< HEAD
@@ -5807,12 +5808,16 @@ SWIGINTERN void GDALMDArrayHS_GetNoDataValueAsDouble(GDALMDArrayHS *self,double 
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 >>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+=======
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
+>>>>>>> af969e429b (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 SWIGINTERN void GDALMDArrayHS_GetNoDataValueAsInt64(GDALMDArrayHS *self,GIntBig *val,int *hasval){
     *val = GDALMDArrayGetNoDataValueAsInt64( self, hasval );
   }
 SWIGINTERN void GDALMDArrayHS_GetNoDataValueAsUInt64(GDALMDArrayHS *self,GUIntBig *val,int *hasval){
     *val = GDALMDArrayGetNoDataValueAsUInt64( self, hasval );
   }
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
@@ -5824,6 +5829,10 @@ SWIGINTERN void GDALMDArrayHS_GetNoDataValueAsUInt64(GDALMDArrayHS *self,GUIntBi
 >>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 >>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+=======
+=======
+>>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
+>>>>>>> af969e429b (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 SWIGINTERN retStringAndCPLFree *GDALMDArrayHS_GetNoDataValueAsString(GDALMDArrayHS *self){
     GDALExtendedDataTypeHS* selfType = GDALMDArrayGetDataType(self);
     const size_t typeClass = GDALExtendedDataTypeGetClass(selfType);
@@ -5848,6 +5857,7 @@ SWIGINTERN CPLErr GDALMDArrayHS_SetNoDataValueDouble(GDALMDArrayHS *self,double 
     return GDALMDArraySetNoDataValueAsDouble( self, d ) ? CE_None : CE_Failure;
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
 =======
 <<<<<<< HEAD
@@ -5857,12 +5867,16 @@ SWIGINTERN CPLErr GDALMDArrayHS_SetNoDataValueDouble(GDALMDArrayHS *self,double 
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 >>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+=======
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
+>>>>>>> af969e429b (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 SWIGINTERN CPLErr GDALMDArrayHS_SetNoDataValueInt64(GDALMDArrayHS *self,GIntBig v){
     return GDALMDArraySetNoDataValueAsInt64( self, v ) ? CE_None : CE_Failure;
   }
 SWIGINTERN CPLErr GDALMDArrayHS_SetNoDataValueUInt64(GDALMDArrayHS *self,GUIntBig v){
     return GDALMDArraySetNoDataValueAsUInt64( self, v ) ? CE_None : CE_Failure;
   }
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
@@ -5874,6 +5888,10 @@ SWIGINTERN CPLErr GDALMDArrayHS_SetNoDataValueUInt64(GDALMDArrayHS *self,GUIntBi
 >>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 >>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+=======
+=======
+>>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
+>>>>>>> af969e429b (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 SWIGINTERN CPLErr GDALMDArrayHS_SetNoDataValueString(GDALMDArrayHS *self,char const *nodata){
     GDALExtendedDataTypeHS* selfType = GDALMDArrayGetDataType(self);
     const size_t typeClass = GDALExtendedDataTypeGetClass(selfType);
@@ -25534,6 +25552,7 @@ fail:
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
 =======
 <<<<<<< HEAD
@@ -25543,6 +25562,9 @@ fail:
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 >>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+=======
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
+>>>>>>> af969e429b (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 SWIGINTERN PyObject *_wrap_MDArray_GetNoDataValueAsInt64(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0; int bLocalUseExceptionsCode = bUseExceptions;
   GDALMDArrayHS *arg1 = (GDALMDArrayHS *) 0 ;
@@ -25668,6 +25690,7 @@ fail:
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
 =======
@@ -25678,11 +25701,16 @@ fail:
 >>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 >>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+=======
+=======
+>>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
+>>>>>>> af969e429b (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 SWIGINTERN PyObject *_wrap_MDArray_GetNoDataValueAsString(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0; int bLocalUseExceptionsCode = bUseExceptions;
   GDALMDArrayHS *arg1 = (GDALMDArrayHS *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
 =======
@@ -25698,6 +25726,9 @@ SWIGINTERN PyObject *_wrap_MDArray_GetNoDataValueAsString(PyObject *SWIGUNUSEDPA
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 >>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+=======
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
+>>>>>>> af969e429b (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
   PyObject *swig_obj[1] ;
   retStringAndCPLFree *result = 0 ;
   
@@ -25705,11 +25736,14 @@ SWIGINTERN PyObject *_wrap_MDArray_GetNoDataValueAsString(PyObject *SWIGUNUSEDPA
   swig_obj[0] = args;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
 =======
 >>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+=======
+>>>>>>> af969e429b (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 =======
   PyObject * obj0 = 0 ;
   retStringAndCPLFree *result = 0 ;
@@ -25718,9 +25752,12 @@ SWIGINTERN PyObject *_wrap_MDArray_GetNoDataValueAsString(PyObject *SWIGUNUSEDPA
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
 >>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 >>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+=======
+>>>>>>> af969e429b (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "MDArray_GetNoDataValueAsString" "', argument " "1"" of type '" "GDALMDArrayHS *""'"); 
   }
@@ -25813,6 +25850,7 @@ fail:
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
 =======
 <<<<<<< HEAD
@@ -25822,6 +25860,9 @@ fail:
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 >>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+=======
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
+>>>>>>> af969e429b (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueInt64(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0; int bLocalUseExceptionsCode = bUseExceptions;
   GDALMDArrayHS *arg1 = (GDALMDArrayHS *) 0 ;
@@ -25911,6 +25952,7 @@ fail:
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
 =======
@@ -25921,6 +25963,10 @@ fail:
 >>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 >>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+=======
+=======
+>>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
+>>>>>>> af969e429b (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueString(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0; int bLocalUseExceptionsCode = bUseExceptions;
   GDALMDArrayHS *arg1 = (GDALMDArrayHS *) 0 ;
@@ -25931,6 +25977,9 @@ SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueString(PyObject *SWIGUNUSEDPARM
   char *buf2 = 0 ;
   int alloc2 = 0 ;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> af969e429b (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
   PyObject *swig_obj[2] ;
   CPLErr result;
@@ -25938,6 +25987,7 @@ SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueString(PyObject *SWIGUNUSEDPARM
   if (!SWIG_Python_UnpackTuple(args, "MDArray_SetNoDataValueString", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
 =======
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
@@ -25964,6 +26014,8 @@ SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueString(PyObject *SWIGUNUSEDPARM
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
 =======
 =======
+=======
+>>>>>>> af969e429b (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   CPLErr result;
@@ -25971,18 +26023,25 @@ SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueString(PyObject *SWIGUNUSEDPARM
   if (!PyArg_ParseTuple(args,(char *)"OO:MDArray_SetNoDataValueString",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
 >>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
+<<<<<<< HEAD
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 >>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+=======
+>>>>>>> af969e429b (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "MDArray_SetNoDataValueString" "', argument " "1"" of type '" "GDALMDArrayHS *""'"); 
   }
   arg1 = reinterpret_cast< GDALMDArrayHS * >(argp1);
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> af969e429b (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
   res2 = SWIG_AsCharPtrAndSize(swig_obj[1], &buf2, NULL, &alloc2);
 =======
   res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
 >>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
@@ -25998,6 +26057,8 @@ SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueString(PyObject *SWIGUNUSEDPARM
 >>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 >>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+=======
+>>>>>>> af969e429b (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "MDArray_SetNoDataValueString" "', argument " "2"" of type '" "char const *""'");
   }
@@ -45519,6 +45580,7 @@ static PyMethodDef SwigMethods[] = {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	 { (char *)"MDArray_GetNoDataValueAsString", _wrap_MDArray_GetNoDataValueAsString, METH_VARARGS, (char *)"MDArray_GetNoDataValueAsString(MDArray self) -> retStringAndCPLFree *"},
 	 { (char *)"MDArray_SetNoDataValueDouble", _wrap_MDArray_SetNoDataValueDouble, METH_VARARGS, (char *)"MDArray_SetNoDataValueDouble(MDArray self, double d) -> CPLErr"},
 	 { (char *)"MDArray_SetNoDataValueString", _wrap_MDArray_SetNoDataValueString, METH_VARARGS, (char *)"MDArray_SetNoDataValueString(MDArray self, char const * nodata) -> CPLErr"},
@@ -45535,6 +45597,11 @@ static PyMethodDef SwigMethods[] = {
 =======
 	 { (char *)"MDArray_SetNoDataValueDouble", _wrap_MDArray_SetNoDataValueDouble, METH_VARARGS, (char *)"MDArray_SetNoDataValueDouble(MDArray self, double d) -> CPLErr"},
 >>>>>>> 6b318bd831 (Merge pull request #3822 from rouault/gml_srs)
+=======
+	 { (char *)"MDArray_GetNoDataValueAsString", _wrap_MDArray_GetNoDataValueAsString, METH_VARARGS, (char *)"MDArray_GetNoDataValueAsString(MDArray self) -> retStringAndCPLFree *"},
+	 { (char *)"MDArray_SetNoDataValueDouble", _wrap_MDArray_SetNoDataValueDouble, METH_VARARGS, (char *)"MDArray_SetNoDataValueDouble(MDArray self, double d) -> CPLErr"},
+	 { (char *)"MDArray_SetNoDataValueString", _wrap_MDArray_SetNoDataValueString, METH_VARARGS, (char *)"MDArray_SetNoDataValueString(MDArray self, char const * nodata) -> CPLErr"},
+>>>>>>> af969e429b (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
 	 { (char *)"MDArray_SetNoDataValueRaw", _wrap_MDArray_SetNoDataValueRaw, METH_VARARGS, (char *)"MDArray_SetNoDataValueRaw(MDArray self, GIntBig nLen) -> CPLErr"},
 	 { (char *)"MDArray_DeleteNoDataValue", _wrap_MDArray_DeleteNoDataValue, METH_VARARGS, (char *)"MDArray_DeleteNoDataValue(MDArray self) -> CPLErr"},
 	 { (char *)"MDArray_GetOffset", _wrap_MDArray_GetOffset, METH_VARARGS, (char *)"MDArray_GetOffset(MDArray self)"},
