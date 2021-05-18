@@ -811,6 +811,7 @@ public:
     *val = GDALMDArrayGetNoDataValueAsDouble( self, hasval );
   }
 
+<<<<<<< HEAD:swig/include/MultiDimensional.i
 #ifdef SWIGPYTHON
   void GetNoDataValueAsInt64( GIntBig *val, int *hasval ) {
     *val = GDALMDArrayGetNoDataValueAsInt64( self, hasval );
@@ -821,6 +822,8 @@ public:
   }
 #endif
 
+=======
+>>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/include/MultiDimensional.i
   retStringAndCPLFree* GetNoDataValueAsString() {
     GDALExtendedDataTypeHS* selfType = GDALMDArrayGetDataType(self);
     const size_t typeClass = GDALExtendedDataTypeGetClass(selfType);
@@ -846,6 +849,7 @@ public:
     return GDALMDArraySetNoDataValueAsDouble( self, d ) ? CE_None : CE_Failure;
   }
 
+<<<<<<< HEAD:swig/include/MultiDimensional.i
 #ifdef SWIGPYTHON
   CPLErr SetNoDataValueInt64( GIntBig v ) {
     return GDALMDArraySetNoDataValueAsInt64( self, v ) ? CE_None : CE_Failure;
@@ -856,6 +860,8 @@ public:
   }
 #endif
 
+=======
+>>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/include/MultiDimensional.i
   CPLErr SetNoDataValueString( const char* nodata ) {
     GDALExtendedDataTypeHS* selfType = GDALMDArrayGetDataType(self);
     const size_t typeClass = GDALExtendedDataTypeGetClass(selfType);
