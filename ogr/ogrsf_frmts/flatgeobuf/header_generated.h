@@ -534,11 +534,19 @@ struct Header FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyString(name()) &&
            VerifyOffset(verifier, VT_ENVELOPE) &&
            verifier.VerifyVector(envelope()) &&
+<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/header_generated.h
            VerifyField<uint8_t>(verifier, VT_GEOMETRY_TYPE, 1) &&
            VerifyField<uint8_t>(verifier, VT_HAS_Z, 1) &&
            VerifyField<uint8_t>(verifier, VT_HAS_M, 1) &&
            VerifyField<uint8_t>(verifier, VT_HAS_T, 1) &&
            VerifyField<uint8_t>(verifier, VT_HAS_TM, 1) &&
+=======
+           VerifyField<uint8_t>(verifier, VT_GEOMETRY_TYPE) &&
+           VerifyField<uint8_t>(verifier, VT_HAS_Z) &&
+           VerifyField<uint8_t>(verifier, VT_HAS_M) &&
+           VerifyField<uint8_t>(verifier, VT_HAS_T) &&
+           VerifyField<uint8_t>(verifier, VT_HAS_TM) &&
+>>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/header_generated.h
            VerifyOffset(verifier, VT_COLUMNS) &&
            verifier.VerifyVector(columns()) &&
            verifier.VerifyVectorOfTables(columns()) &&
