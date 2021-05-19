@@ -306,9 +306,21 @@ struct FieldDef : public Definition {
   bool IsScalarOptional() const {
     return IsScalar(value.type.base_type) && IsOptional();
   }
+<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
   bool IsOptional() const { return presence == kOptional; }
   bool IsRequired() const { return presence == kRequired; }
   bool IsDefault() const { return presence == kDefault; }
+=======
+  bool IsOptional() const {
+    return presence == kOptional;
+  }
+  bool IsRequired() const {
+    return presence == kRequired;
+  }
+  bool IsDefault() const {
+    return presence == kDefault;
+  }
+>>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 
   Value value;
   bool deprecated;  // Field is allowed to be present in old data, but can't be.
@@ -539,9 +551,12 @@ struct ServiceDef : public Definition {
 
 // Container of options that may apply to any of the source/text generators.
 struct IDLOptions {
+<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
   // field case style options for C++
   enum CaseStyle { CaseStyle_Unchanged = 0, CaseStyle_Upper, CaseStyle_Lower };
 
+=======
+>>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
   bool gen_jvmstatic;
   // Use flexbuffers instead for binary and text generation
   bool use_flexbuffers;
@@ -565,7 +580,10 @@ struct IDLOptions {
   std::string cpp_object_api_pointer_type;
   std::string cpp_object_api_string_type;
   bool cpp_object_api_string_flexible_constructor;
+<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
   CaseStyle cpp_object_api_field_case_style;
+=======
+>>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
   bool cpp_direct_copy;
   bool gen_nullable;
   bool java_checkerframework;
@@ -596,6 +614,7 @@ struct IDLOptions {
   std::string filename_suffix;
   std::string filename_extension;
   bool no_warnings;
+<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
   bool warnings_as_errors;
   std::string project_root;
   bool cs_global_alias;
@@ -603,6 +622,8 @@ struct IDLOptions {
   bool json_nested_flexbuffers;
   bool json_nested_legacy_flatbuffers;
   bool ts_flat_file;
+=======
+>>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 
   // Possible options for the more general generator below.
   enum Language {
@@ -632,12 +653,15 @@ struct IDLOptions {
   // If set, require all fields in a table to be explicitly numbered.
   bool require_explicit_ids;
 
+<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
   // If set, implement serde::Serialize for generated Rust types
   bool rust_serialize;
 
   // If set, generate rust types in individual files with a root module file.
   bool rust_module_root_file;
 
+=======
+>>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
   // The corresponding language bit will be set if a language is included
   // for code generation.
   unsigned long lang_to_generate;
@@ -672,7 +696,10 @@ struct IDLOptions {
         gen_compare(false),
         cpp_object_api_pointer_type("std::unique_ptr"),
         cpp_object_api_string_flexible_constructor(false),
+<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
         cpp_object_api_field_case_style(CaseStyle_Unchanged),
+=======
+>>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
         cpp_direct_copy(true),
         gen_nullable(false),
         java_checkerframework(false),
@@ -695,6 +722,7 @@ struct IDLOptions {
         filename_suffix("_generated"),
         filename_extension(),
         no_warnings(false),
+<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
         warnings_as_errors(false),
         project_root(""),
         cs_global_alias(false),
@@ -706,6 +734,11 @@ struct IDLOptions {
         require_explicit_ids(false),
         rust_serialize(false),
         rust_module_root_file(false),
+=======
+        lang(IDLOptions::kJava),
+        mini_reflect(IDLOptions::kNone),
+        require_explicit_ids(false),
+>>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
         lang_to_generate(0),
         set_empty_strings_to_null(true),
         set_empty_vectors_to_null(true) {}
@@ -805,7 +838,10 @@ class Parser : public ParserState {
         root_struct_def_(nullptr),
         opts(options),
         uses_flexbuffers_(false),
+<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
         has_warning_(false),
+=======
+>>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
         advanced_features_(0),
         source_(nullptr),
         anonymous_counter_(0),
@@ -1044,6 +1080,8 @@ class Parser : public ParserState {
 
   uint64_t advanced_features_;
 
+  uint64_t advanced_features_;
+
  private:
   const char *source_;
 
@@ -1051,10 +1089,13 @@ class Parser : public ParserState {
 
   std::vector<std::pair<Value, FieldDef *>> field_stack_;
 
+<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
   // TODO(cneo): Refactor parser to use string_cache more often to save
   // on memory usage.
   mutable std::set<std::string> string_cache_;
 
+=======
+>>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
   int anonymous_counter_;
   int parse_depth_counter_;  // stack-overflow guard
 };
@@ -1224,9 +1265,12 @@ extern bool GenerateSwiftGRPC(const Parser &parser, const std::string &path,
 
 extern bool GenerateTSGRPC(const Parser &parser, const std::string &path,
                            const std::string &file_name);
+<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 
 extern bool GenerateRustModuleRootFile(const Parser &parser,
                                        const std::string &path);
+=======
+>>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 }  // namespace flatbuffers
 
 #endif  // FLATBUFFERS_IDL_H_
