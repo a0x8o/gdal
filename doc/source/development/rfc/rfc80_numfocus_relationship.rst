@@ -11,8 +11,11 @@ Started:       2021-Apr-15
 <<<<<<< HEAD:doc/source/development/rfc/rfc80_numfocus_relationship.rst
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 8da24d86c4 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 04faccf337 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0)
 <<<<<<< HEAD:doc/source/development/rfc/rfc80_numfocus_relationship.rst
 Last modified: 2021-Jun-07
 =======
@@ -21,13 +24,23 @@ Last modified: 2021-Jun-07
 Last modified: 2021-Jun-07
 >>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/development/rfc/rfc80_numfocus_relationship.rst
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> OSGeo-master:doc/source/development/rfc/rfc80_numfocus_relationship.rst
+=======
+>>>>>>> 04faccf337 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0)
 =======
 Last modified: 2021-Jun-07
 =======
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/doc/source/development/rfc/rfc80_numfocus_relationship.rst
+<<<<<<< HEAD
 >>>>>>> d41f619c4d (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0)
 =======
 >>>>>>> 8da24d86c4 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 623e493dbe (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0)
+>>>>>>> d16aead3e9 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0)
+>>>>>>> 04faccf337 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0)
 Status:        Adopted
 ============== =============================================
 
