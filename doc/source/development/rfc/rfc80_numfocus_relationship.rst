@@ -12,6 +12,7 @@ Started:       2021-Apr-15
 Last modified: 2021-Jun-07
 =======
 <<<<<<< HEAD:doc/source/development/rfc/rfc80_numfocus_relationship.rst
+<<<<<<< HEAD
 <<<<<<< HEAD:doc/source/development/rfc/rfc80_numfocus_relationship.rst
 Last modified: 2021-Jun-07
 =======
@@ -19,7 +20,15 @@ Last modified: 2021-Jun-07
 =======
 Last modified: 2021-Jun-07
 >>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/development/rfc/rfc80_numfocus_relationship.rst
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:doc/source/development/rfc/rfc80_numfocus_relationship.rst
+=======
+=======
+Last modified: 2021-Jun-07
+=======
+>>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/doc/source/development/rfc/rfc80_numfocus_relationship.rst
+>>>>>>> 623e493dbe (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0)
+>>>>>>> d16aead3e9 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0)
 Status:        Adopted
 ============== =============================================
 
