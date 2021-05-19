@@ -96,6 +96,11 @@ class BaseGenerator {
   static std::string NamespaceDir(const Parser &parser, const std::string &path,
                                   const Namespace &ns,
                                   const bool dasherize = false);
+<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/code_generators.h
+=======
+
+  static std::string ToDasherizedCase(const std::string pascal_case);
+>>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/code_generators.h
 
   std::string GeneratedFileName(const std::string &path,
                                 const std::string &file_name,
