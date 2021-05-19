@@ -49,6 +49,13 @@
 #if defined(__unix__) && !defined(FLATBUFFERS_LOCALE_INDEPENDENT)
   #include <unistd.h>
 #endif
+<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/base.h
+=======
+
+#ifdef _STLPORT_VERSION
+  #define FLATBUFFERS_CPP98_STL
+#endif
+>>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/base.h
 
 #ifdef __ANDROID__
   #include <android/api-level.h>
@@ -140,7 +147,11 @@
 
 #define FLATBUFFERS_VERSION_MAJOR 2
 #define FLATBUFFERS_VERSION_MINOR 0
+<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/base.h
 #define FLATBUFFERS_VERSION_REVISION 6
+=======
+#define FLATBUFFERS_VERSION_REVISION 0
+>>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/base.h
 #define FLATBUFFERS_STRING_EXPAND(X) #X
 #define FLATBUFFERS_STRING(X) FLATBUFFERS_STRING_EXPAND(X)
 namespace flatbuffers {
@@ -335,6 +346,11 @@ typedef uintmax_t largest_scalar_t;
 
 /// @brief The length of a FlatBuffer file header.
 static const size_t kFileIdentifierLength = 4;
+
+inline bool VerifyAlignmentRequirements(size_t align, size_t min_align = 1) {
+  return (min_align <= align) && (align <= (FLATBUFFERS_MAX_ALIGNMENT)) &&
+         (align & (align - 1)) == 0;  // must be power of 2
+}
 
 inline bool VerifyAlignmentRequirements(size_t align, size_t min_align = 1) {
   return (min_align <= align) && (align <= (FLATBUFFERS_MAX_ALIGNMENT)) &&
