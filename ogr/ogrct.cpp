@@ -1124,6 +1124,7 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
  *
  * This is the same as the C++ function OGRCreateCoordinateTransformation::Clone
 <<<<<<< HEAD
+<<<<<<< HEAD
  *
  * @return handle to transformation's clone or NULL on error,
  *         must be freed with OCTDestroyCoordinateTransformation
@@ -1131,6 +1132,12 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
 =======
 
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+=======
+ *
+ * @return handle to transformation's clone or NULL on error, 
+ *         must be freed with OCTDestroyCoordinateTransformation
+ *
+>>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
  * @since GDAL 3.4
  */
 
@@ -1145,6 +1152,9 @@ OCTClone(OGRCoordinateTransformationH hTransform)
 
 /************************************************************************/
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
 /*                             OCTGetSourceCS()                         */
 /************************************************************************/
 
@@ -1201,7 +1211,11 @@ OGRSpatialReferenceH OCTGetTargetCS(OGRCoordinateTransformationH hTransform)
  *
  * This is the same as the C++ function OGRCreateCoordinateTransformation::GetInverse
  *
+<<<<<<< HEAD
  * @return handle to inverse transformation or NULL on error,
+=======
+ * @return handle to inverse transformation or NULL on error, 
+>>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
  *         must be freed with OCTDestroyCoordinateTransformation
  *
  * @since GDAL 3.4
@@ -1216,6 +1230,7 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
 }
 
 /************************************************************************/
+<<<<<<< HEAD
 <<<<<<< HEAD
 /*                              OCTClone()                              */
 /************************************************************************/
@@ -1316,6 +1331,12 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 >>>>>>> df05d90486 (Merge pull request #3822 from rouault/gml_srs)
+=======
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 913c3ef6c1 (Merge branch 'master' of github.com:OSGeo/gdal)
 /*                             OGRProjCT()                             */
 /************************************************************************/
 
