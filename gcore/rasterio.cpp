@@ -5247,7 +5247,11 @@ bool GDALBufferHasOnlyNoData( const void* pBuffer,
 {
     // In the case where the nodata is 0, we can compare several bytes at
     // once. Select the largest natural integer type for the architecture.
+<<<<<<< HEAD:gcore/rasterio.cpp
 #if SIZEOF_VOIDP >= 8 || defined(__x86_64__)
+=======
+#if SIZEOF_VOIDP == 8 || defined(__x86_64__)
+>>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/rasterio.cpp
     // We test __x86_64__ for x32 arch where SIZEOF_VOIDP == 4
     typedef std::uint64_t WordType;
 #else
@@ -5261,7 +5265,11 @@ bool GDALBufferHasOnlyNoData( const void* pBuffer,
         size_t i = 0;
         const size_t nInitialIters = std::min(
             sizeof(WordType) -
+<<<<<<< HEAD:gcore/rasterio.cpp
                 static_cast<size_t>(reinterpret_cast<std::uintptr_t>(pabyBuffer) % sizeof(WordType)),
+=======
+                (reinterpret_cast<std::uintptr_t>(pabyBuffer) % sizeof(WordType)),
+>>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/rasterio.cpp
             nSize);
         for( ; i < nInitialIters; i++ )
         {
@@ -5332,6 +5340,7 @@ bool GDALBufferHasOnlyNoData( const void* pBuffer,
                                   static_cast<int32_t>(dfNoDataValue)),
                               nWidth, nHeight, nLineStride, nComponents);
     }
+<<<<<<< HEAD:gcore/rasterio.cpp
     if( nBitsPerSample == 64 && nSampleFormat == GSF_UNSIGNED_INT )
     {
         return GDALIsValueInRange<uint64_t>(dfNoDataValue) &&
@@ -5349,6 +5358,8 @@ bool GDALBufferHasOnlyNoData( const void* pBuffer,
                                   static_cast<int64_t>(dfNoDataValue)),
                               nWidth, nHeight, nLineStride, nComponents);
     }
+=======
+>>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/rasterio.cpp
     if( nBitsPerSample == 32 && nSampleFormat == GSF_FLOATING_POINT )
     {
         return (std::isnan(dfNoDataValue) ||
