@@ -1082,6 +1082,7 @@ OGRCoordinateTransformationH CPL_DLL OCTClone(OGRCoordinateTransformationH hTran
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:ogr/ogr_srs_api.h
 =======
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
@@ -1111,11 +1112,15 @@ OGRCoordinateTransformationH CPL_DLL OCTClone(OGRCoordinateTransformationH hTran
 >>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 6b318bd831 (Merge pull request #3822 from rouault/gml_srs)
+=======
+<<<<<<< HEAD:ogr/ogr_srs_api.h
+>>>>>>> ceea52d9e9 (Merge branch 'master' of github.com:OSGeo/gdal)
 OGRSpatialReferenceH CPL_DLL OCTGetSourceCS(OGRCoordinateTransformationH hTransform);
 OGRSpatialReferenceH CPL_DLL OCTGetTargetCS(OGRCoordinateTransformationH hTransform);
 OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH hTransform);
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/ogr/ogr_srs_api.h
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1134,10 +1139,13 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
 =======
 >>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+>>>>>>> ceea52d9e9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
 OGRSpatialReferenceH CPL_DLL OCTGetSourceCS(OGRCoordinateTransformationH hTransform);
 OGRSpatialReferenceH CPL_DLL OCTGetTargetCS(OGRCoordinateTransformationH hTransform);
 OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH hTransform);
 >>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogr_srs_api.h
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1170,6 +1178,8 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
 >>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 6b318bd831 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> ceea52d9e9 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 void CPL_DLL CPL_STDCALL
       OCTDestroyCoordinateTransformation( OGRCoordinateTransformationH );
