@@ -5337,6 +5337,7 @@ bool GDALBufferHasOnlyNoData( const void* pBuffer,
                                   static_cast<int32_t>(dfNoDataValue)),
                               nWidth, nHeight, nLineStride, nComponents);
     }
+<<<<<<< HEAD:gcore/rasterio.cpp
     if( nBitsPerSample == 64 && nSampleFormat == GSF_UNSIGNED_INT )
     {
         return GDALIsValueInRange<uint64_t>(dfNoDataValue) &&
@@ -5354,6 +5355,8 @@ bool GDALBufferHasOnlyNoData( const void* pBuffer,
                                   static_cast<int64_t>(dfNoDataValue)),
                               nWidth, nHeight, nLineStride, nComponents);
     }
+=======
+>>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/rasterio.cpp
     if( nBitsPerSample == 32 && nSampleFormat == GSF_FLOATING_POINT )
     {
         return (std::isnan(dfNoDataValue) ||

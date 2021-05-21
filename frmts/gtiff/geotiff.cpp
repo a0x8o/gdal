@@ -8911,8 +8911,11 @@ bool GTiffDataset::HasOnlyNoData( const void* pBuffer, int nWidth, int nHeight,
     if( m_nSampleFormat == SAMPLEFORMAT_COMPLEXINT ||
         m_nSampleFormat == SAMPLEFORMAT_COMPLEXIEEEFP )
         return false;
+<<<<<<< HEAD:frmts/gtiff/geotiff.cpp
     if( m_bNoDataSetAsInt64 || m_bNoDataSetAsUInt64 )
         return false; // FIXME: over pessimistic
+=======
+>>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/gtiff/geotiff.cpp
     return GDALBufferHasOnlyNoData( pBuffer,
                                     m_bNoDataSet ? m_dfNoDataValue : 0.0,
                                     nWidth, nHeight,
