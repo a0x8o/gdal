@@ -5341,6 +5341,7 @@ def test_ogr_gpkg_fixup_wrong_mr_column_name_update_trigger():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -5423,6 +5424,7 @@ def test_ogr_gpkg_fixup_wrong_mr_column_name_update_trigger():
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -5473,6 +5475,10 @@ def test_ogr_gpkg_fixup_wrong_mr_column_name_update_trigger():
 >>>>>>> 86346bde67 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 9485e1edb6 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 ###############################################################################
 # Test support for CRS coordinate_epoch
@@ -5624,8 +5630,11 @@ def test_ogr_gpkg_CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> b30dbf7205 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 9485e1edb6 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 ###############################################################################
 # Test (currently minimum) support for related tables extension
@@ -5866,10 +5875,14 @@ def test_ogr_gpkg_alter_geom_field_defn():
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9485e1edb6 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -5908,3 +5921,5 @@ def test_ogr_gpkg_alter_geom_field_defn():
 >>>>>>> 86346bde67 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 9485e1edb6 (Merge branch 'master' of github.com:OSGeo/gdal)

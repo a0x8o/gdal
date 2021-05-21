@@ -395,12 +395,15 @@ namespace tut
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 10915dbdc5 (Merge pull request #3822 from rouault/gml_srs)
 =======
 >>>>>>> ae4141a16a (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 9bf6f4fb10 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> 9485e1edb6 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
@@ -433,10 +436,14 @@ namespace tut
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9485e1edb6 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 6b318bd831 (Merge pull request #3822 from rouault/gml_srs)
 =======
@@ -478,6 +485,8 @@ namespace tut
 >>>>>>> ae4141a16a (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 9bf6f4fb10 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> 9485e1edb6 (Merge branch 'master' of github.com:OSGeo/gdal)
 
     // Test OGRCoordinateTransformation in pure "C" API
     // OCTClone/OCTGetSourceCS/OCTGetTargetCS/OCTGetInverse
@@ -520,6 +529,7 @@ namespace tut
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -547,6 +557,7 @@ namespace tut
 =======
 >>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
 >>>>>>> ceea52d9e9 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 5d1d6dfdab (Merge pull request #3822 from rouault/gml_srs)
@@ -555,9 +566,12 @@ namespace tut
 >>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> b30dbf7205 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+=======
+>>>>>>> 9485e1edb6 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
 =======
 >>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -575,6 +589,8 @@ namespace tut
 >>>>>>> 10915dbdc5 (Merge pull request #3822 from rouault/gml_srs)
 =======
 >>>>>>> ae4141a16a (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 9485e1edb6 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
@@ -610,6 +626,7 @@ namespace tut
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -654,4 +671,8 @@ namespace tut
 >>>>>>> ae4141a16a (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 9bf6f4fb10 (Merge pull request #3822 from rouault/gml_srs)
+=======
+=======
+>>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 9485e1edb6 (Merge branch 'master' of github.com:OSGeo/gdal)
 } // namespace tut
