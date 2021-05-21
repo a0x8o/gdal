@@ -5347,6 +5347,7 @@ def test_ogr_gpkg_fixup_wrong_mr_column_name_update_trigger():
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -5354,13 +5355,22 @@ def test_ogr_gpkg_fixup_wrong_mr_column_name_update_trigger():
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 145dd38d72 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+=======
+>>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> OSGeo-master
 =======
 <<<<<<< HEAD
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+>>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 913c3ef6c1 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 ###############################################################################
 # Test support for CRS coordinate_epoch
@@ -5644,8 +5654,10 @@ def test_ogr_gpkg_alter_geom_field_defn():
     gdal.Unlink(filename)
 =======
 >>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -5659,3 +5671,12 @@ def test_ogr_gpkg_alter_geom_field_defn():
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 913c3ef6c1 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
