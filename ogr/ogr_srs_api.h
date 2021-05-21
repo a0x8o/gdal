@@ -1084,11 +1084,15 @@ OGRCoordinateTransformationH CPL_DLL OCTClone(OGRCoordinateTransformationH hTran
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b30dbf7205 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogr_srs_api.h
 =======
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
 =======
 <<<<<<< HEAD:ogr/ogr_srs_api.h
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -1121,11 +1125,15 @@ OGRCoordinateTransformationH CPL_DLL OCTClone(OGRCoordinateTransformationH hTran
 =======
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
 >>>>>>> 5d1d6dfdab (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> b30dbf7205 (Merge branch 'master' of github.com:OSGeo/gdal)
 OGRSpatialReferenceH CPL_DLL OCTGetSourceCS(OGRCoordinateTransformationH hTransform);
 OGRSpatialReferenceH CPL_DLL OCTGetTargetCS(OGRCoordinateTransformationH hTransform);
 OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH hTransform);
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/ogr/ogr_srs_api.h
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1150,6 +1158,10 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
 =======
 >>>>>>> 5d1d6dfdab (Merge pull request #3822 from rouault/gml_srs)
 =======
+=======
+>>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> b30dbf7205 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
 OGRSpatialReferenceH CPL_DLL OCTGetSourceCS(OGRCoordinateTransformationH hTransform);
 OGRSpatialReferenceH CPL_DLL OCTGetTargetCS(OGRCoordinateTransformationH hTransform);
 OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH hTransform);
@@ -1160,10 +1172,14 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b30dbf7205 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
 =======
 >>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -1194,6 +1210,8 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
 =======
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
 >>>>>>> 5d1d6dfdab (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> b30dbf7205 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 void CPL_DLL CPL_STDCALL
       OCTDestroyCoordinateTransformation( OGRCoordinateTransformationH );
