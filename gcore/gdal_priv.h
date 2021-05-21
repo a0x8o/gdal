@@ -3005,12 +3005,15 @@ bool CPL_DLL GDALBufferHasOnlyNoData(const void* pBuffer,
                                      int nBitsPerSample,
                                      GDALBufferSampleFormat nSampleFormat);
 
+<<<<<<< HEAD:gcore/gdal_priv.h
 void CPL_DLL GDALCopyNoDataValue(GDALRasterBand* poDstBand,
                                  GDALRasterBand* poSrcBand);
 
 double CPL_DLL GDALGetNoDataValueCastToDouble(int64_t nVal);
 double CPL_DLL GDALGetNoDataValueCastToDouble(uint64_t nVal);
 
+=======
+>>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdal_priv.h
 //! @endcond
 
 #endif /* ndef GDAL_PRIV_H_INCLUDED */
