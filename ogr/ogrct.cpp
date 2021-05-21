@@ -1108,6 +1108,7 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
  *
  * This is the same as the C++ function OGRCreateCoordinateTransformation::Clone
 <<<<<<< HEAD
+<<<<<<< HEAD
  *
  * @return handle to transformation's clone or NULL on error,
  *         must be freed with OCTDestroyCoordinateTransformation
@@ -1115,6 +1116,12 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
 =======
 
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+=======
+ *
+ * @return handle to transformation's clone or NULL on error, 
+ *         must be freed with OCTDestroyCoordinateTransformation
+ *
+>>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
  * @since GDAL 3.4
  */
 
@@ -1129,6 +1136,9 @@ OCTClone(OGRCoordinateTransformationH hTransform)
 
 /************************************************************************/
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
 /*                             OCTGetSourceCS()                         */
 /************************************************************************/
 
@@ -1185,7 +1195,11 @@ OGRSpatialReferenceH OCTGetTargetCS(OGRCoordinateTransformationH hTransform)
  *
  * This is the same as the C++ function OGRCreateCoordinateTransformation::GetInverse
  *
+<<<<<<< HEAD
  * @return handle to inverse transformation or NULL on error,
+=======
+ * @return handle to inverse transformation or NULL on error, 
+>>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
  *         must be freed with OCTDestroyCoordinateTransformation
  *
  * @since GDAL 3.4
@@ -1200,8 +1214,11 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
 }
 
 /************************************************************************/
+<<<<<<< HEAD
 =======
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
 /*                             OGRProjCT()                             */
 /************************************************************************/
 
