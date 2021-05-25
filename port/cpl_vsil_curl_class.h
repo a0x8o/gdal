@@ -456,8 +456,11 @@ class IVSIS3LikeFSHandler: public VSICurlFilesystemHandlerBase
 
     int RmdirRecursiveInternal( const char* pszDirname, int nBatchSize);
 
+<<<<<<< HEAD:port/cpl_vsil_curl_class.h
     virtual bool IsAllowedHeaderForObjectCreation( const char* /* pszHeaderName */ ) { return false; }
 
+=======
+>>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_vsil_curl_class.h
     IVSIS3LikeFSHandler() = default;
 
   public:
