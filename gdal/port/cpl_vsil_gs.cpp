@@ -221,8 +221,11 @@ const char* VSIGSFSHandler::GetOptions()
         "description='Secret access key. To use with GS_ACCESS_KEY_ID'/>"
     "  <Option name='GS_ACCESS_KEY_ID' type='string' "
         "description='Access key id'/>"
+<<<<<<< HEAD
     "  <Option name='GS_NO_SIGN_REQUEST' type='boolean' "
         "description='Whether to disable signing of requests' default='NO'/>"
+=======
+>>>>>>> b39a831ddf (Merge branch 'master' of github.com:OSGeo/gdal)
     "  <Option name='GS_OAUTH2_REFRESH_TOKEN' type='string' "
         "description='OAuth2 refresh token. For OAuth2 client authentication. "
         "To use with GS_OAUTH2_CLIENT_ID and GS_OAUTH2_CLIENT_SECRET'/>"
@@ -253,8 +256,13 @@ const char* VSIGSFSHandler::GetOptions()
         "default='~/.aws/config'/>"
     "  <Option name='CPL_GS_CREDENTIALS_FILE' type='string' "
         "description='Filename that contains Google Storage credentials' "
+<<<<<<< HEAD
         "default='~/.boto'/>"
     + VSICurlFilesystemHandler::GetOptionsStatic() +
+=======
+        "default='~/.boto'/>" +
+        VSICurlFilesystemHandler::GetOptionsStatic() +
+>>>>>>> b39a831ddf (Merge branch 'master' of github.com:OSGeo/gdal)
         "</Options>");
     return osOptions.c_str();
 }
@@ -416,6 +424,7 @@ bool VSIGSFSHandler::SetFileMetadata( const char * pszFilename,
     if( !STARTS_WITH_CI(pszFilename, GetFSPrefix()) )
         return false;
 
+<<<<<<< HEAD
     if( pszDomain == nullptr ||
         !(EQUAL(pszDomain, "HEADERS") || EQUAL(pszDomain, "ACL")) )
     {
@@ -429,6 +438,15 @@ bool VSIGSFSHandler::SetFileMetadata( const char * pszFilename,
         return CopyObject(pszFilename, pszFilename, papszMetadata) == 0;
     }
 
+=======
+    if( pszDomain == nullptr || !(EQUAL(pszDomain, "ACL")) )
+    {
+        CPLError(CE_Failure, CPLE_NotSupported,
+                 "Only ACL domain is supported");
+        return false;
+    }
+
+>>>>>>> b39a831ddf (Merge branch 'master' of github.com:OSGeo/gdal)
     const char* pszXML = CSLFetchNameValue(papszMetadata, "XML");
     if( pszXML == nullptr )
     {

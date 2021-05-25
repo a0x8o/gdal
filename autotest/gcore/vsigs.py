@@ -851,6 +851,7 @@ def test_vsigs_acl():
             assert not gdal.SetFileMetadata('/vsigs/test_metadata/foo.txt', {'XML': '<foo/>'}, 'ACL')
 
 ###############################################################################
+<<<<<<< HEAD
 # Test reading/writing HEADERS
 
 
@@ -897,6 +898,8 @@ def test_vsigs_headers():
 >>>>>>> OSGeo-master
 
 ###############################################################################
+=======
+>>>>>>> b39a831ddf (Merge branch 'master' of github.com:OSGeo/gdal)
 # Read credentials with OAuth2 refresh_token
 
 
