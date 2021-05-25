@@ -227,6 +227,7 @@ const char* VSIGSFSHandler::GetOptions()
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     "  <Option name='GS_NO_SIGN_REQUEST' type='boolean' "
         "description='Whether to disable signing of requests' default='NO'/>"
 =======
@@ -256,6 +257,8 @@ const char* VSIGSFSHandler::GetOptions()
     "  <Option name='GS_NO_SIGN_REQUEST' type='boolean' "
         "description='Whether to disable signing of requests' default='NO'/>"
 >>>>>>> baada40179 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> e347273b13 (Merge branch 'master' of github.com:OSGeo/gdal)
     "  <Option name='GS_OAUTH2_REFRESH_TOKEN' type='string' "
         "description='OAuth2 refresh token. For OAuth2 client authentication. "
         "To use with GS_OAUTH2_CLIENT_ID and GS_OAUTH2_CLIENT_SECRET'/>"
@@ -292,6 +295,7 @@ const char* VSIGSFSHandler::GetOptions()
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> d42a2ed026 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -325,6 +329,10 @@ const char* VSIGSFSHandler::GetOptions()
         "default='~/.boto'/>"
     + VSICurlFilesystemHandler::GetOptionsStatic() +
 >>>>>>> baada40179 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+        "default='~/.boto'/>" +
+        VSICurlFilesystemHandler::GetOptionsStatic() +
+>>>>>>> e347273b13 (Merge branch 'master' of github.com:OSGeo/gdal)
         "</Options>");
     return osOptions.c_str();
 }
@@ -492,6 +500,7 @@ bool VSIGSFSHandler::SetFileMetadata( const char * pszFilename,
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> d42a2ed026 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -579,6 +588,15 @@ bool VSIGSFSHandler::SetFileMetadata( const char * pszFilename,
     }
 
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+    if( pszDomain == nullptr || !(EQUAL(pszDomain, "ACL")) )
+    {
+        CPLError(CE_Failure, CPLE_NotSupported,
+                 "Only ACL domain is supported");
+        return false;
+    }
+
+>>>>>>> e347273b13 (Merge branch 'master' of github.com:OSGeo/gdal)
     const char* pszXML = CSLFetchNameValue(papszMetadata, "XML");
     if( pszXML == nullptr )
     {
