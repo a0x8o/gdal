@@ -10675,7 +10675,11 @@ SWIGINTERN PyObject *_wrap_CPLBinaryToHex(PyObject *SWIGUNUSEDPARM(self), PyObje
       size_t safeLen = 0;
       int ret;
       try {
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[0], (char**) &arg2, &safeLen, &alloc1);
+=======
+        ret = SWIG_AsCharPtrAndSize(obj0, (char**) &arg2, &safeLen, &alloc1);
+>>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
       }
       catch( const std::exception& )
       {
@@ -10847,7 +10851,11 @@ SWIGINTERN PyObject *_wrap_FileFromMemBuffer(PyObject *SWIGUNUSEDPARM(self), PyO
       size_t safeLen = 0;
       int ret;
       try {
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[1], (char**) &arg3, &safeLen, &alloc2);
+=======
+        ret = SWIG_AsCharPtrAndSize(obj1, (char**) &arg3, &safeLen, &alloc2);
+>>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
       }
       catch( const std::exception& )
       {
@@ -11645,6 +11653,7 @@ SWIGINTERN PyObject *_wrap_AbortPendingUploads(PyObject *SWIGUNUSEDPARM(self), P
   PyObject *resultobj = 0; int bLocalUseExceptionsCode = bUseExceptions;
   char *arg1 = (char *) 0 ;
   int bToFree1 = 0 ;
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
   PyObject *swig_obj[1] ;
   bool result;
   
@@ -11653,6 +11662,15 @@ SWIGINTERN PyObject *_wrap_AbortPendingUploads(PyObject *SWIGUNUSEDPARM(self), P
   {
     /* %typemap(in) (const char *utf8_path) */
     arg1 = GDALPythonObjectToCStr( swig_obj[0], &bToFree1 );
+=======
+  PyObject * obj0 = 0 ;
+  bool result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:AbortPendingUploads",&obj0)) SWIG_fail;
+  {
+    /* %typemap(in) (const char *utf8_path) */
+    arg1 = GDALPythonObjectToCStr( obj0, &bToFree1 );
+>>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
     if (arg1 == NULL)
     {
       PyErr_SetString( PyExc_RuntimeError, "not a string" );
@@ -13184,7 +13202,11 @@ SWIGINTERN PyObject *_wrap_VSIFWriteL(PyObject *SWIGUNUSEDPARM(self), PyObject *
       size_t safeLen = 0;
       int ret;
       try {
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[0], (char**) &arg2, &safeLen, &alloc1);
+=======
+        ret = SWIG_AsCharPtrAndSize(obj0, (char**) &arg2, &safeLen, &alloc1);
+>>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
       }
       catch( const std::exception& )
       {
@@ -24815,7 +24837,11 @@ SWIGINTERN PyObject *_wrap_MDArray_Write(PyObject *SWIGUNUSEDPARM(self), PyObjec
       size_t safeLen = 0;
       int ret;
       try {
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[6], (char**) &arg12, &safeLen, &alloc11);
+=======
+        ret = SWIG_AsCharPtrAndSize(obj6, (char**) &arg12, &safeLen, &alloc11);
+>>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
       }
       catch( const std::exception& )
       {
@@ -25869,7 +25895,11 @@ SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueRaw(PyObject *SWIGUNUSEDPARM(se
       size_t safeLen = 0;
       int ret;
       try {
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[1], (char**) &arg3, &safeLen, &alloc2);
+=======
+        ret = SWIG_AsCharPtrAndSize(obj1, (char**) &arg3, &safeLen, &alloc2);
+>>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
       }
       catch( const std::exception& )
       {
@@ -27980,7 +28010,11 @@ SWIGINTERN PyObject *_wrap_Attribute_WriteRaw(PyObject *SWIGUNUSEDPARM(self), Py
       size_t safeLen = 0;
       int ret;
       try {
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[1], (char**) &arg3, &safeLen, &alloc2);
+=======
+        ret = SWIG_AsCharPtrAndSize(obj1, (char**) &arg3, &safeLen, &alloc2);
+>>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
       }
       catch( const std::exception& )
       {
@@ -44510,6 +44544,7 @@ fail:
 
 
 static PyMethodDef SwigMethods[] = {
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
 	 { "SWIG_PyInstanceMethod_New", SWIG_PyInstanceMethod_New, METH_O, NULL},
 	 { "GetUseExceptions", _wrap_GetUseExceptions, METH_NOARGS, "GetUseExceptions() -> int"},
 	 { "UseExceptions", _wrap_UseExceptions, METH_NOARGS, "UseExceptions()"},
@@ -44617,6 +44652,107 @@ static PyMethodDef SwigMethods[] = {
 	 { "MajorObject_SetMetadata", _wrap_MajorObject_SetMetadata, METH_VARARGS, "\n"
 		"MajorObject_SetMetadata(MajorObject self, char ** papszMetadata, char const * pszDomain=\"\") -> CPLErr\n"
 		"MajorObject_SetMetadata(MajorObject self, char * pszMetadataString, char const * pszDomain=\"\") -> CPLErr\n"
+=======
+	 { (char *)"SWIG_PyInstanceMethod_New", (PyCFunction)SWIG_PyInstanceMethod_New, METH_O, NULL},
+	 { (char *)"GetUseExceptions", _wrap_GetUseExceptions, METH_VARARGS, (char *)"GetUseExceptions() -> int"},
+	 { (char *)"UseExceptions", _wrap_UseExceptions, METH_VARARGS, (char *)"UseExceptions()"},
+	 { (char *)"DontUseExceptions", _wrap_DontUseExceptions, METH_VARARGS, (char *)"DontUseExceptions()"},
+	 { (char *)"VSIFReadL", _wrap_VSIFReadL, METH_VARARGS, (char *)"VSIFReadL(unsigned int nMembSize, unsigned int nMembCount, VSILFILE fp) -> unsigned int"},
+	 { (char *)"VSIGetMemFileBuffer_unsafe", _wrap_VSIGetMemFileBuffer_unsafe, METH_VARARGS, (char *)"VSIGetMemFileBuffer_unsafe(char const * utf8_path)"},
+	 { (char *)"Debug", _wrap_Debug, METH_VARARGS, (char *)"Debug(char const * msg_class, char const * message)"},
+	 { (char *)"SetErrorHandler", _wrap_SetErrorHandler, METH_VARARGS, (char *)"SetErrorHandler(CPLErrorHandler pfnErrorHandler=0) -> CPLErr"},
+	 { (char *)"SetCurrentErrorHandlerCatchDebug", _wrap_SetCurrentErrorHandlerCatchDebug, METH_VARARGS, (char *)"SetCurrentErrorHandlerCatchDebug(int bCatchDebug)"},
+	 { (char *)"PushErrorHandler", _wrap_PushErrorHandler, METH_VARARGS, (char *)"PushErrorHandler(CPLErrorHandler pfnErrorHandler=0) -> CPLErr"},
+	 { (char *)"PopErrorHandler", _wrap_PopErrorHandler, METH_VARARGS, (char *)"PopErrorHandler()"},
+	 { (char *)"Error", _wrap_Error, METH_VARARGS, (char *)"Error(CPLErr msg_class, int err_code=0, char const * msg)"},
+	 { (char *)"GOA2GetAuthorizationURL", _wrap_GOA2GetAuthorizationURL, METH_VARARGS, (char *)"GOA2GetAuthorizationURL(char const * pszScope) -> retStringAndCPLFree *"},
+	 { (char *)"GOA2GetRefreshToken", _wrap_GOA2GetRefreshToken, METH_VARARGS, (char *)"GOA2GetRefreshToken(char const * pszAuthToken, char const * pszScope) -> retStringAndCPLFree *"},
+	 { (char *)"GOA2GetAccessToken", _wrap_GOA2GetAccessToken, METH_VARARGS, (char *)"GOA2GetAccessToken(char const * pszRefreshToken, char const * pszScope) -> retStringAndCPLFree *"},
+	 { (char *)"ErrorReset", _wrap_ErrorReset, METH_VARARGS, (char *)"ErrorReset()"},
+	 { (char *)"EscapeString", (PyCFunction) _wrap_EscapeString, METH_VARARGS | METH_KEYWORDS, (char *)"EscapeString(int len, int scheme) -> retStringAndCPLFree *"},
+	 { (char *)"GetLastErrorNo", _wrap_GetLastErrorNo, METH_VARARGS, (char *)"GetLastErrorNo() -> int"},
+	 { (char *)"GetLastErrorType", _wrap_GetLastErrorType, METH_VARARGS, (char *)"GetLastErrorType() -> int"},
+	 { (char *)"GetLastErrorMsg", _wrap_GetLastErrorMsg, METH_VARARGS, (char *)"GetLastErrorMsg() -> char const *"},
+	 { (char *)"GetErrorCounter", _wrap_GetErrorCounter, METH_VARARGS, (char *)"GetErrorCounter() -> unsigned int"},
+	 { (char *)"VSIGetLastErrorNo", _wrap_VSIGetLastErrorNo, METH_VARARGS, (char *)"VSIGetLastErrorNo() -> int"},
+	 { (char *)"VSIGetLastErrorMsg", _wrap_VSIGetLastErrorMsg, METH_VARARGS, (char *)"VSIGetLastErrorMsg() -> char const *"},
+	 { (char *)"VSIErrorReset", _wrap_VSIErrorReset, METH_VARARGS, (char *)"VSIErrorReset()"},
+	 { (char *)"PushFinderLocation", _wrap_PushFinderLocation, METH_VARARGS, (char *)"PushFinderLocation(char const * utf8_path)"},
+	 { (char *)"PopFinderLocation", _wrap_PopFinderLocation, METH_VARARGS, (char *)"PopFinderLocation()"},
+	 { (char *)"FinderClean", _wrap_FinderClean, METH_VARARGS, (char *)"FinderClean()"},
+	 { (char *)"FindFile", _wrap_FindFile, METH_VARARGS, (char *)"FindFile(char const * pszClass, char const * utf8_path) -> char const *"},
+	 { (char *)"ReadDir", _wrap_ReadDir, METH_VARARGS, (char *)"ReadDir(char const * utf8_path, int nMaxFiles=0) -> char **"},
+	 { (char *)"ReadDirRecursive", _wrap_ReadDirRecursive, METH_VARARGS, (char *)"ReadDirRecursive(char const * utf8_path) -> char **"},
+	 { (char *)"OpenDir", _wrap_OpenDir, METH_VARARGS, (char *)"OpenDir(char const * utf8_path, int nRecurseDepth=-1, char ** options=None) -> VSIDIR *"},
+	 { (char *)"DirEntry_name_get", _wrap_DirEntry_name_get, METH_VARARGS, (char *)"DirEntry_name_get(DirEntry self) -> char *"},
+	 { (char *)"DirEntry_mode_get", _wrap_DirEntry_mode_get, METH_VARARGS, (char *)"DirEntry_mode_get(DirEntry self) -> int"},
+	 { (char *)"DirEntry_size_get", _wrap_DirEntry_size_get, METH_VARARGS, (char *)"DirEntry_size_get(DirEntry self) -> GIntBig"},
+	 { (char *)"DirEntry_mtime_get", _wrap_DirEntry_mtime_get, METH_VARARGS, (char *)"DirEntry_mtime_get(DirEntry self) -> GIntBig"},
+	 { (char *)"DirEntry_modeKnown_get", _wrap_DirEntry_modeKnown_get, METH_VARARGS, (char *)"DirEntry_modeKnown_get(DirEntry self) -> bool"},
+	 { (char *)"DirEntry_sizeKnown_get", _wrap_DirEntry_sizeKnown_get, METH_VARARGS, (char *)"DirEntry_sizeKnown_get(DirEntry self) -> bool"},
+	 { (char *)"DirEntry_mtimeKnown_get", _wrap_DirEntry_mtimeKnown_get, METH_VARARGS, (char *)"DirEntry_mtimeKnown_get(DirEntry self) -> bool"},
+	 { (char *)"DirEntry_extra_get", _wrap_DirEntry_extra_get, METH_VARARGS, (char *)"DirEntry_extra_get(DirEntry self) -> char **"},
+	 { (char *)"new_DirEntry", _wrap_new_DirEntry, METH_VARARGS, (char *)"new_DirEntry(DirEntry entryIn) -> DirEntry"},
+	 { (char *)"delete_DirEntry", _wrap_delete_DirEntry, METH_VARARGS, (char *)"delete_DirEntry(DirEntry self)"},
+	 { (char *)"DirEntry_IsDirectory", _wrap_DirEntry_IsDirectory, METH_VARARGS, (char *)"DirEntry_IsDirectory(DirEntry self) -> bool"},
+	 { (char *)"DirEntry_swigregister", DirEntry_swigregister, METH_VARARGS, NULL},
+	 { (char *)"GetNextDirEntry", _wrap_GetNextDirEntry, METH_VARARGS, (char *)"GetNextDirEntry(VSIDIR * dir) -> DirEntry"},
+	 { (char *)"CloseDir", _wrap_CloseDir, METH_VARARGS, (char *)"CloseDir(VSIDIR * dir)"},
+	 { (char *)"SetConfigOption", _wrap_SetConfigOption, METH_VARARGS, (char *)"SetConfigOption(char const * pszKey, char const * pszValue)"},
+	 { (char *)"GetConfigOption", _wrap_GetConfigOption, METH_VARARGS, (char *)"GetConfigOption(char const * pszKey, char const * pszDefault=None) -> char const *"},
+	 { (char *)"CPLBinaryToHex", _wrap_CPLBinaryToHex, METH_VARARGS, (char *)"CPLBinaryToHex(int nBytes) -> retStringAndCPLFree *"},
+	 { (char *)"CPLHexToBinary", _wrap_CPLHexToBinary, METH_VARARGS, (char *)"CPLHexToBinary(char const * pszHex, int * pnBytes) -> GByte *"},
+	 { (char *)"FileFromMemBuffer", _wrap_FileFromMemBuffer, METH_VARARGS, (char *)"FileFromMemBuffer(char const * utf8_path, GIntBig nBytes)"},
+	 { (char *)"Unlink", _wrap_Unlink, METH_VARARGS, (char *)"Unlink(char const * utf8_path) -> VSI_RETVAL"},
+	 { (char *)"UnlinkBatch", _wrap_UnlinkBatch, METH_VARARGS, (char *)"UnlinkBatch(char ** files) -> bool"},
+	 { (char *)"HasThreadSupport", _wrap_HasThreadSupport, METH_VARARGS, (char *)"HasThreadSupport() -> int"},
+	 { (char *)"Mkdir", _wrap_Mkdir, METH_VARARGS, (char *)"Mkdir(char const * utf8_path, int mode) -> VSI_RETVAL"},
+	 { (char *)"Rmdir", _wrap_Rmdir, METH_VARARGS, (char *)"Rmdir(char const * utf8_path) -> VSI_RETVAL"},
+	 { (char *)"MkdirRecursive", _wrap_MkdirRecursive, METH_VARARGS, (char *)"MkdirRecursive(char const * utf8_path, int mode) -> VSI_RETVAL"},
+	 { (char *)"RmdirRecursive", _wrap_RmdirRecursive, METH_VARARGS, (char *)"RmdirRecursive(char const * utf8_path) -> VSI_RETVAL"},
+	 { (char *)"Rename", _wrap_Rename, METH_VARARGS, (char *)"Rename(char const * pszOld, char const * pszNew) -> VSI_RETVAL"},
+	 { (char *)"Sync", (PyCFunction) _wrap_Sync, METH_VARARGS | METH_KEYWORDS, (char *)"Sync(char const * pszSource, char const * pszTarget, char ** options=None, GDALProgressFunc callback=0, void * callback_data=None) -> bool"},
+	 { (char *)"AbortPendingUploads", _wrap_AbortPendingUploads, METH_VARARGS, (char *)"AbortPendingUploads(char const * utf8_path) -> bool"},
+	 { (char *)"GetActualURL", _wrap_GetActualURL, METH_VARARGS, (char *)"GetActualURL(char const * utf8_path) -> char const *"},
+	 { (char *)"GetSignedURL", _wrap_GetSignedURL, METH_VARARGS, (char *)"GetSignedURL(char const * utf8_path, char ** options=None) -> retStringAndCPLFree *"},
+	 { (char *)"GetFileSystemsPrefixes", _wrap_GetFileSystemsPrefixes, METH_VARARGS, (char *)"GetFileSystemsPrefixes() -> char **"},
+	 { (char *)"GetFileSystemOptions", _wrap_GetFileSystemOptions, METH_VARARGS, (char *)"GetFileSystemOptions(char const * utf8_path) -> char const *"},
+	 { (char *)"VSILFILE_swigregister", VSILFILE_swigregister, METH_VARARGS, NULL},
+	 { (char *)"StatBuf_mode_get", _wrap_StatBuf_mode_get, METH_VARARGS, (char *)"StatBuf_mode_get(StatBuf self) -> int"},
+	 { (char *)"StatBuf_size_get", _wrap_StatBuf_size_get, METH_VARARGS, (char *)"StatBuf_size_get(StatBuf self) -> GIntBig"},
+	 { (char *)"StatBuf_mtime_get", _wrap_StatBuf_mtime_get, METH_VARARGS, (char *)"StatBuf_mtime_get(StatBuf self) -> GIntBig"},
+	 { (char *)"new_StatBuf", _wrap_new_StatBuf, METH_VARARGS, (char *)"new_StatBuf(StatBuf psStatBuf) -> StatBuf"},
+	 { (char *)"delete_StatBuf", _wrap_delete_StatBuf, METH_VARARGS, (char *)"delete_StatBuf(StatBuf self)"},
+	 { (char *)"StatBuf_IsDirectory", _wrap_StatBuf_IsDirectory, METH_VARARGS, (char *)"StatBuf_IsDirectory(StatBuf self) -> int"},
+	 { (char *)"StatBuf_swigregister", StatBuf_swigregister, METH_VARARGS, NULL},
+	 { (char *)"VSIStatL", _wrap_VSIStatL, METH_VARARGS, (char *)"VSIStatL(char const * utf8_path, int nFlags=0) -> int"},
+	 { (char *)"GetFileMetadata", _wrap_GetFileMetadata, METH_VARARGS, (char *)"GetFileMetadata(char const * utf8_path, char const * domain, char ** options=None) -> char **"},
+	 { (char *)"SetFileMetadata", _wrap_SetFileMetadata, METH_VARARGS, (char *)"SetFileMetadata(char const * utf8_path, char ** metadata, char const * domain, char ** options=None) -> bool"},
+	 { (char *)"VSIFOpenL", _wrap_VSIFOpenL, METH_VARARGS, (char *)"VSIFOpenL(char const * utf8_path, char const * pszMode) -> VSILFILE"},
+	 { (char *)"VSIFOpenExL", _wrap_VSIFOpenExL, METH_VARARGS, (char *)"VSIFOpenExL(char const * utf8_path, char const * pszMode, int bSetError=False, char ** options=None) -> VSILFILE"},
+	 { (char *)"VSIFEofL", _wrap_VSIFEofL, METH_VARARGS, (char *)"VSIFEofL(VSILFILE fp) -> int"},
+	 { (char *)"VSIFFlushL", _wrap_VSIFFlushL, METH_VARARGS, (char *)"VSIFFlushL(VSILFILE fp) -> int"},
+	 { (char *)"VSIFCloseL", _wrap_VSIFCloseL, METH_VARARGS, (char *)"VSIFCloseL(VSILFILE fp) -> VSI_RETVAL"},
+	 { (char *)"VSIFSeekL", _wrap_VSIFSeekL, METH_VARARGS, (char *)"VSIFSeekL(VSILFILE fp, GIntBig offset, int whence) -> int"},
+	 { (char *)"VSIFTellL", _wrap_VSIFTellL, METH_VARARGS, (char *)"VSIFTellL(VSILFILE fp) -> GIntBig"},
+	 { (char *)"VSIFTruncateL", _wrap_VSIFTruncateL, METH_VARARGS, (char *)"VSIFTruncateL(VSILFILE fp, GIntBig length) -> int"},
+	 { (char *)"VSISupportsSparseFiles", _wrap_VSISupportsSparseFiles, METH_VARARGS, (char *)"VSISupportsSparseFiles(char const * utf8_path) -> int"},
+	 { (char *)"VSIFGetRangeStatusL", _wrap_VSIFGetRangeStatusL, METH_VARARGS, (char *)"VSIFGetRangeStatusL(VSILFILE fp, GIntBig offset, GIntBig length) -> int"},
+	 { (char *)"VSIFWriteL", _wrap_VSIFWriteL, METH_VARARGS, (char *)"VSIFWriteL(int nLen, int size, int memb, VSILFILE fp) -> int"},
+	 { (char *)"VSICurlClearCache", _wrap_VSICurlClearCache, METH_VARARGS, (char *)"VSICurlClearCache()"},
+	 { (char *)"VSICurlPartialClearCache", _wrap_VSICurlPartialClearCache, METH_VARARGS, (char *)"VSICurlPartialClearCache(char const * utf8_path)"},
+	 { (char *)"NetworkStatsReset", _wrap_NetworkStatsReset, METH_VARARGS, (char *)"NetworkStatsReset()"},
+	 { (char *)"NetworkStatsGetAsSerializedJSON", _wrap_NetworkStatsGetAsSerializedJSON, METH_VARARGS, (char *)"NetworkStatsGetAsSerializedJSON(char ** options=None) -> retStringAndCPLFree *"},
+	 { (char *)"ParseCommandLine", _wrap_ParseCommandLine, METH_VARARGS, (char *)"ParseCommandLine(char const * utf8_path) -> char **"},
+	 { (char *)"MajorObject_GetDescription", _wrap_MajorObject_GetDescription, METH_VARARGS, (char *)"MajorObject_GetDescription(MajorObject self) -> char const *"},
+	 { (char *)"MajorObject_SetDescription", _wrap_MajorObject_SetDescription, METH_VARARGS, (char *)"MajorObject_SetDescription(MajorObject self, char const * pszNewDesc)"},
+	 { (char *)"MajorObject_GetMetadataDomainList", _wrap_MajorObject_GetMetadataDomainList, METH_VARARGS, (char *)"MajorObject_GetMetadataDomainList(MajorObject self) -> char **"},
+	 { (char *)"MajorObject_GetMetadata_Dict", _wrap_MajorObject_GetMetadata_Dict, METH_VARARGS, (char *)"MajorObject_GetMetadata_Dict(MajorObject self, char const * pszDomain) -> char **"},
+	 { (char *)"MajorObject_GetMetadata_List", _wrap_MajorObject_GetMetadata_List, METH_VARARGS, (char *)"MajorObject_GetMetadata_List(MajorObject self, char const * pszDomain) -> char **"},
+	 { (char *)"MajorObject_SetMetadata", _wrap_MajorObject_SetMetadata, METH_VARARGS, (char *)"\n"
+		"SetMetadata(char ** papszMetadata, char const * pszDomain) -> CPLErr\n"
+		"MajorObject_SetMetadata(MajorObject self, char * pszMetadataString, char const * pszDomain) -> CPLErr\n"
+>>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
 		""},
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
 	 { "MajorObject_GetMetadataItem", _wrap_MajorObject_GetMetadataItem, METH_VARARGS, "MajorObject_GetMetadataItem(MajorObject self, char const * pszName, char const * pszDomain=\"\") -> char const *"},
