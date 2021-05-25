@@ -2887,6 +2887,46 @@ def test_vsis3_write_multipart_retry(aws_test_config, webserver_port):
                 gdal.VSIFCloseL(f)
 
 
+
+###############################################################################
+# Test abort pending multipart uploads
+
+
+def test_vsis3_abort_pending_uploads():
+
+    if gdaltest.webserver_port == 0:
+        pytest.skip()
+
+    handler = webserver.SequentialHandler()
+    handler.add('GET', '/my_bucket/?max-uploads=1&uploads', 200, {},
+                """<?xml version="1.0"?>
+                <ListMultipartUploadsResult>
+                    <NextKeyMarker>next_key_marker</NextKeyMarker>
+                    <NextUploadIdMarker>next_upload_id_marker</NextUploadIdMarker>
+                    <IsTruncated>true</IsTruncated>
+                    <Upload>
+                        <Key>my_key</Key>
+                        <UploadId>my_upload_id</UploadId>
+                    </Upload>
+                </ListMultipartUploadsResult>
+                """)
+    handler.add('GET', '/my_bucket/?key-marker=next_key_marker&max-uploads=1&upload-id-marker=next_upload_id_marker&uploads', 200, {},
+                """<?xml version="1.0"?>
+                <ListMultipartUploadsResult>
+                    <IsTruncated>false</IsTruncated>
+                    <Upload>
+                        <Key>my_key2</Key>
+                        <UploadId>my_upload_id2</UploadId>
+                    </Upload>
+                </ListMultipartUploadsResult>
+                """)
+    handler.add('DELETE', "/my_bucket/my_key?uploadId=my_upload_id", 204)
+    handler.add('DELETE', "/my_bucket/my_key2?uploadId=my_upload_id2", 204)
+    with webserver.install_http_handler(handler):
+        with gdaltest.config_option('CPL_VSIS3_LIST_UPLOADS_MAX', '1'):
+            assert gdal.AbortPendingUploads('/vsis3/my_bucket')
+
+
 ###############################################################################
 # Test abort pending multipart uploads
 
@@ -3157,6 +3197,10 @@ def test_vsis3_7(aws_test_config, webserver_port):
         ) is not None
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal)
 ###############################################################################
 # Test handling of file and directory with same name
 

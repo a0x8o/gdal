@@ -1714,7 +1714,11 @@ def Sync(*args, **kwargs):
     return _gdal.Sync(*args, **kwargs)
 
 def AbortPendingUploads(*args):
+<<<<<<< HEAD:swig/python/osgeo/gdal.py
     r"""AbortPendingUploads(char const * utf8_path) -> bool"""
+=======
+    """AbortPendingUploads(char const * utf8_path) -> bool"""
+>>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/osgeo/gdal.py
     return _gdal.AbortPendingUploads(*args)
 
 def GetActualURL(*args):
