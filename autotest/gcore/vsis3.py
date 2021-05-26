@@ -4076,6 +4076,7 @@ def test_vsis3_fake_sync_multithreaded_upload_chunk_size_failure(
     gdal.FileFromMemBuffer('/vsimem/test/foo', 'foo\n')
 
     handler = webserver.SequentialHandler()
+<<<<<<< HEAD
     handler.add(
         'GET',
         '/test_bucket/?prefix=test%2F',
@@ -4128,6 +4129,20 @@ def test_vsis3_fake_sync_multithreaded_upload_chunk_size_failure(
         '/test_bucket/test/foo?uploadId=my_id',
         204
     )
+=======
+    handler.add('GET', '/test_bucket/?prefix=test%2F', 200)
+    handler.add('GET', '/test_bucket/test', 404)
+    handler.add('GET', '/test_bucket/?delimiter=%2F&max-keys=100&prefix=test%2F', 200)
+    handler.add('GET', '/test_bucket/', 200)
+    handler.add('GET', '/test_bucket/test/', 404)
+    handler.add('PUT', '/test_bucket/test/', 200)
+    handler.add('POST', '/test_bucket/test/foo?uploads', 200, {'Content-type': 'application:/xml'},
+                b'<?xml version="1.0" encoding="UTF-8"?><InitiateMultipartUploadResult><UploadId>my_id</UploadId></InitiateMultipartUploadResult>')
+    handler.add('PUT', '/test_bucket/test/foo?partNumber=1&uploadId=my_id', 200,
+                {'ETag':  '"first_etag"'},
+                expected_headers = {'Content-Length': '3'})
+    handler.add('DELETE', '/test_bucket/test/foo?uploadId=my_id', 204)
+>>>>>>> 8d1efd1c06 (Merge branch 'master' of github.com:OSGeo/gdal)
 
     with gdaltest.config_options({'VSIS3_SIMULATE_THREADING': 'YES',
                                   'VSIS3_SYNC_MULTITHREADING': 'NO'}):
@@ -4181,6 +4196,7 @@ def test_vsis3_metadata(aws_test_config, webserver_port):
 
     # Write HEADERS domain
     handler = webserver.SequentialHandler()
+<<<<<<< HEAD
     handler.add(
         'PUT',
         '/test_metadata/foo.txt',
@@ -4192,6 +4208,12 @@ def test_vsis3_metadata(aws_test_config, webserver_port):
             'x-amz-copy-source': '/test_metadata/foo.txt'
         }
     )
+=======
+    handler.add('PUT', '/test_metadata/foo.txt', 200, {},
+                expected_headers = {'foo': 'bar',
+                                    'x-amz-metadata-directive': 'REPLACE',
+                                    'x-amz-copy-source': '/test_metadata/foo.txt'})
+>>>>>>> 8d1efd1c06 (Merge branch 'master' of github.com:OSGeo/gdal)
     with webserver.install_http_handler(handler):
         assert gdal.SetFileMetadata(
             '/vsis3/test_metadata/foo.txt',
@@ -4201,11 +4223,16 @@ def test_vsis3_metadata(aws_test_config, webserver_port):
 
     # Write TAGS domain
     handler = webserver.SequentialHandler()
+<<<<<<< HEAD
     handler.add(
         'PUT',
         '/test_metadata/foo.txt?tagging',
         200,
         expected_body=b"""<?xml version="1.0" encoding="UTF-8"?>
+=======
+    handler.add('PUT', '/test_metadata/foo.txt?tagging', 200,
+                expected_body = b"""<?xml version="1.0" encoding="UTF-8"?>
+>>>>>>> 8d1efd1c06 (Merge branch 'master' of github.com:OSGeo/gdal)
 <Tagging xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
   <TagSet>
     <Tag>
