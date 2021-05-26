@@ -425,6 +425,7 @@ bool VSIGSFSHandler::SetFileMetadata( const char * pszFilename,
         return false;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     if( pszDomain == nullptr ||
         !(EQUAL(pszDomain, "HEADERS") || EQUAL(pszDomain, "ACL")) )
     {
@@ -440,13 +441,25 @@ bool VSIGSFSHandler::SetFileMetadata( const char * pszFilename,
 
 =======
     if( pszDomain == nullptr || !(EQUAL(pszDomain, "ACL")) )
+=======
+    if( pszDomain == nullptr ||
+        !(EQUAL(pszDomain, "HEADERS") || EQUAL(pszDomain, "ACL")) )
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
     {
         CPLError(CE_Failure, CPLE_NotSupported,
-                 "Only ACL domain is supported");
+                 "Only HEADERS and ACL domain are supported");
         return false;
     }
 
+<<<<<<< HEAD
 >>>>>>> 264c5ccbb0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+    if( EQUAL(pszDomain, "HEADERS") )
+    {
+        return CopyObject(pszFilename, pszFilename, papszMetadata) == 0;
+    }
+
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
     const char* pszXML = CSLFetchNameValue(papszMetadata, "XML");
     if( pszXML == nullptr )
     {
