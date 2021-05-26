@@ -852,6 +852,9 @@ def test_vsigs_acl():
 
 ###############################################################################
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 # Test reading/writing HEADERS
 
 
@@ -898,8 +901,11 @@ def test_vsigs_headers():
 >>>>>>> OSGeo-master
 
 ###############################################################################
+<<<<<<< HEAD
 =======
 >>>>>>> b39a831ddf (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 # Read credentials with OAuth2 refresh_token
 
 
