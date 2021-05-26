@@ -568,10 +568,14 @@ bool VSIGSFSHandler::SetFileMetadata( const char * pszFilename,
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> d42a2ed026 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 52d0f1a995 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -580,6 +584,8 @@ bool VSIGSFSHandler::SetFileMetadata( const char * pszFilename,
 =======
 >>>>>>> d42a2ed026 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> fd72dc30f5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
     if( pszDomain == nullptr ||
         !(EQUAL(pszDomain, "HEADERS") || EQUAL(pszDomain, "ACL")) )
     {
@@ -600,10 +606,13 @@ bool VSIGSFSHandler::SetFileMetadata( const char * pszFilename,
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> fd72dc30f5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
     if( pszDomain == nullptr ||
         !(EQUAL(pszDomain, "HEADERS") || EQUAL(pszDomain, "ACL")) )
@@ -626,12 +635,16 @@ bool VSIGSFSHandler::SetFileMetadata( const char * pszFilename,
 >>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
     if( pszDomain == nullptr ||
         !(EQUAL(pszDomain, "HEADERS") || EQUAL(pszDomain, "ACL")) )
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
     {
         CPLError(CE_Failure, CPLE_NotSupported,
                  "Only HEADERS and ACL domain are supported");
@@ -716,15 +729,31 @@ bool VSIGSFSHandler::SetFileMetadata( const char * pszFilename,
 >>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
     {
         CPLError(CE_Failure, CPLE_NotSupported,
-                 "Only ACL domain is supported");
+                 "Only HEADERS and ACL domain are supported");
         return false;
     }
 
+<<<<<<< HEAD
 >>>>>>> b39a831ddf (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> d42a2ed026 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> fd72dc30f5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+    if( EQUAL(pszDomain, "HEADERS") )
+    {
+        return CopyObject(pszFilename, pszFilename, papszMetadata) == 0;
+    }
+
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
     const char* pszXML = CSLFetchNameValue(papszMetadata, "XML");
     if( pszXML == nullptr )
     {

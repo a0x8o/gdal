@@ -709,17 +709,24 @@ def test_vsigs_acl():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> fd72dc30f5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> d42a2ed026 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -732,6 +739,8 @@ def test_vsigs_acl():
 >>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> fd72dc30f5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
 # Test reading/writing HEADERS
 
 
@@ -767,10 +776,13 @@ def test_vsigs_headers():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> fd72dc30f5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 264c5ccbb0 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -784,12 +796,16 @@ def test_vsigs_headers():
 >>>>>>> b39a831ddf (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> d42a2ed026 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> b39a831ddf (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> b39a831ddf (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -806,6 +822,8 @@ def test_vsigs_headers():
 >>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> fd72dc30f5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
 # Read credentials with OAuth2 refresh_token
 
 
