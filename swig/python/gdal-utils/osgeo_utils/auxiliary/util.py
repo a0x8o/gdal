@@ -565,11 +565,15 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 11d5e7d07e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 =======
 >>>>>>> a153e8e338 (Docker: alpine-normal: add lzma support [ci skip])
 =======
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> e81c96e8f4 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -602,11 +606,15 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
 =======
 >>>>>>> a153e8e338 (Docker: alpine-normal: add lzma support [ci skip])
 >>>>>>> fc56cc00f1 (Docker: alpine-normal: add lzma support [ci skip])
+=======
+>>>>>>> e81c96e8f4 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 11d5e7d07e (Merge branch 'master' of github.com:OSGeo/gdal)
             if ovr_idx != 0:
                 band = band.GetOverview(ovr_idx-1)
 =======
             band = band.GetOverview(ovr_idx-1)
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -631,6 +639,10 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
 =======
 >>>>>>> fc56cc00f1 (Docker: alpine-normal: add lzma support [ci skip])
 =======
+=======
+>>>>>>> e81c96e8f4 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 11d5e7d07e (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
             if ovr_idx != 0:
                 band = band.GetOverview(ovr_idx-1)
 >>>>>>> bdb6ec92bf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
@@ -640,10 +652,14 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 11d5e7d07e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> a153e8e338 (Docker: alpine-normal: add lzma support [ci skip])
 =======
 >>>>>>> e81c96e8f4 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 6d82960989 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -674,6 +690,8 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
 =======
 >>>>>>> a153e8e338 (Docker: alpine-normal: add lzma support [ci skip])
 >>>>>>> fc56cc00f1 (Docker: alpine-normal: add lzma support [ci skip])
+=======
+>>>>>>> 11d5e7d07e (Merge branch 'master' of github.com:OSGeo/gdal)
             if band is None:
                 raise Exception(f'Could not get overview {ovr_idx} from band {band_num} of file {filename_or_ds}')
         bands.append(band)
