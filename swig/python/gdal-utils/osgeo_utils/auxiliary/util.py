@@ -391,11 +391,16 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
         if ovr_idx:
             ovr_idx = get_ovr_idx(ds, ovr_idx)
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
             if ovr_idx != 0:
                 band = band.GetOverview(ovr_idx-1)
 =======
             band = band.GetOverview(ovr_idx-1)
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+=======
+            if ovr_idx != 0:
+                band = band.GetOverview(ovr_idx-1)
+>>>>>>> bdb6ec92bf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
             if band is None:
                 raise Exception(f'Could not get overview {ovr_idx} from band {band_num} of file {filename_or_ds}')
         bands.append(band)
