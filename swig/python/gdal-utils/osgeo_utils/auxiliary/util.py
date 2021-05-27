@@ -695,10 +695,13 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 11d5e7d07e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> d51454bf4a (Docker: alpine-normal: add lzma support [ci skip])
+=======
+>>>>>>> d2a2da654c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 =======
 >>>>>>> a153e8e338 (Docker: alpine-normal: add lzma support [ci skip])
@@ -744,6 +747,7 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
 =======
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
 >>>>>>> 8832feb74a (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 7d85c89fbb (Docker: alpine-normal: add lzma support [ci skip])
 =======
@@ -766,11 +770,14 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
 =======
 >>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
 >>>>>>> d51454bf4a (Docker: alpine-normal: add lzma support [ci skip])
+=======
+>>>>>>> d2a2da654c (Merge branch 'master' of github.com:OSGeo/gdal)
             if ovr_idx != 0:
                 band = band.GetOverview(ovr_idx-1)
 =======
             band = band.GetOverview(ovr_idx-1)
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -791,6 +798,8 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
 =======
 >>>>>>> d51454bf4a (Docker: alpine-normal: add lzma support [ci skip])
 =======
+>>>>>>> d2a2da654c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
 >>>>>>> e81c96e8f4 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 9b650fdeac (Docker: alpine-normal: add lzma support [ci skip])
@@ -803,6 +812,7 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
 >>>>>>> 8832feb74a (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6d82960989 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 8832feb74a (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -818,9 +828,14 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
 >>>>>>> 7c32ccac5a (Docker: alpine-normal: add lzma support [ci skip])
 =======
 >>>>>>> e5161c5a84 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 8832feb74a (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> d2a2da654c (Merge branch 'master' of github.com:OSGeo/gdal)
             if ovr_idx != 0:
                 band = band.GetOverview(ovr_idx-1)
 >>>>>>> bdb6ec92bf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/util.py
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -836,6 +851,8 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
 >>>>>>> 7c32ccac5a (Docker: alpine-normal: add lzma support [ci skip])
 =======
 >>>>>>> e5161c5a84 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> d2a2da654c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> a153e8e338 (Docker: alpine-normal: add lzma support [ci skip])
 =======
@@ -876,6 +893,7 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
 >>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
 =======
 >>>>>>> 8832feb74a (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 7d85c89fbb (Docker: alpine-normal: add lzma support [ci skip])
 =======
@@ -895,6 +913,8 @@ def get_bands(filename_or_ds: PathOrDS, band_nums: Optional[MaybeSequence[int]] 
 =======
 >>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
 >>>>>>> d51454bf4a (Docker: alpine-normal: add lzma support [ci skip])
+=======
+>>>>>>> d2a2da654c (Merge branch 'master' of github.com:OSGeo/gdal)
             if band is None:
                 raise Exception(f'Could not get overview {ovr_idx} from band {band_num} of file {filename_or_ds}')
         bands.append(band)
