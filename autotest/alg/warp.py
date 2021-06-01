@@ -1778,6 +1778,7 @@ def test_warp_rms_2():
     ds = gdal.Open('data/utmsmall_rms.vrt')
     # 29818 on non-Intel archs
     assert ds.GetRasterBand(1).Checksum() in (29818, 29819)
+<<<<<<< HEAD
 
 
 def test_warp_mode_ties():
@@ -1800,3 +1801,5 @@ def test_warp_mode_ties():
                                                     [5, 1, 0]]))
     out_ds = gdal.Warp('', src_ds, format='MEM', resampleAlg='mode', xRes=3, yRes=3)
     assert out_ds.GetRasterBand(1).ReadAsArray()[0, 0] == 5
+=======
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal)

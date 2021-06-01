@@ -102,11 +102,26 @@ std::unique_ptr<SQLResult> SQLQuery(sqlite3 * poDb, const char * pszSQL)
     {
         CPLError( CE_Failure, CPLE_AppDefined,
                   "sqlite3_get_table(%s) failed: %s", pszSQL, pszErrMsg );
+<<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogrsqliteutility.cpp
         sqlite3_free(pszErrMsg);
         return nullptr;
     }
 
     return cpl::make_unique<SQLResult>(papszResult, nRowCount, nColCount);
+=======
+        return nullptr;
+    }
+
+    if (pszErrMsg) {
+        sqlite3_free(pszErrMsg);
+    }
+
+    std::unique_ptr<SQLResult> poResult(new SQLResult(
+        papszResult, nRowCount, nColCount
+    ));
+
+    return poResult;
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqliteutility.cpp
 }
 
 const char* SQLResult::GetValue(int iColNum, int iRowNum) const
