@@ -1780,13 +1780,19 @@ def test_warp_rms_2():
     assert ds.GetRasterBand(1).Checksum() in (29818, 29819)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 =======
 <<<<<<< HEAD
 =======
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 
 
 def test_warp_mode_ties():
@@ -1812,9 +1818,17 @@ def test_warp_mode_ties():
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 >>>>>>> OSGeo-master
 =======
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
