@@ -1044,14 +1044,20 @@ OGRErr OGRGeoPackageTableLayer::ReadTableDefinition()
             for ( int iRecord = 0; iRecord < oResultTable->RowCount(); iRecord++ )
             {
                 const char *pszColumn = oResultTable->GetValue(0, iRecord);
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagetablelayer.cpp
 =======
+=======
+>>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagetablelayer.cpp
                 if( pszColumn == nullptr )
                     continue;
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagetablelayer.cpp
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagetablelayer.cpp
+=======
+>>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
                 const char *pszMimeType = oResultTable->GetValue(1, iRecord);
                 const char *pszConstraintName = oResultTable->GetValue(2, iRecord);
                 if( pszMimeType && EQUAL(pszMimeType, "application/json") )
@@ -4245,13 +4251,19 @@ char **OGRGeoPackageTableLayer::GetMetadata( const char *pszDomain )
         const char *pszMetadata = oResult->GetValue(0, i);
         const char* pszMDStandardURI = oResult->GetValue(1, i);
         const char* pszMimeType = oResult->GetValue(2, i);
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagetablelayer.cpp
 =======
+=======
+>>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagetablelayer.cpp
         if( pszMetadata && pszMDStandardURI && pszMimeType &&
             EQUAL(pszMDStandardURI, "http://gdal.org") &&
 =======
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagetablelayer.cpp
+=======
+>>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
         //const char* pszReferenceScope = oResult->GetValue(3, i);
         //int bIsGPKGScope = EQUAL(pszReferenceScope, "geopackage");
         if( EQUAL(pszMDStandardURI, "http://gdal.org") &&
@@ -4845,13 +4857,19 @@ OGRErr OGRGeoPackageTableLayer::AlterFieldDefn( int iFieldToAlter,
 /*      column if renaming. We re-install some indexes afterwards.      */
 /* -------------------------------------------------------------------- */
     std::unique_ptr<SQLResult> oTriggers;
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagetablelayer.cpp
 =======
+=======
+>>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagetablelayer.cpp
     // cppcheck-suppress knownConditionTrueFalse
     if( bRenameCol && !bUseRenameColumn )
 =======
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagetablelayer.cpp
+=======
+>>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
     if( bRenameCol )
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagetablelayer.cpp
     {

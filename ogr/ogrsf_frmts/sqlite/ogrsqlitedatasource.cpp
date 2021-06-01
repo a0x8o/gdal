@@ -623,15 +623,21 @@ void OGRSQLiteDataSource::SaveStatistics()
                   "SELECT event_id, table_name, geometry_column, event "
                   "FROM spatialite_history ORDER BY event_id DESC LIMIT 1" );
 
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
         if( oResult->RowCount() == 1 )
 =======
+=======
+>>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
         if( oResult && oResult->RowCount() == 1 )
 =======
         if( oResult->RowCount() == 1 )
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
+=======
+>>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
         {
             const char* pszEventId = oResult->GetValue(0, 0);
             const char* pszTableName = oResult->GetValue(1, 0);

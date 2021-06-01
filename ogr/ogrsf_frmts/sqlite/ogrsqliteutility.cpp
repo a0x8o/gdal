@@ -102,11 +102,14 @@ std::unique_ptr<SQLResult> SQLQuery(sqlite3 * poDb, const char * pszSQL)
     {
         CPLError( CE_Failure, CPLE_AppDefined,
                   "sqlite3_get_table(%s) failed: %s", pszSQL, pszErrMsg );
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/sqlite/ogrsqliteutility.cpp
         return nullptr;
     }
 
 =======
+=======
+>>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogrsqliteutility.cpp
         sqlite3_free(pszErrMsg);
         return nullptr;
@@ -117,7 +120,10 @@ std::unique_ptr<SQLResult> SQLQuery(sqlite3 * poDb, const char * pszSQL)
         return nullptr;
     }
 
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/sqlite/ogrsqliteutility.cpp
+=======
+>>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
     if (pszErrMsg) {
         sqlite3_free(pszErrMsg);
     }
@@ -127,10 +133,14 @@ std::unique_ptr<SQLResult> SQLQuery(sqlite3 * poDb, const char * pszSQL)
     ));
 
     return poResult;
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/sqlite/ogrsqliteutility.cpp
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqliteutility.cpp
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/sqlite/ogrsqliteutility.cpp
+=======
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqliteutility.cpp
+>>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 }
 
 const char* SQLResult::GetValue(int iColNum, int iRowNum) const
