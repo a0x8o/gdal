@@ -235,9 +235,15 @@ void OGRSQLiteLayer::BuildFeatureDefn( const char *pszLayerName,
     {
         // oField.GetNameRef() can be better than sqlite3_column_name() on views
         char* pszSQL = sqlite3_mprintf("PRAGMA table_info('%q')", pszLayerName);
+<<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogrsqlitelayer.cpp
         auto oResultTable = SQLQuery(m_poDS->GetDB(), pszSQL);
         sqlite3_free(pszSQL);
         if( oResultTable && oResultTable->ColCount() == 6 )
+=======
+        auto oResultTable = SQLQuery(poDS->GetDB(), pszSQL);
+        sqlite3_free(pszSQL);
+        if( oResultTable->ColCount() == 6 )
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitelayer.cpp
         {
             for ( int iRecord = 0; iRecord < oResultTable->RowCount(); iRecord++ )
             {
