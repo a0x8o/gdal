@@ -355,8 +355,11 @@ OGRSpatialReference* GDALGeoPackageDataset::GetSpatialRef(int iSrsId,
     }
 
     const char *pszWkt = oResult->GetValue(0, 0);
+<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
     if( pszWkt == nullptr )
         return nullptr;
+=======
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
     const char* pszOrganization = oResult->GetValue(1, 0);
     const char* pszOrganizationCoordsysID = oResult->GetValue(2, 0);
     const char *pszWkt2 = m_bHasDefinition12_063 ? oResult->GetValue(3, 0) : nullptr;
@@ -1092,6 +1095,7 @@ const std::map< CPLString, std::vector<GPKGExtensionDesc> > &
             const char* pszExtensionName = oResult->GetValue(1, i);
             const char* pszDefinition = oResult->GetValue(2, i);
             const char* pszScope = oResult->GetValue(3, i);
+<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
             if( pszTableName && pszExtensionName && pszDefinition && pszScope )
             {
                 GPKGExtensionDesc oDesc;
@@ -1100,6 +1104,13 @@ const std::map< CPLString, std::vector<GPKGExtensionDesc> > &
                 oDesc.osScope = pszScope;
                 m_oMapTableToExtensions[ CPLString(pszTableName).toupper() ].push_back(oDesc);
             }
+=======
+            GPKGExtensionDesc oDesc;
+            oDesc.osExtensionName = pszExtensionName;
+            oDesc.osDefinition = pszDefinition;
+            oDesc.osScope = pszScope;
+            m_oMapTableToExtensions[ CPLString(pszTableName).toupper() ].push_back(oDesc);
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
         }
     }
 
@@ -1133,8 +1144,11 @@ const std::map< CPLString, GPKGContentsDesc > &
         for( int i = 0; i < oResult->RowCount(); i++ )
         {
             const char* pszTableName = oResult->GetValue(0, i);
+<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
             if( pszTableName == nullptr )
                 continue;
+=======
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
             const char* pszDataType = oResult->GetValue(1, i);
             const char* pszIdentifier = oResult->GetValue(2, i);
             const char* pszDescription = oResult->GetValue(3, i);
@@ -1508,8 +1522,11 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
             for ( int i = 0; i < oResult->RowCount(); i++ )
             {
                 const char *pszTableName = oResult->GetValue(0, i);
+<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                 if( pszTableName == nullptr )
                     continue;
+=======
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                 if( oSetTables.find(pszTableName) != oSetTables.end() )
                 {
                     // This should normally not happen if all constraints are properly set
@@ -1526,6 +1543,7 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
                 const char* pszZ = oResult->GetValue(5, i);
                 const char* pszM = oResult->GetValue(6, i);
                 bool bIsInGpkgContents = CPL_TO_BOOL(oResult->GetValueAsInteger(11, i));
+<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                 const char* pszObjectType = oResult->GetValue(12, i);
                 if( pszObjectType == nullptr ||
                     !(EQUAL(pszObjectType, "table") || EQUAL(pszObjectType, "view")) )
@@ -1536,6 +1554,8 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
                              pszTableName);
                     continue;
                 }
+=======
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                 OGRGeoPackageTableLayer *poLayer = new OGRGeoPackageTableLayer(this, pszTableName);
                 bool bHasZ = pszZ && atoi(pszZ) > 0;
                 bool bHasM = pszM && atoi(pszM) > 0;
@@ -1617,6 +1637,7 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
             const char* pszTMSMaxX = oResult->GetValue(10, 0);
             const char* pszTMSMaxY = oResult->GetValue(11, 0);
             const char* pszDataType = oResult->GetValue(12, 0);
+<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
             if( pszTableName && pszTMSMinX && pszTMSMinY && pszTMSMaxX &&
                 pszTMSMaxY )
             {
@@ -1628,6 +1649,16 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
                                     EQUAL(pszDataType, "tiles"),
                                     poOpenInfo->papszOpenOptions );
             }
+=======
+
+            bRet = OpenRaster( pszTableName, pszIdentifier, pszDescription,
+                                pszSRSId ? atoi(pszSRSId) : 0,
+                                CPLAtof(pszTMSMinX), CPLAtof(pszTMSMinY),
+                                CPLAtof(pszTMSMaxX), CPLAtof(pszTMSMaxY),
+                                pszMinX, pszMinY, pszMaxX, pszMaxY,
+                                EQUAL(pszDataType, "tiles"),
+                                poOpenInfo->papszOpenOptions );
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
         }
         else if( oResult->RowCount() >= 1 )
         {
@@ -1648,8 +1679,12 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
             {
                 const char *pszTableName = oResult->GetValue(0, i);
                 const char *pszIdentifier = oResult->GetValue(1, i);
+<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                 if( pszTableName == nullptr )
                     continue;
+=======
+
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                 m_aosSubDatasets.AddNameValue(
                     CPLSPrintf("SUBDATASET_%d_NAME", nSDSCount+1),
                     CPLSPrintf("GPKG:%s:%s", m_pszFilename, pszTableName));
@@ -1731,8 +1766,11 @@ void GDALGeoPackageDataset::FixupWrongRTreeTrigger()
     auto oResult = SQLQuery(hDB,
         "SELECT name, sql FROM sqlite_master WHERE type = 'trigger' AND "
         "NAME LIKE 'rtree_%_update3' AND sql LIKE '% AFTER UPDATE OF % ON %'");
+<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
     if( oResult == nullptr )
         return;
+=======
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
     if( oResult->RowCount() > 0 )
     {
         CPLDebug("GPKG", "Fixing incorrect trigger(s) related to RTree");
@@ -1780,6 +1818,7 @@ void GDALGeoPackageDataset::FixupWrongRTreeTrigger()
             }
         }
     }
+<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
 }
 
 /************************************************************************/
@@ -1807,6 +1846,8 @@ void GDALGeoPackageDataset::FixupWrongMedataReferenceColumnNameUpdate()
             "DROP TRIGGER gpkg_metadata_reference_column_name_update");
         SQLCommand(hDB, osNewSQL.c_str());
     }
+=======
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
 }
 
 /************************************************************************/
@@ -1817,17 +1858,14 @@ void GDALGeoPackageDataset::FixupWrongMedataReferenceColumnNameUpdate()
 {
     // Fix wrong trigger that was generated by GDAL < 2.4.0
     // See https://github.com/qgis/QGIS/issues/42768
-    SQLResult oResult;
-    SQLResultInit(&oResult);
-    CPL_IGNORE_RET_VAL(SQLQuery(hDB,
+    auto oResult = SQLQuery(hDB,
         "SELECT sql FROM sqlite_master WHERE type = 'trigger' AND "
         "NAME ='gpkg_metadata_reference_column_name_update' AND "
-        "sql LIKE '%column_nameIS%'",
-        &oResult));
-    if( oResult.nRowCount == 1 )
+        "sql LIKE '%column_nameIS%'");
+    if( oResult->RowCount() == 1 )
     {
         CPLDebug("GPKG", "Fixing incorrect trigger gpkg_metadata_reference_column_name_update");
-        const char *pszSQL = SQLResultGetValue(&oResult, 0, 0);
+        const char *pszSQL = oResult->GetValue(0, 0);
         std::string osNewSQL(
             CPLString(pszSQL).replaceAll("column_nameIS", "column_name IS"));
 
@@ -1835,7 +1873,6 @@ void GDALGeoPackageDataset::FixupWrongMedataReferenceColumnNameUpdate()
             "DROP TRIGGER gpkg_metadata_reference_column_name_update");
         SQLCommand(hDB, osNewSQL.c_str());
     }
-    SQLResultFree(&oResult);
 }
 
 /************************************************************************/
@@ -3399,9 +3436,14 @@ char **GDALGeoPackageDataset::GetMetadata( const char *pszDomain )
         const char* pszMDStandardURI = oResult->GetValue(1, i);
         const char* pszMimeType = oResult->GetValue(2, i);
         const char* pszReferenceScope = oResult->GetValue(3, i);
+<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
         if( pszMetadata && pszMDStandardURI && pszMimeType &&
             pszReferenceScope &&
             EQUAL(pszMDStandardURI, "http://gdal.org") &&
+=======
+        int bIsGPKGScope = EQUAL(pszReferenceScope, "geopackage");
+        if( EQUAL(pszMDStandardURI, "http://gdal.org") &&
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
             EQUAL(pszMimeType, "text/xml") )
         {
             CPLXMLNode* psXMLNode = CPLParseXMLString(pszMetadata);
@@ -6321,11 +6363,14 @@ void GDALGeoPackageDataset::CheckUnknownExtensions(bool bCheckRasterTable)
             const char* pszExtName = oResultTable->GetValue(0, i);
             const char* pszDefinition = oResultTable->GetValue(1, i);
             const char* pszScope = oResultTable->GetValue(2, i);
+<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
             if( pszExtName == nullptr || pszDefinition == nullptr ||
                 pszScope == nullptr )
             {
                 continue;
             }
+=======
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
 
             if( EQUAL(pszExtName, "gpkg_webp") )
             {
@@ -7425,8 +7470,11 @@ const OGRFieldDomain* GDALGeoPackageDataset::GetFieldDomain(const std::string& n
             {
                 const char* pszTableName = oResultTable2->GetValue (0, iRecord);
                 const char* pszColumnName = oResultTable2->GetValue (1, iRecord);
+<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                 if( pszTableName == nullptr || pszColumnName == nullptr )
                     continue;
+=======
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                 OGRLayer* poLayer = const_cast<GDALGeoPackageDataset*>(this)->
                                                     GetLayerByName(pszTableName);
                 if( poLayer )
@@ -7475,8 +7523,11 @@ const OGRFieldDomain* GDALGeoPackageDataset::GetFieldDomain(const std::string& n
     for ( int iRecord = 0; iRecord < oResultTable->RowCount(); iRecord++ )
     {
         const char* pszConstraintType = oResultTable->GetValue (0, iRecord);
+<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
         if( pszConstraintType == nullptr )
             continue;
+=======
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
         const char* pszValue = oResultTable->GetValue (1, iRecord);
         const char* pszMin = oResultTable->GetValue (2, iRecord);
         const bool bIsMinIncluded = oResultTable->GetValueAsInteger(3, iRecord) == 1;

@@ -174,6 +174,7 @@ The following open options are available:
    This corresponds to the nolock=1 query parameter described at
    https://www.sqlite.org/uri.html
 
+<<<<<<< HEAD:doc/source/drivers/vector/gpkg.rst
 Note: open options are typically specified with "-oo name=value" syntax
 in most OGR utilities, or with the ``GDALOpenEx()`` API call.
 
@@ -182,6 +183,13 @@ be used to set the journal mode of the GeoPackage (and thus SQLite)
 file, see also https://www.sqlite.org/pragma.html#pragma_journal_mode.
 
 Creation issues
+=======
+Note: configuration option :decl_configoption:`OGR_SQLITE_JOURNAL` can 
+be used to set the journal mode of the GeoPackage (and thus SQLite)
+file, see also https://www.sqlite.org/pragma.html#pragma_journal_mode.
+
+Creation Issues
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/vector/gpkg.rst
 ---------------
 
 When creating a new GeoPackage file, the driver will attempt to force

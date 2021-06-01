@@ -2481,6 +2481,7 @@ public:
      * This is used in particular for caching.
      *
 <<<<<<< HEAD:gcore/gdal_priv.h
+<<<<<<< HEAD:gcore/gdal_priv.h
      * Might be empty if the array is not linked to a file.
      *
      * @since GDAL 3.4
@@ -2488,6 +2489,12 @@ public:
 =======
      * Might be empty if the array is not linked to a file. */
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/gcore/gdal_priv.h
+=======
+     * Might be empty if the array is not linked to a file.
+     * 
+     * @since GDAL 3.4
+     */
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdal_priv.h
     virtual const std::string& GetFilename() const = 0;
 
     virtual CSLConstList GetStructuralInfo() const;

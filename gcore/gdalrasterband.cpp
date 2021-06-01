@@ -4657,7 +4657,11 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
                 nMax = nValue;
         }
         nSum += nValue;
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
         nSumSquare += static_cast_for_coverity_scan<GUIntBig>(nValue) * nValue;
+=======
+        nSumSquare += nValue * nValue;
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
     }
 
     nSampleCount += static_cast<GUIntBig>(nBlockPixels);
@@ -4833,9 +4837,19 @@ void ComputeStatisticsInternal<GByte>( int nXCheck,
     }
     else if( !bHasNoData && nXCheck == nBlockXSize && nBlockPixels >= 32 )
     {
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
         if( nMin > 0 )
         {
             if( nMax < 255 )
+=======
+        const GUInt32 nMinThreshold =
+                        (bHasNoData && nNoDataValue == 0) ? 1 : 0;
+        const GUInt32 nMaxThreshold =
+                        (bHasNoData && nNoDataValue == 255) ? 254 : 255;
+        if( nMin > nMinThreshold )
+        {
+            if( nMax < nMaxThreshold )
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
             {
                 ComputeStatisticsByteNoNodata<true, true>(
                     nBlockPixels, pData,
@@ -4852,7 +4866,11 @@ void ComputeStatisticsInternal<GByte>( int nXCheck,
         }
         else
         {
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
             if( nMax < 255 )
+=======
+            if( nMax < nMaxThreshold )
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
             {
                 ComputeStatisticsByteNoNodata<false, true>(
                     nBlockPixels, pData,
@@ -4923,7 +4941,15 @@ void ComputeStatisticsInternal<GUInt16>( int nXCheck,
         if( (nBlockPixels % nMaxIterationsPerInnerLoop) != 0 )
             nOuterLoops ++;
 
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
         const bool bComputeMinMax = nMin > 0 || nMax < 65535;
+=======
+        const GUInt32 nMinThreshold =
+                        (bHasNoData && nNoDataValue == 0) ? 1 : 0;
+        const GUInt32 nMaxThreshold =
+                        (bHasNoData && nNoDataValue == 65535) ? 65534 : 65535;
+        const bool bComputeMinMax = nMin > nMinThreshold || nMax < nMaxThreshold;
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
         const auto ymm_mask_16bits = GDALmm256_set1_epi32(0xFFFF);
         const auto ymm_mask_32bits = GDALmm256_set1_epi64x(0xFFFFFFFF);
 
