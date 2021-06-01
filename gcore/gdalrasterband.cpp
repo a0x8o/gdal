@@ -4812,7 +4812,15 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
     }
 =======
         nSum += nValue;
+<<<<<<< HEAD
         nSumSquare += nValue * nValue;
+=======
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
+        nSumSquare += static_cast_for_coverity_scan<GUIntBig>(nValue) * nValue;
+=======
+        nSumSquare += nValue * nValue;
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
+>>>>>>> 8d6f7a8fd1 (Merge branch 'master' of github.com:OSGeo/gdal)
     }
 
     nSampleCount += static_cast<GUIntBig>(nBlockPixels);
@@ -5030,6 +5038,15 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
         if( nMin > 0 )
         {
             if( nMax < 255 )
+=======
+        const GUInt32 nMinThreshold =
+                        (bHasNoData && nNoDataValue == 0) ? 1 : 0;
+        const GUInt32 nMaxThreshold =
+                        (bHasNoData && nNoDataValue == 255) ? 254 : 255;
+        if( nMin > nMinThreshold )
+        {
+            if( nMax < nMaxThreshold )
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
             {
                 ComputeStatisticsByteNoNodata<true, true, COMPUTE_OTHER_STATS>(
 =======
@@ -5063,6 +5080,9 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
         {
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
             if( nMax < 255 )
+=======
+            if( nMax < nMaxThreshold )
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
             {
                 ComputeStatisticsByteNoNodata<false, true, COMPUTE_OTHER_STATS>(
 =======
