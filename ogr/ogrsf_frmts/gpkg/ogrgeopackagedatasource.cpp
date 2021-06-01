@@ -387,6 +387,7 @@ OGRSpatialReference* GDALGeoPackageDataset::GetSpatialRef(int iSrsId,
     const char *pszWkt = oResult->GetValue(0, 0);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -401,11 +402,14 @@ OGRSpatialReference* GDALGeoPackageDataset::GetSpatialRef(int iSrsId,
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
     if( pszWkt == nullptr )
         return nullptr;
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -421,6 +425,8 @@ OGRSpatialReference* GDALGeoPackageDataset::GetSpatialRef(int iSrsId,
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
     const char* pszOrganization = oResult->GetValue(1, 0);
     const char* pszOrganizationCoordsysID = oResult->GetValue(2, 0);
     const char *pszWkt2 = m_bHasDefinition12_063 ? oResult->GetValue(3, 0) : nullptr;
@@ -1290,6 +1296,7 @@ const std::map< CPLString, std::vector<GPKGExtensionDesc> > &
             const char* pszScope = oResult->GetValue(3, i);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -1304,6 +1311,8 @@ const std::map< CPLString, std::vector<GPKGExtensionDesc> > &
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
             if( pszTableName && pszExtensionName && pszDefinition && pszScope )
             {
@@ -1314,6 +1323,7 @@ const std::map< CPLString, std::vector<GPKGExtensionDesc> > &
                 m_oMapTableToExtensions[ CPLString(pszTableName).toupper() ].push_back(oDesc);
             }
 =======
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -1329,6 +1339,8 @@ const std::map< CPLString, std::vector<GPKGExtensionDesc> > &
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
             GPKGExtensionDesc oDesc;
             oDesc.osExtensionName = pszExtensionName;
             oDesc.osDefinition = pszDefinition;
@@ -1370,6 +1382,7 @@ const std::map< CPLString, GPKGContentsDesc > &
             const char* pszTableName = oResult->GetValue(0, i);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -1384,11 +1397,14 @@ const std::map< CPLString, GPKGContentsDesc > &
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
             if( pszTableName == nullptr )
                 continue;
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -1404,6 +1420,8 @@ const std::map< CPLString, GPKGContentsDesc > &
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
             const char* pszDataType = oResult->GetValue(1, i);
             const char* pszIdentifier = oResult->GetValue(2, i);
             const char* pszDescription = oResult->GetValue(3, i);
@@ -1779,6 +1797,7 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
                 const char *pszTableName = oResult->GetValue(0, i);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -1793,11 +1812,14 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                 if( pszTableName == nullptr )
                     continue;
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -1813,6 +1835,8 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
                 if( oSetTables.find(pszTableName) != oSetTables.end() )
                 {
                     // This should normally not happen if all constraints are properly set
@@ -1831,6 +1855,7 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
                 bool bIsInGpkgContents = CPL_TO_BOOL(oResult->GetValueAsInteger(11, i));
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -1845,6 +1870,8 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                 const char* pszObjectType = oResult->GetValue(12, i);
                 if( pszObjectType == nullptr ||
@@ -1860,6 +1887,7 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -1873,6 +1901,8 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
                 OGRGeoPackageTableLayer *poLayer = new OGRGeoPackageTableLayer(this, pszTableName);
                 bool bHasZ = pszZ && atoi(pszZ) > 0;
                 bool bHasM = pszM && atoi(pszM) > 0;
@@ -1956,6 +1986,7 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
             const char* pszDataType = oResult->GetValue(12, 0);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -1970,6 +2001,8 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
             if( pszTableName && pszTMSMinX && pszTMSMinY && pszTMSMaxX &&
                 pszTMSMaxY )
@@ -1985,6 +2018,7 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -1998,6 +2032,8 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 
             bRet = OpenRaster( pszTableName, pszIdentifier, pszDescription,
                                 pszSRSId ? atoi(pszSRSId) : 0,
@@ -2029,6 +2065,7 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
                 const char *pszIdentifier = oResult->GetValue(1, i);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -2043,10 +2080,13 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                 if( pszTableName == nullptr )
                     continue;
 =======
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -2062,6 +2102,8 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                 m_aosSubDatasets.AddNameValue(
@@ -2147,6 +2189,7 @@ void GDALGeoPackageDataset::FixupWrongRTreeTrigger()
         "NAME LIKE 'rtree_%_update3' AND sql LIKE '% AFTER UPDATE OF % ON %'");
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -2161,11 +2204,14 @@ void GDALGeoPackageDataset::FixupWrongRTreeTrigger()
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
     if( oResult == nullptr )
         return;
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -2181,6 +2227,8 @@ void GDALGeoPackageDataset::FixupWrongRTreeTrigger()
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
     if( oResult->RowCount() > 0 )
     {
         CPLDebug("GPKG", "Fixing incorrect trigger(s) related to RTree");
@@ -2230,6 +2278,7 @@ void GDALGeoPackageDataset::FixupWrongRTreeTrigger()
     }
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -2244,6 +2293,8 @@ void GDALGeoPackageDataset::FixupWrongRTreeTrigger()
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
 }
 
@@ -2274,6 +2325,7 @@ void GDALGeoPackageDataset::FixupWrongMedataReferenceColumnNameUpdate()
     }
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -2379,6 +2431,8 @@ void GDALGeoPackageDataset::FixupWrongMedataReferenceColumnNameUpdate()
             "DROP TRIGGER gpkg_metadata_reference_column_name_update");
         SQLCommand(hDB, osNewSQL.c_str());
     }
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 }
 
 /************************************************************************/
@@ -2389,17 +2443,14 @@ void GDALGeoPackageDataset::FixupWrongMedataReferenceColumnNameUpdate()
 {
     // Fix wrong trigger that was generated by GDAL < 2.4.0
     // See https://github.com/qgis/QGIS/issues/42768
-    SQLResult oResult;
-    SQLResultInit(&oResult);
-    CPL_IGNORE_RET_VAL(SQLQuery(hDB,
+    auto oResult = SQLQuery(hDB,
         "SELECT sql FROM sqlite_master WHERE type = 'trigger' AND "
         "NAME ='gpkg_metadata_reference_column_name_update' AND "
-        "sql LIKE '%column_nameIS%'",
-        &oResult));
-    if( oResult.nRowCount == 1 )
+        "sql LIKE '%column_nameIS%'");
+    if( oResult->RowCount() == 1 )
     {
         CPLDebug("GPKG", "Fixing incorrect trigger gpkg_metadata_reference_column_name_update");
-        const char *pszSQL = SQLResultGetValue(&oResult, 0, 0);
+        const char *pszSQL = oResult->GetValue(0, 0);
         std::string osNewSQL(
             CPLString(pszSQL).replaceAll("column_nameIS", "column_name IS"));
 
@@ -2407,7 +2458,6 @@ void GDALGeoPackageDataset::FixupWrongMedataReferenceColumnNameUpdate()
             "DROP TRIGGER gpkg_metadata_reference_column_name_update");
         SQLCommand(hDB, osNewSQL.c_str());
     }
-    SQLResultFree(&oResult);
 }
 
 /************************************************************************/
@@ -3985,6 +4035,7 @@ char **GDALGeoPackageDataset::GetMetadata( const char *pszDomain )
         const char* pszReferenceScope = oResult->GetValue(3, i);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -3999,11 +4050,14 @@ char **GDALGeoPackageDataset::GetMetadata( const char *pszDomain )
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
         if( pszMetadata && pszMDStandardURI && pszMimeType &&
             pszReferenceScope &&
             EQUAL(pszMDStandardURI, "http://gdal.org") &&
 =======
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -4019,6 +4073,8 @@ char **GDALGeoPackageDataset::GetMetadata( const char *pszDomain )
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
         int bIsGPKGScope = EQUAL(pszReferenceScope, "geopackage");
         if( EQUAL(pszMDStandardURI, "http://gdal.org") &&
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
@@ -6996,6 +7052,7 @@ void GDALGeoPackageDataset::CheckUnknownExtensions(bool bCheckRasterTable)
             const char* pszScope = oResultTable->GetValue(2, i);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -7010,6 +7067,8 @@ void GDALGeoPackageDataset::CheckUnknownExtensions(bool bCheckRasterTable)
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
             if( pszExtName == nullptr || pszDefinition == nullptr ||
                 pszScope == nullptr )
@@ -7018,6 +7077,7 @@ void GDALGeoPackageDataset::CheckUnknownExtensions(bool bCheckRasterTable)
             }
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -7033,6 +7093,8 @@ void GDALGeoPackageDataset::CheckUnknownExtensions(bool bCheckRasterTable)
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 
             if( EQUAL(pszExtName, "gpkg_webp") )
             {
@@ -8134,6 +8196,7 @@ const OGRFieldDomain* GDALGeoPackageDataset::GetFieldDomain(const std::string& n
                 const char* pszColumnName = oResultTable2->GetValue (1, iRecord);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -8148,11 +8211,14 @@ const OGRFieldDomain* GDALGeoPackageDataset::GetFieldDomain(const std::string& n
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                 if( pszTableName == nullptr || pszColumnName == nullptr )
                     continue;
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -8168,6 +8234,8 @@ const OGRFieldDomain* GDALGeoPackageDataset::GetFieldDomain(const std::string& n
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
                 OGRLayer* poLayer = const_cast<GDALGeoPackageDataset*>(this)->
                                                     GetLayerByName(pszTableName);
                 if( poLayer )
@@ -8218,6 +8286,7 @@ const OGRFieldDomain* GDALGeoPackageDataset::GetFieldDomain(const std::string& n
         const char* pszConstraintType = oResultTable->GetValue (0, iRecord);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -8232,11 +8301,14 @@ const OGRFieldDomain* GDALGeoPackageDataset::GetFieldDomain(const std::string& n
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
         if( pszConstraintType == nullptr )
             continue;
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -8252,6 +8324,8 @@ const OGRFieldDomain* GDALGeoPackageDataset::GetFieldDomain(const std::string& n
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
         const char* pszValue = oResultTable->GetValue (1, iRecord);
         const char* pszMin = oResultTable->GetValue (2, iRecord);
         const bool bIsMinIncluded = oResultTable->GetValueAsInteger(3, iRecord) == 1;

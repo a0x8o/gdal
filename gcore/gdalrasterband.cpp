@@ -4271,8 +4271,11 @@ class GDALUInt128
 // Use with T = GByte or GUInt16 only !
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
 template<class T, bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternalGeneric
 {
@@ -4282,6 +4285,7 @@ template<class T>
 static void ComputeStatisticsInternalGeneric( int nXCheck,
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 template<class T, bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternalGeneric
 {
@@ -4289,6 +4293,8 @@ template<class T, bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternalGene
 >>>>>>> 5e5d54dced (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
                                        int nBlockXSize,
                                        int nYCheck,
                                        const T* pData,
@@ -4641,19 +4647,25 @@ template<class T, bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
 template<bool COMPUTE_MIN, bool COMPUTE_MAX, bool COMPUTE_OTHER_STATS>
 =======
 template<bool COMPUTE_MIN, bool COMPUTE_MAX>
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 template<bool COMPUTE_MIN, bool COMPUTE_MAX, bool COMPUTE_OTHER_STATS>
 >>>>>>> 5e5d54dced (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
                                            // assumed to be aligned on 256 bits
                                            const GByte* pData,
@@ -4667,27 +4679,36 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
     // 32-byte alignment may not be enforced by linker, so do it at hand
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
     GByte aby32ByteUnaligned[32+32+32+(COMPUTE_OTHER_STATS ? 32+32 : 0)];
 =======
     GByte aby32ByteUnaligned[32+32+32+32+32];
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     GByte aby32ByteUnaligned[32+32+32+(COMPUTE_OTHER_STATS ? 32+32 : 0)];
 >>>>>>> 5e5d54dced (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
     GByte* paby32ByteAligned = aby32ByteUnaligned +
                                 (32 - (reinterpret_cast<GUIntptr_t>(aby32ByteUnaligned) % 32));
     GByte* pabyMin = paby32ByteAligned;
     GByte* pabyMax = paby32ByteAligned + 32;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
     GUInt32* panSum = COMPUTE_OTHER_STATS ? reinterpret_cast<GUInt32*>(paby32ByteAligned + 32*2): nullptr;
     GUInt32* panSumSquare = COMPUTE_OTHER_STATS ? reinterpret_cast<GUInt32*>(paby32ByteAligned + 32*3): nullptr;
@@ -4695,12 +4716,16 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
     CPLAssert( (reinterpret_cast<uintptr_t>(pData) % 32) == 0 );
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
     GUInt32* panSum = reinterpret_cast<GUInt32*>(paby32ByteAligned + 32*2);
     GUInt32* panSumSquare = reinterpret_cast<GUInt32*>(paby32ByteAligned + 32*3);
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
     GUInt32* panSum = COMPUTE_OTHER_STATS ? reinterpret_cast<GUInt32*>(paby32ByteAligned + 32*2): nullptr;
@@ -4710,6 +4735,8 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
 >>>>>>> de48f9207c (ComputeRasterMinMax(): avoid potential crash due to recent improvements. Fixes https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=47786. master only)
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 
     GPtrDiff_t i = 0;
     // Make sure that sumSquare can fit on uint32
@@ -4745,12 +4772,16 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
 =======
 >>>>>>> 5e5d54dced (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
 =======
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
             if( COMPUTE_OTHER_STATS )
             {
                 // Extract even-8bit values
@@ -4796,6 +4827,7 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
             // Add to the sumsquare accumulator
             ymm_sumsquare = GDALmm256_add_epi32(ymm_sumsquare, ymm_even_square);
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 5e5d54dced (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
 
@@ -4818,6 +4850,8 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
 
 <<<<<<< HEAD
 =======
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 
             // Extract odd-8bit values
             const GDALm256i ymm_odd = GDALmm256_srli_epi16(ymm, 8);
@@ -4833,13 +4867,17 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
         GDALmm256_store_si256(reinterpret_cast<GDALm256i*>(panSum), ymm_sum);
         GDALmm256_store_si256(reinterpret_cast<GDALm256i*>(panSumSquare), ymm_sumsquare);
 
+<<<<<<< HEAD
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
         nSum += panSum[0] + panSum[2] + panSum[4] + panSum[6];
         nSumSquare += static_cast<GUIntBig>(panSumSquare[0]) +
                       panSumSquare[1] + panSumSquare[2] + panSumSquare[3] +
                       panSumSquare[4] + panSumSquare[5] + panSumSquare[6] +
                       panSumSquare[7];
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
             nSum += panSum[0] + panSum[2] + panSum[4] + panSum[6];
@@ -4851,6 +4889,8 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
 >>>>>>> 5e5d54dced (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
     }
 
     if( COMPUTE_MIN )
@@ -4892,6 +4932,9 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
         if( COMPUTE_OTHER_STATS )
         {
@@ -4906,6 +4949,7 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
         nValidCount += static_cast<GUIntBig>(nBlockPixels);
     }
 =======
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 >>>>>>> 5e5d54dced (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
@@ -4957,6 +5001,8 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
 >>>>>>> 5e5d54dced (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
 =======
 =======
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
         nSum += nValue;
         nSumSquare += nValue * nValue;
     }
@@ -4964,7 +5010,10 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
     nSampleCount += static_cast<GUIntBig>(nBlockPixels);
     nValidCount += static_cast<GUIntBig>(nBlockPixels);
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
+<<<<<<< HEAD
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 }
 
 
@@ -5075,12 +5124,16 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
 =======
 >>>>>>> 5e5d54dced (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
 =======
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
                 if( COMPUTE_OTHER_STATS )
                 {
                     // Extract even-8bit values
@@ -5119,6 +5172,7 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
                 ymm_sumsquare = GDALmm256_add_epi32(ymm_sumsquare, ymm_odd_square);
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
                     // Extract odd-8bit values
@@ -5130,6 +5184,8 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
 >>>>>>> 5e5d54dced (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 
                     // Now compute the sums
                     ymm_sum = GDALmm256_add_epi32(ymm_sum,
@@ -5202,6 +5258,7 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
     {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -5223,6 +5280,8 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
         if( nMin > 0 )
         {
@@ -5249,6 +5308,7 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
             {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 ComputeStatisticsByteNoNodata<true, true>(
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 =======
@@ -5258,6 +5318,10 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
                 ComputeStatisticsByteNoNodata<true, true>(
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+                ComputeStatisticsByteNoNodata<true, true>(
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
                     nBlockPixels, pData,
                     nMin, nMax,
                     nSum, nSumSquare, nSampleCount, nValidCount );
@@ -5266,19 +5330,25 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
             {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
                 ComputeStatisticsByteNoNodata<true, false, COMPUTE_OTHER_STATS>(
 =======
                 ComputeStatisticsByteNoNodata<true, false>(
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                 ComputeStatisticsByteNoNodata<true, false, COMPUTE_OTHER_STATS>(
 >>>>>>> 5e5d54dced (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
                     nBlockPixels, pData,
                     nMin, nMax,
                     nSum, nSumSquare, nSampleCount, nValidCount );
@@ -5286,6 +5356,7 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
         }
         else
         {
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -5303,6 +5374,8 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
             if( nMax < 255 )
 =======
@@ -5315,6 +5388,7 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
             {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 ComputeStatisticsByteNoNodata<false, true>(
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 =======
@@ -5324,6 +5398,10 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
                 ComputeStatisticsByteNoNodata<false, true>(
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+                ComputeStatisticsByteNoNodata<false, true>(
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
                     nBlockPixels, pData,
                     nMin, nMax,
                     nSum, nSumSquare, nSampleCount, nValidCount );
@@ -5332,25 +5410,34 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
             {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
                 ComputeStatisticsByteNoNodata<false, false, COMPUTE_OTHER_STATS>(
 =======
                 ComputeStatisticsByteNoNodata<false, false>(
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                 ComputeStatisticsByteNoNodata<false, false, COMPUTE_OTHER_STATS>(
 >>>>>>> 5e5d54dced (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
                     nBlockPixels, pData,
                     nMin, nMax,
                     nSum, nSumSquare, nSampleCount, nValidCount );
             }
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
         }
     }
     else if ( !COMPUTE_OTHER_STATS && !bHasNoData && nXCheck >= 32 &&
@@ -5364,6 +5451,7 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
                     nSum, nSumSquare, nSampleCount, nValidCount );
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
+<<<<<<< HEAD
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
         }
@@ -5379,6 +5467,8 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
                     nSum, nSumSquare, nSampleCount, nValidCount );
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
         }
     }
     else
@@ -5443,6 +5533,7 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GUInt16, COM
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
         const bool bComputeMinMax = nMin > 0 || nMax < 65535;
 =======
@@ -5470,6 +5561,11 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GUInt16, COM
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
+        const bool bComputeMinMax = nMin > 0 || nMax < 65535;
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
         const GUInt32 nMinThreshold =
                         (bHasNoData && nNoDataValue == 0) ? 1 : 0;
         const GUInt32 nMaxThreshold =
@@ -5477,6 +5573,7 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GUInt16, COM
         const bool bComputeMinMax = nMin > nMinThreshold || nMax < nMaxThreshold;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 =======
 =======
@@ -5496,6 +5593,9 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GUInt16, COM
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
         const auto ymm_mask_16bits = GDALmm256_set1_epi32(0xFFFF);
         const auto ymm_mask_32bits = GDALmm256_set1_epi64x(0xFFFFFFFF);
 
@@ -5517,12 +5617,16 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GUInt16, COM
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
 =======
 >>>>>>> 5e5d54dced (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
 =======
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
                 if( COMPUTE_OTHER_STATS )
                 {
                     // Note: the int32 range can overflow for (0-32768)^2 +
@@ -5560,6 +5664,7 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GUInt16, COM
                                   GDALmm256_srli_epi32(ymm, 16));
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
                     // Now compute the sums
@@ -5571,6 +5676,8 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GUInt16, COM
 >>>>>>> 5e5d54dced (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
             }
 
             if( COMPUTE_OTHER_STATS )
@@ -5602,8 +5709,11 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GUInt16, COM
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
         if ( COMPUTE_OTHER_STATS )
 =======
@@ -5620,11 +5730,14 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GUInt16, COM
         for( ; i<nBlockPixels; i++)
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         if ( COMPUTE_OTHER_STATS )
 >>>>>>> 5e5d54dced (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
         {
             GUIntBig anSumSquare[4];
             GDALmm256_storeu_si256(reinterpret_cast<GDALm256i*>(anSumSquare), ymm_sumsquare);
@@ -6685,12 +6798,16 @@ CPLErr GDALRasterBand::ComputeRasterMinMax( int bApproxOK,
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
 =======
 >>>>>>> 5e5d54dced (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
 =======
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
     GUInt32 nMin = (eDataType == GDT_Byte) ? 255 : 65535; // used for GByte & GUInt16 cases
     GUInt32 nMax = 0;// used for GByte & GUInt16 cases
     GInt16 nMinInt16 = std::numeric_limits<GInt16>::max(); // used for GInt16 case
@@ -6777,17 +6894,23 @@ CPLErr GDALRasterBand::ComputeRasterMinMax( int bApproxOK,
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
     double dfMin = std::numeric_limits<double>::max();
     double dfMax = -std::numeric_limits<double>::max();
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 5e5d54dced (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
     if ( bApproxOK && HasArbitraryOverviews() )
     {
 /* -------------------------------------------------------------------- */
@@ -6829,8 +6952,11 @@ CPLErr GDALRasterBand::ComputeRasterMinMax( int bApproxOK,
         {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
             ComputeMinMaxForBlock(pData, nXReduced, nXReduced, nYReduced);
 =======
@@ -6855,11 +6981,14 @@ CPLErr GDALRasterBand::ComputeRasterMinMax( int bApproxOK,
             }
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
             ComputeMinMaxForBlock(pData, nXReduced, nXReduced, nYReduced);
 >>>>>>> 5e5d54dced (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
         }
         else
         {
@@ -6911,12 +7040,16 @@ CPLErr GDALRasterBand::ComputeRasterMinMax( int bApproxOK,
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
 =======
 >>>>>>> 5e5d54dced (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
 =======
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
                 GDALRasterBlock *poBlock = GetLockedBlockRef( iXBlock, iYBlock );
                 if( poBlock == nullptr )
                     return CE_Failure;
@@ -6956,6 +7089,7 @@ CPLErr GDALRasterBand::ComputeRasterMinMax( int bApproxOK,
                     dfMax = std::max(dfMax, dfValue);
                 }
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
+<<<<<<< HEAD
 =======
 >>>>>>> 5e5d54dced (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
             }
@@ -6981,11 +7115,14 @@ CPLErr GDALRasterBand::ComputeRasterMinMax( int bApproxOK,
                     dfMax = std::max(dfMax, dfValue);
                 }
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
             }
         }
     }
 
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
+<<<<<<< HEAD
     if( (eDataType == GDT_Byte && !bSignedByte) || eDataType == GDT_UInt16 )
     {
         dfMin = nMin;
@@ -6998,6 +7135,8 @@ CPLErr GDALRasterBand::ComputeRasterMinMax( int bApproxOK,
     }
 
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
     if( (eDataType == GDT_Byte && !bSignedByte) || eDataType == GDT_UInt16 )
     {
         dfMin = nMin;
