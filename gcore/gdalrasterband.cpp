@@ -4232,9 +4232,14 @@ class GDALUInt128
 // The rationale for below optimizations is detailed in statistics.txt
 
 // Use with T = GByte or GUInt16 only !
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
 template<class T, bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternalGeneric
 {
     static void f( int nXCheck,
+=======
+template<class T>
+static void ComputeStatisticsInternalGeneric( int nXCheck,
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
                                        int nBlockXSize,
                                        int nYCheck,
                                        const T* pData,
@@ -4585,7 +4590,11 @@ template<class T, bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal
 
 #define ZERO256                      GDALmm256_setzero_si256()
 
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
 template<bool COMPUTE_MIN, bool COMPUTE_MAX, bool COMPUTE_OTHER_STATS>
+=======
+template<bool COMPUTE_MIN, bool COMPUTE_MAX>
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
                                            // assumed to be aligned on 256 bits
                                            const GByte* pData,
@@ -4597,15 +4606,24 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
                                            GUIntBig& nValidCount )
 {
     // 32-byte alignment may not be enforced by linker, so do it at hand
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
     GByte aby32ByteUnaligned[32+32+32+(COMPUTE_OTHER_STATS ? 32+32 : 0)];
+=======
+    GByte aby32ByteUnaligned[32+32+32+32+32];
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
     GByte* paby32ByteAligned = aby32ByteUnaligned +
                                 (32 - (reinterpret_cast<GUIntptr_t>(aby32ByteUnaligned) % 32));
     GByte* pabyMin = paby32ByteAligned;
     GByte* pabyMax = paby32ByteAligned + 32;
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
     GUInt32* panSum = COMPUTE_OTHER_STATS ? reinterpret_cast<GUInt32*>(paby32ByteAligned + 32*2): nullptr;
     GUInt32* panSumSquare = COMPUTE_OTHER_STATS ? reinterpret_cast<GUInt32*>(paby32ByteAligned + 32*3): nullptr;
 
     CPLAssert( (reinterpret_cast<uintptr_t>(pData) % 32) == 0 );
+=======
+    GUInt32* panSum = reinterpret_cast<GUInt32*>(paby32ByteAligned + 32*2);
+    GUInt32* panSumSquare = reinterpret_cast<GUInt32*>(paby32ByteAligned + 32*3);
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 
     GPtrDiff_t i = 0;
     // Make sure that sumSquare can fit on uint32
@@ -4639,6 +4657,7 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
                 ymm_max = GDALmm256_max_epu8 (ymm_max, ymm);
             }
 
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
             if( COMPUTE_OTHER_STATS )
             {
                 // Extract even-8bit values
@@ -4673,6 +4692,36 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
                           panSumSquare[4] + panSumSquare[5] + panSumSquare[6] +
                           panSumSquare[7];
         }
+=======
+            // Extract even-8bit values
+            const GDALm256i ymm_even = GDALmm256_and_si256(ymm, ymm_mask_8bits);
+            // Compute square of those 16 values as 32 bit result
+            // and add adjacent pairs
+            const GDALm256i ymm_even_square =
+                                        GDALmm256_madd_epi16(ymm_even, ymm_even);
+            // Add to the sumsquare accumulator
+            ymm_sumsquare = GDALmm256_add_epi32(ymm_sumsquare, ymm_even_square);
+
+            // Extract odd-8bit values
+            const GDALm256i ymm_odd = GDALmm256_srli_epi16(ymm, 8);
+            const GDALm256i ymm_odd_square =
+                                    GDALmm256_madd_epi16(ymm_odd, ymm_odd);
+            ymm_sumsquare = GDALmm256_add_epi32(ymm_sumsquare, ymm_odd_square);
+
+            // Now compute the sums
+            ymm_sum = GDALmm256_add_epi32(ymm_sum,
+                                       GDALmm256_sad_epu8(ymm, ZERO256));
+        }
+
+        GDALmm256_store_si256(reinterpret_cast<GDALm256i*>(panSum), ymm_sum);
+        GDALmm256_store_si256(reinterpret_cast<GDALm256i*>(panSumSquare), ymm_sumsquare);
+
+        nSum += panSum[0] + panSum[2] + panSum[4] + panSum[6];
+        nSumSquare += static_cast<GUIntBig>(panSumSquare[0]) +
+                      panSumSquare[1] + panSumSquare[2] + panSumSquare[3] +
+                      panSumSquare[4] + panSumSquare[5] + panSumSquare[6] +
+                      panSumSquare[7];
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
     }
 
     if( COMPUTE_MIN )
@@ -4711,6 +4760,7 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
             if( nValue > nMax )
                 nMax = nValue;
         }
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
         if( COMPUTE_OTHER_STATS )
         {
             nSum += nValue;
@@ -4723,6 +4773,14 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
         nSampleCount += static_cast<GUIntBig>(nBlockPixels);
         nValidCount += static_cast<GUIntBig>(nBlockPixels);
     }
+=======
+        nSum += nValue;
+        nSumSquare += nValue * nValue;
+    }
+
+    nSampleCount += static_cast<GUIntBig>(nBlockPixels);
+    nValidCount += static_cast<GUIntBig>(nBlockPixels);
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 }
 
 
@@ -4831,6 +4889,7 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
                                                   ymm_nodata_by_neutral);
                 }
 
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
                 if( COMPUTE_OTHER_STATS )
                 {
                     // Extract even-8bit values
@@ -4849,6 +4908,24 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
                     const GDALm256i ymm_odd_square =
                                             GDALmm256_madd_epi16(ymm_odd, ymm_odd);
                     ymm_sumsquare = GDALmm256_add_epi32(ymm_sumsquare, ymm_odd_square);
+=======
+                // Extract even-8bit values
+                const GDALm256i ymm_even =
+                    GDALmm256_and_si256(ymm_nodata_by_zero, ymm_mask_8bits);
+                // Compute square of those 16 values as 32 bit result
+                // and add adjacent pairs
+                const GDALm256i ymm_even_square =
+                                            GDALmm256_madd_epi16(ymm_even, ymm_even);
+                // Add to the sumsquare accumulator
+                ymm_sumsquare = GDALmm256_add_epi32(ymm_sumsquare, ymm_even_square);
+
+                // Extract odd-8bit values
+                const GDALm256i ymm_odd =
+                    GDALmm256_srli_epi16(ymm_nodata_by_zero, 8);
+                const GDALm256i ymm_odd_square =
+                                        GDALmm256_madd_epi16(ymm_odd, ymm_odd);
+                ymm_sumsquare = GDALmm256_add_epi32(ymm_sumsquare, ymm_odd_square);
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 
                     // Now compute the sums
                     ymm_sum = GDALmm256_add_epi32(ymm_sum,
@@ -4912,18 +4989,34 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
     }
     else if( !bHasNoData && nXCheck == nBlockXSize && nBlockPixels >= 32 )
     {
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
         if( nMin > 0 )
         {
             if( nMax < 255 )
             {
                 ComputeStatisticsByteNoNodata<true, true, COMPUTE_OTHER_STATS>(
+=======
+        const GUInt32 nMinThreshold =
+                        (bHasNoData && nNoDataValue == 0) ? 1 : 0;
+        const GUInt32 nMaxThreshold =
+                        (bHasNoData && nNoDataValue == 255) ? 254 : 255;
+        if( nMin > nMinThreshold )
+        {
+            if( nMax < nMaxThreshold )
+            {
+                ComputeStatisticsByteNoNodata<true, true>(
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
                     nBlockPixels, pData,
                     nMin, nMax,
                     nSum, nSumSquare, nSampleCount, nValidCount );
             }
             else
             {
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
                 ComputeStatisticsByteNoNodata<true, false, COMPUTE_OTHER_STATS>(
+=======
+                ComputeStatisticsByteNoNodata<true, false>(
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
                     nBlockPixels, pData,
                     nMin, nMax,
                     nSum, nSumSquare, nSampleCount, nValidCount );
@@ -4931,20 +5024,31 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
         }
         else
         {
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
             if( nMax < 255 )
             {
                 ComputeStatisticsByteNoNodata<false, true, COMPUTE_OTHER_STATS>(
+=======
+            if( nMax < nMaxThreshold )
+            {
+                ComputeStatisticsByteNoNodata<false, true>(
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
                     nBlockPixels, pData,
                     nMin, nMax,
                     nSum, nSumSquare, nSampleCount, nValidCount );
             }
             else
             {
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
                 ComputeStatisticsByteNoNodata<false, false, COMPUTE_OTHER_STATS>(
+=======
+                ComputeStatisticsByteNoNodata<false, false>(
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
                     nBlockPixels, pData,
                     nMin, nMax,
                     nSum, nSumSquare, nSampleCount, nValidCount );
             }
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
         }
     }
     else if ( !COMPUTE_OTHER_STATS && !bHasNoData && nXCheck >= 32 &&
@@ -4956,6 +5060,8 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
                     nXCheck, pData + static_cast<size_t>(iY) * nBlockXSize,
                     nMin, nMax,
                     nSum, nSumSquare, nSampleCount, nValidCount );
+=======
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
         }
     }
     else
@@ -5018,7 +5124,15 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GUInt16, COM
         if( (nBlockPixels % nMaxIterationsPerInnerLoop) != 0 )
             nOuterLoops ++;
 
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
         const bool bComputeMinMax = nMin > 0 || nMax < 65535;
+=======
+        const GUInt32 nMinThreshold =
+                        (bHasNoData && nNoDataValue == 0) ? 1 : 0;
+        const GUInt32 nMaxThreshold =
+                        (bHasNoData && nNoDataValue == 65535) ? 65534 : 65535;
+        const bool bComputeMinMax = nMin > nMinThreshold || nMax < nMaxThreshold;
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
         const auto ymm_mask_16bits = GDALmm256_set1_epi32(0xFFFF);
         const auto ymm_mask_32bits = GDALmm256_set1_epi64x(0xFFFFFFFF);
 
@@ -5038,6 +5152,7 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GUInt16, COM
                     ymm_max = GDALmm256_max_epi16 (ymm_max, ymm_shifted);
                 }
 
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
                 if( COMPUTE_OTHER_STATS )
                 {
                     // Note: the int32 range can overflow for (0-32768)^2 +
@@ -5056,6 +5171,23 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GUInt16, COM
                     ymm_sum = GDALmm256_add_epi32(ymm_sum,
                                       GDALmm256_srli_epi32(ymm, 16));
                 }
+=======
+                // Note: the int32 range can overflow for (0-32768)^2 +
+                // (0-32768)^2 = 0x80000000, but as we know the result is
+                // positive, this is OK as we interpret is a uint32.
+                const GDALm256i ymm_square = GDALmm256_madd_epi16(ymm_shifted,
+                                                                  ymm_shifted);
+                ymm_sumsquare = GDALmm256_add_epi64(ymm_sumsquare,
+                                    GDALmm256_and_si256(ymm_square, ymm_mask_32bits));
+                ymm_sumsquare = GDALmm256_add_epi64(ymm_sumsquare,
+                                    GDALmm256_srli_epi64(ymm_square, 32));
+
+                // Now compute the sums
+                ymm_sum = GDALmm256_add_epi32(ymm_sum,
+                                  GDALmm256_and_si256(ymm, ymm_mask_16bits));
+                ymm_sum = GDALmm256_add_epi32(ymm_sum,
+                                  GDALmm256_srli_epi32(ymm, 16));
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
             }
 
             if( COMPUTE_OTHER_STATS )
@@ -5085,7 +5217,21 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GUInt16, COM
             }
         }
 
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
         if ( COMPUTE_OTHER_STATS )
+=======
+        GUIntBig anSumSquare[4];
+        GDALmm256_storeu_si256(reinterpret_cast<GDALm256i*>(anSumSquare), ymm_sumsquare);
+        nSumSquare += anSumSquare[0] +
+                        anSumSquare[1] + anSumSquare[2] + anSumSquare[3];
+
+        // Unshift the sum of squares
+        UnshiftSumSquare(nSumSquare, nSumThis, static_cast<GUIntBig>(i));
+
+        nSum += nSumThis;
+
+        for( ; i<nBlockPixels; i++)
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
         {
             GUIntBig anSumSquare[4];
             GDALmm256_storeu_si256(reinterpret_cast<GDALm256i*>(anSumSquare), ymm_sumsquare);
@@ -6144,6 +6290,7 @@ CPLErr GDALRasterBand::ComputeRasterMinMax( int bApproxOK,
     GDALRasterIOExtraArg sExtraArg;
     INIT_RASTERIO_EXTRA_ARG(sExtraArg);
 
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
     GUInt32 nMin = (eDataType == GDT_Byte) ? 255 : 65535; // used for GByte & GUInt16 cases
     GUInt32 nMax = 0;// used for GByte & GUInt16 cases
     GInt16 nMinInt16 = std::numeric_limits<GInt16>::max(); // used for GInt16 case
@@ -6228,6 +6375,10 @@ CPLErr GDALRasterBand::ComputeRasterMinMax( int bApproxOK,
         }
     };
 
+=======
+    double dfMin = std::numeric_limits<double>::max();
+    double dfMax = -std::numeric_limits<double>::max();
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
     if ( bApproxOK && HasArbitraryOverviews() )
     {
 /* -------------------------------------------------------------------- */
@@ -6267,7 +6418,29 @@ CPLErr GDALRasterBand::ComputeRasterMinMax( int bApproxOK,
 
         if( bUseOptimizedPath )
         {
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
             ComputeMinMaxForBlock(pData, nXReduced, nXReduced, nYReduced);
+=======
+            for( int iX = 0; iX < nXReduced; iX++ )
+            {
+                const int iOffset = iX + iY * nXReduced;
+                bool bValid = true;
+                double dfValue = GetPixelValue( eDataType,
+                                                bSignedByte,
+                                                pData,
+                                                iOffset,
+                                                CPL_TO_BOOL(bGotNoDataValue),
+                                                dfNoDataValue,
+                                                bGotFloatNoDataValue,
+                                                fNoDataValue,
+                                                bValid );
+                if( !bValid )
+                    continue;
+
+                dfMin = std::min(dfMin, dfValue);
+                dfMax = std::max(dfMax, dfValue);
+            }
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
         }
         else
         {
@@ -6317,6 +6490,7 @@ CPLErr GDALRasterBand::ComputeRasterMinMax( int bApproxOK,
                 const int iYBlock = iSampleBlock / nBlocksPerRow;
                 const int iXBlock = iSampleBlock - nBlocksPerRow * iYBlock;
 
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
                 GDALRasterBlock *poBlock = GetLockedBlockRef( iXBlock, iYBlock );
                 if( poBlock == nullptr )
                     return CE_Failure;
@@ -6350,10 +6524,16 @@ CPLErr GDALRasterBand::ComputeRasterMinMax( int bApproxOK,
                                                 dfMax) )
             {
                 return CE_Failure;
+=======
+                    dfMin = std::min(dfMin, dfValue);
+                    dfMax = std::max(dfMax, dfValue);
+                }
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
             }
         }
     }
 
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
     if( (eDataType == GDT_Byte && !bSignedByte) || eDataType == GDT_UInt16 )
     {
         dfMin = nMin;
@@ -6367,6 +6547,10 @@ CPLErr GDALRasterBand::ComputeRasterMinMax( int bApproxOK,
 
     if( dfMin > dfMax )
     {
+=======
+    if( dfMin > dfMax )
+    {
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
         adfMinMax[0] = 0;
         adfMinMax[1] = 0;
         ReportError(
