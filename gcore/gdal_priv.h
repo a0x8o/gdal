@@ -2491,9 +2491,13 @@ public:
 <<<<<<< HEAD:gcore/gdal_priv.h
 <<<<<<< HEAD:gcore/gdal_priv.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gcore/gdal_priv.h
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+=======
+<<<<<<< HEAD:gcore/gdal_priv.h
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
      * Might be empty if the array is not linked to a file.
      *
      * @since GDAL 3.4
@@ -2502,6 +2506,9 @@ public:
      * Might be empty if the array is not linked to a file. */
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/gcore/gdal_priv.h
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:gcore/gdal_priv.h
@@ -2516,6 +2523,7 @@ public:
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdal_priv.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:gcore/gdal_priv.h
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdal_priv.h
@@ -2524,6 +2532,12 @@ public:
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 >>>>>>> df05d90486 (Merge pull request #3822 from rouault/gml_srs)
+=======
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> d9da6eb2a3 (Merge branch 'master' of github.com:OSGeo/gdal)
     virtual const std::string& GetFilename() const = 0;
 
     virtual CSLConstList GetStructuralInfo() const;
