@@ -948,12 +948,15 @@ It can be used to declare the function signature to the user and to request addi
 parameters aside from the ones from the Dataset.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/doc/source/drivers/raster/vrt.rst
 A :cpp:type:`GDALDerivedPixelFunc` is defined with a signature similar to :cpp:func:`GDALRasterBand::IRasterIO`:
 
 
 .. cpp:function:: CPL_Err TestFunction(void** papoSources, int nSources, void* pData, int nBufXSize, int nBufYSize, GDALDataType eSrcType, GDALDataType eBufType, int nPixelSpace, int nLineSpace)
 =======
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:doc/source/drivers/raster/vrt.rst
 A :cpp:type:`GDALDerivedPixelFuncWithArgs` is defined with a signature similar to :cpp:func:`GDALRasterBand::IRasterIO`:
 
@@ -965,7 +968,10 @@ A :cpp:type:`GDALDerivedPixelFunc` is defined with a signature similar to :cpp:f
 
 .. cpp:function:: CPL_Err TestFunction(void** papoSources, int nSources, void* pData, int nBufXSize, int nBufYSize, GDALDataType eSrcType, GDALDataType eBufType, int nPixelSpace, int nLineSpace)
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/raster/vrt.rst
+<<<<<<< HEAD
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 
    :param papoSources: A pointer to packed rasters; one per source.  The
     datatype of all will be the same, specified in the ``eSrcType`` parameter.
@@ -996,6 +1002,7 @@ A :cpp:type:`GDALDerivedPixelFunc` is defined with a signature similar to :cpp:f
 
    :param nLineSpace: The byte offset from the start of one scanline in
     pData to the start of the next.
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 <<<<<<< HEAD:doc/source/drivers/raster/vrt.rst
@@ -1041,6 +1048,8 @@ A :cpp:type:`GDALDerivedPixelFunc` is defined with a signature similar to :cpp:f
     pData to the start of the next.
 =======
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:doc/source/drivers/raster/vrt.rst
 
    :param papszArgs: An optional string list of named function arguments (e.g. ``y=4``)
@@ -1050,9 +1059,12 @@ It is also possible to register a :cpp:type:`GDALDerivedPixelFunc` (which omits 
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/raster/vrt.rst
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:doc/source/drivers/raster/vrt.rst
 =======
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 
 The following is an implementation of the pixel function:
 
