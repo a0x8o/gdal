@@ -188,6 +188,16 @@ Note: configuration option :decl_configoption:`OGR_SQLITE_JOURNAL` can
 be used to set the journal mode of the GeoPackage (and thus SQLite)
 file, see also https://www.sqlite.org/pragma.html#pragma_journal_mode.
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+Note: configuration option :decl_configoption:`OGR_SQLITE_JOURNAL` can 
+be used to set the journal mode of the GeoPackage (and thus SQLite)
+file, see also https://www.sqlite.org/pragma.html#pragma_journal_mode.
+
+=======
+>>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 Creation Issues
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/vector/gpkg.rst
 ---------------
