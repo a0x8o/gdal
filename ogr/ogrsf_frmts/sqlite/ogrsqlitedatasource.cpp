@@ -628,12 +628,18 @@ void OGRSQLiteDataSource::SaveStatistics()
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
         if( oResult->RowCount() == 1 )
@@ -642,11 +648,15 @@ void OGRSQLiteDataSource::SaveStatistics()
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -654,6 +664,8 @@ void OGRSQLiteDataSource::SaveStatistics()
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
         if( oResult && oResult->RowCount() == 1 )
 =======
@@ -664,23 +676,33 @@ void OGRSQLiteDataSource::SaveStatistics()
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
 =======
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -688,6 +710,8 @@ void OGRSQLiteDataSource::SaveStatistics()
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
         {
             const char* pszEventId = oResult->GetValue(0, 0);
             const char* pszTableName = oResult->GetValue(1, 0);

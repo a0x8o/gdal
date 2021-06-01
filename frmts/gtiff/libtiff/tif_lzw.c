@@ -398,12 +398,18 @@ LZWDecode(TIFF* tif, uint8_t* op0, tmsize_t occ0, uint16_t s)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/gtiff/libtiff/tif_lzw.c
 =======
@@ -411,11 +417,15 @@ LZWDecode(TIFF* tif, uint8_t* op0, tmsize_t occ0, uint16_t s)
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -423,6 +433,8 @@ LZWDecode(TIFF* tif, uint8_t* op0, tmsize_t occ0, uint16_t s)
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:frmts/gtiff/libtiff/tif_lzw.c
 	tmsize_t occ = occ0;
 	uint8_t *bp;
@@ -432,23 +444,33 @@ LZWDecode(TIFF* tif, uint8_t* op0, tmsize_t occ0, uint16_t s)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/gtiff/libtiff/tif_lzw.c
 =======
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -456,6 +478,8 @@ LZWDecode(TIFF* tif, uint8_t* op0, tmsize_t occ0, uint16_t s)
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 	long occ = (long) occ0;
 	uint8_t *tp;
 	uint8_t *bp;
@@ -521,16 +545,22 @@ LZWDecode(TIFF* tif, uint8_t* op0, tmsize_t occ0, uint16_t s)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:frmts/gtiff/libtiff/tif_lzw.c
 =======
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD:frmts/gtiff/libtiff/tif_lzw.c
 =======
 =======
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/gtiff/libtiff/tif_lzw.c
 =======
@@ -543,6 +573,9 @@ LZWDecode(TIFF* tif, uint8_t* op0, tmsize_t occ0, uint16_t s)
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
@@ -550,6 +583,7 @@ LZWDecode(TIFF* tif, uint8_t* op0, tmsize_t occ0, uint16_t s)
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD:frmts/gtiff/libtiff/tif_lzw.c
 =======
@@ -561,6 +595,8 @@ LZWDecode(TIFF* tif, uint8_t* op0, tmsize_t occ0, uint16_t s)
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 #ifdef LZW_CHECKEOS
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/gtiff/libtiff/tif_lzw.c
 	sp->dec_bitsleft += (((uint64_t)tif->tif_rawcc - sp->old_tif_rawcc) << 3);
@@ -979,12 +1015,18 @@ LZWDecodeCompat(TIFF* tif, uint8_t* op0, tmsize_t occ0, uint16_t s)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/gtiff/libtiff/tif_lzw.c
 	long occ = (long) occ0;
@@ -993,11 +1035,15 @@ LZWDecodeCompat(TIFF* tif, uint8_t* op0, tmsize_t occ0, uint16_t s)
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -1005,6 +1051,8 @@ LZWDecodeCompat(TIFF* tif, uint8_t* op0, tmsize_t occ0, uint16_t s)
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:frmts/gtiff/libtiff/tif_lzw.c
 	tmsize_t occ = occ0;
 =======
@@ -1015,23 +1063,33 @@ LZWDecodeCompat(TIFF* tif, uint8_t* op0, tmsize_t occ0, uint16_t s)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/gtiff/libtiff/tif_lzw.c
 =======
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -1039,6 +1097,8 @@ LZWDecodeCompat(TIFF* tif, uint8_t* op0, tmsize_t occ0, uint16_t s)
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 	uint8_t *tp;
 	uint8_t *bp;
 	int code, nbits;
@@ -1095,12 +1155,17 @@ LZWDecodeCompat(TIFF* tif, uint8_t* op0, tmsize_t occ0, uint16_t s)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:frmts/gtiff/libtiff/tif_lzw.c
 
 =======
 =======
+=======
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -1120,6 +1185,9 @@ LZWDecodeCompat(TIFF* tif, uint8_t* op0, tmsize_t occ0, uint16_t s)
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
@@ -1128,6 +1196,7 @@ LZWDecodeCompat(TIFF* tif, uint8_t* op0, tmsize_t occ0, uint16_t s)
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD:frmts/gtiff/libtiff/tif_lzw.c
 
@@ -1141,6 +1210,8 @@ LZWDecodeCompat(TIFF* tif, uint8_t* op0, tmsize_t occ0, uint16_t s)
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 #ifdef LZW_CHECKEOS
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/gtiff/libtiff/tif_lzw.c
 	sp->dec_bitsleft += (((uint64_t)tif->tif_rawcc - sp->old_tif_rawcc) << 3);

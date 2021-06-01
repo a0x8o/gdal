@@ -5130,6 +5130,7 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -5138,6 +5139,8 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
 >>>>>>> 344140fb99 (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
 =======
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
         if( COMPUTE_OTHER_STATS )
         {
@@ -5162,11 +5165,17 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
 <<<<<<< HEAD
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+<<<<<<< HEAD
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
         nSum += nValue;
 <<<<<<< HEAD
         nSumSquare += nValue * nValue;
@@ -5190,6 +5199,9 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -5570,12 +5582,18 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/gdalrasterband.cpp
         const GUInt32 nMinThreshold =
@@ -5590,11 +5608,15 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -5602,6 +5624,8 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
         if( nMin > 0 )
         {
@@ -5727,12 +5751,18 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/gdalrasterband.cpp
             if( nMax < nMaxThreshold )
@@ -5741,11 +5771,15 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -5753,6 +5787,8 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
             if( nMax < 255 )
 =======
@@ -5986,12 +6022,17 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GUInt16, COM
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
         const bool bComputeMinMax = nMin > 0 || nMax < 65535;
 =======
 =======
+=======
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -6011,6 +6052,9 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GUInt16, COM
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
@@ -6019,6 +6063,7 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GUInt16, COM
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD:gcore/gdalrasterband.cpp
         const bool bComputeMinMax = nMin > 0 || nMax < 65535;
@@ -6032,6 +6077,8 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GUInt16, COM
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
         const GUInt32 nMinThreshold =
                         (bHasNoData && nNoDataValue == 0) ? 1 : 0;
         const GUInt32 nMaxThreshold =
@@ -6042,14 +6089,20 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GUInt16, COM
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 =======
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/gdalrasterband.cpp
 =======
@@ -6060,12 +6113,16 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GUInt16, COM
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -6075,6 +6132,8 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GUInt16, COM
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
         const auto ymm_mask_16bits = GDALmm256_set1_epi32(0xFFFF);
         const auto ymm_mask_32bits = GDALmm256_set1_epi64x(0xFFFFFFFF);
 

@@ -193,12 +193,18 @@ file, see also https://www.sqlite.org/pragma.html#pragma_journal_mode.
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 Note: configuration option :decl_configoption:`OGR_SQLITE_JOURNAL` can 
 be used to set the journal mode of the GeoPackage (and thus SQLite)
@@ -208,11 +214,15 @@ file, see also https://www.sqlite.org/pragma.html#pragma_journal_mode.
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -220,6 +230,8 @@ file, see also https://www.sqlite.org/pragma.html#pragma_journal_mode.
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 Creation Issues
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/vector/gpkg.rst
 ---------------

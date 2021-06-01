@@ -2531,12 +2531,17 @@ public:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> ea95dd45eb (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> b93670d45a (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -2562,11 +2567,15 @@ public:
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> b93670d45a (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 =======
@@ -2594,6 +2603,8 @@ public:
 =======
 >>>>>>> b93670d45a (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> ea95dd45eb (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
      * Might be empty if the array is not linked to a file.
      *
      * @since GDAL 3.4
@@ -2601,6 +2612,7 @@ public:
 =======
      * Might be empty if the array is not linked to a file. */
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/gcore/gdal_priv.h
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -2625,12 +2637,16 @@ public:
 =======
 >>>>>>> ea95dd45eb (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
 >>>>>>> 8d6f7a8fd1 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD
 =======
 >>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
 =======
+=======
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> b93670d45a (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -2652,12 +2668,16 @@ public:
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -2667,6 +2687,8 @@ public:
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
      * Might be empty if the array is not linked to a file.
      * 
      * @since GDAL 3.4
@@ -2676,8 +2698,11 @@ public:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdal_priv.h
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -2693,9 +2718,12 @@ public:
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/gdal_priv.h
 =======
@@ -2741,12 +2769,16 @@ public:
 >>>>>>> d9da6eb2a3 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> b93670d45a (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdal_priv.h
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 =======
@@ -2772,6 +2804,8 @@ public:
 =======
 >>>>>>> b93670d45a (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> ea95dd45eb (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
     virtual const std::string& GetFilename() const = 0;
 
     virtual CSLConstList GetStructuralInfo() const;
