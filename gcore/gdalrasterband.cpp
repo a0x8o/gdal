@@ -5050,7 +5050,15 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
 =======
 >>>>>>> 1c9e8f1d1c (Merge branch 'master' of github.com:OSGeo/gdal)
         nSum += nValue;
+<<<<<<< HEAD
         nSumSquare += nValue * nValue;
+=======
+<<<<<<< HEAD:gcore/gdalrasterband.cpp
+        nSumSquare += static_cast_for_coverity_scan<GUIntBig>(nValue) * nValue;
+=======
+        nSumSquare += nValue * nValue;
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdalrasterband.cpp
+>>>>>>> 8d6f7a8fd1 (Merge branch 'master' of github.com:OSGeo/gdal)
     }
 
     nSampleCount += static_cast<GUIntBig>(nBlockPixels);
