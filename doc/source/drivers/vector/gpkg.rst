@@ -194,6 +194,9 @@ file, see also https://www.sqlite.org/pragma.html#pragma_journal_mode.
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 490e165685 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -223,6 +226,7 @@ file, see also https://www.sqlite.org/pragma.html#pragma_journal_mode.
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -232,6 +236,10 @@ file, see also https://www.sqlite.org/pragma.html#pragma_journal_mode.
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 490e165685 (Merge branch 'master' of github.com:OSGeo/gdal)
 Creation Issues
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/vector/gpkg.rst
 ---------------

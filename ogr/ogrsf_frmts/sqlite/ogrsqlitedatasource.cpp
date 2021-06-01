@@ -629,6 +629,9 @@ void OGRSQLiteDataSource::SaveStatistics()
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 490e165685 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -657,6 +660,7 @@ void OGRSQLiteDataSource::SaveStatistics()
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -666,6 +670,10 @@ void OGRSQLiteDataSource::SaveStatistics()
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 490e165685 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
         if( oResult && oResult->RowCount() == 1 )
 =======
@@ -677,6 +685,9 @@ void OGRSQLiteDataSource::SaveStatistics()
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 490e165685 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -703,6 +714,7 @@ void OGRSQLiteDataSource::SaveStatistics()
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -712,6 +724,10 @@ void OGRSQLiteDataSource::SaveStatistics()
 >>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> bc8cd5609d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 490e165685 (Merge branch 'master' of github.com:OSGeo/gdal)
         {
             const char* pszEventId = oResult->GetValue(0, 0);
             const char* pszTableName = oResult->GetValue(1, 0);
