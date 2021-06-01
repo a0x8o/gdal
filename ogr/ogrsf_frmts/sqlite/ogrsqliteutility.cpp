@@ -105,6 +105,7 @@ std::unique_ptr<SQLResult> SQLQuery(sqlite3 * poDb, const char * pszSQL)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -124,6 +125,8 @@ std::unique_ptr<SQLResult> SQLQuery(sqlite3 * poDb, const char * pszSQL)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c9e8f1d1c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogrsqliteutility.cpp
         sqlite3_free(pszErrMsg);
         return nullptr;
@@ -137,6 +140,7 @@ std::unique_ptr<SQLResult> SQLQuery(sqlite3 * poDb, const char * pszSQL)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -152,6 +156,8 @@ std::unique_ptr<SQLResult> SQLQuery(sqlite3 * poDb, const char * pszSQL)
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c9e8f1d1c (Merge branch 'master' of github.com:OSGeo/gdal)
     if (pszErrMsg) {
         sqlite3_free(pszErrMsg);
     }
@@ -161,6 +167,7 @@ std::unique_ptr<SQLResult> SQLQuery(sqlite3 * poDb, const char * pszSQL)
     ));
 
     return poResult;
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -186,6 +193,9 @@ std::unique_ptr<SQLResult> SQLQuery(sqlite3 * poDb, const char * pszSQL)
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqliteutility.cpp
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqliteutility.cpp
+>>>>>>> 1c9e8f1d1c (Merge branch 'master' of github.com:OSGeo/gdal)
 }
 
 const char* SQLResult::GetValue(int iColNum, int iRowNum) const

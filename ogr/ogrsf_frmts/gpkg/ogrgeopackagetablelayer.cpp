@@ -1047,6 +1047,7 @@ OGRErr OGRGeoPackageTableLayer::ReadTableDefinition()
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -1063,11 +1064,14 @@ OGRErr OGRGeoPackageTableLayer::ReadTableDefinition()
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c9e8f1d1c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagetablelayer.cpp
                 if( pszColumn == nullptr )
                     continue;
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagetablelayer.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1086,6 +1090,8 @@ OGRErr OGRGeoPackageTableLayer::ReadTableDefinition()
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c9e8f1d1c (Merge branch 'master' of github.com:OSGeo/gdal)
                 const char *pszMimeType = oResultTable->GetValue(1, iRecord);
                 const char *pszConstraintName = oResultTable->GetValue(2, iRecord);
                 if( pszMimeType && EQUAL(pszMimeType, "application/json") )
@@ -4312,6 +4318,7 @@ char **OGRGeoPackageTableLayer::GetMetadata( const char *pszDomain )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -4328,10 +4335,13 @@ char **OGRGeoPackageTableLayer::GetMetadata( const char *pszDomain )
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c9e8f1d1c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagetablelayer.cpp
         if( pszMetadata && pszMDStandardURI && pszMimeType &&
             EQUAL(pszMDStandardURI, "http://gdal.org") &&
 =======
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4350,6 +4360,8 @@ char **OGRGeoPackageTableLayer::GetMetadata( const char *pszDomain )
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c9e8f1d1c (Merge branch 'master' of github.com:OSGeo/gdal)
         //const char* pszReferenceScope = oResult->GetValue(3, i);
         //int bIsGPKGScope = EQUAL(pszReferenceScope, "geopackage");
         if( EQUAL(pszMDStandardURI, "http://gdal.org") &&
@@ -5004,6 +5016,7 @@ OGRErr OGRGeoPackageTableLayer::AlterFieldDefn( int iFieldToAlter,
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -5020,10 +5033,13 @@ OGRErr OGRGeoPackageTableLayer::AlterFieldDefn( int iFieldToAlter,
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c9e8f1d1c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagetablelayer.cpp
     // cppcheck-suppress knownConditionTrueFalse
     if( bRenameCol && !bUseRenameColumn )
 =======
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -5042,6 +5058,8 @@ OGRErr OGRGeoPackageTableLayer::AlterFieldDefn( int iFieldToAlter,
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c9e8f1d1c (Merge branch 'master' of github.com:OSGeo/gdal)
     if( bRenameCol )
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagetablelayer.cpp
     {

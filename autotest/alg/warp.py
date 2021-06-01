@@ -1782,6 +1782,7 @@ def test_warp_rms_2():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 =======
@@ -1796,6 +1797,8 @@ def test_warp_rms_2():
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c9e8f1d1c (Merge branch 'master' of github.com:OSGeo/gdal)
 
 
 def test_warp_mode_ties():
@@ -1823,6 +1826,7 @@ def test_warp_mode_ties():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -1838,3 +1842,5 @@ def test_warp_mode_ties():
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c9e8f1d1c (Merge branch 'master' of github.com:OSGeo/gdal)
