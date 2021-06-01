@@ -450,12 +450,16 @@ def test_osr_epsg_auto_identify_epsg_odd_wkt():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD
 =======
 <<<<<<< HEAD
 =======
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -466,6 +470,9 @@ def test_osr_epsg_auto_identify_epsg_odd_wkt():
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c9e8f1d1c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 ###############################################################################
 #   Test bugfix for https://github.com/OSGeo/gdal/issues/4038
@@ -493,13 +500,18 @@ def test_osr_epsg_EPSGTreatsAsLatLong_for_CompoundCRS():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 >>>>>>> OSGeo-master
 =======
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -510,3 +522,6 @@ def test_osr_epsg_EPSGTreatsAsLatLong_for_CompoundCRS():
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c9e8f1d1c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 37c42c6d05 (Merge branch 'master' of github.com:OSGeo/gdal)
