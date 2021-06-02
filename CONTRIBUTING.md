@@ -8,10 +8,14 @@ Build:
 ```
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> c91d824020 (Merge branch 'master' of github.com:OSGeo/gdal)
 ./autogen.sh
 =======
 cd gdal
 >>>>>>> 0d8751a21a (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 cd gdal
@@ -25,6 +29,8 @@ cd gdal
 >>>>>>> 0d8751a21a (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> d152855ae2 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 29a6c2eec2 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> c91d824020 (Merge branch 'master' of github.com:OSGeo/gdal)
 ./configure --with-python [other options]
 make -j8 -s
 cd apps; make -s test_ogrsf; cd ..
