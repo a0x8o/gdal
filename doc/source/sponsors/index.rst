@@ -86,7 +86,16 @@ the health of the project:
 
     .. container:: horizontal-logo
 
+<<<<<<< HEAD
 <<<<<<< HEAD:doc/source/sponsors/index.rst
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD:gdal/doc/source/sponsors/index.rst
+=======
+=======
+<<<<<<< HEAD:doc/source/sponsors/index.rst
+>>>>>>> 5d8212851c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> ab444de0f1 (Merge branch 'master' of github.com:OSGeo/gdal)
         .. image:: ../../images/sponsors/logo-aerometrex.png
            :class: img-logos
            :width: 150 px
@@ -94,17 +103,40 @@ the health of the project:
 
     .. container:: horizontal-logo
 
+<<<<<<< HEAD
 =======
 >>>>>>> f89730514c (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/sponsors/index.rst
+=======
+<<<<<<< HEAD
+>>>>>>> OSGeo-master:doc/source/sponsors/index.rst
+=======
+=======
+>>>>>>> f89730514c (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/sponsors/index.rst
+>>>>>>> 5d8212851c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> ab444de0f1 (Merge branch 'master' of github.com:OSGeo/gdal)
         .. image:: ../../images/sponsors/logo-frontiersi.png
            :class: img-logos
            :width: 150 px
            :target: https://frontiersi.com.au
 
+<<<<<<< HEAD
 <<<<<<< HEAD:doc/source/sponsors/index.rst
 =======
 
 >>>>>>> f89730514c (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/sponsors/index.rst
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD:gdal/doc/source/sponsors/index.rst
+
+=======
+>>>>>>> OSGeo-master:doc/source/sponsors/index.rst
+=======
+<<<<<<< HEAD:doc/source/sponsors/index.rst
+=======
+
+>>>>>>> f89730514c (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/sponsors/index.rst
+>>>>>>> 5d8212851c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> ab444de0f1 (Merge branch 'master' of github.com:OSGeo/gdal)
     .. container:: horizontal-logo
 
         .. image:: ../../images/sponsors/logo-koordinates.png
@@ -147,9 +179,13 @@ the health of the project:
 
 <<<<<<< HEAD:doc/source/sponsors/index.rst
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:doc/source/sponsors/index.rst
 =======
 >>>>>>> 0783563b99 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
+=======
+<<<<<<< HEAD:doc/source/sponsors/index.rst
+>>>>>>> ab444de0f1 (Merge branch 'master' of github.com:OSGeo/gdal)
         `Kaplan Open Source Consulting <https://kaplanopensource.co.il/>`__
 
     .. container:: horizontal-logo
@@ -159,11 +195,20 @@ the health of the project:
         `Space Intelligence <https://www.space-intelligence.com//>`__
 >>>>>>> b6b690a901 (Merge pull request #3834 from talos-gis/locationinfo_fixes):gdal/doc/source/sponsors/index.rst
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         `Space Intelligence <https://www.space-intelligence.com>`__
 >>>>>>> f89730514c (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/sponsors/index.rst
 =======
 >>>>>>> 0783563b99 (Merge pull request #3834 from talos-gis/locationinfo_fixes)
+=======
+>>>>>>> OSGeo-master:doc/source/sponsors/index.rst
+=======
+=======
+        `Space Intelligence <https://www.space-intelligence.com>`__
+>>>>>>> f89730514c (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/sponsors/index.rst
+>>>>>>> 5d8212851c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> ab444de0f1 (Merge branch 'master' of github.com:OSGeo/gdal)
 
     .. container:: horizontal-logo
 
