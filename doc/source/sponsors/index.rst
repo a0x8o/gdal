@@ -86,6 +86,7 @@ the health of the project:
 
     .. container:: horizontal-logo
 
+<<<<<<< HEAD:doc/source/sponsors/index.rst
         .. image:: ../../images/sponsors/logo-aerometrex.png
            :class: img-logos
            :width: 150 px
@@ -93,11 +94,17 @@ the health of the project:
 
     .. container:: horizontal-logo
 
+=======
+>>>>>>> f89730514c (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/sponsors/index.rst
         .. image:: ../../images/sponsors/logo-frontiersi.png
            :class: img-logos
            :width: 150 px
            :target: https://frontiersi.com.au
 
+<<<<<<< HEAD:doc/source/sponsors/index.rst
+=======
+
+>>>>>>> f89730514c (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/sponsors/index.rst
     .. container:: horizontal-logo
 
         .. image:: ../../images/sponsors/logo-koordinates.png
@@ -139,6 +146,7 @@ the health of the project:
     .. container:: horizontal-logo
 
 <<<<<<< HEAD:doc/source/sponsors/index.rst
+<<<<<<< HEAD:doc/source/sponsors/index.rst
         `Kaplan Open Source Consulting <https://kaplanopensource.co.il/>`__
 
     .. container:: horizontal-logo
@@ -147,6 +155,9 @@ the health of the project:
 =======
         `Space Intelligence <https://www.space-intelligence.com//>`__
 >>>>>>> b6b690a901 (Merge pull request #3834 from talos-gis/locationinfo_fixes):gdal/doc/source/sponsors/index.rst
+=======
+        `Space Intelligence <https://www.space-intelligence.com>`__
+>>>>>>> f89730514c (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/sponsors/index.rst
 
     .. container:: horizontal-logo
 
