@@ -6,7 +6,11 @@ Install all required development packages: GNU make, g++, ...
 Build:
 
 ```
+<<<<<<< HEAD
 ./autogen.sh
+=======
+cd gdal
+>>>>>>> 0d8751a21a (Merge branch 'master' of github.com:OSGeo/gdal)
 ./configure --with-python [other options]
 make -j8 -s
 cd apps; make -s test_ogrsf; cd ..
