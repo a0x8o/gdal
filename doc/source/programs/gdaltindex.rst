@@ -107,8 +107,11 @@ Examples
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> c79d3c2d1e (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:doc/source/programs/gdaltindex.rst
 =======
 >>>>>>> a806a30646 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -156,6 +159,7 @@ Examples
 <<<<<<< HEAD:doc/source/programs/gdaltindex.rst
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> 59bee8280c (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -183,6 +187,10 @@ Examples
 >>>>>>> 81c46b4d6a (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 59bee8280c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> c79d3c2d1e (Merge branch 'master' of github.com:OSGeo/gdal)
 - Perform the same command as before, but now we create a GeoPackage instead of a Shapefile. 
 =======
 - Perform the same command as before, but now we create a GeoPacakge instead of a Shapefile. 
@@ -199,8 +207,11 @@ Examples
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> c79d3c2d1e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 02a6804ddc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -269,6 +280,7 @@ Examples
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 59bee8280c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 =======
 - Perform the same command as before, but now we create a GeoPackage instead of a Shapefile. 
@@ -320,6 +332,8 @@ Examples
 >>>>>>> 9105b4f6b6 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> c79d3c2d1e (Merge branch 'master' of github.com:OSGeo/gdal)
 
 ::
 
