@@ -225,6 +225,7 @@ int OGRDXFReader::ReadValueRaw( char *pszValueBuf, int nValueBufSize )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 02a6804ddc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -298,6 +299,12 @@ int OGRDXFReader::ReadValueRaw( char *pszValueBuf, int nValueBufSize )
             return -1;
 >>>>>>> 66a76c0d6d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
 >>>>>>> 55fbac43a8 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+        // If nothing was read, we have reached the end of the file
+        if( iEOL == iSrcBufferOffset )
+            break;
+>>>>>>> 137c8e8f4e (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
+>>>>>>> 68bb5c6446 (Merge branch 'master' of github.com:OSGeo/gdal)
     }
 
     size_t nValueBufLen = 0;
