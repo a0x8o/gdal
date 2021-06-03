@@ -9,6 +9,7 @@ if version_info >= (3, 8, 0) and platform == 'win32':
             if p:
                 try:
                     os.add_dll_directory(p)
+<<<<<<< HEAD:swig/python/osgeo/__init__.py
                 except (FileNotFoundError, OSError):
                     continue
     elif 'PATH' in os.environ:
@@ -19,6 +20,9 @@ if version_info >= (3, 8, 0) and platform == 'win32':
                     os.add_dll_directory(p)
                     break
                 except (FileNotFoundError, OSError):
+=======
+                except FileNotFoundError:
+>>>>>>> ac60fc417f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/osgeo/__init__.py
                     continue
 
 
