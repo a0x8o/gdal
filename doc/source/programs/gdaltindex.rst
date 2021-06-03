@@ -126,14 +126,20 @@ Examples
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 81c46b4d6a (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD:doc/source/programs/gdaltindex.rst
 =======
 >>>>>>> 59bee8280c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 02a6804ddc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -162,10 +168,14 @@ Examples
 =======
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 02a6804ddc (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 81c46b4d6a (Merge branch 'master' of github.com:OSGeo/gdal)
 - Perform the same command as before, but now we create a GeoPackage instead of a Shapefile. 
 =======
 - Perform the same command as before, but now we create a GeoPacakge instead of a Shapefile. 
 >>>>>>> 137c8e8f4e (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/programs/gdaltindex.rst
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -181,13 +191,20 @@ Examples
 =======
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+=======
+>>>>>>> 02a6804ddc (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 81c46b4d6a (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
 - Perform the same command as before, but now we create a GeoPackage instead of a Shapefile. 
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/programs/gdaltindex.rst
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 81c46b4d6a (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> a806a30646 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -196,6 +213,8 @@ Examples
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/programs/gdaltindex.rst
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+=======
+>>>>>>> 02a6804ddc (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 =======
 >>>>>>> 02a6804ddc (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -207,11 +226,15 @@ Examples
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 81c46b4d6a (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 =======
 >>>>>>> 59bee8280c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> fa67961096 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
@@ -259,6 +282,10 @@ Examples
 =======
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> fa67961096 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 02a6804ddc (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 81c46b4d6a (Merge branch 'master' of github.com:OSGeo/gdal)
 
 ::
 
