@@ -177,7 +177,10 @@ int OGRDXFReader::ReadValueRaw( char *pszValueBuf, int nValueBufSize )
            && achSrcBuffer[iEOL] != '\0' )
         iEOL++;
 
+<<<<<<< HEAD:ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
     bool bLongLine = false;
+=======
+>>>>>>> 137c8e8f4e (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
     while( achSrcBuffer[iEOL] == '\0' )
     {
         // The line is longer than the buffer. Let's copy what we have so
@@ -199,17 +202,27 @@ int OGRDXFReader::ReadValueRaw( char *pszValueBuf, int nValueBufSize )
         iSrcBufferOffset = iEOL;
         LoadDiskChunk();
         iEOL = iSrcBufferOffset;
+<<<<<<< HEAD:ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
         bLongLine = true;
 
         // Have we prematurely reached the end of the file?
         if( achSrcBuffer[iEOL] == '\0' )
             return -1;
+=======
+>>>>>>> 137c8e8f4e (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
 
         // Proceed to newline again
         while( achSrcBuffer[iEOL] != '\n'
                && achSrcBuffer[iEOL] != '\r'
                && achSrcBuffer[iEOL] != '\0' )
             iEOL++;
+<<<<<<< HEAD:ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
+=======
+
+        // If nothing was read, we have reached the end of the file
+        if( iEOL == iSrcBufferOffset )
+            break;
+>>>>>>> 137c8e8f4e (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
     }
 
     size_t nValueBufLen = 0;
