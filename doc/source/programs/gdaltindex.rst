@@ -103,18 +103,27 @@ Examples
 =======
 <<<<<<< HEAD:doc/source/programs/gdaltindex.rst
 <<<<<<< HEAD:doc/source/programs/gdaltindex.rst
+<<<<<<< HEAD
 <<<<<<< HEAD:doc/source/programs/gdaltindex.rst
+=======
+>>>>>>> 59bee8280c (Merge branch 'master' of github.com:OSGeo/gdal)
 - Perform the same command as before, but now we create a GeoPackage instead of a Shapefile. 
 =======
 - Perform the same command as before, but now we create a GeoPacakge instead of a Shapefile. 
 >>>>>>> 137c8e8f4e (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/programs/gdaltindex.rst
+<<<<<<< HEAD
 =======
 - Perform the same command as before, but now we create a GeoPackage instead of a Shapefile. 
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/programs/gdaltindex.rst
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:doc/source/programs/gdaltindex.rst
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 59bee8280c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> fa67961096 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 ::
 
