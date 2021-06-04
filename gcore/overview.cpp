@@ -5613,12 +5613,30 @@ GDALRegenerateOverviewsMultiBand( int nBands, GDALRasterBand** papoSrcBands,
 
                     if( bUseNoDataMask && eErr == CE_None )
                     {
+<<<<<<< HEAD
 <<<<<<< HEAD:gcore/overview.cpp
                         auto poMaskBand = poSrcBand->IsMaskBand() ? poSrcBand : poSrcBand->GetMaskBand();
 =======
                         const bool bUseSrcAsMaskBand = bIsMask || papoSrcBands[iBand]->GetColorInterpretation() == GCI_AlphaBand;
                         auto poMaskBand = bUseSrcAsMaskBand ? poSrcBand : poSrcBand->GetMaskBand();
 >>>>>>> 7355095be4 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/overview.cpp
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD:gdal/gcore/overview.cpp
+                        const bool bUseSrcAsMaskBand = bIsMask || papoSrcBands[iBand]->GetColorInterpretation() == GCI_AlphaBand;
+                        auto poMaskBand = bUseSrcAsMaskBand ? poSrcBand : poSrcBand->GetMaskBand();
+=======
+                        auto poMaskBand = poSrcBand->IsMaskBand() ? poSrcBand : poSrcBand->GetMaskBand();
+>>>>>>> OSGeo-master:gcore/overview.cpp
+=======
+<<<<<<< HEAD:gcore/overview.cpp
+                        auto poMaskBand = poSrcBand->IsMaskBand() ? poSrcBand : poSrcBand->GetMaskBand();
+=======
+                        const bool bUseSrcAsMaskBand = bIsMask || papoSrcBands[iBand]->GetColorInterpretation() == GCI_AlphaBand;
+                        auto poMaskBand = bUseSrcAsMaskBand ? poSrcBand : poSrcBand->GetMaskBand();
+>>>>>>> 7355095be4 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/overview.cpp
+>>>>>>> e953ccdffe (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8ad0701720 (Merge branch 'master' of github.com:OSGeo/gdal)
                         eErr = poMaskBand->RasterIO(
                             GF_Read,
                             nChunkXOffQueried, nChunkYOffQueried,
@@ -5694,11 +5712,27 @@ GDALRegenerateOverviewsMultiBand( int nBands, GDALRasterBand** papoSrcBands,
         for( int iBand = 0; iBand < nBands; ++iBand )
         {
             CPLFree(apaChunk[iBand]);
+<<<<<<< HEAD
 <<<<<<< HEAD:gcore/overview.cpp
             papapoOverviewBands[iBand][iOverview]->FlushCache(false);
 =======
             papapoOverviewBands[iBand][iOverview]->FlushCache();
 >>>>>>> 7355095be4 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/overview.cpp
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD:gdal/gcore/overview.cpp
+            papapoOverviewBands[iBand][iOverview]->FlushCache();
+=======
+            papapoOverviewBands[iBand][iOverview]->FlushCache(false);
+>>>>>>> OSGeo-master:gcore/overview.cpp
+=======
+<<<<<<< HEAD:gcore/overview.cpp
+            papapoOverviewBands[iBand][iOverview]->FlushCache(false);
+=======
+            papapoOverviewBands[iBand][iOverview]->FlushCache();
+>>>>>>> 7355095be4 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/overview.cpp
+>>>>>>> e953ccdffe (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8ad0701720 (Merge branch 'master' of github.com:OSGeo/gdal)
 
             CPLFree(apabyChunkNoDataMask[iBand]);
         }
