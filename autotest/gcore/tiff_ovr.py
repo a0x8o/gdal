@@ -2053,10 +2053,24 @@ def test_tiff_ovr_nodata_multiband():
 
     numpy = pytest.importorskip('numpy')
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
     
 >>>>>>> 7355095be4 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD
+    
+=======
+
+>>>>>>> OSGeo-master
+=======
+
+=======
+    
+>>>>>>> 7355095be4 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> e953ccdffe (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8ad0701720 (Merge branch 'master' of github.com:OSGeo/gdal)
     temp_path = '/vsimem/test.tif'
     ds = gdal.GetDriverByName('GTiff').Create(temp_path, 4, 4, 2, gdal.GDT_Float32)
     ds.GetRasterBand(1).SetNoDataValue(-10000)
@@ -2072,21 +2086,49 @@ def test_tiff_ovr_nodata_multiband():
         'Overview could not be generated'
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+    pix = ds.GetRasterBand(1).GetOverview(0).ReadAsArray(win_xsize=1, win_ysize=1) 
+    assert pix[0,0] == 2.0
+
+    pix = ds.GetRasterBand(2).GetOverview(0).ReadAsArray(win_xsize=1, win_ysize=1) 
+=======
+=======
+>>>>>>> e953ccdffe (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8ad0701720 (Merge branch 'master' of github.com:OSGeo/gdal)
     pix = ds.GetRasterBand(1).GetOverview(0).ReadAsArray(win_xsize=1, win_ysize=1)
     assert pix[0,0] == 2.0
 
     pix = ds.GetRasterBand(2).GetOverview(0).ReadAsArray(win_xsize=1, win_ysize=1)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> OSGeo-master
+=======
+>>>>>>> 8ad0701720 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
     pix = ds.GetRasterBand(1).GetOverview(0).ReadAsArray(win_xsize=1, win_ysize=1) 
     assert pix[0,0] == 2.0
 
     pix = ds.GetRasterBand(2).GetOverview(0).ReadAsArray(win_xsize=1, win_ysize=1) 
 >>>>>>> 7355095be4 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+>>>>>>> e953ccdffe (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8ad0701720 (Merge branch 'master' of github.com:OSGeo/gdal)
     assert pix[0,0] == 3.0
 
     ds = None
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> e953ccdffe (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8ad0701720 (Merge branch 'master' of github.com:OSGeo/gdal)
 ###############################################################################
 
 @pytest.mark.parametrize("external_ovr", [False,True])
@@ -2236,8 +2278,17 @@ def test_tiff_ovr_uint64():
     del ds
     gdal.GetDriverByName('GTiff').Delete(temp_path)
 
+<<<<<<< HEAD
 =======
 >>>>>>> 7355095be4 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD
+>>>>>>> OSGeo-master
+=======
+=======
+>>>>>>> 7355095be4 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> e953ccdffe (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8ad0701720 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 ###############################################################################
 # Cleanup
