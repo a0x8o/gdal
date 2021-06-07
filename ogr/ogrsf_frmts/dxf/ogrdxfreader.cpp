@@ -219,10 +219,14 @@ int OGRDXFReader::ReadValueRaw( char *pszValueBuf, int nValueBufSize )
 <<<<<<< HEAD:ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
 =======
 
-        // If nothing was read, we have reached the end of the file
+        // If nothing was read, we have prematurely reached the end of the file
         if( iEOL == iSrcBufferOffset )
+<<<<<<< HEAD:ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
             break;
 >>>>>>> 137c8e8f4e (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
+=======
+            return -1;
+>>>>>>> 66a76c0d6d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
     }
 
     size_t nValueBufLen = 0;
