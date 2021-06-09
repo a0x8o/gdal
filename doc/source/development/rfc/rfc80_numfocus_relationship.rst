@@ -18,6 +18,7 @@ Started:       2021-Apr-15
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 8da24d86c4 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -32,6 +33,10 @@ Started:       2021-Apr-15
 >>>>>>> 49a7c730c7 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 639f22775f (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0)
+=======
+=======
+>>>>>>> 8da24d86c4 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2ad9b72587 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:doc/source/development/rfc/rfc80_numfocus_relationship.rst
 Last modified: 2021-Jun-07
 =======
@@ -39,6 +44,7 @@ Last modified: 2021-Jun-07
 =======
 Last modified: 2021-Jun-07
 >>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/development/rfc/rfc80_numfocus_relationship.rst
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -56,6 +62,8 @@ Last modified: 2021-Jun-07
 =======
 >>>>>>> 639f22775f (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0)
 =======
+>>>>>>> 2ad9b72587 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
 Last modified: 2021-Jun-07
 =======
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/doc/source/development/rfc/rfc80_numfocus_relationship.rst
@@ -64,6 +72,7 @@ Last modified: 2021-Jun-07
 >>>>>>> d41f619c4d (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0)
 =======
 >>>>>>> 8da24d86c4 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 623e493dbe (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0)
 <<<<<<< HEAD
@@ -93,6 +102,8 @@ Last modified: 2021-Jun-07
 =======
 >>>>>>> d41f619c4d (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0)
 >>>>>>> 639f22775f (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0)
+=======
+>>>>>>> 2ad9b72587 (Merge branch 'master' of github.com:OSGeo/gdal)
 Status:        Adopted
 ============== =============================================
 
