@@ -68,12 +68,18 @@ static bool NITFPatchImageLength( const char *pszFilename,
                                   GUIntBig nImageOffset,
                                   GIntBig nPixelCount,
                                   const char *pszIC,
+<<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
                                   vsi_l_offset nICOffset,
                                   CSLConstList papszCreationOptions );
 static bool NITFWriteExtraSegments( const char *pszFilename,
                                     CSLConstList papszCgmMD,
                                     CSLConstList papszTextMD,
                                     CSLConstList papszOptions );
+=======
+                                  CSLConstList papszCreationOptions );
+static bool NITFWriteCGMSegments( const char *pszFilename, char **papszList );
+static bool NITFWriteTextSegments( const char *pszFilename, char **papszList );
+>>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
 
 #ifdef JPEG_SUPPORTED
 static bool NITFWriteJPEGImage( GDALDataset *, VSILFILE *, vsi_l_offset, char **,
@@ -201,8 +207,13 @@ int NITFDataset::CloseDependentDatasets()
             nBands;
 
         CPL_IGNORE_RET_VAL(
+<<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
             NITFPatchImageLength( GetDescription(), m_nIMIndex, m_nImageOffset, nPixelCount,
                                   "C8", m_nICOffset, nullptr ));
+=======
+            NITFPatchImageLength( GetDescription(), nImageStart, nPixelCount,
+                                  "C8", nullptr ));
+>>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
     }
 
     bJP2Writing = FALSE;
@@ -4317,6 +4328,15 @@ NITFDataset::NITFCreateCopy(
                     poJ2KDriver =
                         GetGDALDriverManager()->GetDriverByName( "JP2OPENJPEG" );
                 }
+<<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
+=======
+                if( poJ2KDriver == nullptr )
+                {
+                    /* Try with Jasper as an alternate driver */
+                    poJ2KDriver =
+                        GetGDALDriverManager()->GetDriverByName( "JPEG2000" );
+                }
+>>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
             }
             if( poJ2KDriver == nullptr )
             {
@@ -4993,6 +5013,7 @@ NITFDataset::NITFCreateCopy(
         GIntBig nPixelCount = nXSize * ((GIntBig) nYSize) *
             poSrcDS->GetRasterCount();
 
+<<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
         bool bOK = NITFPatchImageLength( pszFilename,
                                          nIMIndex,
                                          nImageOffset, nPixelCount,
@@ -5004,6 +5025,12 @@ NITFDataset::NITFCreateCopy(
                                            papszTextMD,
                                            papszFullOptions );
         }
+=======
+        bool bOK = NITFPatchImageLength( pszFilename, nImageOffset, nPixelCount,
+                                         "C8", papszFullOptions );
+        bOK &= NITFWriteCGMSegments( pszFilename, papszCgmMD );
+        bOK &= NITFWriteTextSegments( pszFilename, papszTextMD );
+>>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
         if( !bOK )
         {
             CSLDestroy(papszCgmMD);
@@ -5061,6 +5088,7 @@ NITFDataset::NITFCreateCopy(
 
         NITFClose( psFile );
 
+<<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
         bool bOK = NITFPatchImageLength( pszFilename,
                                          nIMIndex,
                                          nImageOffset,
@@ -5072,6 +5100,13 @@ NITFDataset::NITFCreateCopy(
                                            papszTextMD,
                                            papszFullOptions );
         }
+=======
+        bool bOK = NITFPatchImageLength( pszFilename, nImageOffset,
+                              nPixelCount, pszIC, papszFullOptions );
+
+        bOK &= NITFWriteCGMSegments( pszFilename, papszCgmMD );
+        bOK &= NITFWriteTextSegments( pszFilename, papszTextMD );
+>>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
         if( !bOK )
         {
             CSLDestroy(papszCgmMD);
@@ -5269,7 +5304,10 @@ static bool NITFPatchImageLength( const char *pszFilename,
                                   GUIntBig nImageOffset,
                                   GIntBig nPixelCount,
                                   const char *pszIC,
+<<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
                                   vsi_l_offset nICOffset,
+=======
+>>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
                                   CSLConstList papszCreationOptions )
 
 {
@@ -6580,8 +6618,12 @@ void NITFDriver::InitCreationOptionList()
 "   <Option name='PROGRESSIVE' type='boolean' description='JPEG progressive mode'/>"
 "   <Option name='RESTART_INTERVAL' type='int' description='Restart interval (in MCUs). -1 for auto, 0 for none, > 0 for user specified' default='-1'/>"
 #endif
+<<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
 "   <Option name='NUMI' type='int' default='1' description='Number of images to create (1-999). Only works with IC=NC if WRITE_ONLY_FIRST_IMAGE=NO'/>"
 "   <Option name='WRITE_ONLY_FIRST_IMAGE' type='boolean' default='NO' description='To be used with NUMI. If YES, only write first image. Subsequent one must be written with APPEND_SUBDATASET=YES'/>";
+=======
+"   <Option name='NUMI' type='int' default='1' description='Number of images to create (1-999). Only works with IC=NC'/>";
+>>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
 
     if( bHasJPEG2000Drivers)
     {
