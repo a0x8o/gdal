@@ -95,6 +95,7 @@ Creation Options:
    -  C8 means JPEG2000 compression (one block) and is available for
       CreateCopy() and/or Create() methods. See below paragraph for specificities.
 
+<<<<<<< HEAD:doc/source/drivers/raster/nitf.rst
 -  **NUMI=n** : Number of images. Default = 1.
    See :ref:`Advanced GDAL NITF Driver Information <raster.nitf_advanced>` for
    the procedure to follow to write several images in a NITF file.
@@ -105,6 +106,10 @@ Creation Options:
    When WRITE_ALL_IMAGES=YES, the space for all images is allocated, which is
    only compatible with IC=NC (uncompressed images).
    (Behavior with GDAL < 3.4 was similar to WRITE_ALL_IMAGES=YES)
+=======
+-  **NUMI=n** : Number of images. Default =
+   1. This option is only compatible with IC=NC (uncompressed images).
+>>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/raster/nitf.rst
 -  **ICORDS=G/D/N/S**: Set to "G" to ensure that space will be reserved
    for geographic corner coordinates (in DMS) to be set later via
    SetGeoTransform(), set to "D" for geographic coordinates in decimal
@@ -183,7 +188,11 @@ JPEG2000 compression (write support)
 
 JPEG2000 compression is available when using the IC=C8 creation option,
 if the JP2ECW (SDK 3.3, or for later versions assuming the user has the key to
+<<<<<<< HEAD:doc/source/drivers/raster/nitf.rst
 enable JPEG2000 writing), JP2KAK or JP2OpenJPEG driver are available.
+=======
+enable JPEG2000 writing), JP2KAK, JP2OpenJPEG or Jasper driver are available.
+>>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/raster/nitf.rst
 
 They are tried in that order when several ones are available, unless the
 JPEG2000_DRIVER creation option (added in GDAL 3.4) is set to explicitly specify
@@ -213,6 +222,11 @@ the JPEG2000 capable driver to use.
   When those profiles are specified, the J2KLRA TRE will also be written, unless
   the J2KLRA=NO creation option is specified.
 
+<<<<<<< HEAD:doc/source/drivers/raster/nitf.rst
+=======
+-  Jasper JPEG2000 driver: only in the CreateCopy() case.
+
+>>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/raster/nitf.rst
 Links
 -----
 
