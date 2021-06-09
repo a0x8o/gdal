@@ -13,6 +13,9 @@ Last modified: 2021-Jun-07
 =======
 <<<<<<< HEAD:doc/source/development/rfc/rfc80_numfocus_relationship.rst
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61f974f82f (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:doc/source/development/rfc/rfc80_numfocus_relationship.rst
 Last modified: 2021-Jun-07
 =======
@@ -21,14 +24,22 @@ Last modified: 2021-Jun-07
 Last modified: 2021-Jun-07
 >>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/development/rfc/rfc80_numfocus_relationship.rst
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:doc/source/development/rfc/rfc80_numfocus_relationship.rst
 =======
+=======
+>>>>>>> 86d4bf43e3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 Last modified: 2021-Jun-07
 =======
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/doc/source/development/rfc/rfc80_numfocus_relationship.rst
 >>>>>>> 623e493dbe (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0)
+<<<<<<< HEAD
 >>>>>>> d16aead3e9 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0)
+=======
+=======
+>>>>>>> 61f974f82f (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 86d4bf43e3 (Merge branch 'master' of github.com:OSGeo/gdal)
 Status:        Adopted
 ============== =============================================
 
