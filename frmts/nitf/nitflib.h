@@ -95,6 +95,7 @@ int      CPL_DLL  NITFCreate( const char *pszFilename,
                               char **papszOptions );
 
 int        NITFCreateEx( const char *pszFilename,
+<<<<<<< HEAD:frmts/nitf/nitflib.h
                          int nPixels, int nLines, int nBands,
                          int nBitsPerSample, const char *pszPVType,
                          char **papszOptions,
@@ -102,6 +103,11 @@ int        NITFCreateEx( const char *pszFilename,
                          int* pnImageCount,
                          vsi_l_offset* pnImageOffset,
                          vsi_l_offset* pnICOffset );
+=======
+                              int nPixels, int nLines, int nBands,
+                              int nBitsPerSample, const char *pszPVType,
+                              char **papszOptions, int* pnICOffset );
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitflib.h
 
 const char CPL_DLL *NITFFindTRE( const char *pszTREData, int nTREBytes,
                                  const char *pszTag, int *pnFoundTRESize );

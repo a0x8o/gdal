@@ -57,6 +57,7 @@ class ColorPalette:
         return str(self.pal)
 
     def __eq__(self, other):
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
         return self.pal == other.pal and self.ndv == other.ndv
 
     def is_numeric(self):
@@ -81,6 +82,9 @@ class ColorPalette:
         if with_ndv and self.ndv is not None:
             keys = ['nv', *keys]
         return keys
+=======
+        return self.pal == other.pal
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
 
     def replace_absolute_values_with_percent(self, ndv=True):
         new_pal = ColorPalette()
@@ -149,7 +153,11 @@ class ColorPalette:
         self._all_numeric = other._all_numeric
 
     @staticmethod
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
     def get_supported_extenstions() -> Sequence[str]:
+=======
+    def get_supported_extenstions():
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
         return [
             'txt',  # GDAL Text-based color configuration file
             'qlr',  # QGIS Layer Definition File (qlr)
@@ -163,8 +171,17 @@ class ColorPalette:
         return False
 
     def set_ndv(self, ndv: Optional[int], override: bool = True):
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
         if override or (self.ndv is None):
             self.ndv = ndv
+=======
+        if ndv is not None:
+            if override or ('nv' not in self.pal):
+                self.pal['nv'] = ndv
+        else:
+            if override and ('nv' in self.pal):
+                del self.pal['nv']
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
 
     def read(self, filename_or_strings: Optional[ColorPaletteOrPathOrStrings]):
         if filename_or_strings is None:
@@ -186,7 +203,11 @@ class ColorPalette:
         else:
             self.read_file_txt(filename)
 
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
     def read_file_qml(self, qml_filename: PathLikeOrStr, tag_name=None, type=None):
+=======
+    def read_file_qml(self, qml_filename, tag_name=None, type=None):
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
         """ Read QGIS Layer Style File (qml) or QGIS Layer Definition File (qlr) """
         qlr = minidom.parse(str(qml_filename))
         if tag_name is None:
@@ -248,6 +269,7 @@ class ColorPalette:
                     self._all_numeric = False
             self.pal[key] = color
 
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
     def get_txt_color_entry(self, key):
         color = self.get_color(key)
         key = self.get_txt_key(key)
@@ -275,6 +297,27 @@ class ColorPalette:
             s = s + line
         return s
 
+=======
+    def write_file(self, color_filename: Optional[PathLikeOrStr] = None):
+        if color_filename is None:
+            color_filename = tempfile.mktemp(suffix='.txt')
+        os.makedirs(os.path.dirname(color_filename), exist_ok=True)
+        with open(color_filename, mode='w') as fp:
+            for key, color in self.pal.items():
+                color_entry = self.color_to_color_entry(color)
+                color_entry = ' '.join(str(c) for c in color_entry)
+                fp.write('{} {}\n'.format(key, color_entry))
+        return color_filename
+
+    def to_mem_buffer(self):
+        s = ''
+        for key, color in self.pal.items():
+            cc = self.color_to_color_entry(color)
+            cc = ' '.join(str(c) for c in cc)
+            s = s + '{} {}\n'.format(key, cc)
+        return s
+
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
     @staticmethod
     def from_string_list(color_palette_strings: Optional[ColorPaletteOrPathOrStrings]) -> 'ColorPalette':
         res = ColorPalette()
@@ -290,22 +333,33 @@ class ColorPalette:
         return col if isinstance(col, str) else '#{:06X}'.format(col)
 
     @staticmethod
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
     def color_to_color_entry(color, with_alpha: Optional[bool]=None):
+=======
+    def color_to_color_entry(color):
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
         b = base.get_byte(color, 0)
         g = base.get_byte(color, 1)
         r = base.get_byte(color, 2)
         a = base.get_byte(color, 3)
 
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
         if with_alpha or (with_alpha is None and (a < 255)):
+=======
+        if a < 255:
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
             return r, g, b, a
         else:
             return r, g, b
 
     @staticmethod
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
     def color_entry_to_color(r, g, b, a):
         return (a << 24) + (r << 16) + (g << 8) + b
 
     @staticmethod
+=======
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
     def pal_color_to_rgb(cc: str) -> int:
         # r g b a -> argb
         # todo: support color names as implemented in the cpp version of this function...
@@ -366,6 +420,10 @@ class ColorPalette:
     read_color_file = read
     write_color_file = write_file
     read_file_xml = read_file_qlr = read_file_qml
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
+=======
+
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
 
 
 def xml_to_color_file(xml_filename: Path, **kwargs) -> Tuple[ColorPalette, Path]:
