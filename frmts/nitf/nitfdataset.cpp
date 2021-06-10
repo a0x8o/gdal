@@ -69,6 +69,7 @@ static bool NITFPatchImageLength( const char *pszFilename,
                                   GIntBig nPixelCount,
                                   const char *pszIC,
 <<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
+<<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
                                   vsi_l_offset nICOffset,
                                   CSLConstList papszCreationOptions );
 static bool NITFWriteExtraSegments( const char *pszFilename,
@@ -76,6 +77,9 @@ static bool NITFWriteExtraSegments( const char *pszFilename,
                                     CSLConstList papszTextMD,
                                     CSLConstList papszOptions );
 =======
+=======
+                                  int nICOffset,
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
                                   CSLConstList papszCreationOptions );
 static bool NITFWriteCGMSegments( const char *pszFilename, char **papszList );
 static bool NITFWriteTextSegments( const char *pszFilename, char **papszList );
@@ -212,8 +216,12 @@ int NITFDataset::CloseDependentDatasets()
                                   "C8", m_nICOffset, nullptr ));
 =======
             NITFPatchImageLength( GetDescription(), nImageStart, nPixelCount,
+<<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
                                   "C8", nullptr ));
 >>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
+=======
+                                  "C8", m_nICOffset, nullptr ));
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
     }
 
     bJP2Writing = FALSE;
@@ -4199,6 +4207,7 @@ NITFDataset::NITFDatasetCreate( const char *pszFilename, int nXSize, int nYSize,
 /*      Create the file.                                                */
 /* -------------------------------------------------------------------- */
 
+<<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
     int nIMIndex = 0;
     int nImageCount = 0;
     vsi_l_offset nImageOffset = 0;
@@ -4207,6 +4216,12 @@ NITFDataset::NITFDatasetCreate( const char *pszFilename, int nXSize, int nYSize,
                        GDALGetDataTypeSize( eType ), pszPVType,
                        papszFullOptions,
                        &nIMIndex, &nImageCount, &nImageOffset, &nICOffset ) )
+=======
+    int nICOffset = 0;
+    if( !NITFCreateEx( pszFilename, nXSize, nYSize, nBands,
+                       GDALGetDataTypeSize( eType ), pszPVType,
+                       papszFullOptions, &nICOffset ) )
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
     {
         CSLDestroy(papszTextMD);
         CSLDestroy(papszCgmMD);
@@ -4248,9 +4263,12 @@ NITFDataset::NITFDatasetCreate( const char *pszFilename, int nXSize, int nYSize,
         NITFDataset::OpenInternal(&oOpenInfo, poWritableJ2KDataset, true, nIMIndex);
     if (poDS)
     {
+<<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
         poDS->m_nImageOffset = nImageOffset;
         poDS->m_nIMIndex = nIMIndex;
         poDS->m_nImageCount = nImageCount;
+=======
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
         poDS->m_nICOffset = nICOffset;
         poDS->papszTextMDToWrite = papszTextMD;
         poDS->papszCgmMDToWrite = papszCgmMD;
@@ -4928,6 +4946,7 @@ NITFDataset::NITFCreateCopy(
         }
     }
 
+<<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
     int nIMIndex = 0;
     int nImageCount = 0;
     vsi_l_offset nImageOffset = 0;
@@ -4936,6 +4955,12 @@ NITFDataset::NITFCreateCopy(
                 GDALGetDataTypeSize( eType ), pszPVType,
                 papszFullOptions,
                 &nIMIndex, &nImageCount, &nImageOffset, &nICOffset ) )
+=======
+    int nICOffset = 0;
+    if (!NITFCreateEx( pszFilename, nXSize, nYSize, poSrcDS->GetRasterCount(),
+                GDALGetDataTypeSize( eType ), pszPVType,
+                papszFullOptions, &nICOffset ))
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
     {
         CSLDestroy( papszFullOptions );
         CSLDestroy(papszCgmMD);
@@ -5023,7 +5048,7 @@ NITFDataset::NITFCreateCopy(
         }
 =======
         bool bOK = NITFPatchImageLength( pszFilename, nImageOffset, nPixelCount,
-                                         "C8", papszFullOptions );
+                                         "C8", nICOffset, papszFullOptions );
         bOK &= NITFWriteCGMSegments( pszFilename, papszCgmMD );
         bOK &= NITFWriteTextSegments( pszFilename, papszTextMD );
 >>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
@@ -5098,7 +5123,7 @@ NITFDataset::NITFCreateCopy(
         }
 =======
         bool bOK = NITFPatchImageLength( pszFilename, nImageOffset,
-                              nPixelCount, pszIC, papszFullOptions );
+                              nPixelCount, pszIC, nICOffset, papszFullOptions );
 
         bOK &= NITFWriteCGMSegments( pszFilename, papszCgmMD );
         bOK &= NITFWriteTextSegments( pszFilename, papszTextMD );
@@ -5301,9 +5326,13 @@ static bool NITFPatchImageLength( const char *pszFilename,
                                   GIntBig nPixelCount,
                                   const char *pszIC,
 <<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
+<<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
                                   vsi_l_offset nICOffset,
 =======
 >>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
+=======
+                                  int nICOffset,
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
                                   CSLConstList papszCreationOptions )
 
 {
