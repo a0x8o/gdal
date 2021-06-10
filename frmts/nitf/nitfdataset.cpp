@@ -78,10 +78,13 @@ static bool NITFPatchImageLength( const char *pszFilename,
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 2d0fae300d (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 9c3db40105 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 92d0f8a9c0 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
 =======
 >>>>>>> 8da24d86c4 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -127,6 +130,7 @@ static bool NITFPatchImageLength( const char *pszFilename,
 =======
 <<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 49a7c730c7 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -149,6 +153,8 @@ static bool NITFPatchImageLength( const char *pszFilename,
 =======
 >>>>>>> 61f974f82f (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 9c3db40105 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 92d0f8a9c0 (Merge branch 'master' of github.com:OSGeo/gdal)
                                   vsi_l_offset nICOffset,
                                   CSLConstList papszCreationOptions );
 static bool NITFWriteExtraSegments( const char *pszFilename,
@@ -156,6 +162,7 @@ static bool NITFWriteExtraSegments( const char *pszFilename,
                                     CSLConstList papszTextMD,
                                     CSLConstList papszOptions );
 =======
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -179,6 +186,8 @@ static bool NITFWriteExtraSegments( const char *pszFilename,
 >>>>>>> f16d61da56 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 9c3db40105 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 92d0f8a9c0 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
                                   int nICOffset,
 >>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
@@ -231,11 +240,15 @@ static bool NITFWriteExtraSegments( const char *pszFilename,
 =======
 >>>>>>> 61f974f82f (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 92d0f8a9c0 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
                                   int nICOffset,
 >>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 49a7c730c7 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -268,6 +281,8 @@ static bool NITFWriteExtraSegments( const char *pszFilename,
 >>>>>>> f16d61da56 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 9c3db40105 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 92d0f8a9c0 (Merge branch 'master' of github.com:OSGeo/gdal)
                                   CSLConstList papszCreationOptions );
 static bool NITFWriteCGMSegments( const char *pszFilename, char **papszList );
 static bool NITFWriteTextSegments( const char *pszFilename, char **papszList );
@@ -417,10 +432,13 @@ int NITFDataset::CloseDependentDatasets()
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> f16d61da56 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 9c3db40105 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 92d0f8a9c0 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 9a931cd0f4 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -454,6 +472,7 @@ int NITFDataset::CloseDependentDatasets()
 >>>>>>> 2767799a55 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -469,12 +488,17 @@ int NITFDataset::CloseDependentDatasets()
 >>>>>>> 12751c1455 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> f16d61da56 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 92d0f8a9c0 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
                                   "C8", nullptr ));
 >>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
 =======
                                   "C8", m_nICOffset, nullptr ));
 >>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -492,6 +516,8 @@ int NITFDataset::CloseDependentDatasets()
 >>>>>>> 12751c1455 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> f16d61da56 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 92d0f8a9c0 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
                                   "C8", nullptr ));
 >>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
@@ -527,6 +553,7 @@ int NITFDataset::CloseDependentDatasets()
                                   "C8", nullptr ));
 >>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
 >>>>>>> 61f974f82f (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -571,6 +598,10 @@ int NITFDataset::CloseDependentDatasets()
 >>>>>>> f16d61da56 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 9c3db40105 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 92d0f8a9c0 (Merge branch 'master' of github.com:OSGeo/gdal)
     }
 
     bJP2Writing = FALSE;
@@ -5509,6 +5540,7 @@ NITFDataset::NITFCreateCopy(
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 2ad9b72587 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -5519,6 +5551,8 @@ NITFDataset::NITFCreateCopy(
 >>>>>>> f16d61da56 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 9c3db40105 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 92d0f8a9c0 (Merge branch 'master' of github.com:OSGeo/gdal)
                                          "C8", nICOffset, papszFullOptions );
 =======
                                          "C8", papszFullOptions );
@@ -5562,6 +5596,7 @@ NITFDataset::NITFCreateCopy(
 =======
                                          "C8", nICOffset, papszFullOptions );
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
                                          "C8", papszFullOptions );
 >>>>>>> 49a7c730c7 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -5585,6 +5620,8 @@ NITFDataset::NITFCreateCopy(
                                          "C8", papszFullOptions );
 >>>>>>> 61f974f82f (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 9c3db40105 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 92d0f8a9c0 (Merge branch 'master' of github.com:OSGeo/gdal)
         bOK &= NITFWriteCGMSegments( pszFilename, papszCgmMD );
         bOK &= NITFWriteTextSegments( pszFilename, papszTextMD );
 >>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
@@ -5672,6 +5709,7 @@ NITFDataset::NITFCreateCopy(
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 2ad9b72587 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -5682,6 +5720,8 @@ NITFDataset::NITFCreateCopy(
 >>>>>>> f16d61da56 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 9c3db40105 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 92d0f8a9c0 (Merge branch 'master' of github.com:OSGeo/gdal)
                               nPixelCount, pszIC, nICOffset, papszFullOptions );
 =======
                               nPixelCount, pszIC, papszFullOptions );
@@ -5725,6 +5765,7 @@ NITFDataset::NITFCreateCopy(
 =======
                               nPixelCount, pszIC, nICOffset, papszFullOptions );
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
                               nPixelCount, pszIC, papszFullOptions );
 >>>>>>> 49a7c730c7 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -5748,6 +5789,8 @@ NITFDataset::NITFCreateCopy(
                               nPixelCount, pszIC, papszFullOptions );
 >>>>>>> 61f974f82f (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 9c3db40105 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 92d0f8a9c0 (Merge branch 'master' of github.com:OSGeo/gdal)
 
         bOK &= NITFWriteCGMSegments( pszFilename, papszCgmMD );
         bOK &= NITFWriteTextSegments( pszFilename, papszTextMD );
@@ -5978,12 +6021,15 @@ static bool NITFPatchImageLength( const char *pszFilename,
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 12751c1455 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> f16d61da56 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 9c3db40105 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 92d0f8a9c0 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 9a931cd0f4 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -5996,6 +6042,7 @@ static bool NITFPatchImageLength( const char *pszFilename,
 =======
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -6011,6 +6058,10 @@ static bool NITFPatchImageLength( const char *pszFilename,
 >>>>>>> 12751c1455 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> f16d61da56 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 92d0f8a9c0 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
                                   vsi_l_offset nICOffset,
 =======
@@ -6027,6 +6078,9 @@ static bool NITFPatchImageLength( const char *pszFilename,
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 92d0f8a9c0 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -6079,6 +6133,7 @@ static bool NITFPatchImageLength( const char *pszFilename,
 =======
 >>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
 >>>>>>> 61f974f82f (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -6116,6 +6171,10 @@ static bool NITFPatchImageLength( const char *pszFilename,
 >>>>>>> f16d61da56 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 9c3db40105 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 92d0f8a9c0 (Merge branch 'master' of github.com:OSGeo/gdal)
                                   CSLConstList papszCreationOptions )
 
 {
