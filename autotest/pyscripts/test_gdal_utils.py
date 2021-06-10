@@ -42,11 +42,17 @@ import test_py_scripts
 
 pytest.importorskip('osgeo_utils')
 
+<<<<<<< HEAD
 from osgeo_utils.auxiliary import util, raster_creation, base, array_util, color_table
 from osgeo_utils.auxiliary.color_palette import ColorPalette
 from osgeo_utils.auxiliary.color_table import get_color_table
 from osgeo_utils.auxiliary.extent_util import Extent
 import gdaltest
+=======
+from osgeo_utils.auxiliary import util, raster_creation, base, array_util
+from osgeo_utils.auxiliary.color_palette import ColorPalette
+from osgeo_utils.auxiliary.extent_util import Extent
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal)
 
 temp_files = []
 
@@ -165,6 +171,7 @@ def test_utils_np_arrays():
             assert isinstance(arr, array_util.ArrayLike.__args__)
 
 
+<<<<<<< HEAD
 @pytest.mark.parametrize("name,count,pal",
                          [['color_paletted_red_green_0-255.qml', 256, {0: 0x00ffffff, 1: 0xFF808080}],
                           ['color_pseudocolor_spectral_0-100.qml', 5, {0: 0xFFD7191C, 25: 0xFFFFFFBF}]])
@@ -264,6 +271,28 @@ def test_read_write_color_table_from_raster():
     ds = None
 
     gdaltest.tiff_drv.Delete('tmp/ct8.tif')
+=======
+def test_utils_color_files():
+    """ test color palettes: read QML and TXT files """
+    items = [
+        dict(name='color_paletted_red_green_0-255.qml', count=256, pal={0: 0x00ffffff, 1: 0xFF808080}),
+        dict(name='colro_pseudocolor_spectral_0-100.qml', count=5, pal={0: 0xFFD7191C, 25: 0xFFFFFFBF}),
+    ]
+    root = Path(test_py_scripts.get_data_path('utilities'))
+    for item in items:
+        path = root / item['name']
+        path2 = path.with_suffix('.txt')
+        cp1 = ColorPalette()
+        cp2 = ColorPalette()
+        cp1.read_file(path)
+        # cp1.write_file(path2)
+        cp2.read_file(path2)
+        assert cp1 == cp2
+        assert len(cp1.pal) == item['count']
+        for k, v in item['pal'].items():
+            # compare the first values against the hard-coded test sample
+            assert cp1.pal[k] == v
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal)
 
 
 def test_utils_py_cleanup():
