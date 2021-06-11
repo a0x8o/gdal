@@ -111,6 +111,7 @@ bool VSISwiftHandleHelper::GetConfiguration(const std::string& osPathForOption,
     const CPLString osAuthVersion = VSIGetCredential(osPathForOption.c_str(), "OS_IDENTITY_API_VERSION", "");
     if ( osAuthVersion == "3" )
     {
+<<<<<<< HEAD:port/cpl_swift.cpp
         const CPLString osAuthType = VSIGetCredential(osPathForOption.c_str(), "OS_AUTH_TYPE", "");
         if( ! CheckCredentialsV3(osPathForOption, osAuthType) )
             return false;
@@ -118,15 +119,30 @@ bool VSISwiftHandleHelper::GetConfiguration(const std::string& osPathForOption,
         {
             if( GetCached(osPathForOption,
                           "OS_AUTH_URL", "OS_APPLICATION_CREDENTIAL_ID",
+=======
+        const CPLString osAuthType = CPLGetConfigOption("OS_AUTH_TYPE", "");
+        if( ! CheckCredentialsV3(osAuthType) )
+            return false;
+        if( osAuthType == "v3applicationcredential" )
+        {
+            if( GetCached("OS_AUTH_URL", "OS_APPLICATION_CREDENTIAL_ID",
+>>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_swift.cpp
                           "OS_APPLICATION_CREDENTIAL_SECRET", osStorageURL, osAuthToken) )
                 return true;
         }
         else
         {
+<<<<<<< HEAD:port/cpl_swift.cpp
             if( GetCached(osPathForOption, "OS_AUTH_URL", "OS_USERNAME", "OS_PASSWORD", osStorageURL, osAuthToken) )
                 return true;
         }
         if( AuthV3(osPathForOption, osAuthType, osStorageURL, osAuthToken) )
+=======
+            if( GetCached("OS_AUTH_URL", "OS_USERNAME", "OS_PASSWORD", osStorageURL, osAuthToken) )
+                return true;
+        }
+        if( AuthV3(osAuthType, osStorageURL, osAuthToken) )
+>>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_swift.cpp
             return true;
     }
     else
@@ -203,8 +219,12 @@ bool VSISwiftHandleHelper::AuthV1(const std::string& osPathForOption,
 /*                      CreateAuthV3RequestObject()                     */
 /************************************************************************/
 
+<<<<<<< HEAD:port/cpl_swift.cpp
 CPLJSONObject VSISwiftHandleHelper::CreateAuthV3RequestObject(const std::string& osPathForOption,
                                                               const CPLString& osAuthType)
+=======
+CPLJSONObject VSISwiftHandleHelper::CreateAuthV3RequestObject(const CPLString& osAuthType)
+>>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_swift.cpp
 {
     CPLJSONArray methods;
     CPLJSONObject identity;
@@ -212,9 +232,15 @@ CPLJSONObject VSISwiftHandleHelper::CreateAuthV3RequestObject(const std::string&
     if ( osAuthType == "v3applicationcredential" )
     {
         CPLString osApplicationCredentialID =
+<<<<<<< HEAD:port/cpl_swift.cpp
                 VSIGetCredential(osPathForOption.c_str(), "OS_APPLICATION_CREDENTIAL_ID", "");
         CPLString osApplicationCredentialSecret =
                 VSIGetCredential(osPathForOption.c_str(), "OS_APPLICATION_CREDENTIAL_SECRET", "");
+=======
+                CPLGetConfigOption("OS_APPLICATION_CREDENTIAL_ID", "");
+        CPLString osApplicationCredentialSecret =
+                CPLGetConfigOption("OS_APPLICATION_CREDENTIAL_SECRET", "");
+>>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_swift.cpp
         CPLJSONObject applicationCredential;
         applicationCredential.Add("id", osApplicationCredentialID);
         applicationCredential.Add("secret", osApplicationCredentialSecret);
@@ -224,14 +250,23 @@ CPLJSONObject VSISwiftHandleHelper::CreateAuthV3RequestObject(const std::string&
     }
     else
     {
+<<<<<<< HEAD:port/cpl_swift.cpp
         CPLString osUser = VSIGetCredential(osPathForOption.c_str(), "OS_USERNAME", "");
         CPLString osPassword = VSIGetCredential(osPathForOption.c_str(), "OS_PASSWORD", "");
+=======
+        CPLString osUser = CPLGetConfigOption("OS_USERNAME", "");
+        CPLString osPassword = CPLGetConfigOption("OS_PASSWORD", "");
+>>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_swift.cpp
 
         CPLJSONObject user;
         user.Add("name", osUser);
         user.Add("password", osPassword);
 
+<<<<<<< HEAD:port/cpl_swift.cpp
         CPLString osUserDomainName = VSIGetCredential(osPathForOption.c_str(), "OS_USER_DOMAIN_NAME", "");
+=======
+        CPLString osUserDomainName = CPLGetConfigOption("OS_USER_DOMAIN_NAME", "");
+>>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_swift.cpp
         if( ! osUserDomainName.empty() )
         {
             CPLJSONObject userDomain;
@@ -245,13 +280,21 @@ CPLJSONObject VSISwiftHandleHelper::CreateAuthV3RequestObject(const std::string&
         identity.Add("password", password);
 
         //Request a scope if one is specified in the configuration
+<<<<<<< HEAD:port/cpl_swift.cpp
         CPLString osProjectName = VSIGetCredential(osPathForOption.c_str(), "OS_PROJECT_NAME", "");
+=======
+        CPLString osProjectName = CPLGetConfigOption("OS_PROJECT_NAME", "");
+>>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_swift.cpp
         if( ! osProjectName.empty() )
         {
             CPLJSONObject project;
             project.Add("name", osProjectName);
 
+<<<<<<< HEAD:port/cpl_swift.cpp
             CPLString osProjectDomainName = VSIGetCredential(osPathForOption.c_str(), "OS_PROJECT_DOMAIN_NAME", "");
+=======
+            CPLString osProjectDomainName = CPLGetConfigOption("OS_PROJECT_DOMAIN_NAME", "");
+>>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_swift.cpp
             if( ! osProjectDomainName.empty() )
             {
                 CPLJSONObject projectDomain;
@@ -350,8 +393,12 @@ bool VSISwiftHandleHelper::GetAuthV3StorageURL(const std::string& osPathForOptio
 /*                                AuthV3()                              */
 /************************************************************************/
 
+<<<<<<< HEAD:port/cpl_swift.cpp
 bool VSISwiftHandleHelper::AuthV3(const std::string& osPathForOption,
                                   const CPLString& osAuthType,
+=======
+bool VSISwiftHandleHelper::AuthV3(const CPLString& osAuthType,
+>>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_swift.cpp
                                   CPLString& osStorageURL,
                                   CPLString& osAuthToken)
 {
@@ -359,6 +406,7 @@ bool VSISwiftHandleHelper::AuthV3(const std::string& osPathForOption,
     CPLString osAuthKey;
     if( osAuthType.empty() || osAuthType == "password" )
     {
+<<<<<<< HEAD:port/cpl_swift.cpp
         osAuthID = VSIGetCredential(osPathForOption.c_str(), "OS_USERNAME", "");
         osAuthKey = VSIGetCredential(osPathForOption.c_str(), "OS_PASSWORD", "");
     }
@@ -366,6 +414,15 @@ bool VSISwiftHandleHelper::AuthV3(const std::string& osPathForOption,
     {
         osAuthID = VSIGetCredential(osPathForOption.c_str(), "OS_APPLICATION_CREDENTIAL_ID", "");
         osAuthKey = VSIGetCredential(osPathForOption.c_str(), "OS_APPLICATION_CREDENTIAL_SECRET", "");
+=======
+        osAuthID = CPLGetConfigOption("OS_USERNAME", "");
+        osAuthKey = CPLGetConfigOption("OS_PASSWORD", "");
+    }
+    else if( osAuthType == "v3applicationcredential" )
+    {
+        osAuthID = CPLGetConfigOption("OS_APPLICATION_CREDENTIAL_ID", "");
+        osAuthKey = CPLGetConfigOption("OS_APPLICATION_CREDENTIAL_SECRET", "");
+>>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_swift.cpp
     }
     else
     {
@@ -373,7 +430,11 @@ bool VSISwiftHandleHelper::AuthV3(const std::string& osPathForOption,
         VSIError(VSIE_AWSInvalidCredentials, "%s", osAuthType.c_str());
         return false;
     }
+<<<<<<< HEAD:port/cpl_swift.cpp
     CPLJSONObject postObject(CreateAuthV3RequestObject(osPathForOption, osAuthType));
+=======
+    CPLJSONObject postObject(CreateAuthV3RequestObject(osAuthType));
+>>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_swift.cpp
     std::string post = postObject.Format(CPLJSONObject::PrettyFormat::Plain);
 
     // coverity[tainted_data]
@@ -439,9 +500,15 @@ bool VSISwiftHandleHelper::Authenticate(const std::string& osPathForOption)
         return true;
     }
 
+<<<<<<< HEAD:port/cpl_swift.cpp
     const CPLString osAuthVersion = VSIGetCredential(osPathForOption.c_str(), "OS_IDENTITY_API_VERSION", "");
     const CPLString osAuthType = VSIGetCredential(osPathForOption.c_str(), "OS_AUTH_TYPE", "");
     if( osAuthVersion == "3" && AuthV3(osPathForOption, osAuthType, m_osStorageURL, m_osAuthToken) )
+=======
+    const CPLString osAuthVersion = CPLGetConfigOption("OS_IDENTITY_API_VERSION", "");
+    const CPLString osAuthType = CPLGetConfigOption("OS_AUTH_TYPE", "");
+    if( osAuthVersion == "3" && AuthV3(osAuthType, m_osStorageURL, m_osAuthToken) )
+>>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_swift.cpp
     {
         RebuildURL();
         return true;
@@ -482,8 +549,12 @@ bool VSISwiftHandleHelper::CheckCredentialsV1(const std::string& osPathForOption
 /*                         CheckCredentialsV3()                         */
 /************************************************************************/
 
+<<<<<<< HEAD:port/cpl_swift.cpp
 bool VSISwiftHandleHelper::CheckCredentialsV3(const std::string& osPathForOption,
                                               const CPLString& osAuthType)
+=======
+bool VSISwiftHandleHelper::CheckCredentialsV3(const CPLString& osAuthType)
+>>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_swift.cpp
 {
     const char* papszMandatoryOptionKeys[3] = {
         "OS_AUTH_URL",
@@ -491,6 +562,25 @@ bool VSISwiftHandleHelper::CheckCredentialsV3(const std::string& osPathForOption
         "",
     };
     if(osAuthType.empty() || osAuthType == "password")
+<<<<<<< HEAD:port/cpl_swift.cpp
+=======
+    {
+        papszMandatoryOptionKeys[1] = "OS_USERNAME";
+        papszMandatoryOptionKeys[2] = "OS_PASSWORD";
+    }
+    else if( osAuthType == "v3applicationcredential" )
+    {
+        papszMandatoryOptionKeys[1] = "OS_APPLICATION_CREDENTIAL_ID";
+        papszMandatoryOptionKeys[2] = "OS_APPLICATION_CREDENTIAL_SECRET";
+    }
+    else
+    {
+        CPLDebug("SWIFT", "Unsupported OS SWIFT Auth Type: %s", osAuthType.c_str());
+        VSIError(VSIE_AWSInvalidCredentials, "%s", osAuthType.c_str());
+        return false;
+    }
+    for( auto const * pszOptionKey : papszMandatoryOptionKeys )
+>>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_swift.cpp
     {
         papszMandatoryOptionKeys[1] = "OS_USERNAME";
         papszMandatoryOptionKeys[2] = "OS_PASSWORD";

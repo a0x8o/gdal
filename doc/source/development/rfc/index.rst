@@ -88,7 +88,11 @@ RFC list
     rfc78_gdal_utils_package
     rfc79_listing_service_providers
     rfc80_numfocus_relationship
+<<<<<<< HEAD:doc/source/development/rfc/index.rst
     rfc81_coordinate_epoch
     rfc83_use_of_project_sponsorship
     rfc84_cmake
     rfc85_policy_code_additions
+=======
+    rfc83_use_of_project_sponsorship
+>>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/development/rfc/index.rst
