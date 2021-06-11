@@ -46,8 +46,12 @@ class VSISwiftHandleHelper final: public IVSIS3LikeHandleHelper
         CPLString m_osBucket;
         CPLString m_osObjectKey;
 
+<<<<<<< HEAD:port/cpl_swift.h
         static bool GetConfiguration(const std::string& osPathForOption,
                                      CPLString& osStorageURL,
+=======
+        static bool GetConfiguration(CPLString& osStorageURL,
+>>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_swift.h
                                      CPLString& osAuthToken);
 
         static bool GetCached(const std::string& osPathForOption,
@@ -70,6 +74,7 @@ class VSISwiftHandleHelper final: public IVSIS3LikeHandleHelper
                            CPLString& osAuthToken);
 
         // V3 Authentication
+<<<<<<< HEAD:port/cpl_swift.h
         static bool CheckCredentialsV3(const std::string& osPathForOption,
                                        const CPLString& osAuthType);
         static bool AuthV3(const std::string& osPathForOption,
@@ -80,6 +85,14 @@ class VSISwiftHandleHelper final: public IVSIS3LikeHandleHelper
                                                        const CPLString& osAuthType);
         static bool GetAuthV3StorageURL(const std::string& osPathForOption,
                                         const CPLHTTPResult *psResult,
+=======
+        static bool CheckCredentialsV3(const CPLString& osAuthType);
+        static bool AuthV3(const CPLString& osAuthType,
+                           CPLString& osStorageURL,
+                           CPLString& osAuthToken);
+        static CPLJSONObject CreateAuthV3RequestObject(const CPLString& osAuthType);
+        static bool GetAuthV3StorageURL(const CPLHTTPResult *psResult,
+>>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_swift.h
                                         CPLString& storageURL);
 
     public:
