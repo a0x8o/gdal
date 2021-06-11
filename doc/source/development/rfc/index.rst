@@ -91,16 +91,23 @@ RFC list
 <<<<<<< HEAD:doc/source/development/rfc/index.rst
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8fc61d7286 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:doc/source/development/rfc/index.rst
 =======
 >>>>>>> b1792c641a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/development/rfc/index.rst
 =======
+<<<<<<< HEAD
 >>>>>>> 19c9e5d30a (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD:doc/source/development/rfc/index.rst
 =======
 >>>>>>> b1792c641a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/development/rfc/index.rst
 >>>>>>> 0ca587e694 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> b7187c72cc (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8fc61d7286 (Merge branch 'master' of github.com:OSGeo/gdal)
     rfc81_coordinate_epoch
     rfc83_use_of_project_sponsorship
     rfc84_cmake
