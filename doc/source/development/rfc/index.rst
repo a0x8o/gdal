@@ -93,9 +93,12 @@ RFC list
     rfc83_use_of_project_sponsorship
 =======
 <<<<<<< HEAD:doc/source/development/rfc/index.rst
+<<<<<<< HEAD
 <<<<<<< HEAD:doc/source/development/rfc/index.rst
 =======
 >>>>>>> b1792c641a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/development/rfc/index.rst
+=======
+>>>>>>> b7187c72cc (Merge branch 'master' of github.com:OSGeo/gdal)
     rfc81_coordinate_epoch
     rfc83_use_of_project_sponsorship
     rfc84_cmake
