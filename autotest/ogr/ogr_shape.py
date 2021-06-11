@@ -3826,6 +3826,7 @@ def test_ogr_shape_wgs84_with_zero_TOWGS84():
     assert '4326' in got_wkt
 
     ogr.GetDriverByName('ESRI Shapefile').DeleteDataSource('/vsimem/test_ogr_shape_wgs84_with_zero_TOWGS84.shp')
+<<<<<<< HEAD
 
 ###############################################################################
 # Test a ETRS89-based CRS with a TOWGS84[0,0,0,0,0,0]
@@ -3846,6 +3847,8 @@ def test_ogr_shape_etrs89_with_zero_TOWGS84():
     ds = None
 
     ogr.GetDriverByName('ESRI Shapefile').DeleteDataSource('/vsimem/test_ogr_shape_etrs89_with_zero_TOWGS84.shp')
+=======
+>>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal)
 
 ###############################################################################
 # Test REPACK with both implementations
