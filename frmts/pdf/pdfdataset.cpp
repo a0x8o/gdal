@@ -1674,12 +1674,18 @@ void myRenderPageImpl(PDFDataset* poDS,
     pContext->m_pAnnots = std::move(pOwnedList);
     bool bPrinting =
         pContext->m_pDevice->GetDeviceType() != DeviceType::kDisplay;
+<<<<<<< HEAD:frmts/pdf/pdfdataset.cpp
 
     // TODO(https://crbug.com/pdfium/993) - maybe pass true here.
     const bool bShowWidget = false;
     pList->DisplayAnnots(pPage, pContext->m_pDevice.get(),
                          pContext->m_pContext.get(), bPrinting, matrix,
                          bShowWidget);
+=======
+    pList->DisplayAnnots(pPage, pContext->m_pDevice.get(),
+                         pContext->m_pContext.get(), bPrinting, matrix,
+                         false, nullptr);
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/pdf/pdfdataset.cpp
   }
 
   pContext->m_pRenderer = std::make_unique<CPDF_ProgressiveRenderer>(

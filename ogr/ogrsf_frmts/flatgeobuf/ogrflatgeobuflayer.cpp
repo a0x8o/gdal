@@ -118,13 +118,21 @@ OGRFlatGeobufLayer::OGRFlatGeobufLayer(
                 wkt = wkt.substr(strlen("COORDINATEMETADATA["));
             }
         }
+<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
+=======
+        CPL_IGNORE_RET_VAL(dfCoordEpoch);
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 
         if ((org == nullptr || EQUAL(org->c_str(), "EPSG")) && code != 0) {
             m_poSRS->importFromEPSG(code);
         } else if( org && code != 0 ) {
             CPLString osCode;
             osCode.Printf("%s:%d", org->c_str(), code);
+<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
             if( m_poSRS->SetFromUserInput(osCode.c_str(), OGRSpatialReference::SET_FROM_USER_INPUT_LIMITATIONS_get()) != OGRERR_NONE &&
+=======
+            if( m_poSRS->SetFromUserInput(osCode.c_str()) != OGRERR_NONE &&
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
                 !wkt.empty() )
             {
                 m_poSRS->importFromWkt(wkt.c_str());

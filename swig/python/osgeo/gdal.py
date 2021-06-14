@@ -2579,8 +2579,15 @@ class Dataset(MajorObject):
             return self._SetGCPs2(gcps, wkt_or_spatial_ref)
 
 
+<<<<<<< HEAD:swig/python/osgeo/gdal.py
 # Register Dataset in _gdal:
 _gdal.Dataset_swigregister(Dataset)
+=======
+GEDTST_NONE = _gdal.GEDTST_NONE
+GEDTST_JSON = _gdal.GEDTST_JSON
+class Group(_object):
+    """Proxy of C++ GDALGroupHS class."""
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/osgeo/gdal.py
 
 GEDTST_NONE = _gdal.GEDTST_NONE
 
@@ -3357,6 +3364,11 @@ class ExtendedDataType(object):
     def GetSubType(self, *args):
         r"""GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"""
         return _gdal.ExtendedDataType_GetSubType(self, *args)
+
+    def GetSubType(self, *args):
+        """GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"""
+        return _gdal.ExtendedDataType_GetSubType(self, *args)
+
 
     def GetComponents(self, *args):
         r"""GetComponents(ExtendedDataType self)"""

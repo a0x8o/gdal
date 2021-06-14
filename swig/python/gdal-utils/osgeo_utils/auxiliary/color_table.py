@@ -51,10 +51,14 @@ def get_color_table_from_raster(path_or_ds: PathOrDS) -> Optional[gdal.ColorTabl
 
 
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
 def color_table_from_color_palette(pal: ColorPalette, color_table: gdal.ColorTable,
                                    fill_missing_colors=True, min_key=0, max_key=255) -> bool:
     """ returns None if pal has no values, otherwise returns a gdal.ColorTable from the given ColorPalette"""
     if not pal.pal or not pal.is_numeric():
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
         raise Exception('palette has no values or not fully numeric')
 =======
 def get_color_table(color_palette_or_path_or_strings_or_ds: Optional[ColorTableLike],
@@ -73,6 +77,10 @@ def get_color_table(color_palette_or_path_or_strings_or_ds: Optional[ColorTableL
         return get_color_table_from_raster(color_palette_or_path_or_strings_or_ds)
     color_table = gdal.ColorTable()
 >>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
+=======
+        # palette has no values or not numeric
+        return False
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
     if fill_missing_colors:
         keys = sorted(list(pal.pal.keys()))
         if min_key is None:

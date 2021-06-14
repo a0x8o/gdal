@@ -4882,6 +4882,12 @@ def test_netcdf_open_coords_no_georef_indexing_variables():
 
 def test_netcdf_metadata_sentinel5():
 
+<<<<<<< HEAD
+=======
+    if not gdaltest.netcdf_drv_has_nc4:
+        pytest.skip()
+
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal)
     ds = gdal.Open('data/netcdf/fake_ISO_METADATA.nc')
     assert ds is not None
     assert "json:ISO_METADATA" in ds.GetMetadataDomainList()
@@ -4923,6 +4929,7 @@ def test_netcdf_metadata_sentinel5():
     assert j['attributes']['ISO_METADATA'] == expected
 
 
+<<<<<<< HEAD
 ###############################################################################
 # Test opening a file with particular georeferencing encoding
 
@@ -5245,6 +5252,8 @@ def test_netcdf_read_geogcrs_component_names():
     assert srs.GetAttrValue('GEOGCS|PRIMEM') == 'Greenwich'
 
 
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal)
 def test_clean_tmp():
     # [KEEP THIS AS THE LAST TEST]
     # i.e. please do not add any tests after this one. Put new ones above.

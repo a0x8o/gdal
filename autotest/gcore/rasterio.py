@@ -1176,7 +1176,11 @@ def test_rasterio_rms_halfsize_downsampling_float32():
         if math.isnan(expected[i]):
             assert math.isnan(got[i])
         else:
+<<<<<<< HEAD
             assert got[i] == pytest.approx(expected[i], rel=1e-7), i
+=======
+            assert got[i] == pytest.approx(expected[i], rel=1e-7)
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal)
 
     ds.BuildOverviews('RMS', [2])
     ovr_data = ds.GetRasterBand(1).GetOverview(0).ReadRaster()

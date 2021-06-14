@@ -550,6 +550,7 @@ Only GDAL builds against static builds of PDFium have been tested.
 Building PDFium can be challenging, and particular builds must be used to
 work properly with GDAL.
 
+<<<<<<< HEAD:doc/source/drivers/raster/pdf.rst
 With GDAL >= 3.5
 ++++++++++++++++
 
@@ -558,12 +559,21 @@ repository must be used to build a patched version of PDFium.
 
 With GDAL 3.4
 +++++++++++++
+=======
+With GDAL >= 3.4.0
++++++++++++++++++++
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/raster/pdf.rst
 
 The scripts in the `<https://github.com/rouault/pdfium_build_gdal_3_4>`__
 repository must be used to build a patched version of PDFium.
 
+<<<<<<< HEAD:doc/source/drivers/raster/pdf.rst
 With GDAL 3.2 and 3.3
 +++++++++++++++++++++
+=======
+With GDAL >= 3.2.0
++++++++++++++++++++
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/raster/pdf.rst
 
 The scripts in the `<https://github.com/rouault/pdfium_build_gdal_3_2>`__
 repository must be used to build a patched version of PDFium.
