@@ -2902,7 +2902,11 @@ char **netCDFDataset::GetMetadata( const char *pszDomain )
     {
         auto iter = m_oMapDomainToJSon.find(pszDomain + strlen("json:"));
         if( iter != m_oMapDomainToJSon.end() )
+<<<<<<< HEAD:frmts/netcdf/netcdfdataset.cpp
             return iter->second.List();
+=======
+            return iter->second.apszMD;
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/netcdf/netcdfdataset.cpp
     }
 
     return GDALDataset::GetMetadata(pszDomain);
@@ -6479,9 +6483,16 @@ CPLErr netCDFDataset::ReadAttributes( int cdfidIn, int var)
                 strcmp(pszVarFullName, CPLSPrintf("/METADATA/%s/NC_GLOBAL", key)) == 0 )
             {
                 CPLFree(pszVarFullName);
+<<<<<<< HEAD:frmts/netcdf/netcdfdataset.cpp
                 CPLStringList aosList;
                 aosList.AddString(CPLString(NCDFReadMetadataAsJson(cdfidIn)).replaceAll("\\/", '/'));
                 m_oMapDomainToJSon[key] = std::move(aosList);
+=======
+                JSonMetadata md;
+                md.osJSon = CPLString(NCDFReadMetadataAsJson(cdfidIn)).replaceAll("\\/", '/');
+                md.apszMD[0] = &md.osJSon[0];
+                m_oMapDomainToJSon[key] = std::move(md);
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/netcdf/netcdfdataset.cpp
                 return CE_None;
             }
         }
@@ -6489,9 +6500,16 @@ CPLErr netCDFDataset::ReadAttributes( int cdfidIn, int var)
     if( STARTS_WITH(pszVarFullName, "/PRODUCT/SUPPORT_DATA/") )
     {
         CPLFree(pszVarFullName);
+<<<<<<< HEAD:frmts/netcdf/netcdfdataset.cpp
         CPLStringList aosList;
         aosList.AddString(CPLString(NCDFReadMetadataAsJson(cdfidIn)).replaceAll("\\/", '/'));
         m_oMapDomainToJSon["SUPPORT_DATA"] = std::move(aosList);
+=======
+        JSonMetadata md;
+        md.osJSon = CPLString(NCDFReadMetadataAsJson(cdfidIn)).replaceAll("\\/", '/');
+        md.apszMD[0] = &md.osJSon[0];
+        m_oMapDomainToJSon["SUPPORT_DATA"] = std::move(md);
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/netcdf/netcdfdataset.cpp
         return CE_None;
     }
 #endif

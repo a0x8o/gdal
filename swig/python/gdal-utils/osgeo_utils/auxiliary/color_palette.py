@@ -46,7 +46,10 @@ ColorPaletteOrPathOrStrings = Union['ColorPalette', PathOrStrings]
 
 class ColorPalette:
     __slots__ = ['pal', 'ndv', '_all_numeric']
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
     ndv_keys = [None, 'nv', 'ndv']
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
 
     def __init__(self):
         self.pal = OrderedDict()
@@ -58,10 +61,14 @@ class ColorPalette:
 
     def __eq__(self, other):
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
         return self.pal == other.pal and self.ndv == other.ndv
 
     def is_numeric(self):
         return self._all_numeric
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
 
     def get_color(self, key):
         return self.ndv if key in self.ndv_keys else self.pal[key]
@@ -85,6 +92,8 @@ class ColorPalette:
 =======
         return self.pal == other.pal
 >>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
 
     def replace_absolute_values_with_percent(self, ndv=True):
         new_pal = ColorPalette()
@@ -120,7 +129,11 @@ class ColorPalette:
                 return True
         return False
 
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
     def apply_percent(self, min_val: Real, max_val: Real):
+=======
+    def apply_percent(self, min_val, max_val):
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
         if min_val is None or max_val is None:
             raise Exception('no min or max values to apply')
         if self._all_numeric:
@@ -172,6 +185,7 @@ class ColorPalette:
 
     def set_ndv(self, ndv: Optional[int], override: bool = True):
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
         if override or (self.ndv is None):
             self.ndv = ndv
 =======
@@ -182,6 +196,10 @@ class ColorPalette:
             if override and ('nv' in self.pal):
                 del self.pal['nv']
 >>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
+=======
+        if override or (self.ndv is None):
+            self.ndv = ndv
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
 
     def read(self, filename_or_strings: Optional[ColorPaletteOrPathOrStrings]):
         if filename_or_strings is None:
@@ -354,12 +372,18 @@ class ColorPalette:
 
     @staticmethod
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
     def color_entry_to_color(r, g, b, a):
         return (a << 24) + (r << 16) + (g << 8) + b
 
     @staticmethod
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
 =======
 >>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
     def pal_color_to_rgb(cc: str) -> int:
         # r g b a -> argb
         # todo: support color names as implemented in the cpp version of this function...

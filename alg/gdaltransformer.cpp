@@ -111,6 +111,7 @@ typedef struct {
 } GDALGenImgProjTransformInfo;
 
 /************************************************************************/
+<<<<<<< HEAD:alg/gdaltransformer.cpp
 /* ==================================================================== */
 /*                       GDALReprojectionTransformer                    */
 /* ==================================================================== */
@@ -135,6 +136,8 @@ struct GDALReprojectionTransformInfo
 };
 
 /************************************************************************/
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/alg/gdaltransformer.cpp
 /*                          GDALTransformFunc                           */
 /*                                                                      */
 /*      Documentation for GDALTransformFunc typedef.                    */
@@ -992,6 +995,73 @@ GDALSuggestedWarpOutput2( GDALDatasetH hSrcDS,
     }
 
 /* -------------------------------------------------------------------- */
+/*      Special case for geolocation array, to quickly find the bounds. */
+/* -------------------------------------------------------------------- */
+    bool bIsGeographicCoords = false;
+    if( pfnTransformer == GDALGenImgProjTransform )
+    {
+        const GDALGenImgProjTransformInfo* pGIPTI =
+            static_cast<const GDALGenImgProjTransformInfo*>(pTransformArg);
+        if( pGIPTI->pSrcTransformer == GDALGeoLocTransform &&
+            pGIPTI->pDstTransformer == nullptr &&
+            pGIPTI->adfDstGeoTransform[0] == 0 &&
+            pGIPTI->adfDstGeoTransform[1] == 1 &&
+            pGIPTI->adfDstGeoTransform[2] == 0 &&
+            pGIPTI->adfDstGeoTransform[3] == 0 &&
+            pGIPTI->adfDstGeoTransform[4] == 0 &&
+            pGIPTI->adfDstGeoTransform[5] == 1 )
+        {
+            const GDALGeoLocTransformInfo* pGLTI =
+                static_cast<const GDALGeoLocTransformInfo*>(pGIPTI->pSrcTransformArg);
+
+            if( pGIPTI->pReproject == nullptr )
+            {
+                const char* pszGLSRS = CSLFetchNameValue(pGLTI->papszGeolocationInfo, "SRS");
+                if( pszGLSRS == nullptr )
+                {
+                    bIsGeographicCoords = true;
+                }
+                else
+                {
+                    OGRSpatialReference oSRS;
+                    if( oSRS.SetFromUserInput(pszGLSRS) == OGRERR_NONE &&
+                        oSRS.IsGeographic() )
+                    {
+                        bIsGeographicCoords = true;
+                    }
+                }
+            }
+
+            for( const auto& xy: {
+                    std::pair<double, double>(pGLTI->dfMinX, pGLTI->dfYAtMinX),
+                    std::pair<double, double>(pGLTI->dfXAtMinY, pGLTI->dfMinY),
+                    std::pair<double, double>(pGLTI->dfMaxX, pGLTI->dfYAtMaxX),
+                    std::pair<double, double>(pGLTI->dfXAtMaxY, pGLTI->dfMaxY) } )
+            {
+                double x = xy.first;
+                double y = xy.second;
+                if( pGLTI->bSwapXY )
+                {
+                    std::swap(x, y);
+                }
+                double xOut = std::numeric_limits<double>::quiet_NaN();
+                double yOut = std::numeric_limits<double>::quiet_NaN();
+                if( pGIPTI->pReproject == nullptr ||
+                    pGIPTI->pReproject(pGIPTI->pReprojectArg, false, 1,
+                                           &x, &y, nullptr, nullptr) )
+                {
+                    xOut = x;
+                    yOut = y;
+                }
+                dfMinXOut = std::min(dfMinXOut, xOut);
+                dfMinYOut = std::min(dfMinYOut, yOut);
+                dfMaxXOut = std::max(dfMaxXOut, xOut);
+                dfMaxYOut = std::max(dfMaxYOut, yOut);
+            }
+        }
+    }
+
+/* -------------------------------------------------------------------- */
 /*      Compute the distance in "georeferenced" units from the top      */
 /*      corner of the transformed input image to the bottom left        */
 /*      corner of the transformed input.  Use this distance to          */
@@ -1104,8 +1174,12 @@ GDALSuggestedWarpOutput2( GDALDatasetH hSrcDS,
 /*      Recompute some bounds so that all return values are consistent  */
 /* -------------------------------------------------------------------- */
     double dfMaxXOutNew = dfMinXOut + (*pnPixels) * dfPixelSizeX;
+<<<<<<< HEAD:alg/gdaltransformer.cpp
     if( bIsGeographicCoords &&
         ((dfMaxXOut <= 180 && dfMaxXOutNew > 180) || dfMaxXOut == 180) )
+=======
+    if( bIsGeographicCoords && dfMaxXOut <= 180 && dfMaxXOutNew > 180 )
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/alg/gdaltransformer.cpp
     {
         dfMaxXOut = 180;
         dfPixelSizeX = (dfMaxXOut - dfMinXOut) / *pnPixels;

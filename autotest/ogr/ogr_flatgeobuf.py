@@ -813,6 +813,7 @@ def test_ogr_flatgeobuf_ossfuzz_bug_29462():
 
 
 ###############################################################################
+<<<<<<< HEAD
 # Check that we don't crash or leak
 
 
@@ -828,6 +829,8 @@ def test_ogr_flatgeobuf_read_invalid_geometries(filename):
             pass
 
 ###############################################################################
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 
 def test_ogr_flatgeobuf_read_coordinate_metadata_wkt():
@@ -837,6 +840,7 @@ def test_ogr_flatgeobuf_read_coordinate_metadata_wkt():
     got_srs = lyr.GetSpatialRef()
     assert got_srs is not None
     assert got_srs.IsGeographic()
+<<<<<<< HEAD
 
 
 ###############################################################################
@@ -912,3 +916,5 @@ def test_ogr_flatgeobuf_invalid_output_filename():
     with gdaltest.error_handler():
         assert ds.CreateLayer('foo') is None
 
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal)
