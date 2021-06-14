@@ -403,6 +403,33 @@ Examples
    ::
 
       ogrinfo file1.dbf -sql "RESIZE file1"
+<<<<<<< HEAD:doc/source/drivers/vector/shapefile.rst
+=======
+
+Advanced topics
+---------------
+
+The :decl_configoption:`SHAPE_REWIND_ON_WRITE` configuration option/environment
+variable can be set to NO to prevent the shapefile writer to correct the
+winding order of exterior/interior rings to be conformant with the one
+mandated by the Shapefile specification. This can be useful in some
+situations where a MultiPolygon passed to the shapefile writer is not
+really a compliant Single Feature polygon, but originates from example
+from a MultiPatch object (from a Shapefile/FileGDB/PGeo datasource).
+
+(GDAL >= 2.1) The :decl_configoption:`SHAPE_RESTORE_SHX` configuration option/environment
+variable can be set to YES (default NO) to restore broken or absent .shx
+file from associated .shp file during opening.
+
+Driver capabilities
+-------------------
+
+.. supports_create::
+
+.. supports_georeferencing::
+
+.. supports_virtualio::
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/vector/shapefile.rst
 
 See Also
 --------

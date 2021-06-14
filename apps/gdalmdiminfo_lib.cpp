@@ -311,7 +311,11 @@ static void SerializeJSON(const CPLJSONObject& obj,
 
         case CPLJSONObject::Type::Long:
         {
+<<<<<<< HEAD:apps/gdalmdiminfo_lib.cpp
             serializer.Add( static_cast<int64_t>(obj.ToLong()) );
+=======
+            serializer.Add( obj.ToLong() );
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/apps/gdalmdiminfo_lib.cpp
             break;
         }
 
