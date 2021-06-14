@@ -908,8 +908,11 @@ def test_ogr_flatgeobuf_read_coordinate_metadata_wkt():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -918,6 +921,9 @@ def test_ogr_flatgeobuf_read_coordinate_metadata_wkt():
 >>>>>>> 145dd38d72 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> OSGeo-master
@@ -935,6 +941,7 @@ def test_ogr_flatgeobuf_read_coordinate_metadata_wkt():
 =======
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 9105b4f6b6 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
@@ -996,6 +1003,10 @@ def test_ogr_flatgeobuf_read_coordinate_metadata_wkt():
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 9105b4f6b6 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
 
 
 ###############################################################################
@@ -1116,6 +1127,7 @@ def test_ogr_flatgeobuf_invalid_output_filename():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -1124,6 +1136,8 @@ def test_ogr_flatgeobuf_invalid_output_filename():
 >>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -1143,6 +1157,7 @@ def test_ogr_flatgeobuf_invalid_output_filename():
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> a57f04675f (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -1155,6 +1170,10 @@ def test_ogr_flatgeobuf_invalid_output_filename():
 >>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> OSGeo-master
 =======
@@ -1172,10 +1191,14 @@ def test_ogr_flatgeobuf_invalid_output_filename():
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 =======
+<<<<<<< HEAD
 >>>>>>> 39cde30c78 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -1222,3 +1245,10 @@ def test_ogr_flatgeobuf_invalid_output_filename():
 =======
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 9105b4f6b6 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)

@@ -45804,10 +45804,13 @@ static PyMethodDef SwigMethods[] = {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 10915dbdc5 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
 	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
 =======
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
@@ -45824,6 +45827,9 @@ static PyMethodDef SwigMethods[] = {
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 >>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
 =======
@@ -45832,6 +45838,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 =======
@@ -45851,6 +45858,8 @@ static PyMethodDef SwigMethods[] = {
 >>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 10915dbdc5 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
 	 { (char *)"ExtendedDataType_GetComponents", _wrap_ExtendedDataType_GetComponents, METH_VARARGS, (char *)"ExtendedDataType_GetComponents(ExtendedDataType self)"},
 	 { (char *)"ExtendedDataType_CanConvertTo", _wrap_ExtendedDataType_CanConvertTo, METH_VARARGS, (char *)"ExtendedDataType_CanConvertTo(ExtendedDataType self, ExtendedDataType other) -> bool"},
 	 { (char *)"ExtendedDataType_Equals", _wrap_ExtendedDataType_Equals, METH_VARARGS, (char *)"ExtendedDataType_Equals(ExtendedDataType self, ExtendedDataType other) -> bool"},
