@@ -29327,6 +29327,7 @@ SWIGINTERN PyObject *_wrap_ExtendedDataType_GetSubType(PyObject *SWIGUNUSEDPARM(
   void *argp1 = 0 ;
   int res1 = 0 ;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
@@ -29334,6 +29335,8 @@ SWIGINTERN PyObject *_wrap_ExtendedDataType_GetSubType(PyObject *SWIGUNUSEDPARM(
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
   PyObject *swig_obj[1] ;
   GDALExtendedDataTypeSubType result;
@@ -29343,17 +29346,21 @@ SWIGINTERN PyObject *_wrap_ExtendedDataType_GetSubType(PyObject *SWIGUNUSEDPARM(
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_GDALExtendedDataTypeHS, 0 |  0 );
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
   PyObject * obj0 = 0 ;
   GDALExtendedDataTypeSubType result;
   
   if (!PyArg_ParseTuple(args,(char *)"O:ExtendedDataType_GetSubType",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_GDALExtendedDataTypeHS, 0 |  0 );
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
 =======
@@ -29366,6 +29373,9 @@ SWIGINTERN PyObject *_wrap_ExtendedDataType_GetSubType(PyObject *SWIGUNUSEDPARM(
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ExtendedDataType_GetSubType" "', argument " "1"" of type '" "GDALExtendedDataTypeHS *""'"); 
   }
@@ -45587,6 +45597,7 @@ static PyMethodDef SwigMethods[] = {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
 =======
 >>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
@@ -45608,6 +45619,9 @@ static PyMethodDef SwigMethods[] = {
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+=======
+	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 	 { (char *)"ExtendedDataType_GetComponents", _wrap_ExtendedDataType_GetComponents, METH_VARARGS, (char *)"ExtendedDataType_GetComponents(ExtendedDataType self)"},
 	 { (char *)"ExtendedDataType_CanConvertTo", _wrap_ExtendedDataType_CanConvertTo, METH_VARARGS, (char *)"ExtendedDataType_CanConvertTo(ExtendedDataType self, ExtendedDataType other) -> bool"},
 	 { (char *)"ExtendedDataType_Equals", _wrap_ExtendedDataType_Equals, METH_VARARGS, (char *)"ExtendedDataType_Equals(ExtendedDataType self, ExtendedDataType other) -> bool"},
