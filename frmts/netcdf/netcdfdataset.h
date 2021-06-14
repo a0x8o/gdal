@@ -722,16 +722,42 @@ class netCDFDataset final: public GDALPamDataset
     char          **papszMetadata;
 
     // Used to report metadata found in Sentinel 5
+<<<<<<< HEAD
 <<<<<<< HEAD:frmts/netcdf/netcdfdataset.h
     std::map<std::string, CPLStringList> m_oMapDomainToJSon{};
 =======
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD:gdal/frmts/netcdf/netcdfdataset.h
+=======
+<<<<<<< HEAD:frmts/netcdf/netcdfdataset.h
+    std::map<std::string, CPLStringList> m_oMapDomainToJSon{};
+=======
+>>>>>>> OSGeo-master:frmts/netcdf/netcdfdataset.h
+=======
+<<<<<<< HEAD:frmts/netcdf/netcdfdataset.h
+    std::map<std::string, CPLStringList> m_oMapDomainToJSon{};
+=======
+>>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
     struct JSonMetadata
     {
         std::string osJSon{};
         char*       apszMD[2] = {nullptr, nullptr};
     };
     std::map<std::string, JSonMetadata> m_oMapDomainToJSon{};
+<<<<<<< HEAD
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/netcdf/netcdfdataset.h
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD:gdal/frmts/netcdf/netcdfdataset.h
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/netcdf/netcdfdataset.h
+>>>>>>> OSGeo-master:frmts/netcdf/netcdfdataset.h
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/netcdf/netcdfdataset.h
+>>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 
     CPLStringList papszDimName;
     bool          bBottomUp;

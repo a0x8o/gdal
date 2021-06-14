@@ -357,6 +357,33 @@ Variables attributes for: tos, lon, lat and time
      time#bounds=time_bnds
      time#original_units=seconds since 2001-1-1
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD:gdal/doc/source/drivers/raster/netcdf.rst
+Product specific behaviour
+--------------------------
+
+Sentinel 5
+++++++++++
+
+.. versionadded:: 3.4
+
+The most verbose metadata is reported in the ``json:ISO_METADATA``,
+``json:ESA_METADATA``, ``json:EOP_METADATA``, ``json:QA_STATISTICS``,
+``json:GRANULE_DESCRIPTION``, ``json:ALGORITHM_SETTINGS`` and ``json:SUPPORT_DATA``
+metadata domains.
+
+Can be discovered for example with:
+
+::
+
+    gdalinfo -mdd all -json S5P.nc
+
+=======
+=======
+>>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:doc/source/drivers/raster/netcdf.rst
 On writing, when using the CreateCopy() interface or gdal_translate, dataset
 level metadata that follows the naming convention NC_GLOBAL#key=value will be
@@ -403,6 +430,13 @@ Can be discovered for example with:
     gdalinfo -mdd all -json S5P.nc
 
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/raster/netcdf.rst
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> OSGeo-master:doc/source/drivers/raster/netcdf.rst
+=======
+>>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 Creation Options
 ----------------

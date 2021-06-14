@@ -403,8 +403,21 @@ Examples
    ::
 
       ogrinfo file1.dbf -sql "RESIZE file1"
+<<<<<<< HEAD
 <<<<<<< HEAD:doc/source/drivers/vector/shapefile.rst
 =======
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD:gdal/doc/source/drivers/vector/shapefile.rst
+=======
+<<<<<<< HEAD:doc/source/drivers/vector/shapefile.rst
+=======
+>>>>>>> OSGeo-master:doc/source/drivers/vector/shapefile.rst
+=======
+<<<<<<< HEAD:doc/source/drivers/vector/shapefile.rst
+=======
+>>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 Advanced topics
 ---------------
