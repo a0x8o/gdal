@@ -64,8 +64,11 @@ class ColorPalette:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
@@ -79,7 +82,15 @@ class ColorPalette:
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
         return self.pal == other.pal and self.ndv == other.ndv
 
     def is_numeric(self):
@@ -111,6 +122,7 @@ class ColorPalette:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
 =======
@@ -121,10 +133,19 @@ class ColorPalette:
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
 =======
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 
     def replace_absolute_values_with_percent(self, ndv=True):
         new_pal = ColorPalette()
@@ -219,6 +240,7 @@ class ColorPalette:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
 =======
 >>>>>>> 9a931cd0f4 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -230,6 +252,14 @@ class ColorPalette:
 =======
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
+=======
+>>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
         if override or (self.ndv is None):
             self.ndv = ndv
 =======
@@ -243,14 +273,20 @@ class ColorPalette:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
         if override or (self.ndv is None):
             self.ndv = ndv
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -261,6 +297,12 @@ class ColorPalette:
 =======
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 
     def read(self, filename_or_strings: Optional[ColorPaletteOrPathOrStrings]):
         if filename_or_strings is None:
@@ -436,8 +478,11 @@ class ColorPalette:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
@@ -451,7 +496,15 @@ class ColorPalette:
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
     def color_entry_to_color(r, g, b, a):
         return (a << 24) + (r << 16) + (g << 8) + b
 
@@ -459,15 +512,21 @@ class ColorPalette:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
 =======
 >>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -478,10 +537,17 @@ class ColorPalette:
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
 =======
 >>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_palette.py
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
     def pal_color_to_rgb(cc: str) -> int:
         # r g b a -> argb
         # todo: support color names as implemented in the cpp version of this function...
