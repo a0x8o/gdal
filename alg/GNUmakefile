@@ -32,8 +32,11 @@ endif
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/alg/GNUmakefile
@@ -43,12 +46,17 @@ CPPFLAGS	:=	-I../frmts/vrt -I../frmts/mem $(CPPFLAGS) $(OPENCL_FLAGS) $(PROJ_FLA
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:alg/GNUmakefile
 CPPFLAGS	:=	-iquote ../frmts/vrt -iquote ../frmts/mem $(CPPFLAGS) $(OPENCL_FLAGS) $(PROJ_FLAGS) $(PROJ_INCLUDE) -iquote marching_squares
 =======
@@ -58,8 +66,11 @@ CPPFLAGS	:=	-I../frmts/vrt -I../frmts/mem $(CPPFLAGS) $(OPENCL_FLAGS) $(PROJ_FLA
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:alg/GNUmakefile
@@ -67,12 +78,17 @@ CPPFLAGS	:=	-I../frmts/vrt -I../frmts/mem $(CPPFLAGS) $(OPENCL_FLAGS) $(PROJ_FLA
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 CXXFLAGS	:=	$(WARN_EFFCPLUSPLUS) $(WARN_OLD_STYLE_CAST) $(CXXFLAGS)
 
