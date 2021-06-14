@@ -722,7 +722,16 @@ class netCDFDataset final: public GDALPamDataset
     char          **papszMetadata;
 
     // Used to report metadata found in Sentinel 5
+<<<<<<< HEAD:frmts/netcdf/netcdfdataset.h
     std::map<std::string, CPLStringList> m_oMapDomainToJSon{};
+=======
+    struct JSonMetadata
+    {
+        std::string osJSon{};
+        char*       apszMD[2] = {nullptr, nullptr};
+    };
+    std::map<std::string, JSonMetadata> m_oMapDomainToJSon{};
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/netcdf/netcdfdataset.h
 
     CPLStringList papszDimName;
     bool          bBottomUp;

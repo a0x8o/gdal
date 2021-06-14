@@ -177,6 +177,7 @@ void CPL_DLL * GDALCloneTransformer( void *pTransformerArg );
 void GDALRefreshGenImgProjTransformer(void* hTransformArg);
 void GDALRefreshApproxTransformer(void* hTransformArg);
 
+<<<<<<< HEAD:alg/gdal_alg_priv.h
 int GDALTransformLonLatToDestGenImgProjTransformer(void* hTransformArg,
                                                     double* pdfX,
                                                     double* pdfY);
@@ -188,11 +189,14 @@ bool GDALTransformIsTranslationOnPixelBoundaries(GDALTransformerFunc pfnTransfor
                                                  void                *pTransformerArg);
 
 typedef struct _CPLQuadTree CPLQuadTree;
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/alg/gdal_alg_priv.h
 
 typedef struct {
     GDALTransformerInfo sTI;
 
     bool        bReversed;
+<<<<<<< HEAD:alg/gdal_alg_priv.h
     double      dfOversampleFactor;
 
     // Map from target georef coordinates back to geolocation array
@@ -203,6 +207,16 @@ typedef struct {
 
     bool        bUseArray;
     void       *pAccessors;
+=======
+
+    // Map from target georef coordinates back to geolocation array
+    // pixel line coordinates.  Built only if needed.
+    size_t      nBackMapWidth;
+    size_t      nBackMapHeight;
+    double      adfBackMapGeoTransform[6];  // Maps georef to pixel/line.
+    float       *pafBackMapX;
+    float       *pafBackMapY;
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/alg/gdal_alg_priv.h
 
     // Geolocation bands.
     GDALDatasetH     hDS_X;
@@ -212,8 +226,15 @@ typedef struct {
     int              bSwapXY;
 
     // Located geolocation data.
+<<<<<<< HEAD:alg/gdal_alg_priv.h
     int              nGeoLocXSize;
     int              nGeoLocYSize;
+=======
+    size_t           nGeoLocXSize;
+    size_t           nGeoLocYSize;
+    double           *padfGeoLocX;
+    double           *padfGeoLocY;
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/alg/gdal_alg_priv.h
     double           dfMinX;
     double           dfYAtMinX;
     double           dfMinY;
@@ -232,10 +253,13 @@ typedef struct {
     double           dfLINE_OFFSET;
     double           dfLINE_STEP;
 
+<<<<<<< HEAD:alg/gdal_alg_priv.h
     bool             bOriginIsTopLeftCorner;
     bool             bGeographicSRSWithMinus180Plus180LongRange;
     CPLQuadTree     *hQuadTree;
 
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/alg/gdal_alg_priv.h
     char **          papszGeolocationInfo;
 
 } GDALGeoLocTransformInfo;

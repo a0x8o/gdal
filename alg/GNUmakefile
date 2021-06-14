@@ -28,7 +28,11 @@ ifeq ($(QHULL_SETTING),internal)
 CPPFLAGS 	:=	-DINTERNAL_QHULL $(CPPFLAGS)
 endif
 
+<<<<<<< HEAD:alg/GNUmakefile
 CPPFLAGS	:=	-iquote ../frmts/vrt -iquote ../frmts/mem $(CPPFLAGS) $(OPENCL_FLAGS) $(PROJ_FLAGS) $(PROJ_INCLUDE) -iquote marching_squares
+=======
+CPPFLAGS	:=	-I../frmts/vrt -I../frmts/mem $(CPPFLAGS) $(OPENCL_FLAGS) $(PROJ_FLAGS) $(PROJ_INCLUDE) -Imarching_squares
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/alg/GNUmakefile
 
 CXXFLAGS	:=	$(WARN_EFFCPLUSPLUS) $(WARN_OLD_STYLE_CAST) $(CXXFLAGS)
 

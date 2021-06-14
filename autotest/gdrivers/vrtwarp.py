@@ -342,7 +342,11 @@ def test_vrtwarp_9():
     vrtwarp_ds = gdal.Warp('tmp/vrtwarp_9.vrt', 'tmp/sstgeo.vrt', options='-overwrite -of VRT -geoloc')
     assert vrtwarp_ds.GetRasterBand(1).GetOverviewCount() == 1
     assert vrtwarp_ds.GetRasterBand(1).Checksum() == expected_cs_main
+<<<<<<< HEAD
     assert vrtwarp_ds.GetRasterBand(1).GetOverview(0).Checksum() == 62489, \
+=======
+    assert vrtwarp_ds.GetRasterBand(1).GetOverview(0).Checksum() == 63696, \
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal)
         (vrtwarp_ds.GetRasterBand(1).GetOverview(0).XSize, vrtwarp_ds.GetRasterBand(1).GetOverview(0).YSize)
     vrtwarp_ds = None
 
