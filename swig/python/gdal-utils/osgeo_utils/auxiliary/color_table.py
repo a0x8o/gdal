@@ -54,8 +54,11 @@ def get_color_table_from_raster(path_or_ds: PathOrDS) -> Optional[gdal.ColorTabl
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
@@ -81,8 +84,19 @@ def get_color_table_from_raster(path_or_ds: PathOrDS) -> Optional[gdal.ColorTabl
 =======
 =======
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> 2767799a55 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 9105b4f6b6 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 def color_table_from_color_palette(pal: ColorPalette, color_table: gdal.ColorTable,
                                    fill_missing_colors=True, min_key=0, max_key=255) -> bool:
     """ returns None if pal has no values, otherwise returns a gdal.ColorTable from the given ColorPalette"""
@@ -119,14 +133,20 @@ def get_color_table(color_palette_or_path_or_strings_or_ds: Optional[ColorTableL
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
         # palette has no values or not numeric
         return False
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -140,6 +160,8 @@ def get_color_table(color_palette_or_path_or_strings_or_ds: Optional[ColorTableL
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+=======
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> OSGeo-master:swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -147,7 +169,16 @@ def get_color_table(color_palette_or_path_or_strings_or_ds: Optional[ColorTableL
 =======
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 2767799a55 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+>>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 9105b4f6b6 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
     if fill_missing_colors:
         keys = sorted(list(pal.pal.keys()))
         if min_key is None:

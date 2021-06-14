@@ -867,6 +867,7 @@ def test_ogr_flatgeobuf_read_coordinate_metadata_wkt():
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -874,6 +875,8 @@ def test_ogr_flatgeobuf_read_coordinate_metadata_wkt():
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 145dd38d72 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+=======
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> OSGeo-master
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -883,7 +886,14 @@ def test_ogr_flatgeobuf_read_coordinate_metadata_wkt():
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 9105b4f6b6 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 
 ###############################################################################
@@ -974,6 +984,7 @@ def test_ogr_flatgeobuf_invalid_output_filename():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -986,6 +997,8 @@ def test_ogr_flatgeobuf_invalid_output_filename():
 =======
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> OSGeo-master
 =======
@@ -997,4 +1010,13 @@ def test_ogr_flatgeobuf_invalid_output_filename():
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 9105b4f6b6 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
