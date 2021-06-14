@@ -406,6 +406,9 @@ Examples
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:doc/source/drivers/vector/shapefile.rst
 =======
 =======
@@ -420,6 +423,7 @@ Examples
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD:doc/source/drivers/vector/shapefile.rst
 =======
@@ -428,6 +432,8 @@ Examples
 <<<<<<< HEAD:doc/source/drivers/vector/shapefile.rst
 =======
 >>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
 
 Advanced topics
 ---------------

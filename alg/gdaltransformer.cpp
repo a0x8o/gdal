@@ -114,6 +114,9 @@ typedef struct {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/alg/gdaltransformer.cpp
@@ -121,10 +124,13 @@ typedef struct {
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:alg/gdaltransformer.cpp
 /* ==================================================================== */
 /*                       GDALReprojectionTransformer                    */
@@ -155,16 +161,22 @@ struct GDALReprojectionTransformInfo
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:alg/gdaltransformer.cpp
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
 /*                          GDALTransformFunc                           */
 /*                                                                      */
 /*      Documentation for GDALTransformFunc typedef.                    */
@@ -1092,6 +1104,9 @@ GDALSuggestedWarpOutput2( GDALDatasetH hSrcDS,
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD
 /*      Special case for geolocation array, to quickly find the bounds. */
@@ -1164,10 +1179,13 @@ GDALSuggestedWarpOutput2( GDALDatasetH hSrcDS,
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
 /*      Compute the distance in "georeferenced" units from the top      */
 /*      corner of the transformed input image to the bottom left        */
 /*      corner of the transformed input.  Use this distance to          */
@@ -1283,6 +1301,9 @@ GDALSuggestedWarpOutput2( GDALDatasetH hSrcDS,
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/alg/gdaltransformer.cpp
@@ -1291,10 +1312,13 @@ GDALSuggestedWarpOutput2( GDALDatasetH hSrcDS,
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:alg/gdaltransformer.cpp
     if( bIsGeographicCoords &&
         ((dfMaxXOut <= 180 && dfMaxXOutNew > 180) || dfMaxXOut == 180) )
@@ -1304,16 +1328,22 @@ GDALSuggestedWarpOutput2( GDALDatasetH hSrcDS,
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:alg/gdaltransformer.cpp
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
     {
         dfMaxXOut = 180;
         dfPixelSizeX = (dfMaxXOut - dfMinXOut) / *pnPixels;

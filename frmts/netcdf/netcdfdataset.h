@@ -725,6 +725,9 @@ class netCDFDataset final: public GDALPamDataset
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:frmts/netcdf/netcdfdataset.h
     std::map<std::string, CPLStringList> m_oMapDomainToJSon{};
 =======
@@ -742,6 +745,7 @@ class netCDFDataset final: public GDALPamDataset
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD:frmts/netcdf/netcdfdataset.h
     std::map<std::string, CPLStringList> m_oMapDomainToJSon{};
@@ -752,6 +756,8 @@ class netCDFDataset final: public GDALPamDataset
     std::map<std::string, CPLStringList> m_oMapDomainToJSon{};
 =======
 >>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
     struct JSonMetadata
     {
         std::string osJSon{};
@@ -761,6 +767,9 @@ class netCDFDataset final: public GDALPamDataset
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/netcdf/netcdfdataset.h
 =======
 <<<<<<< HEAD
@@ -772,12 +781,15 @@ class netCDFDataset final: public GDALPamDataset
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/netcdf/netcdfdataset.h
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/netcdf/netcdfdataset.h
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/netcdf/netcdfdataset.h
 >>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
 
     CPLStringList papszDimName;
     bool          bBottomUp;
