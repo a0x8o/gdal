@@ -45539,9 +45539,13 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"ExtendedDataType_GetSize", _wrap_ExtendedDataType_GetSize, METH_VARARGS, (char *)"ExtendedDataType_GetSize(ExtendedDataType self) -> size_t"},
 	 { (char *)"ExtendedDataType_GetMaxStringLength", _wrap_ExtendedDataType_GetMaxStringLength, METH_VARARGS, (char *)"ExtendedDataType_GetMaxStringLength(ExtendedDataType self) -> size_t"},
 <<<<<<< HEAD
+<<<<<<< HEAD
 	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+=======
+	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 	 { (char *)"ExtendedDataType_GetComponents", _wrap_ExtendedDataType_GetComponents, METH_VARARGS, (char *)"ExtendedDataType_GetComponents(ExtendedDataType self)"},
 	 { (char *)"ExtendedDataType_CanConvertTo", _wrap_ExtendedDataType_CanConvertTo, METH_VARARGS, (char *)"ExtendedDataType_CanConvertTo(ExtendedDataType self, ExtendedDataType other) -> bool"},
 	 { (char *)"ExtendedDataType_Equals", _wrap_ExtendedDataType_Equals, METH_VARARGS, (char *)"ExtendedDataType_Equals(ExtendedDataType self, ExtendedDataType other) -> bool"},

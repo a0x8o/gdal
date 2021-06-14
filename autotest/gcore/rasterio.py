@@ -1232,6 +1232,9 @@ def test_rasterio_rms_halfsize_downsampling_float32():
         else:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
             assert got[i] == pytest.approx(expected[i], rel=1e-7), i
 =======
 <<<<<<< HEAD
@@ -1241,9 +1244,11 @@ def test_rasterio_rms_halfsize_downsampling_float32():
 =======
             assert got[i] == pytest.approx(expected[i], rel=1e-7)
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
             assert got[i] == pytest.approx(expected[i], rel=1e-7), i
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> OSGeo-master
 =======
@@ -1252,6 +1257,10 @@ def test_rasterio_rms_halfsize_downsampling_float32():
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 9105b4f6b6 (Merge branch 'master' of github.com:OSGeo/gdal)
 
     ds.BuildOverviews('RMS', [2])
     ovr_data = ds.GetRasterBand(1).GetOverview(0).ReadRaster()
