@@ -119,12 +119,18 @@ OGRFlatGeobufLayer::OGRFlatGeobufLayer(
             }
         }
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 =======
         CPL_IGNORE_RET_VAL(dfCoordEpoch);
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
+=======
+=======
+        CPL_IGNORE_RET_VAL(dfCoordEpoch);
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
+>>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
 
         if ((org == nullptr || EQUAL(org->c_str(), "EPSG")) && code != 0) {
             m_poSRS->importFromEPSG(code);
