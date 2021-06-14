@@ -29326,6 +29326,14 @@ SWIGINTERN PyObject *_wrap_ExtendedDataType_GetSubType(PyObject *SWIGUNUSEDPARM(
   GDALExtendedDataTypeHS *arg1 = (GDALExtendedDataTypeHS *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
+=======
+=======
+>>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
   PyObject *swig_obj[1] ;
   GDALExtendedDataTypeSubType result;
@@ -29334,12 +29342,30 @@ SWIGINTERN PyObject *_wrap_ExtendedDataType_GetSubType(PyObject *SWIGUNUSEDPARM(
   swig_obj[0] = args;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_GDALExtendedDataTypeHS, 0 |  0 );
 =======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
+=======
+>>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
   PyObject * obj0 = 0 ;
   GDALExtendedDataTypeSubType result;
   
   if (!PyArg_ParseTuple(args,(char *)"O:ExtendedDataType_GetSubType",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_GDALExtendedDataTypeHS, 0 |  0 );
+<<<<<<< HEAD
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
+>>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
+>>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ExtendedDataType_GetSubType" "', argument " "1"" of type '" "GDALExtendedDataTypeHS *""'"); 
   }
