@@ -113,6 +113,7 @@ typedef struct {
 /************************************************************************/
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/alg/gdaltransformer.cpp
@@ -122,6 +123,8 @@ typedef struct {
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:alg/gdaltransformer.cpp
 /* ==================================================================== */
 /*                       GDALReprojectionTransformer                    */
@@ -151,6 +154,7 @@ struct GDALReprojectionTransformInfo
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/alg/gdaltransformer.cpp
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:alg/gdaltransformer.cpp
@@ -159,6 +163,8 @@ struct GDALReprojectionTransformInfo
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
 /*                          GDALTransformFunc                           */
 /*                                                                      */
 /*      Documentation for GDALTransformFunc typedef.                    */
@@ -1085,6 +1091,7 @@ GDALSuggestedWarpOutput2( GDALDatasetH hSrcDS,
 /* -------------------------------------------------------------------- */
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 /*      Special case for geolocation array, to quickly find the bounds. */
@@ -1159,6 +1166,8 @@ GDALSuggestedWarpOutput2( GDALDatasetH hSrcDS,
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
 /*      Compute the distance in "georeferenced" units from the top      */
 /*      corner of the transformed input image to the bottom left        */
 /*      corner of the transformed input.  Use this distance to          */
@@ -1273,6 +1282,7 @@ GDALSuggestedWarpOutput2( GDALDatasetH hSrcDS,
     double dfMaxXOutNew = dfMinXOut + (*pnPixels) * dfPixelSizeX;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/alg/gdaltransformer.cpp
@@ -1283,12 +1293,15 @@ GDALSuggestedWarpOutput2( GDALDatasetH hSrcDS,
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:alg/gdaltransformer.cpp
     if( bIsGeographicCoords &&
         ((dfMaxXOut <= 180 && dfMaxXOutNew > 180) || dfMaxXOut == 180) )
 =======
     if( bIsGeographicCoords && dfMaxXOut <= 180 && dfMaxXOutNew > 180 )
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/alg/gdaltransformer.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -1299,6 +1312,8 @@ GDALSuggestedWarpOutput2( GDALDatasetH hSrcDS,
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
     {
         dfMaxXOut = 180;
         dfPixelSizeX = (dfMaxXOut - dfMinXOut) / *pnPixels;

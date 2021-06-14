@@ -552,6 +552,7 @@ work properly with GDAL.
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/doc/source/drivers/raster/pdf.rst
@@ -563,6 +564,8 @@ With GDAL >= 3.4.0
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:doc/source/drivers/raster/pdf.rst
 With GDAL >= 3.5
 ++++++++++++++++
@@ -578,6 +581,7 @@ With GDAL >= 3.4.0
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/raster/pdf.rst
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:doc/source/drivers/raster/pdf.rst
@@ -586,10 +590,13 @@ With GDAL >= 3.4.0
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
 
 The scripts in the `<https://github.com/rouault/pdfium_build_gdal_3_4>`__
 repository must be used to build a patched version of PDFium.
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -601,10 +608,13 @@ repository must be used to build a patched version of PDFium.
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:doc/source/drivers/raster/pdf.rst
 With GDAL 3.2 and 3.3
 +++++++++++++++++++++
 =======
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -615,6 +625,8 @@ With GDAL 3.2 and 3.3
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
 With GDAL >= 3.2.0
 +++++++++++++++++++
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/raster/pdf.rst

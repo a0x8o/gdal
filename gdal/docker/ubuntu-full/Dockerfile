@@ -375,6 +375,7 @@ RUN if echo "$WITH_PDFIUM" | grep -Eiq "^(y(es)?|1|true)$"  ; then ( \
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
   wget -q https://github.com/rouault/pdfium_build_gdal_3_4/releases/download/v1_pdfium_4538/install-ubuntu2004-rev4538.tar.gz \
@@ -407,6 +408,14 @@ RUN if echo "$WITH_PDFIUM" | grep -Eiq "^(y(es)?|1|true)$"  ; then ( \
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 120fe7f972 (Docker: update to use an alternate repo to OSGeo/gdal)
+=======
+  wget -q https://github.com/rouault/pdfium_build_gdal_3_4/releases/download/v1_pdfium_4538/install-ubuntu2004-rev4538.tar.gz \
+  && tar -xzf install-ubuntu2004-rev4538.tar.gz \
+  && chown -R root:root install \
+  && mv install/lib/* /usr/lib/ \
+  && mv install/include/* /usr/include/ \
+  && rm -rf install-ubuntu2004-rev4538.tar.gz install \
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
   && apt-get update -y \
   && apt-get install -y --fix-missing --no-install-recommends liblcms2-dev \
   && rm -rf /var/lib/apt/lists/* \

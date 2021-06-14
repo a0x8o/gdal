@@ -2904,6 +2904,7 @@ char **netCDFDataset::GetMetadata( const char *pszDomain )
         if( iter != m_oMapDomainToJSon.end() )
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/netcdf/netcdfdataset.cpp
@@ -2914,11 +2915,14 @@ char **netCDFDataset::GetMetadata( const char *pszDomain )
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:frmts/netcdf/netcdfdataset.cpp
             return iter->second.List();
 =======
             return iter->second.apszMD;
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/netcdf/netcdfdataset.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -2929,6 +2933,8 @@ char **netCDFDataset::GetMetadata( const char *pszDomain )
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
     }
 
     return GDALDataset::GetMetadata(pszDomain);
@@ -6507,6 +6513,7 @@ CPLErr netCDFDataset::ReadAttributes( int cdfidIn, int var)
                 CPLFree(pszVarFullName);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/netcdf/netcdfdataset.cpp
@@ -6516,6 +6523,8 @@ CPLErr netCDFDataset::ReadAttributes( int cdfidIn, int var)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:frmts/netcdf/netcdfdataset.cpp
                 CPLStringList aosList;
                 aosList.AddString(CPLString(NCDFReadMetadataAsJson(cdfidIn)).replaceAll("\\/", '/'));
@@ -6523,6 +6532,7 @@ CPLErr netCDFDataset::ReadAttributes( int cdfidIn, int var)
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/netcdf/netcdfdataset.cpp
@@ -6531,10 +6541,13 @@ CPLErr netCDFDataset::ReadAttributes( int cdfidIn, int var)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
                 JSonMetadata md;
                 md.osJSon = CPLString(NCDFReadMetadataAsJson(cdfidIn)).replaceAll("\\/", '/');
                 md.apszMD[0] = &md.osJSon[0];
                 m_oMapDomainToJSon[key] = std::move(md);
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/netcdf/netcdfdataset.cpp
@@ -6551,6 +6564,9 @@ CPLErr netCDFDataset::ReadAttributes( int cdfidIn, int var)
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/netcdf/netcdfdataset.cpp
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/netcdf/netcdfdataset.cpp
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
                 return CE_None;
             }
         }
@@ -6560,6 +6576,7 @@ CPLErr netCDFDataset::ReadAttributes( int cdfidIn, int var)
         CPLFree(pszVarFullName);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/netcdf/netcdfdataset.cpp
@@ -6569,6 +6586,8 @@ CPLErr netCDFDataset::ReadAttributes( int cdfidIn, int var)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:frmts/netcdf/netcdfdataset.cpp
         CPLStringList aosList;
         aosList.AddString(CPLString(NCDFReadMetadataAsJson(cdfidIn)).replaceAll("\\/", '/'));
@@ -6576,6 +6595,7 @@ CPLErr netCDFDataset::ReadAttributes( int cdfidIn, int var)
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/netcdf/netcdfdataset.cpp
@@ -6584,10 +6604,13 @@ CPLErr netCDFDataset::ReadAttributes( int cdfidIn, int var)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
         JSonMetadata md;
         md.osJSon = CPLString(NCDFReadMetadataAsJson(cdfidIn)).replaceAll("\\/", '/');
         md.apszMD[0] = &md.osJSon[0];
         m_oMapDomainToJSon["SUPPORT_DATA"] = std::move(md);
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/netcdf/netcdfdataset.cpp
@@ -6604,6 +6627,9 @@ CPLErr netCDFDataset::ReadAttributes( int cdfidIn, int var)
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/netcdf/netcdfdataset.cpp
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/netcdf/netcdfdataset.cpp
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
         return CE_None;
     }
 #endif

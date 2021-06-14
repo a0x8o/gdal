@@ -4885,6 +4885,7 @@ def test_netcdf_metadata_sentinel5():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
     if not gdaltest.netcdf_drv_has_nc4:
@@ -4898,10 +4899,13 @@ def test_netcdf_metadata_sentinel5():
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
     if not gdaltest.netcdf_drv_has_nc4:
         pytest.skip()
 
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -4912,6 +4916,8 @@ def test_netcdf_metadata_sentinel5():
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
     ds = gdal.Open('data/netcdf/fake_ISO_METADATA.nc')
     assert ds is not None
     assert "json:ISO_METADATA" in ds.GetMetadataDomainList()
@@ -4956,6 +4962,7 @@ def test_netcdf_metadata_sentinel5():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 =======
@@ -4965,6 +4972,8 @@ def test_netcdf_metadata_sentinel5():
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
 ###############################################################################
 # Test opening a file with particular georeferencing encoding
 
@@ -5291,6 +5300,7 @@ def test_netcdf_read_geogcrs_component_names():
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 >>>>>>> OSGeo-master
@@ -5299,6 +5309,8 @@ def test_netcdf_read_geogcrs_component_names():
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
 def test_clean_tmp():
     # [KEEP THIS AS THE LAST TEST]
     # i.e. please do not add any tests after this one. Put new ones above.
