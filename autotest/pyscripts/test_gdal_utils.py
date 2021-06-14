@@ -33,6 +33,7 @@ from numbers import Real
 from pathlib import Path
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 =======
@@ -40,10 +41,13 @@ from pathlib import Path
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 from typing import Optional
 
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 <<<<<<< HEAD
@@ -51,6 +55,8 @@ from typing import Optional
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 from osgeo import gdal
 
 import pytest
@@ -68,6 +74,7 @@ pytest.importorskip('osgeo_utils')
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 =======
@@ -89,6 +96,8 @@ from osgeo_utils.auxiliary.extent_util import Extent
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 from osgeo_utils.auxiliary import util, raster_creation, base, array_util, color_table
 from osgeo_utils.auxiliary.color_palette import ColorPalette
 from osgeo_utils.auxiliary.color_table import get_color_table
@@ -96,6 +105,7 @@ from osgeo_utils.auxiliary.extent_util import Extent
 import gdaltest
 =======
 from osgeo_utils.auxiliary import util, raster_creation, base, array_util
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -129,6 +139,11 @@ from osgeo_utils.auxiliary import util, raster_creation, base, array_util, color
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+from osgeo_utils.auxiliary import util, raster_creation, base, array_util, color_table
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 from osgeo_utils.auxiliary.color_palette import ColorPalette
 from osgeo_utils.auxiliary.extent_util import Extent
 >>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -507,6 +522,36 @@ def test_utils_color_table_and_palette():
         assert color_entries[max_k] == ct256.GetColorEntry(i), 'fill remaining entries'
 =======
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+
+
+def test_utils_color_table_and_palette():
+    pal = ColorPalette()
+    color_entries = {1: (255, 0, 0, 255), 2: (0, 255, 0, 255), 4: (1, 2, 3, 4)}
+    for k, v in color_entries.items():
+        pal.pal[k] = ColorPalette.color_entry_to_color(*v)
+
+    assert pal.pal[4] == 0x04010203, 'color entry to int'
+    ct4 = gdal.ColorTable()
+    ct256 = gdal.ColorTable()
+
+    color_table.color_table_from_color_palette(pal, ct4, fill_missing_colors=False)
+    assert ct4.GetCount() == 5, 'color table without filling'
+    color_table.color_table_from_color_palette(pal, ct256, fill_missing_colors=True)
+    assert ct256.GetCount() == 256, 'color table with filling'
+
+    assert (0, 0, 0, 0) == ct4.GetColorEntry(0), 'empty value'
+    assert (0, 0, 0, 0) == ct4.GetColorEntry(3), 'empty value'
+
+    assert color_entries[1] == ct256.GetColorEntry(0), 'filled value'
+    assert color_entries[2] == ct256.GetColorEntry(3), 'filled value'
+
+    for k, v in color_entries.items():
+        assert pal.pal[k] == ColorPalette.color_entry_to_color(*v), 'color in palette'
+        assert v == ct4.GetColorEntry(k) == ct256.GetColorEntry(k), 'color in table'
+
+    max_k = max(color_entries.keys())
+    for i in range(max_k, 256):
+        assert color_entries[max_k] == ct256.GetColorEntry(i), 'fill remaining entries'
 
 
 def test_utils_py_cleanup():

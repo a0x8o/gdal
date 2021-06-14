@@ -178,6 +178,7 @@ void GDALRefreshGenImgProjTransformer(void* hTransformArg);
 void GDALRefreshApproxTransformer(void* hTransformArg);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/alg/gdal_alg_priv.h
@@ -185,6 +186,8 @@ void GDALRefreshApproxTransformer(void* hTransformArg);
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:alg/gdal_alg_priv.h
 int GDALTransformLonLatToDestGenImgProjTransformer(void* hTransformArg,
                                                     double* pdfX,
@@ -200,17 +203,21 @@ typedef struct _CPLQuadTree CPLQuadTree;
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/alg/gdal_alg_priv.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:alg/gdal_alg_priv.h
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 
 typedef struct {
     GDALTransformerInfo sTI;
 
     bool        bReversed;
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 <<<<<<< HEAD
@@ -219,6 +226,8 @@ typedef struct {
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:alg/gdal_alg_priv.h
     double      dfOversampleFactor;
 
@@ -232,12 +241,15 @@ typedef struct {
     void       *pAccessors;
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:alg/gdal_alg_priv.h
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 
     // Map from target georef coordinates back to geolocation array
     // pixel line coordinates.  Built only if needed.
@@ -246,6 +258,7 @@ typedef struct {
     double      adfBackMapGeoTransform[6];  // Maps georef to pixel/line.
     float       *pafBackMapX;
     float       *pafBackMapY;
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/alg/gdal_alg_priv.h
 =======
@@ -258,6 +271,9 @@ typedef struct {
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/alg/gdal_alg_priv.h
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/alg/gdal_alg_priv.h
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 
     // Geolocation bands.
     GDALDatasetH     hDS_X;
@@ -268,6 +284,7 @@ typedef struct {
 
     // Located geolocation data.
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/alg/gdal_alg_priv.h
@@ -275,21 +292,27 @@ typedef struct {
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:alg/gdal_alg_priv.h
     int              nGeoLocXSize;
     int              nGeoLocYSize;
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:alg/gdal_alg_priv.h
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
     size_t           nGeoLocXSize;
     size_t           nGeoLocYSize;
     double           *padfGeoLocX;
     double           *padfGeoLocY;
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/alg/gdal_alg_priv.h
 =======
@@ -302,6 +325,9 @@ typedef struct {
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/alg/gdal_alg_priv.h
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/alg/gdal_alg_priv.h
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
     double           dfMinX;
     double           dfYAtMinX;
     double           dfMinY;
@@ -321,6 +347,7 @@ typedef struct {
     double           dfLINE_STEP;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/alg/gdal_alg_priv.h
@@ -328,6 +355,8 @@ typedef struct {
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:alg/gdal_alg_priv.h
     bool             bOriginIsTopLeftCorner;
     bool             bGeographicSRSWithMinus180Plus180LongRange;
@@ -336,12 +365,15 @@ typedef struct {
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/alg/gdal_alg_priv.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:alg/gdal_alg_priv.h
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
     char **          papszGeolocationInfo;
 
 } GDALGeoLocTransformInfo;

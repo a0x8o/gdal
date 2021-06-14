@@ -344,6 +344,7 @@ def test_vrtwarp_9():
     assert vrtwarp_ds.GetRasterBand(1).Checksum() == expected_cs_main
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
     assert vrtwarp_ds.GetRasterBand(1).GetOverview(0).Checksum() == 63696, \
@@ -352,10 +353,13 @@ def test_vrtwarp_9():
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
     assert vrtwarp_ds.GetRasterBand(1).GetOverview(0).Checksum() == 62489, \
 =======
     assert vrtwarp_ds.GetRasterBand(1).GetOverview(0).Checksum() == 63696, \
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 <<<<<<< HEAD
@@ -363,6 +367,8 @@ def test_vrtwarp_9():
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
         (vrtwarp_ds.GetRasterBand(1).GetOverview(0).XSize, vrtwarp_ds.GetRasterBand(1).GetOverview(0).YSize)
     vrtwarp_ds = None
 
