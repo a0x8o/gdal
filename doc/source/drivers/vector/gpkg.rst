@@ -467,8 +467,11 @@ Examples
    ::
 
       ogr2ogr -f GPKG filename.gpkg abc.shp
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/doc/source/drivers/vector/gpkg.rst
 =======
+=======
+>>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:doc/source/drivers/vector/gpkg.rst
 
 -  Update of an existing GeoPackage file – e.g. a GeoPackage template – 
@@ -481,7 +484,10 @@ Examples
       ogr2ogr -append output.gpkg input.gpkg
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/vector/gpkg.rst
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:doc/source/drivers/vector/gpkg.rst
+=======
+>>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 
 -  Translation of a directory of shapefiles into a GeoPackage. Each file
    will end up as a new table within the GPKG file. The file

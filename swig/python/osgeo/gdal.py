@@ -2583,13 +2583,19 @@ class Dataset(MajorObject):
             return self._SetGCPs2(gcps, wkt_or_spatial_ref)
 
 
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/osgeo/gdal.py
 =======
+=======
+>>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:swig/python/osgeo/gdal.py
 # Register Dataset in _gdal:
 _gdal.Dataset_swigregister(Dataset)
 =======
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/osgeo/gdal.py
+=======
+>>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 GEDTST_NONE = _gdal.GEDTST_NONE
 GEDTST_JSON = _gdal.GEDTST_JSON
 class Group(_object):
@@ -3392,11 +3398,14 @@ class ExtendedDataType(object):
         return _gdal.ExtendedDataType_GetSubType(self, *args)
 
 
+<<<<<<< HEAD
     def GetSubType(self, *args):
         """GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"""
         return _gdal.ExtendedDataType_GetSubType(self, *args)
 
 
+=======
+>>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
     def GetComponents(self, *args):
         r"""GetComponents(ExtendedDataType self)"""
         return _gdal.ExtendedDataType_GetComponents(self, *args)

@@ -118,16 +118,22 @@ OGRFlatGeobufLayer::OGRFlatGeobufLayer(
                 wkt = wkt.substr(strlen("COORDINATEMETADATA["));
             }
         }
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 =======
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
+=======
+>>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 =======
         CPL_IGNORE_RET_VAL(dfCoordEpoch);
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
+<<<<<<< HEAD
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
+=======
+>>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 
         if ((org == nullptr || EQUAL(org->c_str(), "EPSG")) && code != 0) {
             m_poSRS->importFromEPSG(code);
@@ -138,10 +144,14 @@ OGRFlatGeobufLayer::OGRFlatGeobufLayer(
             if( m_poSRS->SetFromUserInput(osCode.c_str(), OGRSpatialReference::SET_FROM_USER_INPUT_LIMITATIONS_get()) != OGRERR_NONE &&
 =======
             if( m_poSRS->SetFromUserInput(osCode.c_str()) != OGRERR_NONE &&
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
+>>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
                 !wkt.empty() )
             {
                 m_poSRS->importFromWkt(wkt.c_str());
