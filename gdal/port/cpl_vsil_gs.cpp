@@ -232,12 +232,15 @@ const char* VSIGSFSHandler::GetOptions()
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 52d0f1a995 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> b9bff7857e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> fd72dc30f5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 62c5e944ea (Merge branch 'master' of github.com:OSGeo/gdal)
     "  <Option name='GS_NO_SIGN_REQUEST' type='boolean' "
         "description='Whether to disable signing of requests' default='NO'/>"
 =======
@@ -255,15 +258,21 @@ const char* VSIGSFSHandler::GetOptions()
 =======
 =======
 >>>>>>> 77a87224da (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> fd72dc30f5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 62c5e944ea (Merge branch 'master' of github.com:OSGeo/gdal)
     "  <Option name='GS_NO_SIGN_REQUEST' type='boolean' "
         "description='Whether to disable signing of requests' default='NO'/>"
 =======
 >>>>>>> b39a831ddf (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 62c5e944ea (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> d42a2ed026 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
@@ -271,6 +280,7 @@ const char* VSIGSFSHandler::GetOptions()
         "description='Whether to disable signing of requests' default='NO'/>"
 >>>>>>> baada40179 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 77a87224da (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> b39a831ddf (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -290,6 +300,8 @@ const char* VSIGSFSHandler::GetOptions()
 =======
 >>>>>>> d42a2ed026 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> fd72dc30f5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 62c5e944ea (Merge branch 'master' of github.com:OSGeo/gdal)
     "  <Option name='GS_OAUTH2_REFRESH_TOKEN' type='string' "
         "description='OAuth2 refresh token. For OAuth2 client authentication. "
         "To use with GS_OAUTH2_CLIENT_ID and GS_OAUTH2_CLIENT_SECRET'/>"
@@ -331,10 +343,14 @@ const char* VSIGSFSHandler::GetOptions()
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 62c5e944ea (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> d42a2ed026 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 77a87224da (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 52d0f1a995 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -343,6 +359,8 @@ const char* VSIGSFSHandler::GetOptions()
 =======
 >>>>>>> d42a2ed026 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> fd72dc30f5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 62c5e944ea (Merge branch 'master' of github.com:OSGeo/gdal)
         "default='~/.boto'/>"
     + VSICurlFilesystemHandler::GetOptionsStatic() +
 =======
@@ -394,8 +412,18 @@ const char* VSIGSFSHandler::GetOptions()
 =======
 =======
 >>>>>>> b39a831ddf (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> d42a2ed026 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> fd72dc30f5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+        "default='~/.boto'/>"
+    + VSICurlFilesystemHandler::GetOptionsStatic() +
+>>>>>>> baada40179 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 77a87224da (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 62c5e944ea (Merge branch 'master' of github.com:OSGeo/gdal)
         "</Options>");
     return osOptions.c_str();
 }
