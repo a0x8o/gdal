@@ -230,17 +230,24 @@ const char* VSIGSFSHandler::GetOptions()
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 52d0f1a995 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> b9bff7857e (Merge branch 'master' of github.com:OSGeo/gdal)
     "  <Option name='GS_NO_SIGN_REQUEST' type='boolean' "
         "description='Whether to disable signing of requests' default='NO'/>"
 =======
 >>>>>>> 264c5ccbb0 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b9bff7857e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
     "  <Option name='GS_NO_SIGN_REQUEST' type='boolean' "
         "description='Whether to disable signing of requests' default='NO'/>"
 >>>>>>> 75e8911b1c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 77a87224da (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -270,6 +277,8 @@ const char* VSIGSFSHandler::GetOptions()
 >>>>>>> bfdc83cf6d (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 52d0f1a995 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> b9bff7857e (Merge branch 'master' of github.com:OSGeo/gdal)
     "  <Option name='GS_OAUTH2_REFRESH_TOKEN' type='string' "
         "description='OAuth2 refresh token. For OAuth2 client authentication. "
         "To use with GS_OAUTH2_CLIENT_ID and GS_OAUTH2_CLIENT_SECRET'/>"
@@ -309,12 +318,15 @@ const char* VSIGSFSHandler::GetOptions()
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> d42a2ed026 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 77a87224da (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 52d0f1a995 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> b9bff7857e (Merge branch 'master' of github.com:OSGeo/gdal)
         "default='~/.boto'/>"
     + VSICurlFilesystemHandler::GetOptionsStatic() +
 =======
@@ -327,6 +339,7 @@ const char* VSIGSFSHandler::GetOptions()
         "default='~/.boto'/>"
     + VSICurlFilesystemHandler::GetOptionsStatic() +
 >>>>>>> 75e8911b1c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> b39a831ddf (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
@@ -356,6 +369,8 @@ const char* VSIGSFSHandler::GetOptions()
 =======
 >>>>>>> 264c5ccbb0 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 52d0f1a995 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> b9bff7857e (Merge branch 'master' of github.com:OSGeo/gdal)
         "</Options>");
     return osOptions.c_str();
 }
