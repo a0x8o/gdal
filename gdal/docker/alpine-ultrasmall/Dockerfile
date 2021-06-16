@@ -10,6 +10,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 ARG ALPINE_VERSION=3.14
 =======
 ARG ALPINE_VERSION=3.13
@@ -26,6 +27,9 @@ ARG ALPINE_VERSION=3.14
 =======
 ARG ALPINE_VERSION=3.13
 >>>>>>> 120fe7f972 (Docker: update to use an alternate repo to OSGeo/gdal)
+=======
+ARG ALPINE_VERSION=3.14
+>>>>>>> 03b2261518 (Merge branch 'master' of github.com:OSGeo/gdal)
 FROM alpine:${ALPINE_VERSION} as builder
 
 # Derived from osgeo/proj by Howard Butler <howard@hobu.co>

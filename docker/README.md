@@ -11,6 +11,7 @@ best of our knowledge and not guaranteed. Users should check by themselves.
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> d8608c8f1e (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -25,6 +26,9 @@ best of our knowledge and not guaranteed. Users should check by themselves.
 =======
 <<<<<<< HEAD:docker/README.md
 >>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:docker/README.md
+>>>>>>> 03b2261518 (Merge branch 'master' of github.com:OSGeo/gdal)
 # Alpine based
 =======
 # Alpine based (3.14)
@@ -95,13 +99,17 @@ See [alpine-small/Dockerfile](alpine-small/Dockerfile)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 03b2261518 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:docker/README.md
   libspatialite, libxml2, libpoppler, openexr, libheif, libdeflate, libparquet
 * GDAL Python
 * Base PROJ grid package (http://download.osgeo.org/proj/proj-datumgrid-1.8.zip)
 =======
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 <<<<<<< HEAD
@@ -153,6 +161,10 @@ See [alpine-small/Dockerfile](alpine-small/Dockerfile)
   libspatialite, libxml2, libpoppler, openexr, libheif, libdeflate
 * GDAL Python (Python 3.9)
 >>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+  libspatialite, libxml2, libpoppler, openexr, libheif, libdeflate
+* GDAL Python (Python 3.9)
+>>>>>>> 03b2261518 (Merge branch 'master' of github.com:OSGeo/gdal)
 * Base PROJ grid package
 >>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/docker/README.md
 * Overall licensing terms of the GDAL build: copy-left (GPL) + LGPL + permissive

@@ -9,6 +9,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> d8608c8f1e (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -62,6 +63,13 @@ ARG ALPINE_VERSION=3.16
 ARG ALPINE_VERSION=3.14
 >>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/docker/alpine-small/Dockerfile
 >>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:docker/alpine-small/Dockerfile
+ARG ALPINE_VERSION=3.16
+=======
+ARG ALPINE_VERSION=3.14
+>>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/docker/alpine-small/Dockerfile
+>>>>>>> 03b2261518 (Merge branch 'master' of github.com:OSGeo/gdal)
 FROM alpine:${ALPINE_VERSION} as builder
 
 # Derived from osgeo/proj by Howard Butler <howard@hobu.co>

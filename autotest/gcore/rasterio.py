@@ -1074,6 +1074,7 @@ def test_rasterio_average_halfsize_downsampling_byte():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> d8608c8f1e (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -1138,6 +1139,8 @@ def test_rasterio_average_halfsize_downsampling_byte():
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 03b2261518 (Merge branch 'master' of github.com:OSGeo/gdal)
     ds = gdal.GetDriverByName('MEM').Create('', 18, 4, 1, gdal.GDT_Byte)
     ds.WriteRaster(0, 0, 18, 4,
                    struct.pack('B' * 18 * 4,
@@ -1170,6 +1173,7 @@ def test_rasterio_average_halfsize_downsampling_byte():
                                                 m1, m2, m3, m4, m2, m3, m4, m1, m2)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1183,6 +1187,8 @@ def test_rasterio_average_halfsize_downsampling_byte():
 =======
 >>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+>>>>>>> 03b2261518 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
     ds = gdal.GetDriverByName('MEM').Create('', 18, 2, 1, gdal.GDT_Byte)
     ds.WriteRaster(0, 0, 18, 2,
                    struct.pack('B' * 18 * 2,
@@ -1192,6 +1198,7 @@ def test_rasterio_average_halfsize_downsampling_byte():
     data = ds.GetRasterBand(1).ReadRaster(0, 0, 18, 2, 9, 1, resample_alg = gdal.GRIORA_Average)
     assert struct.unpack('B' * 9, data) == (m1, m2, m3, m4, m2, m3, m4, m1, m2)
 >>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1295,6 +1302,8 @@ def test_rasterio_average_halfsize_downsampling_byte():
 >>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 03b2261518 (Merge branch 'master' of github.com:OSGeo/gdal)
 
     ds.BuildOverviews('AVERAGE', [2])
     ovr_data = ds.GetRasterBand(1).GetOverview(0).ReadRaster()
