@@ -8,6 +8,7 @@ Note: the mention of the overall licensing terms of the GDAL build is to the
 best of our knowledge and not guaranteed. Users should check by themselves.
 
 <<<<<<< HEAD:docker/README.md
+<<<<<<< HEAD
 # Alpine based
 =======
 # Alpine based (3.14)
@@ -16,6 +17,24 @@ best of our knowledge and not guaranteed. Users should check by themselves.
 Alpine version:
 * 3.15 for 3.5
 * 3.16 for GDAL 3.6dev
+=======
+# Alpine based (3.15)
+=======
+# Alpine based (3.14)
+
+## Ultra small: `osgeo/gdal:alpine-ultrasmall-latest`
+
+* Image size: ~ 50 MB
+* Raster drivers: VRT, GTiff, HFA, PNG, JPEG, MEM, JP2OpenJPEG, WEB, GPKG
+* Vector drivers: Shapefile, MapInfo, VRT, Memory, GeoJSON, GPKG, SQLite
+* External libraries enabled: libsqlite3, libproj, libcurl, libjpeg, libpng, libwebp, libzstd, libtiff (no LERC support at time of writing)
+* No GDAL Python
+* Base PROJ grid package
+* Overall licensing terms of the GDAL build: permissive (X/MIT, BSD style, Apache, etc..)
+
+See [alpine-ultrasmall/Dockerfile](alpine-ultrasmall/Dockerfile)
+>>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/docker/README.md
+>>>>>>> 9fdcdc669b (Merge branch 'master' of github.com:OSGeo/gdal)
 
 ## Small: `osgeo/gdal:alpine-small-latest`
 
@@ -44,6 +63,12 @@ See [alpine-small/Dockerfile](alpine-small/Dockerfile)
 =======
   libspatialite, libxml2, libpoppler, openexr, libheif, libdeflate
 * GDAL Python (Python 3.9)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD:docker/README.md
+* Base PROJ grid package (http://download.osgeo.org/proj/proj-datumgrid-1.8.zip)
+=======
+>>>>>>> 9fdcdc669b (Merge branch 'master' of github.com:OSGeo/gdal)
 * Base PROJ grid package
 >>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/docker/README.md
 * Overall licensing terms of the GDAL build: copy-left (GPL) + LGPL + permissive

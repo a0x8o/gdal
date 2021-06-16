@@ -1068,8 +1068,11 @@ def test_rasterio_average_halfsize_downsampling_byte():
     m4 = (v13 + v14 + v15 + v16 + 2) >> 2
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 9fdcdc669b (Merge branch 'master' of github.com:OSGeo/gdal)
     ds = gdal.GetDriverByName('MEM').Create('', 18, 4, 1, gdal.GDT_Byte)
     ds.WriteRaster(0, 0, 18, 4,
                    struct.pack('B' * 18 * 4,
@@ -1092,6 +1095,7 @@ def test_rasterio_average_halfsize_downsampling_byte():
     data = ds.GetRasterBand(1).ReadRaster(0, 0, 18, 2, 9, 1, resample_alg = gdal.GRIORA_Average)
     assert struct.unpack('B' * 9, data) == (m1, m2, m3, m4, m2, m3, m4, m1, m2)
 >>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
                                v1, v2, v5, v6, v9,  v10, v13, v14, v5, v6, v9,  v10, v13, v14, v1, v2, v5, v6,
                                v3, v4, v7, v8, v11, v12, v15, v16, v7, v8, v11, v12, v15, v16, v3, v4, v7, v8))
@@ -1100,6 +1104,8 @@ def test_rasterio_average_halfsize_downsampling_byte():
     assert struct.unpack('B' * 9 * 2, data) == (m1, m2, m3, m4, m2, m3, m4, m1, m2,
                                                 m1, m2, m3, m4, m2, m3, m4, m1, m2)
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 9fdcdc669b (Merge branch 'master' of github.com:OSGeo/gdal)
 
     ds.BuildOverviews('AVERAGE', [2])
     ovr_data = ds.GetRasterBand(1).GetOverview(0).ReadRaster()
