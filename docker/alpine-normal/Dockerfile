@@ -6,7 +6,11 @@
 # or licensed under MIT (LICENSE.TXT) Copyright 2019 Even Rouault <even.rouault@spatialys.com>
 
 <<<<<<< HEAD:docker/alpine-normal/Dockerfile
+<<<<<<< HEAD
 ARG ALPINE_VERSION=3.16
+=======
+ARG ALPINE_VERSION=3.15
+>>>>>>> 9fdcdc669b (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 ARG ALPINE_VERSION=3.14
 >>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/docker/alpine-normal/Dockerfile
