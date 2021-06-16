@@ -1068,18 +1068,24 @@ def test_rasterio_average_halfsize_downsampling_byte():
     m4 = (v13 + v14 + v15 + v16 + 2) >> 2
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> OSGeo-master
 =======
 >>>>>>> c71573c49d (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 22fd1623c9 (Merge branch 'master' of github.com:OSGeo/gdal)
     ds = gdal.GetDriverByName('MEM').Create('', 18, 4, 1, gdal.GDT_Byte)
     ds.WriteRaster(0, 0, 18, 4,
                    struct.pack('B' * 18 * 4,
@@ -1115,8 +1121,11 @@ def test_rasterio_average_halfsize_downsampling_byte():
 >>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 22fd1623c9 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
                                v1, v2, v5, v6, v9,  v10, v13, v14, v5, v6, v9,  v10, v13, v14, v1, v2, v5, v6,
                                v3, v4, v7, v8, v11, v12, v15, v16, v7, v8, v11, v12, v15, v16, v3, v4, v7, v8))
@@ -1126,11 +1135,16 @@ def test_rasterio_average_halfsize_downsampling_byte():
                                                 m1, m2, m3, m4, m2, m3, m4, m1, m2)
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master
 =======
 >>>>>>> c71573c49d (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 22fd1623c9 (Merge branch 'master' of github.com:OSGeo/gdal)
 
     ds.BuildOverviews('AVERAGE', [2])
     ovr_data = ds.GetRasterBand(1).GetOverview(0).ReadRaster()
