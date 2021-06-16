@@ -11,6 +11,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> d8608c8f1e (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -19,6 +20,11 @@
 =======
 =======
 >>>>>>> 311244091e (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
+=======
+=======
+=======
+>>>>>>> d8608c8f1e (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> ed22ba7fba (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/docker/alpine-small/Dockerfile
 ARG ALPINE_VERSION=3.14
@@ -41,10 +47,14 @@ ARG ALPINE_VERSION=3.16
 >>>>>>> 0f99b0ef18 (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ed22ba7fba (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 126d56369a (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
 =======
 =======
 <<<<<<< HEAD:docker/alpine-small/Dockerfile
+<<<<<<< HEAD
 <<<<<<< HEAD
 ARG ALPINE_VERSION=3.16
 =======
@@ -82,6 +92,14 @@ ARG ALPINE_VERSION=3.14
 =======
 >>>>>>> 126d56369a (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
 >>>>>>> 311244091e (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
+=======
+ARG ALPINE_VERSION=3.16
+=======
+ARG ALPINE_VERSION=3.14
+>>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/docker/alpine-small/Dockerfile
+>>>>>>> c71573c49d (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> d8608c8f1e (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> ed22ba7fba (Merge branch 'master' of github.com:OSGeo/gdal)
 FROM alpine:${ALPINE_VERSION} as builder
 
 # Derived from osgeo/proj by Howard Butler <howard@hobu.co>

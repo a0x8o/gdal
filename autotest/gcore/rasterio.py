@@ -1069,6 +1069,10 @@ def test_rasterio_average_halfsize_downsampling_byte():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+=======
+>>>>>>> d8608c8f1e (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1088,6 +1092,9 @@ def test_rasterio_average_halfsize_downsampling_byte():
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ed22ba7fba (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 9fdcdc669b (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -1095,6 +1102,7 @@ def test_rasterio_average_halfsize_downsampling_byte():
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 145dd38d72 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
 =======
 >>>>>>> 4ebe45d343 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> OSGeo-master
@@ -1163,6 +1171,12 @@ def test_rasterio_average_halfsize_downsampling_byte():
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 145dd38d72 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 099258b658 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
+=======
+>>>>>>> c71573c49d (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> d8608c8f1e (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> ed22ba7fba (Merge branch 'master' of github.com:OSGeo/gdal)
     ds = gdal.GetDriverByName('MEM').Create('', 18, 4, 1, gdal.GDT_Byte)
     ds.WriteRaster(0, 0, 18, 4,
                    struct.pack('B' * 18 * 4,
@@ -1199,20 +1213,29 @@ def test_rasterio_average_halfsize_downsampling_byte():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> ed22ba7fba (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> d8608c8f1e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> c71573c49d (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 03b2261518 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ed22ba7fba (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
     ds = gdal.GetDriverByName('MEM').Create('', 18, 2, 1, gdal.GDT_Byte)
     ds.WriteRaster(0, 0, 18, 2,
@@ -1237,11 +1260,15 @@ def test_rasterio_average_halfsize_downsampling_byte():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ed22ba7fba (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 145dd38d72 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> d8608c8f1e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
 =======
 >>>>>>> 4ebe45d343 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -1272,6 +1299,8 @@ def test_rasterio_average_halfsize_downsampling_byte():
 >>>>>>> 145dd38d72 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 099258b658 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+=======
+>>>>>>> ed22ba7fba (Merge branch 'master' of github.com:OSGeo/gdal)
                                v1, v2, v5, v6, v9,  v10, v13, v14, v5, v6, v9,  v10, v13, v14, v1, v2, v5, v6,
                                v3, v4, v7, v8, v11, v12, v15, v16, v7, v8, v11, v12, v15, v16, v3, v4, v7, v8))
     # Ask for at least 8 output pixels in width to trigger SSE2 optim
@@ -1289,18 +1318,25 @@ def test_rasterio_average_halfsize_downsampling_byte():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 099258b658 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ed22ba7fba (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 9fdcdc669b (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 145dd38d72 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ed22ba7fba (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> OSGeo-master
 =======
 >>>>>>> c71573c49d (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> d8608c8f1e (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 4ebe45d343 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -1354,6 +1390,8 @@ def test_rasterio_average_halfsize_downsampling_byte():
 >>>>>>> 139f18cc33 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 099258b658 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ed22ba7fba (Merge branch 'master' of github.com:OSGeo/gdal)
 
     ds.BuildOverviews('AVERAGE', [2])
     ovr_data = ds.GetRasterBand(1).GetOverview(0).ReadRaster()
