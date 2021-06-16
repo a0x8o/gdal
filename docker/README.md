@@ -7,7 +7,11 @@ Each directory contains a `./build.sh` for convenient building of the image.
 Note: the mention of the overall licensing terms of the GDAL build is to the
 best of our knowledge and not guaranteed. Users should check by themselves.
 
+<<<<<<< HEAD:docker/README.md
 # Alpine based
+=======
+# Alpine based (3.14)
+>>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/docker/README.md
 
 Alpine version:
 * 3.15 for 3.5
@@ -33,9 +37,15 @@ See [alpine-small/Dockerfile](alpine-small/Dockerfile)
 * Vector drivers: small + Spatialite, XLS
 * Using internal libtiff and libgeotiff
 * External libraries enabled: small + libgeos, libhdf5, libhdf5, libkea, libnetcdf, libfreexl,
+<<<<<<< HEAD:docker/README.md
   libspatialite, libxml2, libpoppler, openexr, libheif, libdeflate, libparquet
 * GDAL Python
 * Base PROJ grid package (http://download.osgeo.org/proj/proj-datumgrid-1.8.zip)
+=======
+  libspatialite, libxml2, libpoppler, openexr, libheif, libdeflate
+* GDAL Python (Python 3.9)
+* Base PROJ grid package
+>>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/docker/README.md
 * Overall licensing terms of the GDAL build: copy-left (GPL) + LGPL + permissive
 
 See [alpine-normal/Dockerfile](alpine-normal/Dockerfile)
