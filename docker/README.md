@@ -23,12 +23,15 @@ best of our knowledge and not guaranteed. Users should check by themselves.
 >>>>>>> 126d56369a (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
 <<<<<<< HEAD:docker/README.md
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD:docker/README.md
 >>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD:docker/README.md
 >>>>>>> 03b2261518 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 139f18cc33 (Merge branch 'master' of github.com:OSGeo/gdal)
 # Alpine based
 =======
 # Alpine based (3.14)
@@ -55,6 +58,7 @@ Alpine version:
 See [alpine-ultrasmall/Dockerfile](alpine-ultrasmall/Dockerfile)
 >>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/docker/README.md
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 9fdcdc669b (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
@@ -74,6 +78,9 @@ Alpine version:
 * 3.16 for GDAL 3.6dev
 >>>>>>> 0f99b0ef18 (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
 >>>>>>> 126d56369a (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
+=======
+>>>>>>> 9fdcdc669b (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 139f18cc33 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 ## Small: `osgeo/gdal:alpine-small-latest`
 
@@ -125,6 +132,7 @@ See [alpine-small/Dockerfile](alpine-small/Dockerfile)
 <<<<<<< HEAD
 =======
 <<<<<<< HEAD:docker/README.md
+<<<<<<< HEAD
 =======
 =======
 <<<<<<< HEAD:docker/README.md
@@ -165,6 +173,11 @@ See [alpine-small/Dockerfile](alpine-small/Dockerfile)
   libspatialite, libxml2, libpoppler, openexr, libheif, libdeflate
 * GDAL Python (Python 3.9)
 >>>>>>> 03b2261518 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+* Base PROJ grid package (http://download.osgeo.org/proj/proj-datumgrid-1.8.zip)
+=======
+>>>>>>> 9fdcdc669b (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 139f18cc33 (Merge branch 'master' of github.com:OSGeo/gdal)
 * Base PROJ grid package
 >>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/docker/README.md
 * Overall licensing terms of the GDAL build: copy-left (GPL) + LGPL + permissive
