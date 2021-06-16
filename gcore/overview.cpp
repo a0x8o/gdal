@@ -993,6 +993,7 @@ inline __m128 SQUARE(__m128 x)
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/overview.cpp
 =======
 <<<<<<< HEAD:gcore/overview.cpp
@@ -1222,6 +1223,9 @@ inline __m128 SQUARE(__m128 x)
     return _mm_mul_ps(x, x);
 }
 
+=======
+<<<<<<< HEAD:gcore/overview.cpp
+>>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
 inline __m128 FIXUP_LANES(__m128 x)
 {
     return x;
@@ -1245,9 +1249,26 @@ inline __m128 FIXUP_LANES(__m128 x)
 #endif
 
 template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
+<<<<<<< HEAD
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/overview.cpp
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 39cde30c78 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+#ifdef __SSE3__
+#define sse2_hadd_ps _mm_hadd_ps
+#else
+inline __m128 sse2_hadd_ps(__m128 a, __m128 b)
+{
+    auto aEven_bEven = _mm_shuffle_ps(a, b, _MM_SHUFFLE(2,0,2,0));
+    auto aOdd_bOdd = _mm_shuffle_ps(a, b, _MM_SHUFFLE(3,1,3,1));
+    return _mm_add_ps(aEven_bEven, aOdd_bOdd); // (aEven + aOdd, bEven + bOdd)
+}
+#endif
+
+template<class T> static int QuadraticMeanFloatSSE2(int nDstXWidth,
+>>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/overview.cpp
+>>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
                                                     int nChunkXSize,
                                                     const T*& CPL_RESTRICT pSrcScanlineShiftedInOut,
                                                     T* CPL_RESTRICT pDstScanline)
@@ -1586,6 +1607,7 @@ template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 9105b4f6b6 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -1609,6 +1631,9 @@ template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
         const auto sumSquares = sse2_hadd_ps(sumLo, sumHi);
 >>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 22fd1623c9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+        const auto sumSquares = sse2_hadd_ps(sumLo, sumHi);
+>>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
 
         auto rms = _mm_mul_ps(maxV, _mm_sqrt_ps(_mm_mul_ps(sumSquares, zeroDot25)));
 
