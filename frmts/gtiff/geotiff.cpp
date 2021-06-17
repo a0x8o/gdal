@@ -6497,8 +6497,14 @@ void GTiffRasterBand::NullBlock( void *pData )
     const GPtrDiff_t nWords = static_cast<GPtrDiff_t>(nBlockXSize) * nBlockYSize;
     const int nChunkSize = std::max(1, GDALGetDataTypeSizeBytes(eDataType));
 
+<<<<<<< HEAD:frmts/gtiff/geotiff.cpp
     int l_bNoDataSet = FALSE;
     if( eDataType == GDT_Int64 )
+=======
+    int bNoDataSetIn = FALSE;
+    double dfNoData = GetNoDataValue( &bNoDataSetIn );
+    if( !bNoDataSetIn )
+>>>>>>> 55d0ced90a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/gtiff/geotiff.cpp
     {
         const auto nVal = GetNoDataValueAsInt64(&l_bNoDataSet);
         if( !l_bNoDataSet )
@@ -6526,6 +6532,7 @@ void GTiffRasterBand::NullBlock( void *pData )
     }
     else
     {
+<<<<<<< HEAD:frmts/gtiff/geotiff.cpp
         double dfNoData = GetNoDataValue( &l_bNoDataSet );
         if( !l_bNoDataSet )
         {
@@ -6555,6 +6562,22 @@ void GTiffRasterBand::NullBlock( void *pData )
             GDALCopyWords64( &dfNoData, GDT_Float64, 0,
                            pData, eDataType, nChunkSize, nWords);
         }
+=======
+        // Hack for Signed Int8 case. As the data type is GDT_Byte (unsigned),
+        // we have to convert a negative nodata value in the range [-128,-1] in
+        // [128, 255]
+        if( m_poGDS->m_nBitsPerSample == 8 &&
+            m_poGDS->m_nSampleFormat == SAMPLEFORMAT_INT &&
+            dfNoData < 0 && dfNoData >= -128 &&
+            static_cast<int>(dfNoData) == dfNoData )
+        {
+            dfNoData = 256 + dfNoData;
+        }
+
+        // Will convert nodata value to the right type and copy efficiently.
+        GDALCopyWords64( &dfNoData, GDT_Float64, 0,
+                       pData, eDataType, nChunkSize, nWords);
+>>>>>>> 55d0ced90a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/gtiff/geotiff.cpp
     }
 }
 
@@ -8661,9 +8684,26 @@ void GTiffDataset::FillEmptyTiles()
         if( nDataTypeSize &&
             nDataTypeSize * 8 == static_cast<int>(m_nBitsPerSample) )
         {
+<<<<<<< HEAD:frmts/gtiff/geotiff.cpp
             if( m_bNoDataSetAsInt64 )
             {
                 GDALCopyWords64( &m_nNoDataValueInt64, GDT_Int64, 0,
+=======
+            double dfNoData = m_dfNoDataValue;
+
+            // Hack for Signed Int8 case. As the data type is GDT_Byte (unsigned),
+            // we have to convert a negative nodata value in the range [-128,-1] in
+            // [128, 255]
+            if( m_nBitsPerSample == 8 &&
+                m_nSampleFormat == SAMPLEFORMAT_INT &&
+                dfNoData < 0 && dfNoData >= -128 &&
+                static_cast<int>(dfNoData) == dfNoData )
+            {
+                dfNoData = 256 + dfNoData;
+            }
+
+            GDALCopyWords64( &dfNoData, GDT_Float64, 0,
+>>>>>>> 55d0ced90a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/gtiff/geotiff.cpp
                            pabyData, eDataType,
                            nDataTypeSize,
                            nBlockBytes / nDataTypeSize );
