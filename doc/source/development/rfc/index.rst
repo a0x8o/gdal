@@ -90,11 +90,17 @@ RFC list
     rfc80_numfocus_relationship
 <<<<<<< HEAD:doc/source/development/rfc/index.rst
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:doc/source/development/rfc/index.rst
 =======
 >>>>>>> b1792c641a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/development/rfc/index.rst
 =======
 >>>>>>> 19c9e5d30a (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:doc/source/development/rfc/index.rst
+=======
+>>>>>>> b1792c641a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/development/rfc/index.rst
+>>>>>>> 0ca587e694 (Merge branch 'master' of github.com:OSGeo/gdal)
     rfc81_coordinate_epoch
     rfc83_use_of_project_sponsorship
     rfc84_cmake
