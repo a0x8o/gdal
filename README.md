@@ -20,6 +20,25 @@ GDAL - Geospatial Data Abstraction Library
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5884351.svg)](https://doi.org/10.5281/zenodo.5884351)
+=======
+=======
+<<<<<<< HEAD
+>>>>>>> dc29376a53 (Merge branch 'master' of github.com:OSGeo/gdal)
+[![Powered by NumFOCUS](https://img.shields.io/badge/powered%20by-NumFOCUS-orange.svg?style=flat&colorA=E1523D&colorB=007D8A )](http://numfocus.org)
+
+
+GDAL is an open source X/MIT licensed translator library for raster and vector geospatial data formats.
+<<<<<<< HEAD
+>>>>>>> a7dc28a119 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5884351.svg)](https://doi.org/10.5281/zenodo.5884351)
+>>>>>>> OSGeo-master
+=======
+>>>>>>> 5a121df24e (Merge branch 'master' of github.com:OSGeo/gdal)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5884351.svg)](https://doi.org/10.5281/zenodo.5884351)
 =======
 =======
@@ -48,10 +67,15 @@ GDAL is an open source X/MIT licensed translator library for raster and vector g
 GDAL is an open source X/MIT licensed translator library for raster and vector geospatial data formats.
 >>>>>>> a7dc28a119 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> cfb746468a (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> dc29376a53 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 4c851eed53 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cfb746468a (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> dc29376a53 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 5a121df24e (Merge branch 'master' of github.com:OSGeo/gdal)
 
 [![Powered by NumFOCUS](https://img.shields.io/badge/powered%20by-NumFOCUS-orange.svg?style=flat&colorA=E1523D&colorB=007D8A )](http://numfocus.org)
 
