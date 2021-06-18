@@ -89,6 +89,9 @@ RFC list
     rfc79_listing_service_providers
     rfc80_numfocus_relationship
 <<<<<<< HEAD:doc/source/development/rfc/index.rst
+<<<<<<< HEAD:doc/source/development/rfc/index.rst
+=======
+>>>>>>> b1792c641a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/development/rfc/index.rst
     rfc81_coordinate_epoch
     rfc83_use_of_project_sponsorship
     rfc84_cmake

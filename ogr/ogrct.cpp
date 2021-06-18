@@ -544,12 +544,17 @@ class OGRProjCT : public OGRCoordinateTransformation
         }
         PjPtr(const PjPtr& other) :
 <<<<<<< HEAD:ogr/ogrct.cpp
+<<<<<<< HEAD:ogr/ogrct.cpp
             m_pj((other.m_pj != nullptr) ?
                  (proj_clone(OSRGetProjTLSContext(), other.m_pj)) :
 =======
             m_pj((other.m_pj != nullptr) ? 
                  (proj_clone(OSRGetProjTLSContext(), other.m_pj)) : 
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/ogr/ogrct.cpp
+=======
+            m_pj((other.m_pj != nullptr) ?
+                 (proj_clone(OSRGetProjTLSContext(), other.m_pj)) :
+>>>>>>> b1792c641a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrct.cpp
                  (nullptr))
         {}
         PjPtr(PjPtr&& other) :
@@ -563,12 +568,17 @@ class OGRProjCT : public OGRCoordinateTransformation
             {
                 reset();
 <<<<<<< HEAD:ogr/ogrct.cpp
+<<<<<<< HEAD:ogr/ogrct.cpp
                 m_pj = (other.m_pj != nullptr) ?
                        (proj_clone(OSRGetProjTLSContext(), other.m_pj)) :
 =======
                 m_pj = (other.m_pj != nullptr) ? 
                        (proj_clone(OSRGetProjTLSContext(), other.m_pj)) : 
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/ogr/ogrct.cpp
+=======
+                m_pj = (other.m_pj != nullptr) ?
+                       (proj_clone(OSRGetProjTLSContext(), other.m_pj)) :
+>>>>>>> b1792c641a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrct.cpp
                        (nullptr);
             }
             return *this;
@@ -1086,7 +1096,7 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
  *
  * This is the same as the C++ function OGRCreateCoordinateTransformation::Clone
  *
- * @return handle to transformation's clone or NULL on error, 
+ * @return handle to transformation's clone or NULL on error,
  *         must be freed with OCTDestroyCoordinateTransformation
  *
  * @since GDAL 3.4
@@ -1158,7 +1168,7 @@ OGRSpatialReferenceH OCTGetTargetCS(OGRCoordinateTransformationH hTransform)
  *
  * This is the same as the C++ function OGRCreateCoordinateTransformation::GetInverse
  *
- * @return handle to inverse transformation or NULL on error, 
+ * @return handle to inverse transformation or NULL on error,
  *         must be freed with OCTDestroyCoordinateTransformation
  *
  * @since GDAL 3.4
