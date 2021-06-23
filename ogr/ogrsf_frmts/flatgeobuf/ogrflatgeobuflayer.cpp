@@ -126,6 +126,9 @@ OGRFlatGeobufLayer::OGRFlatGeobufLayer(
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 =======
         CPL_IGNORE_RET_VAL(dfCoordEpoch);
@@ -134,6 +137,7 @@ OGRFlatGeobufLayer::OGRFlatGeobufLayer(
 <<<<<<< HEAD
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 =======
@@ -144,11 +148,18 @@ OGRFlatGeobufLayer::OGRFlatGeobufLayer(
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
+>>>>>>> 39cde30c78 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
 =======
         CPL_IGNORE_RET_VAL(dfCoordEpoch);
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> 9105b4f6b6 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 39cde30c78 (Merge branch 'master' of github.com:OSGeo/gdal)
 
         if ((org == nullptr || EQUAL(org->c_str(), "EPSG")) && code != 0) {
             m_poSRS->importFromEPSG(code);
