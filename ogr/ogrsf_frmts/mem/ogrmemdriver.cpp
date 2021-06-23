@@ -107,8 +107,11 @@ void RegisterOGRMEM()
         "</LayerCreationOptionList>");
 
     poDriver->SetMetadataItem( GDAL_DCAP_COORDINATE_EPOCH, "YES" );
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/mem/ogrmemdriver.cpp
 =======
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/mem/ogrmemdriver.cpp
     poDriver->SetMetadataItem( GDAL_DCAP_MULTIPLE_VECTOR_LAYERS, "YES" );
 
@@ -116,7 +119,10 @@ void RegisterOGRMEM()
     poDriver->SetMetadataItem( GDAL_DMD_CREATION_FIELD_DOMAIN_TYPES, "Coded Range Glob" );
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/mem/ogrmemdriver.cpp
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/mem/ogrmemdriver.cpp
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
 
     OGRSFDriverRegistrar::GetRegistrar()->RegisterDriver(poDriver);
 }

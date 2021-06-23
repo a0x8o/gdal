@@ -321,12 +321,18 @@ OGRSpatialReference* GDALGeoPackageDataset::GetSpatialRef(int iSrsId,
 
     CPLString oSQL;
     oSQL.Printf( "SELECT definition, organization, organization_coordsys_id%s%s "
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
 =======
 <<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                  "FROM gpkg_spatial_ref_sys WHERE "
 =======
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
+=======
+<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
+                 "FROM gpkg_spatial_ref_sys WHERE "
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
                  "FROM gpkg_spatial_ref_sys WHERE definition IS NOT NULL AND "
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                  "srs_id = %d LIMIT 2",
@@ -781,8 +787,11 @@ int GDALGeoPackageDataset::GetSrsId(const OGRSpatialReference& oSRS)
     // Add epoch column if needed
     if( oSRS.GetCoordinateEpoch() > 0 && !m_bHasEpochColumn )
     {
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
 =======
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
         if( SoftStartTransaction() != OGRERR_NONE )
             return DEFAULT_SRID;
@@ -809,7 +818,10 @@ int GDALGeoPackageDataset::GetSrsId(const OGRSpatialReference& oSRS)
             return DEFAULT_SRID;
 
 =======
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
         if( !m_bHasDefinition12_063 )
         {
             if( !ConvertGpkgSpatialRefSysToExtensionWkt2() )
@@ -824,10 +836,14 @@ int GDALGeoPackageDataset::GetSrsId(const OGRSpatialReference& oSRS)
         {
             return DEFAULT_SRID;
         }
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
         m_bHasEpochColumn = true;
     }
 

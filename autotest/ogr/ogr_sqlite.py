@@ -3168,8 +3168,11 @@ def test_ogr_sqlite_view_type():
     assert f['c'] == 1
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 ###############################################################################
 # Test table WITHOUT ROWID
@@ -3289,7 +3292,10 @@ def test_ogr_sqlite_CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE():
 
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> OSGeo-master
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
 ###############################################################################
 #
 

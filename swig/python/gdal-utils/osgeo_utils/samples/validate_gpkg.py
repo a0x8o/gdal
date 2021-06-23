@@ -216,15 +216,21 @@ class GPKGChecker(object):
                 (5, 'description', 'TEXT', 0, None, 0),
                 (6, 'definition_12_063', 'TEXT', 1, None, 0)
             ]
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/gdal-utils/osgeo_utils/samples/validate_gpkg.py
             if has_epoch_column:
 =======
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/samples/validate_gpkg.py
             if has_epoch:
 =======
             if has_epoch_column:
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/samples/validate_gpkg.py
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/gdal-utils/osgeo_utils/samples/validate_gpkg.py
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
                 expected_columns += [(7, 'epoch', 'DOUBLE', 0, None, 0)]
         else:
             expected_columns = [

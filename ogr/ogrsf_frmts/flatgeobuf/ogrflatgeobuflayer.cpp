@@ -125,15 +125,21 @@ OGRFlatGeobufLayer::OGRFlatGeobufLayer(
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
+<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 =======
         CPL_IGNORE_RET_VAL(dfCoordEpoch);
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
 
         if ((org == nullptr || EQUAL(org->c_str(), "EPSG")) && code != 0) {
             m_poSRS->importFromEPSG(code);
@@ -400,8 +406,11 @@ void OGRFlatGeobufLayer::writeHeader(VSILFILE *poFp, uint64_t featuresCount, std
             pszWKT = CPLStrdup(osWKT.c_str());
         }
 
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 =======
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
         if( pszWKT && !CPLIsUTF8(pszWKT, -1) )
         {
@@ -411,7 +420,10 @@ void OGRFlatGeobufLayer::writeHeader(VSILFILE *poFp, uint64_t featuresCount, std
         }
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
         crs = CreateCrsDirect(fbb, pszAuthorityName, nAuthorityCode, m_poSRS->GetName(), nullptr, pszWKT);
         CPLFree(pszWKT);
     }

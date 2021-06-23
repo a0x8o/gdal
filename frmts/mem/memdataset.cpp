@@ -515,10 +515,14 @@ MEMDataset::~MEMDataset()
     bSuppressOnClose = bSuppressOnCloseBackup;
 =======
     FlushCache();
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/mem/memdataset.cpp
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/mem/memdataset.cpp
 >>>>>>> OSGeo-master:frmts/mem/memdataset.cpp
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/mem/memdataset.cpp
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
 
     GDALDeinitGCPs( m_nGCPCount, m_pasGCPs );
     CPLFree( m_pasGCPs );

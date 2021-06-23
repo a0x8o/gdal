@@ -2303,10 +2303,14 @@ bool OGRSQLiteDataSource::OpenVirtualTable(const char* pszName, const char* pszS
 bool OGRSQLiteDataSource::OpenTable( const char *pszTableName,
 =======
 int OGRSQLiteDataSource::OpenTable( const char *pszTableName,
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
                                     bool bIsTable,
                                     bool bIsVirtualShape )
 
