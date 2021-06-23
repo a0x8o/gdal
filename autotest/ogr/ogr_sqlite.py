@@ -3170,6 +3170,7 @@ def test_ogr_sqlite_view_type():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 =======
@@ -3182,6 +3183,8 @@ def test_ogr_sqlite_view_type():
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 ###############################################################################
 # Test table WITHOUT ROWID
@@ -3303,6 +3306,7 @@ def test_ogr_sqlite_CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE():
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -3316,6 +3320,8 @@ def test_ogr_sqlite_CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE():
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 ###############################################################################
 #
 

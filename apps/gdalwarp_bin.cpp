@@ -75,6 +75,7 @@ static void Usage(const char* pszErrorMsg = nullptr)
         "    [-s_srs srs_def] [-t_srs srs_def] [-to \"NAME=VALUE\"]* [-novshiftgrid]\n"
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/apps/gdalwarp_bin.cpp
 =======
 =======
@@ -94,6 +95,9 @@ static void Usage(const char* pszErrorMsg = nullptr)
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/apps/gdalwarp_bin.cpp
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/apps/gdalwarp_bin.cpp
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
         "    [[-s_coord_epoch epoch] | [-t_coord_epoch epoch]]\n"
         "    [-order n | -tps | -rpc | -geoloc] [-et err_threshold]\n"
         "    [-refine_gcps tolerance [minimum_gcps]]\n"

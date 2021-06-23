@@ -9008,6 +9008,7 @@ bool OGRSpatialReference::IsDynamic() const
     }
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -9022,6 +9023,8 @@ bool OGRSpatialReference::IsDynamic() const
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrspatialreference.cpp
     if( horiz && proj_get_type(horiz) == PJ_TYPE_BOUND_CRS )
     {
@@ -9034,6 +9037,7 @@ bool OGRSpatialReference::IsDynamic() const
     }
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrspatialreference.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -9049,6 +9053,8 @@ bool OGRSpatialReference::IsDynamic() const
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
     auto datum = horiz ? proj_crs_get_datum(ctxt, horiz) : nullptr;
     if( datum )
     {

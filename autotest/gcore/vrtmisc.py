@@ -589,6 +589,7 @@ def test_vrtmisc_coordinate_epoch():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 =======
@@ -601,6 +602,8 @@ def test_vrtmisc_coordinate_epoch():
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 
 ###############################################################################
@@ -735,6 +738,7 @@ def test_vrtmisc_alpha_ismaskband():
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -748,3 +752,5 @@ def test_vrtmisc_alpha_ismaskband():
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)

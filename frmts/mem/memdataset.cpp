@@ -517,6 +517,7 @@ MEMDataset::~MEMDataset()
     FlushCache();
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/mem/memdataset.cpp
 =======
 =======
@@ -536,6 +537,9 @@ MEMDataset::~MEMDataset()
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/mem/memdataset.cpp
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/mem/memdataset.cpp
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 
     GDALDeinitGCPs( m_nGCPCount, m_pasGCPs );
     CPLFree( m_pasGCPs );
