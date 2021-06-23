@@ -883,6 +883,7 @@ def test_ogr_flatgeobuf_read_coordinate_metadata_wkt():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -963,6 +964,7 @@ def test_ogr_flatgeobuf_read_coordinate_metadata_wkt():
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -1023,6 +1025,8 @@ def test_ogr_flatgeobuf_read_coordinate_metadata_wkt():
 >>>>>>> 39cde30c78 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a57f04675f (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 86346bde67 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 
 ###############################################################################
@@ -1093,8 +1097,11 @@ def test_ogr_flatgeobuf_coordinate_epoch_custom_wkt():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD
 =======
@@ -1103,11 +1110,15 @@ def test_ogr_flatgeobuf_coordinate_epoch_custom_wkt():
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -1115,6 +1126,8 @@ def test_ogr_flatgeobuf_coordinate_epoch_custom_wkt():
 =======
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 
 ###############################################################################
@@ -1145,6 +1158,7 @@ def test_ogr_flatgeobuf_invalid_output_filename():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -1157,6 +1171,8 @@ def test_ogr_flatgeobuf_invalid_output_filename():
 >>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 86346bde67 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -1182,6 +1198,7 @@ def test_ogr_flatgeobuf_invalid_output_filename():
 >>>>>>> a57f04675f (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
@@ -1196,6 +1213,10 @@ def test_ogr_flatgeobuf_invalid_output_filename():
 >>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 86346bde67 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> OSGeo-master
 =======
@@ -1246,6 +1267,7 @@ def test_ogr_flatgeobuf_invalid_output_filename():
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -1292,3 +1314,5 @@ def test_ogr_flatgeobuf_invalid_output_filename():
 >>>>>>> 39cde30c78 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a57f04675f (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 86346bde67 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
