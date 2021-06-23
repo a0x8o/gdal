@@ -3660,6 +3660,7 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "DCAP_UNIQUE_FIELDS",SWIG_FromCharPtr(GDAL_DCAP_UNIQUE_FIELDS));
   SWIG_Python_SetConstant(d, "DCAP_COORDINATE_EPOCH",SWIG_FromCharPtr(GDAL_DCAP_COORDINATE_EPOCH));
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdalconst_wrap.c
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdalconst_wrap.c
@@ -3667,6 +3668,9 @@ SWIG_init(void) {
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdalconst_wrap.c
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdalconst_wrap.c
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
   SWIG_Python_SetConstant(d, "DIM_TYPE_HORIZONTAL_X",SWIG_FromCharPtr(GDAL_DIM_TYPE_HORIZONTAL_X));
   SWIG_Python_SetConstant(d, "DIM_TYPE_HORIZONTAL_Y",SWIG_FromCharPtr(GDAL_DIM_TYPE_HORIZONTAL_Y));
   SWIG_Python_SetConstant(d, "DIM_TYPE_VERTICAL",SWIG_FromCharPtr(GDAL_DIM_TYPE_VERTICAL));

@@ -1735,14 +1735,20 @@ prepare_JPEGTables(TIFF* tif)
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 #if defined(JPEG_LIB_VERSION_MAJOR) && (JPEG_LIB_VERSION_MAJOR > 9 || \
     (JPEG_LIB_VERSION_MAJOR == 9 && JPEG_LIB_VERSION_MINOR >= 4))
 /* This is a modified version of std_huff_tables() from jcparam.c
  * in libjpeg-9d because it no longer initializes default Huffman
  * tables in jpeg_set_defaults(). */
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 static void
 TIFF_std_huff_tables (j_compress_ptr cinfo)
 {
@@ -1762,6 +1768,7 @@ TIFF_std_huff_tables (j_compress_ptr cinfo)
   if( cinfo->ac_huff_tbl_ptrs[1] == NULL )
   {
       (void) jpeg_std_huff_table((j_common_ptr) cinfo, FALSE, 1);
+<<<<<<< HEAD
 =======
 #if BITS_IN_JSAMPLE == 8
 /* The two below functions are borrowed to libjpeg, and work around a
@@ -1823,6 +1830,8 @@ TIFF_std_huff_tables (j_compress_ptr cinfo)
 =======
       (void) jpeg_std_huff_table((j_common_ptr) cinfo, FALSE, 1);
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
   }
 }
 #endif
@@ -1999,6 +2008,7 @@ JPEGSetupEncode(TIFF* tif)
         {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 #if defined(JPEG_LIB_VERSION_MAJOR) && (JPEG_LIB_VERSION_MAJOR > 9 || \
     (JPEG_LIB_VERSION_MAJOR == 9 && JPEG_LIB_VERSION_MINOR >= 4))
 =======
@@ -2008,6 +2018,10 @@ JPEGSetupEncode(TIFF* tif)
 #if defined(JPEG_LIB_VERSION_MAJOR) && (JPEG_LIB_VERSION_MAJOR > 9 || \
     (JPEG_LIB_VERSION_MAJOR == 9 && JPEG_LIB_VERSION_MINOR >= 4))
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+#if defined(JPEG_LIB_VERSION_MAJOR) && (JPEG_LIB_VERSION_MAJOR > 9 || \
+    (JPEG_LIB_VERSION_MAJOR == 9 && JPEG_LIB_VERSION_MINOR >= 4))
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
             if( (sp->jpegtablesmode & JPEGTABLESMODE_HUFF) != 0 &&
                 (sp->cinfo.c.dc_huff_tbl_ptrs[0] == NULL ||
                  sp->cinfo.c.dc_huff_tbl_ptrs[1] == NULL ||
@@ -2017,6 +2031,7 @@ JPEGSetupEncode(TIFF* tif)
                 /* libjpeg-9d no longer initializes default Huffman tables in */
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 /* jpeg_set_defaults() */
 =======
                 /* jpeg_set_defaults(), which is likely a bug. */
@@ -2024,6 +2039,9 @@ JPEGSetupEncode(TIFF* tif)
 =======
                 /* jpeg_set_defaults() */
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+                /* jpeg_set_defaults() */
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
                 TIFF_std_huff_tables(&sp->cinfo.c);
             }
 #endif

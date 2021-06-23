@@ -399,6 +399,7 @@ class SpatialReference(object):
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     def IsDynamic(self, *args):
         """IsDynamic(SpatialReference self) -> bool"""
         return _osr.SpatialReference_IsDynamic(self, *args)
@@ -416,6 +417,8 @@ class SpatialReference(object):
 
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
     def EPSGTreatsAsLatLong(self, *args):
         r"""EPSGTreatsAsLatLong(SpatialReference self) -> int"""
         return _osr.SpatialReference_EPSGTreatsAsLatLong(self, *args)

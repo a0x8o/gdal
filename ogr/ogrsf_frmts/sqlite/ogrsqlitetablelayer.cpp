@@ -148,6 +148,7 @@ CPLErr OGRSQLiteTableLayer::Initialize( const char *m_pszTableNameIn,
 =======
 CPLErr OGRSQLiteTableLayer::Initialize( const char *pszTableNameIn,
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitetablelayer.cpp
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitetablelayer.cpp
@@ -155,6 +156,9 @@ CPLErr OGRSQLiteTableLayer::Initialize( const char *pszTableNameIn,
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitetablelayer.cpp
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitetablelayer.cpp
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
                                         bool bIsTable,
                                         bool bIsVirtualShapeIn,
                                         bool bDeferredCreationIn )
@@ -163,10 +167,13 @@ CPLErr OGRSQLiteTableLayer::Initialize( const char *pszTableNameIn,
 
     m_bIsTable = bIsTable;
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitetablelayer.cpp
 =======
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogrsqlitetablelayer.cpp
     m_bIsVirtualShape = bIsVirtualShapeIn;
     m_pszTableName = CPLStrdup(m_pszTableNameIn);
@@ -174,9 +181,12 @@ CPLErr OGRSQLiteTableLayer::Initialize( const char *pszTableNameIn,
     m_pszEscapedTableName = CPLStrdup(SQLEscapeLiteral(m_pszTableName));
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/sqlite/ogrsqlitetablelayer.cpp
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
     bIsVirtualShape = bIsVirtualShapeIn;
     pszTableName = CPLStrdup(pszTableNameIn);
     bDeferredCreation = bDeferredCreationIn;
@@ -364,6 +374,7 @@ CPLErr OGRSQLiteTableLayer::EstablishFeatureDefn(const char* pszGeomCol)
                    m_bIsTable ? "_rowid_, " : "",
                    pszEscapedTableName);
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitetablelayer.cpp
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitetablelayer.cpp
@@ -371,6 +382,9 @@ CPLErr OGRSQLiteTableLayer::EstablishFeatureDefn(const char* pszGeomCol)
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitetablelayer.cpp
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitetablelayer.cpp
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 
     sqlite3_stmt *hColStmt = nullptr;
     int rc = sqlite3_prepare_v2( hDB, pszSQLConst, -1, &hColStmt, nullptr );
@@ -417,10 +431,13 @@ CPLErr OGRSQLiteTableLayer::EstablishFeatureDefn(const char* pszGeomCol)
 /*      column.                                                         */
 /* -------------------------------------------------------------------- */
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitetablelayer.cpp
 =======
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogrsqlitetablelayer.cpp
     if( bHasRowId )
     {
@@ -428,13 +445,17 @@ CPLErr OGRSQLiteTableLayer::EstablishFeatureDefn(const char* pszGeomCol)
         m_pszFIDColumn = CPLStrdup(SQLUnescape(sqlite3_column_name( hColStmt, 0 )));
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/sqlite/ogrsqlitetablelayer.cpp
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
     if( m_bIsTable )
     {
         CPLFree( pszFIDColumn );
         pszFIDColumn = CPLStrdup(SQLUnescape(sqlite3_column_name( hColStmt, 0 )));
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitetablelayer.cpp
 =======
@@ -443,6 +464,9 @@ CPLErr OGRSQLiteTableLayer::EstablishFeatureDefn(const char* pszGeomCol)
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitetablelayer.cpp
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitetablelayer.cpp
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
     }
 
 /* -------------------------------------------------------------------- */
@@ -887,6 +911,7 @@ OGRErr OGRSQLiteTableLayer::ResetStatement()
 
     osSQL.Printf( "SELECT %s* FROM '%s' %s",
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitetablelayer.cpp
                   m_bIsTable ? "_rowid_, " : "",
                   pszEscapedTableName,
@@ -894,6 +919,8 @@ OGRErr OGRSQLiteTableLayer::ResetStatement()
 =======
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogrsqlitetablelayer.cpp
                   m_pszFIDColumn != nullptr ? "_rowid_, " : "",
                   m_pszEscapedTableName,
@@ -904,9 +931,12 @@ OGRErr OGRSQLiteTableLayer::ResetStatement()
                   osWHERE.c_str() );
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitetablelayer.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/sqlite/ogrsqlitetablelayer.cpp
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 #ifdef DEBUG_VERBOSE
     CPLDebug("SQLite", "%s", osSQL.c_str());
 #endif

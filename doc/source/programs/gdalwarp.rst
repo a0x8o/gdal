@@ -21,6 +21,7 @@ Synopsis
 =======
         [-s_srs srs_def] [-t_srs srs_def] [-ct string] [-to "NAME=VALUE"]* [-novshiftgrid]
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/doc/source/programs/gdalwarp.rst
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/programs/gdalwarp.rst
@@ -28,6 +29,9 @@ Synopsis
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/programs/gdalwarp.rst
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/programs/gdalwarp.rst
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
         [[-s_coord_epoch epoch] | [-t_coord_epoch epoch]]
         [-order n | -tps | -rpc | -geoloc] [-et err_threshold]
         [-refine_gcps tolerance [minimum_gcps]]
