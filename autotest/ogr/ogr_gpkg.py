@@ -5339,10 +5339,15 @@ def test_ogr_gpkg_fixup_wrong_mr_column_name_update_trigger():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 145dd38d72 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 ###############################################################################
 # Test support for CRS coordinate_epoch
@@ -5620,7 +5625,10 @@ def test_ogr_gpkg_alter_geom_field_defn():
 >>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 145dd38d72 (Merge branch 'master' of github.com:OSGeo/gdal)
