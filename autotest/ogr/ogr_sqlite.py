@@ -3167,6 +3167,7 @@ def test_ogr_sqlite_view_type():
     f = lyr.GetNextFeature()
     assert f['c'] == 1
 
+<<<<<<< HEAD
 
 ###############################################################################
 # Test table WITHOUT ROWID
@@ -3284,6 +3285,8 @@ def test_ogr_sqlite_CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE():
     assert gdal.VSIStatL(filename) is not None
     assert gdal.ReadDir('/vsimem/temporary_location') is None
 
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 ###############################################################################
 #
 

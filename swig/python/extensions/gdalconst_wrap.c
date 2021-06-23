@@ -3650,12 +3650,17 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "DCAP_UNIQUE_FIELDS",SWIG_FromCharPtr(GDAL_DCAP_UNIQUE_FIELDS));
   SWIG_Python_SetConstant(d, "DCAP_DEFAULT_FIELDS",SWIG_FromCharPtr(GDAL_DCAP_DEFAULT_FIELDS));
   SWIG_Python_SetConstant(d, "DCAP_NOTNULL_GEOMFIELDS",SWIG_FromCharPtr(GDAL_DCAP_NOTNULL_GEOMFIELDS));
+<<<<<<< HEAD:swig/python/extensions/gdalconst_wrap.c
   SWIG_Python_SetConstant(d, "DCAP_NONSPATIAL",SWIG_FromCharPtr(GDAL_DCAP_NONSPATIAL));
   SWIG_Python_SetConstant(d, "DCAP_FEATURE_STYLES",SWIG_FromCharPtr(GDAL_DCAP_FEATURE_STYLES));
   SWIG_Python_SetConstant(d, "DCAP_COORDINATE_EPOCH",SWIG_FromCharPtr(GDAL_DCAP_COORDINATE_EPOCH));
   SWIG_Python_SetConstant(d, "DCAP_MULTIPLE_VECTOR_LAYERS",SWIG_FromCharPtr(GDAL_DCAP_MULTIPLE_VECTOR_LAYERS));
   SWIG_Python_SetConstant(d, "DCAP_FIELD_DOMAINS",SWIG_FromCharPtr(GDAL_DCAP_FIELD_DOMAINS));
   SWIG_Python_SetConstant(d, "DCAP_RENAME_LAYERS",SWIG_FromCharPtr(GDAL_DCAP_RENAME_LAYERS));
+=======
+  SWIG_Python_SetConstant(d, "DCAP_UNIQUE_FIELDS",SWIG_FromCharPtr(GDAL_DCAP_UNIQUE_FIELDS));
+  SWIG_Python_SetConstant(d, "DCAP_COORDINATE_EPOCH",SWIG_FromCharPtr(GDAL_DCAP_COORDINATE_EPOCH));
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdalconst_wrap.c
   SWIG_Python_SetConstant(d, "DIM_TYPE_HORIZONTAL_X",SWIG_FromCharPtr(GDAL_DIM_TYPE_HORIZONTAL_X));
   SWIG_Python_SetConstant(d, "DIM_TYPE_HORIZONTAL_Y",SWIG_FromCharPtr(GDAL_DIM_TYPE_HORIZONTAL_Y));
   SWIG_Python_SetConstant(d, "DIM_TYPE_VERTICAL",SWIG_FromCharPtr(GDAL_DIM_TYPE_VERTICAL));

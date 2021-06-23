@@ -159,6 +159,7 @@ def test_gdalinfo_lib_coordinate_epoch():
     ret = gdal.Info(ds, format = 'json')
     assert 'coordinateEpoch' in ret
     assert ret['coordinateEpoch'] == 2021.3
+<<<<<<< HEAD
 
 
 ###############################################################################
@@ -190,3 +191,5 @@ def test_gdalinfo_lib_nodata_full_precision_float64():
 
     ret = gdal.Info(ds, format = 'json')
     assert ret['bands'][0]['noDataValue'] == float(nodata_str)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)

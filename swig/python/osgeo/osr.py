@@ -383,6 +383,21 @@ class SpatialReference(object):
         r"""SetCoordinateEpoch(SpatialReference self, double coordinateEpoch)"""
         return _osr.SpatialReference_SetCoordinateEpoch(self, *args)
 
+    def IsDynamic(self, *args):
+        """IsDynamic(SpatialReference self) -> bool"""
+        return _osr.SpatialReference_IsDynamic(self, *args)
+
+
+    def GetCoordinateEpoch(self, *args):
+        """GetCoordinateEpoch(SpatialReference self) -> double"""
+        return _osr.SpatialReference_GetCoordinateEpoch(self, *args)
+
+
+    def SetCoordinateEpoch(self, *args):
+        """SetCoordinateEpoch(SpatialReference self, double coordinateEpoch)"""
+        return _osr.SpatialReference_SetCoordinateEpoch(self, *args)
+
+
     def EPSGTreatsAsLatLong(self, *args):
         r"""EPSGTreatsAsLatLong(SpatialReference self) -> int"""
         return _osr.SpatialReference_EPSGTreatsAsLatLong(self, *args)

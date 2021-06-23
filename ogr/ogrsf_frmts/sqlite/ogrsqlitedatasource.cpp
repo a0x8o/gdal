@@ -2289,7 +2289,11 @@ bool OGRSQLiteDataSource::OpenVirtualTable(const char* pszName, const char* pszS
 /*                             OpenTable()                              */
 /************************************************************************/
 
+<<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
 bool OGRSQLiteDataSource::OpenTable( const char *pszTableName,
+=======
+int OGRSQLiteDataSource::OpenTable( const char *pszTableName,
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
                                     bool bIsTable,
                                     bool bIsVirtualShape )
 

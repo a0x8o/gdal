@@ -209,12 +209,17 @@
 %constant char *DCAP_UNIQUE_FIELDS       = GDAL_DCAP_UNIQUE_FIELDS;
 %constant char *DCAP_DEFAULT_FIELDS      = GDAL_DCAP_DEFAULT_FIELDS;
 %constant char *DCAP_NOTNULL_GEOMFIELDS  = GDAL_DCAP_NOTNULL_GEOMFIELDS;
+<<<<<<< HEAD:swig/include/gdalconst.i
 %constant char *DCAP_NONSPATIAL  = GDAL_DCAP_NONSPATIAL;
 %constant char *DCAP_FEATURE_STYLES  = GDAL_DCAP_FEATURE_STYLES;
 %constant char *DCAP_COORDINATE_EPOCH    = GDAL_DCAP_COORDINATE_EPOCH;
 %constant char *DCAP_MULTIPLE_VECTOR_LAYERS    = GDAL_DCAP_MULTIPLE_VECTOR_LAYERS;
 %constant char *DCAP_FIELD_DOMAINS    = GDAL_DCAP_FIELD_DOMAINS;
 %constant char *DCAP_RENAME_LAYERS    = GDAL_DCAP_RENAME_LAYERS;
+=======
+%constant char *DCAP_UNIQUE_FIELDS       = GDAL_DCAP_UNIQUE_FIELDS;
+%constant char *DCAP_COORDINATE_EPOCH    = GDAL_DCAP_COORDINATE_EPOCH;
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/include/gdalconst.i
 
 %constant char *DIM_TYPE_HORIZONTAL_X       = GDAL_DIM_TYPE_HORIZONTAL_X;
 %constant char *DIM_TYPE_HORIZONTAL_Y       = GDAL_DIM_TYPE_HORIZONTAL_Y;
@@ -248,8 +253,11 @@
 #define DCAP_NOTNULL_GEOMFIELDS  "DCAP_NOTNULL_GEOMFIELDS"
 #define DCAP_UNIQUE_FIELDS   "DCAP_UNIQUE_FIELDS"
 #define DCAP_COORDINATE_EPOCH "DCAP_COORDINATE_EPOCH"
+<<<<<<< HEAD:swig/include/gdalconst.i
 #define DCAP_FIELD_DOMAINS    "DCAP_FIELD_DOMAINS"
 #define DCAP_RENAME_LAYERS    "DCAP_RENAME_LAYERS"
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/include/gdalconst.i
 
 #define DIM_TYPE_HORIZONTAL_X "HORIZONTAL_X"
 #define DIM_TYPE_HORIZONTAL_Y "HORIZONTAL_Y"
