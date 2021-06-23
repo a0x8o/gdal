@@ -841,6 +841,9 @@ def test_ogr_flatgeobuf_read_coordinate_metadata_wkt():
     assert got_srs is not None
     assert got_srs.IsGeographic()
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 
 ###############################################################################
@@ -905,6 +908,7 @@ def test_ogr_flatgeobuf_coordinate_epoch_custom_wkt():
     ds = None
 
     ogr.GetDriverByName('FlatGeobuf').DeleteDataSource(filename)
+<<<<<<< HEAD
 
 
 ###############################################################################
@@ -918,3 +922,5 @@ def test_ogr_flatgeobuf_invalid_output_filename():
 
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)

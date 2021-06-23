@@ -1770,10 +1770,13 @@ def test_osr_basic_is_dynamic():
     assert srs.IsDynamic()
 
     srs = osr.SpatialReference()
+<<<<<<< HEAD
     srs.SetFromUserInput("+proj=longlat +ellps=GRS80 +towgs84=0,0,0")
     assert not srs.IsDynamic()
 
     srs = osr.SpatialReference()
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
     srs.ImportFromEPSG(4258) # ETRS89 (generic), using datum ensemble
     assert not srs.IsDynamic()
 
@@ -1816,6 +1819,7 @@ def test_osr_basic_set_get_coordinate_epoch():
     clone.SetCoordinateEpoch(0)
     assert not srs.IsSame(clone)
     assert srs.IsSame(clone, ['IGNORE_COORDINATE_EPOCH=YES'])
+<<<<<<< HEAD
 
 
 ###############################################################################
@@ -1998,3 +2002,5 @@ def test_osr_basic_get_linear_units_compound_engineering_crs():
 
     assert srs.GetLinearUnits() == pytest.approx(0.304800609601219)
     assert srs.GetLinearUnitsName() == "US survey foot"
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
