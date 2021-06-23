@@ -503,6 +503,14 @@ typedef struct GDALDimensionHS* GDALDimensionH;
  */
 #define GDAL_DCAP_COORDINATE_EPOCH   "DCAP_COORDINATE_EPOCH"
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD:gdal/gcore/gdal.h
+=======
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:gcore/gdal.h
 /** Capability set by drivers for formats which support multiple vector layers.
  *
@@ -536,6 +544,7 @@ typedef struct GDALDimensionHS* GDALDimensionH;
 #define GDAL_DMD_CREATION_FIELD_DOMAIN_TYPES "DMD_CREATION_FIELD_DOMAIN_TYPES"
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdal.h
+<<<<<<< HEAD
 
 /** List of (space separated) flags support by the OGRLayer::AlterGeomFieldDefn() API.
  *
@@ -555,6 +564,12 @@ typedef struct GDALDimensionHS* GDALDimensionH;
 
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdal.h
+=======
+<<<<<<< HEAD
+>>>>>>> OSGeo-master:gcore/gdal.h
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 /** Value for GDALDimension::GetType() specifying the X axis of a horizontal CRS.
  * @since GDAL 3.1

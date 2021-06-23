@@ -9001,6 +9001,14 @@ bool OGRSpatialReference::IsDynamic() const
     {
         horiz = proj_clone(ctxt, d->m_pj_crs);
     }
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD:gdal/ogr/ogrspatialreference.cpp
+=======
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrspatialreference.cpp
     if( horiz && proj_get_type(horiz) == PJ_TYPE_BOUND_CRS )
     {
@@ -9013,6 +9021,13 @@ bool OGRSpatialReference::IsDynamic() const
     }
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrspatialreference.cpp
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> OSGeo-master:ogr/ogrspatialreference.cpp
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
     auto datum = horiz ? proj_crs_get_datum(ctxt, horiz) : nullptr;
     if( datum )
     {

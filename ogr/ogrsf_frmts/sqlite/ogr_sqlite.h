@@ -277,8 +277,21 @@ class OGRSQLiteLayer CPL_NON_FINAL: public OGRLayer, public IOGRSQLiteGetSpatial
 class OGRSQLiteTableLayer final: public OGRSQLiteLayer
 {
     bool                m_bIsTable = true;
+<<<<<<< HEAD
 <<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogr_sqlite.h
 =======
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/sqlite/ogr_sqlite.h
+=======
+<<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogr_sqlite.h
+=======
+>>>>>>> OSGeo-master:ogr/ogrsf_frmts/sqlite/ogr_sqlite.h
+=======
+<<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogr_sqlite.h
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 
     int                 bLaunderColumnNames;
     int                 bSpatialite2D;
