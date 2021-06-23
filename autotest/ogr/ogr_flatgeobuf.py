@@ -882,6 +882,7 @@ def test_ogr_flatgeobuf_read_coordinate_metadata_wkt():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -941,6 +942,7 @@ def test_ogr_flatgeobuf_read_coordinate_metadata_wkt():
 =======
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 9105b4f6b6 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -1004,9 +1006,23 @@ def test_ogr_flatgeobuf_read_coordinate_metadata_wkt():
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+=======
+>>>>>>> 86346bde67 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 9105b4f6b6 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+=======
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 39cde30c78 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> a57f04675f (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 86346bde67 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 
 ###############################################################################
@@ -1128,6 +1144,7 @@ def test_ogr_flatgeobuf_invalid_output_filename():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -1138,6 +1155,8 @@ def test_ogr_flatgeobuf_invalid_output_filename():
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 86346bde67 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -1162,6 +1181,7 @@ def test_ogr_flatgeobuf_invalid_output_filename():
 =======
 >>>>>>> a57f04675f (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
@@ -1174,6 +1194,8 @@ def test_ogr_flatgeobuf_invalid_output_filename():
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 86346bde67 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> OSGeo-master
 =======
@@ -1198,6 +1220,7 @@ def test_ogr_flatgeobuf_invalid_output_filename():
 =======
 =======
 =======
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 39cde30c78 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -1246,9 +1269,26 @@ def test_ogr_flatgeobuf_invalid_output_filename():
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+=======
+>>>>>>> 39cde30c78 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 86346bde67 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> 9105b4f6b6 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+=======
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 39cde30c78 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> a57f04675f (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 86346bde67 (Merge branch 'master' of github.com:OSGeo/gdal)
