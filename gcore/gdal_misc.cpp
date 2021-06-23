@@ -3302,6 +3302,7 @@ GDALGeneralCmdLineProcessor( int nArgc, char ***ppapszArgv, int nOptions )
                 printf( "  Supports: Feature styles.\n" );/*ok*/
             if( CPLFetchBool( papszMD, GDAL_DCAP_COORDINATE_EPOCH, false ) )
                 printf( "  Supports: Coordinate epoch.\n" );/*ok*/
+<<<<<<< HEAD:gcore/gdal_misc.cpp
             if( CPLFetchBool( papszMD, GDAL_DCAP_MULTIPLE_VECTOR_LAYERS, false ) )
                 printf( "  Supports: Multiple vector layers.\n" );/*ok*/
             if( CPLFetchBool( papszMD, GDAL_DCAP_FIELD_DOMAINS, false ) )
@@ -3309,6 +3310,8 @@ GDALGeneralCmdLineProcessor( int nArgc, char ***ppapszArgv, int nOptions )
             if( CSLFetchNameValue( papszMD, GDAL_DMD_CREATION_FIELD_DOMAIN_TYPES ) )
               printf( "  Creation field domain types: %s\n",/*ok*/
                       CSLFetchNameValue( papszMD, GDAL_DMD_CREATION_FIELD_DOMAIN_TYPES ) );
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdal_misc.cpp
 
             for( const char* key: { GDAL_DMD_CREATIONOPTIONLIST,
                                     GDAL_DMD_MULTIDIM_DATASET_CREATIONOPTIONLIST,

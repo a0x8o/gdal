@@ -277,6 +277,12 @@ class OGRSQLiteLayer CPL_NON_FINAL: public OGRLayer, public IOGRSQLiteGetSpatial
 class OGRSQLiteTableLayer final: public OGRSQLiteLayer
 {
     bool                m_bIsTable = true;
+<<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogr_sqlite.h
+=======
+
+    int                 bLaunderColumnNames;
+    int                 bSpatialite2D;
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogr_sqlite.h
 
     bool                m_bLaunderColumnNames = true;
     bool                m_bSpatialite2D = false;
@@ -609,10 +615,17 @@ class OGRSQLiteDataSource final : public OGRSQLiteBaseDataSource
     bool                Open( GDALOpenInfo* poOpenInfo );
     bool                Create( const char *, char **papszOptions );
 
+<<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogr_sqlite.h
     bool                OpenTable( const char *pszTableName,
                                    bool IsTable,
                                    bool bIsVirtualShape );
     bool                OpenView( const char *pszViewName,
+=======
+    int                 OpenTable( const char *pszTableName,
+                                   bool IsTable,
+                                   bool bIsVirtualShape );
+    int                  OpenView( const char *pszViewName,
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogr_sqlite.h
                                    const char *pszViewGeometry,
                                    const char *pszViewRowid,
                                    const char *pszTableName,

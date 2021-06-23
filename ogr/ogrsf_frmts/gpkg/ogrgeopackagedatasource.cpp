@@ -321,7 +321,11 @@ OGRSpatialReference* GDALGeoPackageDataset::GetSpatialRef(int iSrsId,
 
     CPLString oSQL;
     oSQL.Printf( "SELECT definition, organization, organization_coordsys_id%s%s "
+<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                  "FROM gpkg_spatial_ref_sys WHERE "
+=======
+                 "FROM gpkg_spatial_ref_sys WHERE definition IS NOT NULL AND "
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                  "srs_id = %d LIMIT 2",
                  m_bHasDefinition12_063 ? ", definition_12_063" : "",
                  m_bHasEpochColumn ? ", epoch" : "",
@@ -765,6 +769,7 @@ int GDALGeoPackageDataset::GetSrsId(const OGRSpatialReference& oSRS)
     // Add epoch column if needed
     if( oSRS.GetCoordinateEpoch() > 0 && !m_bHasEpochColumn )
     {
+<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
         if( SoftStartTransaction() != OGRERR_NONE )
             return DEFAULT_SRID;
 
@@ -789,6 +794,22 @@ int GDALGeoPackageDataset::GetSrsId(const OGRSpatialReference& oSRS)
         if( SoftCommitTransaction() != OGRERR_NONE )
             return DEFAULT_SRID;
 
+=======
+        if( !m_bHasDefinition12_063 )
+        {
+            if( !ConvertGpkgSpatialRefSysToExtensionWkt2() )
+            {
+                return DEFAULT_SRID;
+            }
+        }
+
+        if( SQLCommand(hDB,
+                "ALTER TABLE gpkg_spatial_ref_sys "
+                "ADD COLUMN epoch DOUBLE") != OGRERR_NONE )
+        {
+            return DEFAULT_SRID;
+        }
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
         m_bHasEpochColumn = true;
     }
 
