@@ -22,26 +22,42 @@ Examples of dynamic CRS are ``WGS 84 (G1762)``, ``ITRF2014``, ``ATRF2014``.
 The generic EPSG:4326 WGS 84 CRS is also considered dynamic, although it is
 not recommended to use it due to being based on a datum ensemble whose positional
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/doc/source/user/coordinate_epoch.rst
 accuracy is 2 metres, but prefer one of its realizations, such as WGS 84 (G1762)
 =======
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:doc/source/user/coordinate_epoch.rst
 accuracy is 2 meters, but prefer one of its realizations, such as WGS 84 (G1762)
 =======
 accuracy is 2 metres, but prefer one of its realizations, such as WGS 84 (G1762)
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/user/coordinate_epoch.rst
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:doc/source/user/coordinate_epoch.rst
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 The :cpp:func:`OGRSpatialReference::IsDynamic` method can be used to test if
 a CRS is a dynamic one.
@@ -162,9 +178,12 @@ element.
     </PAMDataset>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:doc/source/user/coordinate_epoch.rst
 =======
 =======
+=======
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/doc/source/user/coordinate_epoch.rst
 =======
@@ -175,7 +194,14 @@ element.
 <<<<<<< HEAD:doc/source/user/coordinate_epoch.rst
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+<<<<<<< HEAD:doc/source/user/coordinate_epoch.rst
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 Shapefile
 +++++++++
 
@@ -202,8 +228,11 @@ precedence over the ``prj`` sidecar file.
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/user/coordinate_epoch.rst
 =======
+=======
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/doc/source/user/coordinate_epoch.rst
 =======
@@ -212,7 +241,13 @@ precedence over the ``prj`` sidecar file.
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/user/coordinate_epoch.rst
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/user/coordinate_epoch.rst
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 GDAL VRT
 ++++++++
 
