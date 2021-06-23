@@ -534,6 +534,8 @@ typedef struct GDALDimensionHS* GDALDimensionH;
  * @since GDAL 3.5
  */
 #define GDAL_DMD_CREATION_FIELD_DOMAIN_TYPES "DMD_CREATION_FIELD_DOMAIN_TYPES"
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdal.h
 
 /** List of (space separated) flags support by the OGRLayer::AlterGeomFieldDefn() API.
  *

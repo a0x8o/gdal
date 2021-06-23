@@ -1973,6 +1973,7 @@ def test_osr_basic_proj_network():
     finally:
         osr.SetPROJEnableNetwork(initial_value)
 
+<<<<<<< HEAD
 
 
 ###############################################################################
@@ -2002,5 +2003,7 @@ def test_osr_basic_get_linear_units_compound_engineering_crs():
 
     assert srs.GetLinearUnits() == pytest.approx(0.304800609601219)
     assert srs.GetLinearUnitsName() == "US survey foot"
+=======
+>>>>>>> 145dd38d72 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
