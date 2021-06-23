@@ -3174,10 +3174,13 @@ def test_ogr_sqlite_view_type():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD
 =======
@@ -3195,6 +3198,7 @@ def test_ogr_sqlite_view_type():
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -3204,6 +3208,10 @@ def test_ogr_sqlite_view_type():
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 ###############################################################################
 # Test table WITHOUT ROWID
@@ -3329,6 +3337,9 @@ def test_ogr_sqlite_CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -3355,6 +3366,7 @@ def test_ogr_sqlite_CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE():
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -3364,6 +3376,10 @@ def test_ogr_sqlite_CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE():
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 ###############################################################################
 #
 

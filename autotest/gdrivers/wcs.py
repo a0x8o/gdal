@@ -347,10 +347,13 @@ class WCSHTTPHandler(BaseHTTPRequestHandler):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD
 =======
@@ -368,6 +371,7 @@ class WCSHTTPHandler(BaseHTTPRequestHandler):
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -377,6 +381,10 @@ class WCSHTTPHandler(BaseHTTPRequestHandler):
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
         key = server + '-' + version
         if key in urls and test in urls[key]:
             _, got = self.path.split('SERVICE=WCS')
@@ -397,6 +405,9 @@ class WCSHTTPHandler(BaseHTTPRequestHandler):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -423,6 +434,7 @@ class WCSHTTPHandler(BaseHTTPRequestHandler):
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -432,6 +444,10 @@ class WCSHTTPHandler(BaseHTTPRequestHandler):
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
         if gdaltest.is_travis_branch('s390x') or gdaltest.is_travis_branch('graviton2') or gdaltest.is_travis_branch('ubuntu_2004'):
             # cannot strictly compare URL due to subtle difference of roundings
             # in BOUNDINGBOX computations.

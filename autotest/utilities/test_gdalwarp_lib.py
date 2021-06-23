@@ -2045,10 +2045,13 @@ def test_gdalwarp_lib_t_coord_epoch():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD
 =======
@@ -2066,6 +2069,7 @@ def test_gdalwarp_lib_t_coord_epoch():
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -2075,6 +2079,10 @@ def test_gdalwarp_lib_t_coord_epoch():
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 # Test automatic grid sampling
 
 
@@ -2247,6 +2255,9 @@ def test_gdalwarp_lib_not_delete_shared_auxiliary_files():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -2273,6 +2284,7 @@ def test_gdalwarp_lib_not_delete_shared_auxiliary_files():
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -2282,6 +2294,10 @@ def test_gdalwarp_lib_not_delete_shared_auxiliary_files():
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 # Cleanup
 
 

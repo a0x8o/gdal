@@ -173,9 +173,11 @@ OGRFlatGeobufLayer::OGRFlatGeobufLayer(
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
+<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 =======
         CPL_IGNORE_RET_VAL(dfCoordEpoch);
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -195,6 +197,8 @@ OGRFlatGeobufLayer::OGRFlatGeobufLayer(
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 <<<<<<< HEAD
@@ -295,6 +299,7 @@ OGRFlatGeobufLayer::OGRFlatGeobufLayer(
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -345,6 +350,8 @@ OGRFlatGeobufLayer::OGRFlatGeobufLayer(
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 
         if ((org == nullptr || EQUAL(org->c_str(), "EPSG")) && code != 0) {
             m_poSRS->importFromEPSG(code);
@@ -644,6 +651,9 @@ void OGRFlatGeobufLayer::writeHeader(VSILFILE *poFp, uint64_t featuresCount, std
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -671,6 +681,7 @@ void OGRFlatGeobufLayer::writeHeader(VSILFILE *poFp, uint64_t featuresCount, std
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -680,6 +691,10 @@ void OGRFlatGeobufLayer::writeHeader(VSILFILE *poFp, uint64_t featuresCount, std
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
         if( pszWKT && !CPLIsUTF8(pszWKT, -1) )
         {
@@ -695,6 +710,9 @@ void OGRFlatGeobufLayer::writeHeader(VSILFILE *poFp, uint64_t featuresCount, std
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -721,6 +739,7 @@ void OGRFlatGeobufLayer::writeHeader(VSILFILE *poFp, uint64_t featuresCount, std
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -730,6 +749,10 @@ void OGRFlatGeobufLayer::writeHeader(VSILFILE *poFp, uint64_t featuresCount, std
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
         crs = CreateCrsDirect(fbb, pszAuthorityName, nAuthorityCode, m_poSRS->GetName(), nullptr, pszWKT);
         CPLFree(pszWKT);
     }

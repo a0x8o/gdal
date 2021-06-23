@@ -79,8 +79,11 @@ static void Usage(const char* pszErrorMsg = nullptr)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/apps/gdalwarp_bin.cpp
 =======
 =======
@@ -112,6 +115,7 @@ static void Usage(const char* pszErrorMsg = nullptr)
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/apps/gdalwarp_bin.cpp
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -123,6 +127,11 @@ static void Usage(const char* pszErrorMsg = nullptr)
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/apps/gdalwarp_bin.cpp
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
         "    [[-s_coord_epoch epoch] | [-t_coord_epoch epoch]]\n"
         "    [-order n | -tps | -rpc | -geoloc] [-et err_threshold]\n"
         "    [-refine_gcps tolerance [minimum_gcps]]\n"

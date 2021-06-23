@@ -79,6 +79,7 @@ RUN wget -q https://github.com/ubarsc/kealib/archive/kealib-${KEA_VERSION}.zip \
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -95,6 +96,8 @@ RUN wget -q https://github.com/ubarsc/kealib/archive/kealib-${KEA_VERSION}.zip \
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 ARG MONGO_C_DRIVER_VERSION=1.17.6
 =======
 ARG MONGO_C_DRIVER_VERSION=1.17.5
@@ -193,6 +196,7 @@ ARG MONGO_C_DRIVER_VERSION=1.17.5
 =======
 ARG MONGO_C_DRIVER_VERSION=1.17.6
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 ARG MONGO_C_DRIVER_VERSION=1.17.5
 >>>>>>> 120fe7f972 (Docker: update to use an alternate repo to OSGeo/gdal)
@@ -236,6 +240,8 @@ ARG MONGO_C_DRIVER_VERSION=1.17.6
 ARG MONGO_C_DRIVER_VERSION=1.17.5
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 RUN mkdir mongo-c-driver \
     && wget -q https://github.com/mongodb/mongo-c-driver/releases/download/${MONGO_C_DRIVER_VERSION}/mongo-c-driver-${MONGO_C_DRIVER_VERSION}.tar.gz -O - \
         | tar xz -C mongo-c-driver --strip-components=1 \
@@ -272,6 +278,7 @@ RUN mkdir mongo-c-driver \
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -288,6 +295,8 @@ RUN mkdir mongo-c-driver \
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 ARG MONGOCXX_VERSION=3.6.5
 =======
 ARG MONGOCXX_VERSION=3.6.3
@@ -386,6 +395,7 @@ ARG MONGOCXX_VERSION=3.6.3
 =======
 ARG MONGOCXX_VERSION=3.6.5
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 ARG MONGOCXX_VERSION=3.6.3
 >>>>>>> 120fe7f972 (Docker: update to use an alternate repo to OSGeo/gdal)
@@ -429,6 +439,8 @@ ARG MONGOCXX_VERSION=3.6.5
 ARG MONGOCXX_VERSION=3.6.3
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 RUN mkdir mongocxx \
     && wget -q https://github.com/mongodb/mongo-cxx-driver/archive/r${MONGOCXX_VERSION}.tar.gz -O - \
         | tar xz -C mongocxx --strip-components=1 \
@@ -464,6 +476,7 @@ RUN mkdir mongocxx \
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -480,6 +493,8 @@ RUN mkdir mongocxx \
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 ARG TILEDB_VERSION=2.3.0
 =======
 ARG TILEDB_VERSION=2.2.7
@@ -578,6 +593,7 @@ ARG TILEDB_VERSION=2.2.7
 =======
 ARG TILEDB_VERSION=2.3.0
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 ARG TILEDB_VERSION=2.2.7
 >>>>>>> 120fe7f972 (Docker: update to use an alternate repo to OSGeo/gdal)
@@ -621,6 +637,8 @@ ARG TILEDB_VERSION=2.3.0
 ARG TILEDB_VERSION=2.2.7
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 RUN mkdir tiledb \
     && wget -q https://github.com/TileDB-Inc/TileDB/archive/${TILEDB_VERSION}.tar.gz -O - \
         | tar xz -C tiledb --strip-components=1 \

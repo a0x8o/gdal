@@ -1742,12 +1742,16 @@ prepare_JPEGTables(TIFF* tif)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -1761,6 +1765,10 @@ prepare_JPEGTables(TIFF* tif)
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 #if defined(JPEG_LIB_VERSION_MAJOR) && (JPEG_LIB_VERSION_MAJOR > 9 || \
     (JPEG_LIB_VERSION_MAJOR == 9 && JPEG_LIB_VERSION_MINOR >= 4))
 /* This is a modified version of std_huff_tables() from jcparam.c
@@ -1772,6 +1780,11 @@ prepare_JPEGTables(TIFF* tif)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -1805,6 +1818,9 @@ TIFF_std_huff_tables (j_compress_ptr cinfo)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -1879,6 +1895,7 @@ TIFF_std_huff_tables (j_compress_ptr cinfo)
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -1945,6 +1962,10 @@ TIFF_std_huff_tables (j_compress_ptr cinfo)
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
   }
 }
 #endif
@@ -2128,12 +2149,15 @@ JPEGSetupEncode(TIFF* tif)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 78a63bd8bf (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 #if defined(JPEG_LIB_VERSION_MAJOR) && (JPEG_LIB_VERSION_MAJOR > 9 || \
     (JPEG_LIB_VERSION_MAJOR == 9 && JPEG_LIB_VERSION_MINOR >= 4))
 =======
@@ -2156,10 +2180,14 @@ JPEGSetupEncode(TIFF* tif)
     (JPEG_LIB_VERSION_MAJOR == 9 && JPEG_LIB_VERSION_MINOR >= 4))
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 #if defined(JPEG_LIB_VERSION_MAJOR) && (JPEG_LIB_VERSION_MAJOR > 9 || \
     (JPEG_LIB_VERSION_MAJOR == 9 && JPEG_LIB_VERSION_MINOR >= 4))
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 #if BITS_IN_JSAMPLE == 8
 >>>>>>> 0f64c727bc (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -2173,6 +2201,8 @@ JPEGSetupEncode(TIFF* tif)
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
             if( (sp->jpegtablesmode & JPEGTABLESMODE_HUFF) != 0 &&
                 (sp->cinfo.c.dc_huff_tbl_ptrs[0] == NULL ||
                  sp->cinfo.c.dc_huff_tbl_ptrs[1] == NULL ||
@@ -2189,12 +2219,15 @@ JPEGSetupEncode(TIFF* tif)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 78a63bd8bf (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
                 /* jpeg_set_defaults() */
 =======
                 /* jpeg_set_defaults(), which is likely a bug. */
@@ -2207,6 +2240,7 @@ JPEGSetupEncode(TIFF* tif)
 =======
                 /* jpeg_set_defaults() */
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
                 /* jpeg_set_defaults() */
@@ -2226,6 +2260,11 @@ JPEGSetupEncode(TIFF* tif)
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+                /* jpeg_set_defaults() */
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
                 TIFF_std_huff_tables(&sp->cinfo.c);
             }
 #endif

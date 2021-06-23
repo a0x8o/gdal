@@ -3396,12 +3396,16 @@ def test_gpkg_coordinate_epoch():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 6209674969 (GPKG: writer: fix corruption when only a subset of all bands of a tile is flushed)
 =======
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -3413,6 +3417,10 @@ def test_gpkg_coordinate_epoch():
 >>>>>>> f8462384c9 (GPKG: writer: fix corruption when only a subset of all bands of a tile is flushed)
 =======
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 ###############################################################################
 # Test flushing only a subset of bands
@@ -3458,10 +3466,13 @@ def test_gpkg_flushing_not_all_bands(tile_format):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> f8462384c9 (GPKG: writer: fix corruption when only a subset of all bands of a tile is flushed)
 =======
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -3475,10 +3486,14 @@ def test_gpkg_flushing_not_all_bands(tile_format):
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -3487,6 +3502,8 @@ def test_gpkg_flushing_not_all_bands(tile_format):
 >>>>>>> f8462384c9 (GPKG: writer: fix corruption when only a subset of all bands of a tile is flushed)
 =======
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 ###############################################################################
 #
 

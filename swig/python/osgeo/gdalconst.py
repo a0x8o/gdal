@@ -210,8 +210,11 @@ DCAP_COORDINATE_EPOCH = _gdalconst.DCAP_COORDINATE_EPOCH
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/osgeo/gdalconst.py
 =======
 =======
@@ -243,6 +246,7 @@ DCAP_COORDINATE_EPOCH = _gdalconst.DCAP_COORDINATE_EPOCH
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/osgeo/gdalconst.py
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -254,6 +258,11 @@ DCAP_COORDINATE_EPOCH = _gdalconst.DCAP_COORDINATE_EPOCH
 >>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 46c4af5ba5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/osgeo/gdalconst.py
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 708f304349 (Merge branch 'master' of github.com:OSGeo/gdal)
 DIM_TYPE_HORIZONTAL_X = _gdalconst.DIM_TYPE_HORIZONTAL_X
 DIM_TYPE_HORIZONTAL_Y = _gdalconst.DIM_TYPE_HORIZONTAL_Y
 DIM_TYPE_VERTICAL = _gdalconst.DIM_TYPE_VERTICAL
