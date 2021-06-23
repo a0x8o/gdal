@@ -160,6 +160,14 @@ def test_gdalinfo_lib_coordinate_epoch():
     assert 'coordinateEpoch' in ret
     assert ret['coordinateEpoch'] == 2021.3
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 
 ###############################################################################
@@ -193,3 +201,10 @@ def test_gdalinfo_lib_nodata_full_precision_float64():
     assert ret['bands'][0]['noDataValue'] == float(nodata_str)
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> OSGeo-master
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)

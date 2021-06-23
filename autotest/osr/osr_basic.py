@@ -1771,12 +1771,27 @@ def test_osr_basic_is_dynamic():
 
     srs = osr.SpatialReference()
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
     srs.SetFromUserInput("+proj=longlat +ellps=GRS80 +towgs84=0,0,0")
     assert not srs.IsDynamic()
 
     srs = osr.SpatialReference()
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> OSGeo-master
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
     srs.ImportFromEPSG(4258) # ETRS89 (generic), using datum ensemble
     assert not srs.IsDynamic()
 
@@ -1820,6 +1835,14 @@ def test_osr_basic_set_get_coordinate_epoch():
     assert not srs.IsSame(clone)
     assert srs.IsSame(clone, ['IGNORE_COORDINATE_EPOCH=YES'])
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 
 ###############################################################################
@@ -2007,3 +2030,10 @@ def test_osr_basic_get_linear_units_compound_engineering_crs():
 >>>>>>> 145dd38d72 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> OSGeo-master
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)

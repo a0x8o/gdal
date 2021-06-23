@@ -547,6 +547,16 @@ def test_osr_ct_take_into_account_srs_coordinate_epoch():
     s = osr.SpatialReference()
     s.SetFromUserInput("EPSG:7844") # GDA2020
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+
+    t_2020 = osr.SpatialReference()
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
     s.SetAxisMappingStrategy(osr.OAMS_AUTHORITY_COMPLIANT)
 
     t_2020 = osr.SpatialReference()
@@ -555,6 +565,13 @@ def test_osr_ct_take_into_account_srs_coordinate_epoch():
 
     t_2020 = osr.SpatialReference()
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> OSGeo-master
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
     t_2020.SetFromUserInput("EPSG:9000") # ITRF2014
     t_2020.SetCoordinateEpoch(2020)
 
@@ -567,9 +584,24 @@ def test_osr_ct_take_into_account_srs_coordinate_epoch():
 
     t_2030 = osr.SpatialReference()
 <<<<<<< HEAD
+<<<<<<< HEAD
     t_2030.SetAxisMappingStrategy(osr.OAMS_AUTHORITY_COMPLIANT)
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+    t_2030.SetAxisMappingStrategy(osr.OAMS_AUTHORITY_COMPLIANT)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> OSGeo-master
+=======
+    t_2030.SetAxisMappingStrategy(osr.OAMS_AUTHORITY_COMPLIANT)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
     t_2030.SetFromUserInput("EPSG:9000") # ITRF2014
     t_2030.SetCoordinateEpoch(2030)
 
@@ -589,6 +621,14 @@ def test_osr_ct_take_into_account_srs_coordinate_epoch():
         ct = osr.CoordinateTransformation(t_2020, t_2030)
     assert gdal.GetLastErrorMsg() != ''
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 ###############################################################################
 # Test transformation between CRS that only differ by axis order
@@ -680,3 +720,10 @@ def test_osr_ct_OGR_CT_PREFER_OFFICIAL_SRS_DEF():
         assert abs(y - 71.125) < 0.001, y
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> OSGeo-master
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)

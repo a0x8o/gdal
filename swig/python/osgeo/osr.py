@@ -398,6 +398,27 @@ class SpatialReference(object):
         return _osr.SpatialReference_SetCoordinateEpoch(self, *args)
 
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+    def IsDynamic(self, *args):
+        """IsDynamic(SpatialReference self) -> bool"""
+        return _osr.SpatialReference_IsDynamic(self, *args)
+
+
+    def GetCoordinateEpoch(self, *args):
+        """GetCoordinateEpoch(SpatialReference self) -> double"""
+        return _osr.SpatialReference_GetCoordinateEpoch(self, *args)
+
+
+    def SetCoordinateEpoch(self, *args):
+        """SetCoordinateEpoch(SpatialReference self, double coordinateEpoch)"""
+        return _osr.SpatialReference_SetCoordinateEpoch(self, *args)
+
+
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
     def EPSGTreatsAsLatLong(self, *args):
         r"""EPSGTreatsAsLatLong(SpatialReference self) -> int"""
         return _osr.SpatialReference_EPSGTreatsAsLatLong(self, *args)
