@@ -2038,6 +2038,7 @@ def test_gdalwarp_lib_t_coord_epoch():
     ds = None
 
 ###############################################################################
+<<<<<<< HEAD
 # Test automatic grid sampling
 
 
@@ -2202,6 +2203,8 @@ def test_gdalwarp_lib_not_delete_shared_auxiliary_files():
     os.unlink('tmp/DIM_foo.XML')
 
 ###############################################################################
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 # Cleanup
 
 

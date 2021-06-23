@@ -586,6 +586,7 @@ def test_vrtmisc_coordinate_epoch():
     ds = None
 
     gdal.Unlink(filename)
+<<<<<<< HEAD
 
 
 ###############################################################################
@@ -716,3 +717,5 @@ def test_vrtmisc_alpha_ismaskband():
     ds = gdal.GetDriverByName('VRT').CreateCopy('', src_ds)
     assert not ds.GetRasterBand(1).IsMaskBand()
     assert ds.GetRasterBand(2).IsMaskBand()
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)

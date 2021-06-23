@@ -5337,6 +5337,9 @@ def test_ogr_gpkg_fixup_wrong_mr_column_name_update_trigger():
     gdal.Unlink(filename)
     assert 'column_nameIS' not in sql
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 ###############################################################################
 # Test support for CRS coordinate_epoch
@@ -5421,6 +5424,7 @@ def test_ogr_gpkg_crs_coordinate_epoch():
     ds = None
 
     gdal.Unlink(filename)
+<<<<<<< HEAD
 
 
 ###############################################################################
@@ -5450,3 +5454,5 @@ def test_ogr_gpkg_CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE():
     gdal.Unlink(filename)
 =======
 >>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)

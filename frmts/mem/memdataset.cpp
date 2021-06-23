@@ -508,10 +508,14 @@ MEMDataset::MEMDataset() :
 MEMDataset::~MEMDataset()
 
 {
+<<<<<<< HEAD:frmts/mem/memdataset.cpp
     const bool bSuppressOnCloseBackup = bSuppressOnClose;
     bSuppressOnClose = true;
     FlushCache(true);
     bSuppressOnClose = bSuppressOnCloseBackup;
+=======
+    FlushCache();
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/mem/memdataset.cpp
 
     GDALDeinitGCPs( m_nGCPCount, m_pasGCPs );
     CPLFree( m_pasGCPs );

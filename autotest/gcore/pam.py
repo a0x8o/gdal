@@ -522,7 +522,11 @@ def test_pam_esri_GeodataXform_gcp():
 
 def test_pam_metadata_coordinate_epoch():
 
+<<<<<<< HEAD
     tmpfilename = '/vsimem/tmp.pgm'
+=======
+    tmpfilename = '/vsimem/tmp.pnm'
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
     ds = gdal.GetDriverByName('PNM').Create(tmpfilename, 1, 1)
     srs = osr.SpatialReference()
     srs.ImportFromEPSG(4326)
@@ -538,6 +542,7 @@ def test_pam_metadata_coordinate_epoch():
     gdal.GetDriverByName('PNM').Delete(tmpfilename)
 
 ###############################################################################
+<<<<<<< HEAD
 # Check that PAM handles correctly equality of NaN nodata values (#4847)
 
 def test_pam_nodata_nan():
@@ -549,5 +554,27 @@ def test_pam_nodata_nan():
     # Check that no PAM file is generated
     assert gdal.VSIStatL(outfilename + '.aux.xml') is None
     gdal.GetDriverByName('GTiff').Delete(outfilename)
+=======
+# Cleanup.
+
+def test_pam_cleanup():
+    gdaltest.clean_tmp()
+    if gdaltest.pam_setting != 'NULL':
+        gdal.SetConfigOption('GDAL_PAM_ENABLED', gdaltest.pam_setting)
+    else:
+        gdal.SetConfigOption('GDAL_PAM_ENABLED', None)
+
+    try:
+        os.chmod('tmpdirreadonly', stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
+        shutil.rmtree('tmpdirreadonly')
+    except OSError:
+        pass
+    try:
+        shutil.rmtree('tmppamproxydir')
+    except OSError:
+        pass
+
+
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 
