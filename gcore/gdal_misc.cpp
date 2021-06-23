@@ -3306,14 +3306,19 @@ GDALGeneralCmdLineProcessor( int nArgc, char ***ppapszArgv, int nOptions )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/gdal_misc.cpp
 =======
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -3324,6 +3329,9 @@ GDALGeneralCmdLineProcessor( int nArgc, char ***ppapszArgv, int nOptions )
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 9f0b95a795 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:gcore/gdal_misc.cpp
             if( CPLFetchBool( papszMD, GDAL_DCAP_MULTIPLE_VECTOR_LAYERS, false ) )
                 printf( "  Supports: Multiple vector layers.\n" );/*ok*/
@@ -3338,13 +3346,18 @@ GDALGeneralCmdLineProcessor( int nArgc, char ***ppapszArgv, int nOptions )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:gcore/gdal_misc.cpp
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -3355,6 +3368,9 @@ GDALGeneralCmdLineProcessor( int nArgc, char ***ppapszArgv, int nOptions )
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 9f0b95a795 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 
             for( const char* key: { GDAL_DMD_CREATIONOPTIONLIST,
                                     GDAL_DMD_MULTIDIM_DATASET_CREATIONOPTIONLIST,

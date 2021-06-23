@@ -162,6 +162,7 @@ OGRFlatGeobufLayer::OGRFlatGeobufLayer(
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
+<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 =======
         CPL_IGNORE_RET_VAL(dfCoordEpoch);
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
@@ -173,8 +174,11 @@ OGRFlatGeobufLayer::OGRFlatGeobufLayer(
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 <<<<<<< HEAD
@@ -265,8 +269,18 @@ OGRFlatGeobufLayer::OGRFlatGeobufLayer(
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> b486835dfc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 
         if ((org == nullptr || EQUAL(org->c_str(), "EPSG")) && code != 0) {
             m_poSRS->importFromEPSG(code);
@@ -555,14 +569,19 @@ void OGRFlatGeobufLayer::writeHeader(VSILFILE *poFp, uint64_t featuresCount, std
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 =======
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -573,6 +592,9 @@ void OGRFlatGeobufLayer::writeHeader(VSILFILE *poFp, uint64_t featuresCount, std
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 9f0b95a795 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
         if( pszWKT && !CPLIsUTF8(pszWKT, -1) )
         {
@@ -586,13 +608,18 @@ void OGRFlatGeobufLayer::writeHeader(VSILFILE *poFp, uint64_t featuresCount, std
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -603,6 +630,9 @@ void OGRFlatGeobufLayer::writeHeader(VSILFILE *poFp, uint64_t featuresCount, std
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 9f0b95a795 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
         crs = CreateCrsDirect(fbb, pszAuthorityName, nAuthorityCode, m_poSRS->GetName(), nullptr, pszWKT);
         CPLFree(pszWKT);
     }

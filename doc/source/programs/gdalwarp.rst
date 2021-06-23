@@ -24,10 +24,15 @@ Synopsis
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/programs/gdalwarp.rst
 =======
 =======
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/programs/gdalwarp.rst
+=======
+>>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/doc/source/programs/gdalwarp.rst
 =======
@@ -36,6 +41,7 @@ Synopsis
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/programs/gdalwarp.rst
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -49,6 +55,9 @@ Synopsis
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/programs/gdalwarp.rst
 >>>>>>> 9f0b95a795 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
         [[-s_coord_epoch epoch] | [-t_coord_epoch epoch]]
         [-order n | -tps | -rpc | -geoloc] [-et err_threshold]
         [-refine_gcps tolerance [minimum_gcps]]

@@ -281,11 +281,17 @@ class OGRSQLiteTableLayer final: public OGRSQLiteLayer
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogr_sqlite.h
 =======
 =======
 =======
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogr_sqlite.h
+=======
+=======
+>>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/sqlite/ogr_sqlite.h
 =======
@@ -296,6 +302,7 @@ class OGRSQLiteTableLayer final: public OGRSQLiteLayer
 <<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogr_sqlite.h
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -312,6 +319,9 @@ class OGRSQLiteTableLayer final: public OGRSQLiteLayer
 <<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogr_sqlite.h
 =======
 >>>>>>> 9f0b95a795 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 
     int                 bLaunderColumnNames;
     int                 bSpatialite2D;

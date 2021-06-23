@@ -3664,10 +3664,15 @@ SWIG_init(void) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdalconst_wrap.c
 =======
 =======
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdalconst_wrap.c
+=======
+>>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdalconst_wrap.c
 =======
@@ -3676,6 +3681,7 @@ SWIG_init(void) {
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdalconst_wrap.c
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -3689,6 +3695,9 @@ SWIG_init(void) {
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdalconst_wrap.c
 >>>>>>> 9f0b95a795 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> c4eb45f967 (Merge branch 'master' of github.com:OSGeo/gdal)
   SWIG_Python_SetConstant(d, "DIM_TYPE_HORIZONTAL_X",SWIG_FromCharPtr(GDAL_DIM_TYPE_HORIZONTAL_X));
   SWIG_Python_SetConstant(d, "DIM_TYPE_HORIZONTAL_Y",SWIG_FromCharPtr(GDAL_DIM_TYPE_HORIZONTAL_Y));
   SWIG_Python_SetConstant(d, "DIM_TYPE_VERTICAL",SWIG_FromCharPtr(GDAL_DIM_TYPE_VERTICAL));
