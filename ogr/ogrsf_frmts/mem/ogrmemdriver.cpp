@@ -139,6 +139,9 @@ void RegisterOGRMEM()
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 099258b658 (Merge branch 'master' of github.com:OSGeo/gdal)
 
     poDriver->SetMetadataItem( GDAL_DMD_ALTER_GEOM_FIELD_DEFN_FLAGS, "Name Type Nullable SRS CoordinateEpoch" );
 =======

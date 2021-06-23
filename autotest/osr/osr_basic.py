@@ -2036,6 +2036,9 @@ def test_osr_basic_proj_network():
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 099258b658 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 
 ###############################################################################
@@ -2067,6 +2070,9 @@ def test_osr_basic_get_linear_units_compound_engineering_crs():
     assert srs.GetLinearUnitsName() == "US survey foot"
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 099258b658 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 145dd38d72 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
