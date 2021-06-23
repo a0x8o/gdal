@@ -506,6 +506,7 @@ typedef struct GDALDimensionHS* GDALDimensionH;
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -522,6 +523,8 @@ typedef struct GDALDimensionHS* GDALDimensionH;
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 9f0b95a795 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD:gcore/gdal.h
 /** Capability set by drivers for formats which support multiple vector layers.
  *
@@ -577,6 +580,7 @@ typedef struct GDALDimensionHS* GDALDimensionH;
 
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdal.h
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -592,6 +596,8 @@ typedef struct GDALDimensionHS* GDALDimensionH;
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 9f0b95a795 (Merge branch 'master' of github.com:OSGeo/gdal)
 
 /** Value for GDALDimension::GetType() specifying the X axis of a horizontal CRS.
  * @since GDAL 3.1

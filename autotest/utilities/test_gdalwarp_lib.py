@@ -2042,6 +2042,7 @@ def test_gdalwarp_lib_t_coord_epoch():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 =======
@@ -2056,6 +2057,8 @@ def test_gdalwarp_lib_t_coord_epoch():
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 9f0b95a795 (Merge branch 'master' of github.com:OSGeo/gdal)
 # Test automatic grid sampling
 
 
@@ -2225,6 +2228,7 @@ def test_gdalwarp_lib_not_delete_shared_auxiliary_files():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -2240,6 +2244,8 @@ def test_gdalwarp_lib_not_delete_shared_auxiliary_files():
 >>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 9f0b95a795 (Merge branch 'master' of github.com:OSGeo/gdal)
 # Cleanup
 
 

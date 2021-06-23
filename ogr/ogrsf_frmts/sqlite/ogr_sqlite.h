@@ -280,6 +280,7 @@ class OGRSQLiteTableLayer final: public OGRSQLiteLayer
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogr_sqlite.h
 =======
 =======
@@ -307,6 +308,10 @@ class OGRSQLiteTableLayer final: public OGRSQLiteLayer
 <<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogr_sqlite.h
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogr_sqlite.h
+=======
+>>>>>>> 9f0b95a795 (Merge branch 'master' of github.com:OSGeo/gdal)
 
     int                 bLaunderColumnNames;
     int                 bSpatialite2D;
