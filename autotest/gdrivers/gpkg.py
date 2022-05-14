@@ -3390,6 +3390,9 @@ def test_gpkg_coordinate_epoch():
     gdal.Unlink('/vsimem/tmp.gpkg')
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 6209674969 (GPKG: writer: fix corruption when only a subset of all bands of a tile is flushed)
 
 ###############################################################################
 # Test flushing only a subset of bands
@@ -3429,8 +3432,11 @@ def test_gpkg_flushing_not_all_bands(tile_format):
 
     gdal.Unlink('/vsimem/tmp.gpkg')
 
+<<<<<<< HEAD
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6209674969 (GPKG: writer: fix corruption when only a subset of all bands of a tile is flushed)
 ###############################################################################
 #
 
