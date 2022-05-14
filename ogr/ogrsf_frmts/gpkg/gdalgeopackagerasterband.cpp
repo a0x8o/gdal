@@ -2060,8 +2060,12 @@ CPLErr GDALGPKGMBTilesLikePseudoDataset::WriteTileInternal()
         {
             CPLAssert( bAllDirty );
 
+<<<<<<< HEAD
             auto poMEM_RGB_DS = MEMDataset::Create(
                                                   "", nBlockXSize, nBlockYSize,
+=======
+            GDALDataset* poMEM_RGB_DS = MEMDataset::Create("", nBlockXSize, nBlockYSize,
+>>>>>>> 6209674969 (GPKG: writer: fix corruption when only a subset of all bands of a tile is flushed)
                                                   0, GDT_Byte, nullptr);
             for( int i = 0; i < 3; i++ )
             {
