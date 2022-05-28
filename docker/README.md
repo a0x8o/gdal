@@ -7,6 +7,7 @@ Each directory contains a `./build.sh` for convenient building of the image.
 Note: the mention of the overall licensing terms of the GDAL build is to the
 best of our knowledge and not guaranteed. Users should check by themselves.
 
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/docker/README.md
 =======
 <<<<<<< HEAD:docker/README.md
@@ -27,6 +28,13 @@ best of our knowledge and not guaranteed. Users should check by themselves.
 
 See [alpine-ultrasmall/Dockerfile](alpine-ultrasmall/Dockerfile)
 >>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/docker/README.md
+=======
+# Alpine based
+
+Alpine version:
+* 3.15 for 3.5
+* 3.16 for GDAL 3.6dev
+>>>>>>> 0f99b0ef18 (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
 
 ## Small: `osgeo/gdal:alpine-small-latest`
 
@@ -35,7 +43,7 @@ See [alpine-ultrasmall/Dockerfile](alpine-ultrasmall/Dockerfile)
 * Vector drivers: ultrasmall + built-in + most XML-based ones + network-based ones + PostgreSQL
 * Using internal libtiff and libgeotiff
 * External libraries enabled: ultrasmall + libexpat, libpq, libssl
-* No GDAL Python
+* *No* GDAL Python
 * Base PROJ grid package (http://download.osgeo.org/proj/proj-datumgrid-1.8.zip)
 * Overall licensing terms of the GDAL build: permissive (MIT, BSD style, Apache, etc..)
 
@@ -43,16 +51,21 @@ See [alpine-small/Dockerfile](alpine-small/Dockerfile)
 
 ## Normal: `osgeo/gdal:alpine-normal-latest`
 
-* Image size: ~ 242 MB
+* Image size: ~ 277 MB
 * Raster drivers: small + netCDF, HDF5, BAG
 * Vector drivers: small + Spatialite, XLS
 * Using internal libtiff and libgeotiff
 * External libraries enabled: small + libgeos, libhdf5, libhdf5, libkea, libnetcdf, libfreexl,
+<<<<<<< HEAD
   libspatialite, libxml2, libpoppler, openexr, libheif, libdeflate
 * GDAL Python (Python 3.9)
 <<<<<<< HEAD:gdal/docker/README.md
 =======
 <<<<<<< HEAD:docker/README.md
+=======
+  libspatialite, libxml2, libpoppler, openexr, libheif, libdeflate, libparquet
+* GDAL Python
+>>>>>>> 0f99b0ef18 (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
 * Base PROJ grid package (http://download.osgeo.org/proj/proj-datumgrid-1.8.zip)
 =======
 >>>>>>> OSGeo-master:docker/README.md
@@ -90,7 +103,7 @@ See [ubuntu-small/Dockerfile](ubuntu-small/Dockerfile)
 * Using internal libtiff and libgeotiff
 * External libraries enabled: small + libnetcdf, libhdf4, libhdf5, libtiledb, libkea,
   mongocxx 3.4, libspatialite, unixodbc, libxml2, libcfitsio, libmysqlclient,
-  libkml, libpoppler, pdfium, openexr, libheif, libdeflate
+  libkml, libpoppler, pdfium, openexr, libheif, libdeflate, libparquet
 * GDAL Python (Python 3.8 for Ubuntu 20.04, Python 3.10 for Ubuntu 22.04)
 * *All* PROJ grid packages (equivalent of latest of proj-data-X.zip from http://download.osgeo.org/proj/ at time of generation, > 500 MB)
 * Overall licensing terms of the GDAL build: copy-left (GPL) + LGPL + permissive
