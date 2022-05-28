@@ -5,6 +5,13 @@
 # Public domain
 # or licensed under MIT (LICENSE.TXT) Copyright 2019 Even Rouault <even.rouault@spatialys.com>
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD:gdal/docker/alpine-normal/Dockerfile
+ARG ALPINE_VERSION=3.14
+=======
+>>>>>>> 126d56369a (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
 <<<<<<< HEAD:docker/alpine-normal/Dockerfile
 <<<<<<< HEAD
 ARG ALPINE_VERSION=3.16
@@ -14,6 +21,13 @@ ARG ALPINE_VERSION=3.15
 =======
 ARG ALPINE_VERSION=3.14
 >>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/docker/alpine-normal/Dockerfile
+<<<<<<< HEAD
+=======
+>>>>>>> OSGeo-master:docker/alpine-normal/Dockerfile
+=======
+ARG ALPINE_VERSION=3.16
+>>>>>>> 0f99b0ef18 (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
+>>>>>>> 126d56369a (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
 FROM alpine:${ALPINE_VERSION} as builder
 
 # Derived from osgeo/proj by Howard Butler <howard@hobu.co>
