@@ -232,6 +232,10 @@ def test_mem_md_array_single_dim():
     assert myarray.GetNoDataValueAsDouble() is None
     assert myarray.SetNoDataValueDouble(1) == gdal.CE_None
     assert myarray.GetNoDataValueAsDouble() == 1
+    assert myarray.GetNoDataValueAsInt64() == 1
+    assert myarray.GetNoDataValueAsUInt64() == 1
+    assert myarray.SetNoDataValue(1) == gdal.CE_None
+    assert myarray.GetNoDataValue() == 1
     assert myarray.SetNoDataValueRaw(struct.pack('B', 127)) == gdal.CE_None
     with gdaltest.error_handler():
         assert myarray.SetNoDataValueRaw(struct.pack('h', 127)) != gdal.CE_None
@@ -820,6 +824,20 @@ def test_mem_md_group_attribute_single_string():
     assert attr.ReadAsStringArray() == ['foo']
     assert attr.Write(['bar']) == gdal.CE_None
     assert attr.Read() == 'bar'
+
+
+def test_mem_md_group_attribute_string_json():
+
+    drv = gdal.GetDriverByName('MEM')
+    ds = drv.CreateMultiDimensional('myds')
+    rg = ds.GetRootGroup()
+
+    attr = rg.CreateAttribute('attr', [], gdal.ExtendedDataType.CreateString(0, gdal.GEDTST_JSON))
+    assert attr
+    assert attr.GetDataType().GetSubType() == gdal.GEDTST_JSON
+    assert attr.Read() is None
+    assert attr.Write({"foo":"bar"}) == gdal.CE_None
+    assert attr.Read() == {"foo" : "bar"}
 
 
 def test_mem_md_group_attribute_multiple_string():
@@ -1845,17 +1863,17 @@ def test_mem_md_array_statistics():
     data = struct.pack('d' * 6, 1, 2, 3, 4, 5, 6)
     ar.Write(data)
 
-    stats = ar.ComputeStatistics(None, False)
+    stats = ar.ComputeStatistics(False)
     assert stats.min == 1.0
     assert stats.max == 5.0
     assert stats.mean == 3.0
     assert stats.std_dev == pytest.approx(1.4142135623730951)
     assert stats.valid_count == 5
 
-    stats = ar.GetStatistics(None, False, False)
+    stats = ar.GetStatistics(False, False)
     assert stats is None
 
-    stats = ar.GetStatistics(None, False, True)
+    stats = ar.GetStatistics(False, True)
     assert stats is not None
     assert stats.min == 1.0
     assert stats.max == 5.0
@@ -1877,7 +1895,7 @@ def test_mem_md_array_statistics_float32():
     data = struct.pack('f' * 6, 1, 2, 3, 4, 5, 6)
     ar.Write(data)
 
-    stats = ar.ComputeStatistics(None, False)
+    stats = ar.ComputeStatistics(False)
     assert stats.min == 1.0
     assert stats.max == 5.0
     assert stats.mean == 3.0
@@ -1941,6 +1959,44 @@ def test_mem_md_array_copy_autoscale_with_explicit_data_type_and_nodata():
     unscaled = struct.unpack('d' * 6, out_ar.GetUnscaled().Read())
     assert unscaled[0:5] == pytest.approx( (1.5, 2, 3, 4, 6.5), abs = out_ar.GetScale() / 2 )
     assert math.isnan(unscaled[5])
+
+
+def test_mem_md_array_nodata_int64():
+
+    drv = gdal.GetDriverByName('MEM')
+    ds = drv.CreateMultiDimensional('myds')
+    rg = ds.GetRootGroup()
+    dim0 = rg.CreateDimension("dim0", "unspecified type", "unspecified direction", 2)
+    dim1 = rg.CreateDimension("dim1", "unspecified type", "unspecified direction", 2)
+    myarray = rg.CreateMDArray("myarray", [dim0, dim1],
+                               gdal.ExtendedDataType.Create(gdal.GDT_Int64))
+    assert myarray
+    val = -(1 << 63)
+    assert myarray.SetNoDataValue(val) == gdal.CE_None
+    assert myarray.GetNoDataValue() == val
+
+    # Test MultiDim -> GDALDataset bridge
+    ds = myarray.AsClassicDataset(0,1)
+    assert ds.GetRasterBand(1).GetNoDataValue() == val
+
+
+def test_mem_md_array_nodata_uint64():
+
+    drv = gdal.GetDriverByName('MEM')
+    ds = drv.CreateMultiDimensional('myds')
+    rg = ds.GetRootGroup()
+    dim0 = rg.CreateDimension("dim0", "unspecified type", "unspecified direction", 2)
+    dim1 = rg.CreateDimension("dim1", "unspecified type", "unspecified direction", 2)
+    myarray = rg.CreateMDArray("myarray", [dim0, dim1],
+                               gdal.ExtendedDataType.Create(gdal.GDT_UInt64))
+    assert myarray
+    val = (1 << 64)-1
+    assert myarray.SetNoDataValue(val) == gdal.CE_None
+    assert myarray.GetNoDataValue() == val
+
+    # Test MultiDim -> GDALDataset bridge
+    ds = myarray.AsClassicDataset(0,1)
+    assert ds.GetRasterBand(1).GetNoDataValue() == val
 
 
 def XX_test_all_forever():

@@ -245,6 +245,61 @@ def test_ogr_sqlite_3():
 
     assert tr
 
+
+###############################################################################
+# Test retrieving layers
+
+
+def test_ogr_sqlite_layers():
+
+    if gdaltest.sl_ds is None:
+        pytest.skip()
+
+    assert gdaltest.sl_ds.GetLayerCount() == 2, 'did not get expected layer count'
+
+    lyr = gdaltest.sl_ds.GetLayer(0)
+    assert lyr is not None
+    assert lyr.GetName() == 'a_layer', 'did not get expected layer name'
+    assert lyr.GetGeomType() == ogr.wkbUnknown, 'did not get expected layer geometry type'
+    assert lyr.GetFeatureCount() == 0, 'did not get expected feature count'
+
+    lyr = gdaltest.sl_ds.GetLayer(1)
+    assert lyr is not None
+    assert lyr.GetName() == 'tpoly', 'did not get expected layer name'
+    assert lyr.GetGeomType() == ogr.wkbUnknown, 'did not get expected layer geometry type'
+    assert lyr.GetFeatureCount() == 10, 'did not get expected feature count'
+
+    # Test LIST_ALL_TABLES=YES open option
+    sl_ds_all_table = gdal.OpenEx('tmp/sqlite_test.db', gdal.OF_VECTOR | gdal.OF_UPDATE,
+                                 open_options=['LIST_ALL_TABLES=YES'])
+    assert sl_ds_all_table.GetLayerCount() == 5, 'did not get expected layer count'
+    lyr = sl_ds_all_table.GetLayer(0)
+    assert lyr is not None
+    assert lyr.GetName() == 'a_layer', 'did not get expected layer name'
+    assert not sl_ds_all_table.IsLayerPrivate(0)
+
+    lyr = sl_ds_all_table.GetLayer(1)
+    assert lyr is not None
+    assert lyr.GetName() == 'tpoly', 'did not get expected layer name'
+    assert not sl_ds_all_table.IsLayerPrivate(1)
+
+    lyr = sl_ds_all_table.GetLayer(2)
+    assert lyr is not None
+    assert lyr.GetName() == 'geometry_columns', 'did not get expected layer name'
+    assert sl_ds_all_table.IsLayerPrivate(2)
+
+    lyr = sl_ds_all_table.GetLayer(3)
+    assert lyr is not None
+    assert lyr.GetName() == 'spatial_ref_sys', 'did not get expected layer name'
+    assert sl_ds_all_table.IsLayerPrivate(3)
+
+    lyr = sl_ds_all_table.GetLayer(4)
+    assert lyr is not None
+    assert lyr.GetName() == 'sqlite_sequence', 'did not get expected layer name'
+    assert sl_ds_all_table.IsLayerPrivate(4)
+
+
+
 ###############################################################################
 # Write more features with a bunch of different geometries, and verify the
 # geometries are still OK.
@@ -818,7 +873,7 @@ def test_ogr_sqlite_17(require_spatialite):
     assert lyr is None, 'layer creation should have failed'
 
     srs = osr.SpatialReference()
-    srs.SetFromUserInput("""GEOGCS["GCS_WGS_1984",DATUM["WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]""")
+    srs.ImportFromEPSG(4326)
     lyr = ds.CreateLayer('geomspatialite', srs=srs)
 
     geom = ogr.CreateGeometryFromWkt('POINT(0 1)')
@@ -3112,6 +3167,129 @@ def test_ogr_sqlite_view_type():
     f = lyr.GetNextFeature()
     assert f['c'] == 1
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+
+###############################################################################
+# Test table WITHOUT ROWID
+
+
+def test_ogr_sqlite_without_rowid():
+
+    tmpfilename = '/vsimem/without_rowid.db'
+    try:
+        ds = ogr.GetDriverByName('SQLite').CreateDataSource(tmpfilename)
+        ds.ExecuteSQL('CREATE TABLE t(key TEXT NOT NULL PRIMARY KEY, value TEXT) WITHOUT ROWID')
+        ds = None
+
+        ds = ogr.Open(tmpfilename, update=1)
+        lyr = ds.GetLayer('t')
+        assert lyr.GetFIDColumn() == ''
+        assert lyr.GetLayerDefn().GetFieldCount() == 2
+
+        f = ogr.Feature(lyr.GetLayerDefn())
+        f['key'] = 'foo'
+        f['value'] = 'bar'
+        assert lyr.CreateFeature(f) == ogr.OGRERR_NONE
+        assert f.GetFID() == -1 # hard to do best
+
+        assert lyr.GetFeatureCount() == 1
+
+        f = lyr.GetNextFeature()
+        assert f['key'] == 'foo'
+        assert f['value'] == 'bar'
+        assert f.GetFID() == 0 # somewhat arbitrary
+
+        f = lyr.GetFeature(0)
+        assert f['key'] == 'foo'
+
+        ds = None
+    finally:
+        gdal.Unlink(tmpfilename)
+
+
+###############################################################################
+# Test table in STRICT mode (sqlite >= 3.37)
+
+
+def test_ogr_sqlite_strict():
+
+    if 'FORCE_SQLITE_STRICT' not in os.environ and \
+        'STRICT' not in gdal.GetDriverByName('SQLite').GetMetadataItem(gdal.DMD_CREATIONOPTIONLIST):
+        pytest.skip('sqlite >= 3.37 required')
+
+    tmpfilename = '/vsimem/strict.db'
+    try:
+        ds = ogr.GetDriverByName('SQLite').CreateDataSource(tmpfilename)
+        lyr = ds.CreateLayer('t', options=['STRICT=YES'])
+        lyr.CreateField(ogr.FieldDefn('int_field', ogr.OFTInteger))
+        lyr.CreateField(ogr.FieldDefn('int64_field', ogr.OFTInteger64))
+        lyr.CreateField(ogr.FieldDefn('text_field', ogr.OFTString))
+        lyr.CreateField(ogr.FieldDefn('blob_field', ogr.OFTBinary))
+        ds = None
+
+        ds = ogr.Open(tmpfilename, update=1)
+        sql_lyr = ds.ExecuteSQL("SELECT sql FROM sqlite_master WHERE name='t'")
+        f = sql_lyr.GetNextFeature()
+        sql = f['sql']
+        ds.ReleaseResultSet(sql_lyr)
+        assert ') STRICT' in sql
+
+        lyr = ds.GetLayer('t')
+        lyr.CreateField(ogr.FieldDefn('real_field', ogr.OFTReal))
+        lyr.CreateField(ogr.FieldDefn('datetime_field', ogr.OFTDateTime))
+        lyr.CreateField(ogr.FieldDefn('date_field', ogr.OFTDate))
+        lyr.CreateField(ogr.FieldDefn('time_field', ogr.OFTTime))
+        ds = None
+
+        ds = ogr.Open(tmpfilename, update=1)
+        lyr = ds.GetLayer('t')
+        layer_defn = lyr.GetLayerDefn()
+        assert layer_defn.GetFieldCount() == 8
+        assert layer_defn.GetFieldDefn(0).GetType() == ogr.OFTInteger
+        assert layer_defn.GetFieldDefn(1).GetType() == ogr.OFTInteger64
+        assert layer_defn.GetFieldDefn(2).GetType() == ogr.OFTString
+        assert layer_defn.GetFieldDefn(3).GetType() == ogr.OFTBinary
+        assert layer_defn.GetFieldDefn(4).GetType() == ogr.OFTReal
+        assert layer_defn.GetFieldDefn(5).GetType() == ogr.OFTDateTime
+        assert layer_defn.GetFieldDefn(6).GetType() == ogr.OFTDate
+        assert layer_defn.GetFieldDefn(7).GetType() == ogr.OFTTime
+
+        ds = None
+    finally:
+        gdal.Unlink(tmpfilename)
+
+
+
+###############################################################################
+# Test CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE
+
+
+def test_ogr_sqlite_CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE():
+
+    # First check that CPL_TMPDIR is ignored for regular files
+    filename = '/vsimem/test_ogr_sqlite_CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE.db'
+    with gdaltest.config_option('CPL_TMPDIR', '/i_do/not/exist'):
+        ds = ogr.GetDriverByName('SQLite').CreateDataSource(filename)
+    assert ds is not None
+    ds = None
+    gdal.Unlink(filename)
+
+    # Now check that CPL_TMPDIR is honored for CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE=FORCED
+    with gdaltest.config_options({'CPL_TMPDIR': '/vsimem/temporary_location',
+                                  'CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE': 'FORCED'}):
+        ds = ogr.GetDriverByName('SQLite').CreateDataSource(filename)
+    assert ds is not None
+    assert gdal.VSIStatL(filename) is None
+    assert len(gdal.ReadDir('/vsimem/temporary_location')) != 0
+    ds = None
+    assert gdal.VSIStatL(filename) is not None
+    assert gdal.ReadDir('/vsimem/temporary_location') is None
+
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> OSGeo-master
 ###############################################################################
 #
 

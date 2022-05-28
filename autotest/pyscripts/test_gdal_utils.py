@@ -29,7 +29,16 @@
 ###############################################################################
 import array
 import os
+from numbers import Real
 from pathlib import Path
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+from typing import Optional
+
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> OSGeo-master
 from osgeo import gdal
 
 import pytest
@@ -39,9 +48,27 @@ import test_py_scripts
 
 pytest.importorskip('osgeo_utils')
 
+<<<<<<< HEAD
 from osgeo_utils.auxiliary import util, raster_creation, base, array_util, color_table
 from osgeo_utils.auxiliary.color_palette import ColorPalette
 from osgeo_utils.auxiliary.extent_util import Extent
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+from osgeo_utils.auxiliary import util, raster_creation, base, array_util, color_table
+from osgeo_utils.auxiliary.color_palette import ColorPalette
+from osgeo_utils.auxiliary.color_table import get_color_table
+from osgeo_utils.auxiliary.extent_util import Extent
+import gdaltest
+=======
+from osgeo_utils.auxiliary import util, raster_creation, base, array_util
+=======
+from osgeo_utils.auxiliary import util, raster_creation, base, array_util, color_table
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal)
+from osgeo_utils.auxiliary.color_palette import ColorPalette
+from osgeo_utils.auxiliary.extent_util import Extent
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> OSGeo-master
 
 temp_files = []
 
@@ -126,6 +153,14 @@ def test_utils_py_1():
     ds_list = None
 
 
+@pytest.mark.parametrize("data,name,min,max,approx_ok",
+                         [('gcore', 'byte.tif', 74, 255, False)])
+def test_min_max(data, name, min, max, approx_ok):
+    ds = util.open_ds(test_py_scripts.get_data_path(data) + name)
+    min_max = util.get_raster_min_max(ds, approx_ok=approx_ok)
+    assert min_max == (min, max)
+
+
 def test_utils_arrays():
     scalars = [7, 5.2]
 
@@ -152,6 +187,7 @@ def test_utils_np_arrays():
             assert isinstance(arr, array_util.ArrayLike.__args__)
 
 
+<<<<<<< HEAD
 def test_utils_color_files():
     """ test color palettes: read QML and TXT files """
     items = [
@@ -172,6 +208,130 @@ def test_utils_color_files():
         for k, v in item['pal'].items():
             # compare the first values against the hard-coded test sample
             assert cp1.pal[k] == v
+=======
+<<<<<<< HEAD
+@pytest.mark.parametrize("name,count,pal",
+                         [['color_paletted_red_green_0-255.qml', 256, {0: 0x00ffffff, 1: 0xFF808080}],
+                          ['color_pseudocolor_spectral_0-100.qml', 5, {0: 0xFFD7191C, 25: 0xFFFFFFBF}]])
+def test_utils_color_files(name: str, count: int, pal: dict):
+    """ test color palettes: read QML and TXT files """
+    root = Path(test_py_scripts.get_data_path('utilities'))
+    path = root / name
+    path2 = path.with_suffix('.txt')
+    cp1 = ColorPalette()
+    cp2 = ColorPalette()
+    cp1.read_file(path)
+    # cp1.write_file(path2)
+    cp2.read_file(path2)
+    assert cp1 == cp2
+    assert len(cp1.pal) == count
+    for k, v in pal.items():
+        # compare the first values against the hard-coded test sample
+        assert cp1.pal[k] == v
+
+
+@pytest.mark.parametrize("name,ndv",
+                         [['color_paletted_red_green_0-255.txt', None],
+                          ['color_paletted_red_green_0-1-nv.txt', 0]])
+def test_utils_color_files_nv(name: str, ndv: Optional[Real]):
+    """ test color palettes with and without nv """
+    root = Path(test_py_scripts.get_data_path('utilities'))
+
+    path = root / name
+    cp1 = ColorPalette()
+    cp1.read_file(path)
+    assert cp1.ndv == ndv
+
+    tmp_filename = Path('tmp') / name
+    temp_files.append(tmp_filename)
+    cp1.write_file(tmp_filename)
+    cp2 = ColorPalette()
+    cp2.read_file(tmp_filename)
+    assert cp1 == cp2
+
+
+def test_utils_color_table_and_palette():
+    pal = ColorPalette()
+    color_entries = {1: (255, 0, 0, 255), 2: (0, 255, 0, 255), 4: (1, 2, 3, 4)}
+    for k, v in color_entries.items():
+        pal.pal[k] = ColorPalette.color_entry_to_color(*v)
+
+    assert pal.pal[4] == 0x04010203, 'color entry to int'
+    ct4 = gdal.ColorTable()
+    ct256 = gdal.ColorTable()
+
+    color_table.color_table_from_color_palette(pal, ct4, fill_missing_colors=False)
+    assert ct4.GetCount() == 5, 'color table without filling'
+    color_table.color_table_from_color_palette(pal, ct256, fill_missing_colors=True)
+    assert ct256.GetCount() == 256, 'color table with filling'
+
+    assert (0, 0, 0, 0) == ct4.GetColorEntry(0), 'empty value'
+    assert (0, 0, 0, 0) == ct4.GetColorEntry(3), 'empty value'
+
+    assert color_entries[1] == ct256.GetColorEntry(0), 'filled value'
+    assert color_entries[2] == ct256.GetColorEntry(3), 'filled value'
+
+    for k, v in color_entries.items():
+        assert pal.pal[k] == ColorPalette.color_entry_to_color(*v), 'color in palette'
+        assert v == ct4.GetColorEntry(k) == ct256.GetColorEntry(k), 'color in table'
+
+    max_k = max(color_entries.keys())
+    for i in range(max_k, 256):
+        assert color_entries[max_k] == ct256.GetColorEntry(i), 'fill remaining entries'
+
+
+def test_read_write_color_table_from_raster():
+    """ test color palettes with and without nv """
+    gdaltest.tiff_drv = gdal.GetDriverByName('GTiff')
+    ds = gdaltest.tiff_drv.Create('tmp/ct8.tif', 1, 1, 1, gdal.GDT_Byte)
+    ct = get_color_table(ds)
+    assert ct is None
+
+    name = 'color_paletted_red_green_0-255.txt'
+    root = Path(test_py_scripts.get_data_path('utilities'))
+    path = root / name
+    cp1 = ColorPalette()
+    cp1.read_file(path)
+    ct = get_color_table(cp1)
+    assert ct is not None
+    ds.GetRasterBand(1).SetRasterColorTable(ct)
+
+    ct2 = get_color_table(ds)
+    assert ct2 is not None
+    assert ct.GetCount() == ct2.GetCount()
+    for k,v in cp1.pal.items():
+        assert ColorPalette.color_to_color_entry(v, with_alpha=True) == \
+               ct.GetColorEntry(k) == ct2.GetColorEntry(k)
+    # assert ct.GetColorEntry(0) == ct2.GetColorEntry(0)
+
+    ct = None
+    ct2 = None
+    ds = None
+
+    gdaltest.tiff_drv.Delete('tmp/ct8.tif')
+=======
+def test_utils_color_files():
+    """ test color palettes: read QML and TXT files """
+    items = [
+        dict(name='color_paletted_red_green_0-255.qml', count=256, pal={0: 0x00ffffff, 1: 0xFF808080}),
+        dict(name='colro_pseudocolor_spectral_0-100.qml', count=5, pal={0: 0xFFD7191C, 25: 0xFFFFFFBF}),
+    ]
+    root = Path(test_py_scripts.get_data_path('utilities'))
+    for item in items:
+        path = root / item['name']
+        path2 = path.with_suffix('.txt')
+        cp1 = ColorPalette()
+        cp2 = ColorPalette()
+        cp1.read_file(path)
+        # cp1.write_file(path2)
+        cp2.read_file(path2)
+        assert cp1 == cp2
+        assert len(cp1.pal) == item['count']
+        for k, v in item['pal'].items():
+            # compare the first values against the hard-coded test sample
+            assert cp1.pal[k] == v
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> OSGeo-master
 
 
 def test_utils_color_table_and_palette():

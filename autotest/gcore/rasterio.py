@@ -616,7 +616,7 @@ def test_rasterio_9():
                                           callback_data=tab)
     assert data is not None
     cs = rasterio_9_checksum(data, 162 * 16, 150 * 16)
-    assert cs == 30836
+    assert cs == 18981
     assert tab[0] == pytest.approx(1.0, abs=1e-5)
 
 ###############################################################################
@@ -723,8 +723,8 @@ def test_rasterio_13():
 
         ar_ds = mem_ds.ReadAsArray(0, 0, 4, 3, buf_xsize=8, buf_ysize=3, resample_alg=gdal.GRIORA_Cubic)
 
-        expected_ar = numpy.array([[0, 0, 0, 0, 0, 0, 0, 0], [0, 255, 255, 255, 255, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0]])
-        assert numpy.array_equal(ar_ds, expected_ar), dt
+        expected_ar = numpy.array([[0, 0, 0, 0, 0, 0, 0, 0], [0, 255, 255, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0]])
+        assert numpy.array_equal(ar_ds, expected_ar), (ar_ds, dt)
 
 
 ###############################################################################
@@ -1010,7 +1010,7 @@ def test_rasterio_dataset_invalid_resample_alg(resample_alg):
 def test_rasterio_floating_point_window_no_resampling():
     """ Test fix for #3101 """
 
-    ds = gdal.Translate('/vsimem/test.tif', gdal.Open('data/rgbsmall.tif'))
+    ds = gdal.Translate('/vsimem/test.tif', gdal.Open('data/rgbsmall.tif'), options = '-co INTERLEAVE=PIXEL')
     assert ds.GetMetadataItem('INTERLEAVE', 'IMAGE_STRUCTURE') == 'PIXEL'
 
     # Check that GDALDataset::IRasterIO() in block-based strategy behaves the
@@ -1027,7 +1027,7 @@ def test_rasterio_floating_point_window_no_resampling_numpy():
     # Same as above but using ReadAsArray() instead of ReadRaster()
     numpy = pytest.importorskip('numpy')
 
-    ds = gdal.Translate('/vsimem/test.tif', gdal.Open('data/rgbsmall.tif'))
+    ds = gdal.Translate('/vsimem/test.tif', gdal.Open('data/rgbsmall.tif'), options = '-co INTERLEAVE=PIXEL')
     assert ds.GetMetadataItem('INTERLEAVE', 'IMAGE_STRUCTURE') == 'PIXEL'
 
     data_per_band = numpy.stack([ds.GetRasterBand(i+1).ReadAsArray(0.1,0.2,10.4,11.4,buf_xsize=10,buf_ysize=11) for i in range(3)])
@@ -1066,17 +1066,49 @@ def test_rasterio_average_halfsize_downsampling_byte():
     v15 = 1
     v16 = 1
     m4 = (v13 + v14 + v15 + v16 + 2) >> 2
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> OSGeo-master
     ds = gdal.GetDriverByName('MEM').Create('', 18, 4, 1, gdal.GDT_Byte)
     ds.WriteRaster(0, 0, 18, 4,
                    struct.pack('B' * 18 * 4,
                                v1, v2, v5, v6, v9,  v10, v13, v14, v5, v6, v9,  v10, v13, v14, v1, v2, v5, v6,
                                v3, v4, v7, v8, v11, v12, v15, v16, v7, v8, v11, v12, v15, v16, v3, v4, v7, v8,
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> OSGeo-master
                                v1, v2, v5, v6, v9,  v10, v13, v14, v5, v6, v9,  v10, v13, v14, v1, v2, v5, v6,
                                v3, v4, v7, v8, v11, v12, v15, v16, v7, v8, v11, v12, v15, v16, v3, v4, v7, v8))
     # Ask for at least 8 output pixels in width to trigger SSE2 optim
     data = ds.GetRasterBand(1).ReadRaster(0, 0, 18, 4, 9, 2, resample_alg = gdal.GRIORA_Average)
     assert struct.unpack('B' * 9 * 2, data) == (m1, m2, m3, m4, m2, m3, m4, m1, m2,
                                                 m1, m2, m3, m4, m2, m3, m4, m1, m2)
+<<<<<<< HEAD
+=======
+=======
+    ds = gdal.GetDriverByName('MEM').Create('', 18, 2, 1, gdal.GDT_Byte)
+    ds.WriteRaster(0, 0, 18, 2,
+                   struct.pack('B' * 18 * 2,
+                               v1, v2, v5, v6, v9,  v10, v13, v14, v5, v6, v9,  v10, v13, v14, v1, v2, v5, v6,
+                               v3, v4, v7, v8, v11, v12, v15, v16, v7, v8, v11, v12, v15, v16, v3, v4, v7, v8))
+    # Ask for at least 8 output pixels in width to trigger SSE2 optim
+    data = ds.GetRasterBand(1).ReadRaster(0, 0, 18, 2, 9, 1, resample_alg = gdal.GRIORA_Average)
+    assert struct.unpack('B' * 9, data) == (m1, m2, m3, m4, m2, m3, m4, m1, m2)
+>>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+                               v1, v2, v5, v6, v9,  v10, v13, v14, v5, v6, v9,  v10, v13, v14, v1, v2, v5, v6,
+                               v3, v4, v7, v8, v11, v12, v15, v16, v7, v8, v11, v12, v15, v16, v3, v4, v7, v8))
+    # Ask for at least 8 output pixels in width to trigger SSE2 optim
+    data = ds.GetRasterBand(1).ReadRaster(0, 0, 18, 4, 9, 2, resample_alg = gdal.GRIORA_Average)
+    assert struct.unpack('B' * 9 * 2, data) == (m1, m2, m3, m4, m2, m3, m4, m1, m2,
+                                                m1, m2, m3, m4, m2, m3, m4, m1, m2)
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> OSGeo-master
 
     ds.BuildOverviews('AVERAGE', [2])
     ovr_data = ds.GetRasterBand(1).GetOverview(0).ReadRaster()
@@ -1176,7 +1208,19 @@ def test_rasterio_rms_halfsize_downsampling_float32():
         if math.isnan(expected[i]):
             assert math.isnan(got[i])
         else:
+<<<<<<< HEAD
             assert got[i] == pytest.approx(expected[i], rel=1e-7), i
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+            assert got[i] == pytest.approx(expected[i], rel=1e-7), i
+=======
+            assert got[i] == pytest.approx(expected[i], rel=1e-7)
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+            assert got[i] == pytest.approx(expected[i], rel=1e-7), i
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> OSGeo-master
 
     ds.BuildOverviews('RMS', [2])
     ovr_data = ds.GetRasterBand(1).GetOverview(0).ReadRaster()

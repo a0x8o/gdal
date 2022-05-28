@@ -242,6 +242,44 @@ do_log = False
 wcs_6_ok = True
 
 
+def compare_urls(a, b):
+    """Compare two WCS URLs taking into account that some items are floats
+    """
+    a_list = a.split('&')
+    b_list = b.split('&')
+    n = len(a_list)
+    if n != len(b_list):
+        return False
+    for i in (range(n)):
+        if not re.match('SUBSET=', a_list[i]):
+            if a_list[i] != b_list[i]:
+                print(a_list[i], '!=', b_list[i])
+                return False
+            continue
+        x = a_list[i]
+        y = b_list[i]
+        for c in ('SUBSET=[a-zA-Z]+', '%28', '%29'):
+            x = re.sub(c, '', x)
+            y = re.sub(c, '', y)
+        x_list = x.split(',')
+        y_list = y.split(',')
+        m = len(x_list)
+        if m != len(y_list):
+            return False
+        for j in (range(m)):
+            try:
+                c1 = float(x_list[j])
+                c2 = float(y_list[j])
+            except Exception as e:
+                print(repr(e))
+                return False
+            if c1 == c2:
+                continue
+            if abs((c1-c2)/c1) > 0.001:
+                return False
+    return True
+
+
 class WCSHTTPHandler(BaseHTTPRequestHandler):
 
     def log_request(self, code=',', size=','):
@@ -302,6 +340,24 @@ class WCSHTTPHandler(BaseHTTPRequestHandler):
         if 'test' in query2:
             test = query2['test'][0]
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+        key = server + '-' + version
+        if key in urls and test in urls[key]:
+            _, got = self.path.split('SERVICE=WCS')
+            got = re.sub(r'\&test=.*', '', got)
+            _, have = urls[key][test].split('SERVICE=WCS')
+            have += '&server=' + server
+            if compare_urls(got, have):
+                ok = 'ok'
+            else:
+                ok = "not ok\ngot:  " + got + "\nhave: " + have
+                global wcs_6_ok
+                wcs_6_ok = False
+            print('test ' + server + ' ' + test + ' WCS ' + version + ' ' + ok)
+=======
+>>>>>>> OSGeo-master
         if gdaltest.is_travis_branch('s390x') or gdaltest.is_travis_branch('graviton2') or gdaltest.is_travis_branch('ubuntu_2004'):
             # cannot strictly compare URL due to subtle difference of roundings
             # in BOUNDINGBOX computations.
@@ -320,6 +376,7 @@ class WCSHTTPHandler(BaseHTTPRequestHandler):
                     global wcs_6_ok
                     wcs_6_ok = False
                 print('test ' + server + ' ' + test + ' WCS ' + version + ' ' + ok)
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 
         self.Respond(request, server, version, test)
 

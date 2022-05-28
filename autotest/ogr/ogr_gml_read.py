@@ -74,6 +74,10 @@ def startup_and_cleanup():
     except OSError:
         pass
     try:
+        os.remove('data/gml/citygml_compound_crs.gfs')
+    except OSError:
+        pass
+    try:
         os.remove('data/gml/gnis_pop_100.gfs')
     except OSError:
         pass
@@ -209,6 +213,7 @@ def test_ogr_gml_2():
     assert gml_ds.GetLayerCount() == 1, 'wrong number of layers'
 
     lyr = gml_ds.GetLayerByName('GEM')
+    assert lyr.GetGeometryColumn() == 'Geometry'
     feat = lyr.GetNextFeature()
 
     assert feat.GetField('Name') == 'Aartselaar', 'Wrong name field value'
@@ -668,6 +673,37 @@ def test_ogr_gml_16():
         feat.DumpReadable()
         pytest.fail('did not get expected values')
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+###############################################################################
+# Test reading CityGML of Project PLATEAU
+
+
+def test_gml_read_compound_crs_lat_long():
+
+    if not gdaltest.have_gml_reader:
+        pytest.skip()
+
+    # open CityGML file
+    gml = ogr.Open('data/gml/citygml_compound_crs.gml')
+
+    # check number of layers
+    assert gml.GetLayerCount() == 1, 'Wrong layer count'
+
+    lyr = gml.GetLayer(0)
+    sr = osr.SpatialReference()
+    sr.ImportFromEPSG(6668)  # JGD2011
+    assert sr.IsSame(lyr.GetSpatialRef(), options = ['IGNORE_DATA_AXIS_TO_SRS_AXIS_MAPPING=YES']), 'Wrong SRS'
+
+    wkt = 'POLYHEDRALSURFACE Z (((139.812484938717 35.7092130413279 0.15,139.812489071491 35.7091641446533 0.15,139.812444202746 35.7091610722245 0.15,139.812439721473 35.7092112956502 0.15,139.812436111402 35.7092517484017 0.15,139.812481422309 35.7092546406366 0.15,139.812484938717 35.7092130413279 0.15)),((139.812484938717 35.7092130413279 0.15,139.812481422309 35.7092546406366 0.15,139.812481422309 35.7092546406366 12.08,139.812484938717 35.7092130413279 12.08,139.812484938717 35.7092130413279 0.15)),((139.812481422309 35.7092546406366 0.15,139.812436111402 35.7092517484017 0.15,139.812436111402 35.7092517484017 12.08,139.812481422309 35.7092546406366 12.08,139.812481422309 35.7092546406366 0.15)),((139.812436111402 35.7092517484017 0.15,139.812439721473 35.7092112956502 0.15,139.812439721473 35.7092112956502 12.08,139.812436111402 35.7092517484017 12.08,139.812436111402 35.7092517484017 0.15)),((139.812439721473 35.7092112956502 0.15,139.812444202746 35.7091610722245 0.15,139.812444202746 35.7091610722245 12.08,139.812439721473 35.7092112956502 12.08,139.812439721473 35.7092112956502 0.15)),((139.812444202746 35.7091610722245 0.15,139.812489071491 35.7091641446533 0.15,139.812489071491 35.7091641446533 12.08,139.812444202746 35.7091610722245 12.08,139.812444202746 35.7091610722245 0.15)),((139.812489071491 35.7091641446533 0.15,139.812484938717 35.7092130413279 0.15,139.812484938717 35.7092130413279 12.08,139.812489071491 35.7091641446533 12.08,139.812489071491 35.7091641446533 0.15)),((139.812484938717 35.7092130413279 12.08,139.812481422309 35.7092546406366 12.08,139.812436111402 35.7092517484017 12.08,139.812439721473 35.7092112956502 12.08,139.812444202746 35.7091610722245 12.08,139.812489071491 35.7091641446533 12.08,139.812484938717 35.7092130413279 12.08)))'
+
+    # check the first feature
+    feat = lyr.GetNextFeature()
+    assert not ogrtest.check_feature_geometry(feat, wkt), 'Wrong geometry'
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> OSGeo-master
 
 ###############################################################################
 # Read layer SRS for WFS 1.0.0 return
@@ -796,8 +832,22 @@ def test_ogr_gml_20():
 # Test writing GML3
 
 
+<<<<<<< HEAD
 @pytest.mark.parametrize('frmt', ['GML3', 'GML3Deegree', 'GML3.2'])
 def test_ogr_gml_21(frmt):
+=======
+<<<<<<< HEAD
+@pytest.mark.parametrize('frmt,base_filename',
+                         [('GML3', 'expected_gml_gml3'),
+                          ('GML3Deegree', 'expected_gml_gml3degree'),
+                          ('GML3.2', 'expected_gml_gml32')
+                         ])
+def test_ogr_gml_21(frmt,base_filename):
+=======
+@pytest.mark.parametrize('frmt', ['GML3', 'GML3Deegree', 'GML3.2'])
+def test_ogr_gml_21(frmt):
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> OSGeo-master
 
     if not gdaltest.have_gml_reader:
         pytest.skip()
@@ -806,13 +856,11 @@ def test_ogr_gml_21(frmt):
     sr = osr.SpatialReference()
     sr.ImportFromEPSG(4326)
 
-    for filename in ['tmp/gml_21.gml', 'tmp/gml_21.xsd', 'tmp/gml_21.gfs']:
-        try:
-            os.remove(filename)
-        except OSError:
-            pass
+    for ext in ('gml', 'gfs', 'xsd'):
+        gdal.Unlink('tmp/' + base_filename + '.' + ext)
 
-    ds = ogr.GetDriverByName('GML').CreateDataSource('tmp/gml_21.gml', options=['FORMAT=' + frmt])
+    filename = 'tmp/' + base_filename + '.gml'
+    ds = ogr.GetDriverByName('GML').CreateDataSource(filename, options=['FORMAT=' + frmt])
     lyr = ds.CreateLayer('firstlayer', srs=sr)
     lyr.CreateField(ogr.FieldDefn('string_field', ogr.OFTString))
 
@@ -830,7 +878,7 @@ def test_ogr_gml_21(frmt):
     ds = None
 
     # Reopen the file
-    ds = ogr.Open('tmp/gml_21.gml')
+    ds = ogr.Open(filename)
     lyr = ds.GetLayer(0)
     feat = lyr.GetNextFeature()
     assert feat.GetGeometryRef().ExportToWkt() == 'POINT (2 49)', \
@@ -838,44 +886,46 @@ def test_ogr_gml_21(frmt):
     ds = None
 
     # Test that .gml and .xsd are identical to what is expected
-    f1 = open('tmp/gml_21.gml', 'rt')
-    if frmt == 'GML3.2':
-        f2 = open('data/gml/expected_gml_gml32.gml', 'rt')
-    else:
-        f2 = open('data/gml/expected_gml_21.gml', 'rt')
+    f1 = open(filename, 'rt')
+    f2 = open('data/gml/' + base_filename + '.gml', 'rt')
     line1 = f1.readline()
     line2 = f2.readline()
     while line1 != '':
         line1 = line1.strip()
         line2 = line2.strip()
         if line1 != line2:
-            print(open('tmp/gml_21.gml', 'rt').read())
+            print(open(filename, 'rt').read())
             pytest.fail('.gml file not identical to expected')
         line1 = f1.readline()
         line2 = f2.readline()
     f1.close()
     f2.close()
 
-    f1 = open('tmp/gml_21.xsd', 'rt')
-    if frmt == 'GML3':
-        f2 = open('data/gml/expected_gml_21.xsd', 'rt')
-    elif frmt == 'GML3.2':
-        f2 = open('data/gml/expected_gml_gml32.xsd', 'rt')
-    else:
-        f2 = open('data/gml/expected_gml_21_deegree3.xsd', 'rt')
+    xsd_filename = filename[0:-3] + 'xsd'
+    f1 = open(xsd_filename, 'rt')
+    f2 = open('tmp/' + base_filename + '.xsd', 'rt')
     line1 = f1.readline()
     line2 = f2.readline()
     while line1 != '':
         line1 = line1.strip()
         line2 = line2.strip()
         if line1 != line2:
-            print(open('tmp/gml_21.xsd', 'rt').read())
+            print(open(xsd_filename, 'rt').read())
             pytest.fail('.xsd file not identical to expected')
         line1 = f1.readline()
         line2 = f2.readline()
     f1.close()
     f2.close()
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+    for ext in ('gml', 'gfs', 'xsd'):
+        gdal.Unlink('tmp/' + base_filename + '.' + ext)
+
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> OSGeo-master
 ###############################################################################
 # Read a OpenLS DetermineRouteResponse document
 
@@ -1489,7 +1539,7 @@ def test_ogr_gml_41():
     if not gdaltest.download_file('http://schemas.opengis.net/SCHEMAS_OPENGIS_NET.zip', 'SCHEMAS_OPENGIS_NET.zip'):
         pytest.skip()
 
-    ds = ogr.Open('data/gml/expected_gml_21.gml')
+    ds = ogr.Open('data/gml/expected_gml_gml3.gml')
 
     gdal.SetConfigOption('GDAL_OPENGIS_SCHEMAS', '/vsizip/./tmp/cache/SCHEMAS_OPENGIS_NET.zip')
     lyr = ds.ExecuteSQL('SELECT ValidateSchema()')
@@ -2970,7 +3020,7 @@ def test_ogr_gml_67():
     gdal.Unlink(filename[0:-3] + "gfs")
 
 ###############################################################################
-# Test reading GML with xsd with a choice of geometry properites
+# Test reading GML with xsd with a choice of geometry properties
 
 
 def test_ogr_gml_68():
@@ -3861,3 +3911,34 @@ def test_ogr_gml_srs_name_in_xsd(gml_format):
 
     gdal.Unlink(filename)
     gdal.Unlink(xsdfilename)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+
+
+###############################################################################
+
+
+def test_ogr_gml_too_nested():
+
+    if not gdaltest.have_gml_reader:
+        pytest.skip()
+
+    gdal.Unlink('data/gml/too_nested.gfs')
+
+    with gdaltest.error_handler():
+        ds = ogr.Open('data/gml/too_nested.gml')
+        lyr = ds.GetLayer(0)
+        assert lyr.GetNextFeature() is None
+
+    gdal.Unlink('data/gml/too_nested.gfs')
+
+    with gdaltest.config_option('OGR_GML_NESTING_LEVEL', 'UNLIMITED'):
+        ds = ogr.Open('data/gml/too_nested.gml')
+        lyr = ds.GetLayer(0)
+        assert lyr.GetNextFeature() is not None
+
+    gdal.Unlink('data/gml/too_nested.gfs')
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> OSGeo-master

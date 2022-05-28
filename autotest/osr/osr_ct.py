@@ -79,6 +79,7 @@ def test_osr_ct_2():
     utm_srs.SetWellKnownGeogCS('WGS84')
 
     ll_srs = osr.SpatialReference()
+    ll_srs.SetAxisMappingStrategy(osr.OAMS_AUTHORITY_COMPLIANT)
     ll_srs.SetWellKnownGeogCS('WGS84')
 
     ct = osr.CoordinateTransformation(ll_srs, utm_srs)
@@ -353,8 +354,10 @@ def test_osr_ct_options_area_of_interest():
 
     srs_nad27 = osr.SpatialReference()
     srs_nad27.SetFromUserInput("NAD27")
+    srs_nad27.SetAxisMappingStrategy(osr.OAMS_AUTHORITY_COMPLIANT)
     srs_wgs84 = osr.SpatialReference()
     srs_wgs84.SetFromUserInput("WGS84")
+    srs_wgs84.SetAxisMappingStrategy(osr.OAMS_AUTHORITY_COMPLIANT)
     options = osr.CoordinateTransformationOptions()
     assert not options.SetAreaOfInterest(-200,40,-99,41)
     assert not options.SetAreaOfInterest(-100,-100,-99,41)
@@ -543,8 +546,20 @@ def test_osr_ct_take_into_account_srs_coordinate_epoch():
 
     s = osr.SpatialReference()
     s.SetFromUserInput("EPSG:7844") # GDA2020
+<<<<<<< HEAD
 
     t_2020 = osr.SpatialReference()
+=======
+<<<<<<< HEAD
+    s.SetAxisMappingStrategy(osr.OAMS_AUTHORITY_COMPLIANT)
+
+    t_2020 = osr.SpatialReference()
+    t_2020.SetAxisMappingStrategy(osr.OAMS_AUTHORITY_COMPLIANT)
+=======
+
+    t_2020 = osr.SpatialReference()
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> OSGeo-master
     t_2020.SetFromUserInput("EPSG:9000") # ITRF2014
     t_2020.SetCoordinateEpoch(2020)
 
@@ -556,6 +571,13 @@ def test_osr_ct_take_into_account_srs_coordinate_epoch():
     assert y == pytest.approx(150, abs=1e-10)
 
     t_2030 = osr.SpatialReference()
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+    t_2030.SetAxisMappingStrategy(osr.OAMS_AUTHORITY_COMPLIANT)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> OSGeo-master
     t_2030.SetFromUserInput("EPSG:9000") # ITRF2014
     t_2030.SetCoordinateEpoch(2030)
 
@@ -574,3 +596,98 @@ def test_osr_ct_take_into_account_srs_coordinate_epoch():
     with gdaltest.error_handler():
         ct = osr.CoordinateTransformation(t_2020, t_2030)
     assert gdal.GetLastErrorMsg() != ''
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+
+###############################################################################
+# Test transformation between CRS that only differ by axis order
+
+def test_osr_ct_only_axis_order_different():
+
+    s_wrong_axis_order = osr.SpatialReference()
+    s_wrong_axis_order.SetFromUserInput("""GEOGCS["WGS 84",
+    DATUM["WGS_1984",
+        SPHEROID["WGS 84",6378137,298.257223563,
+            AUTHORITY["EPSG","7030"]],
+        AUTHORITY["EPSG","6326"]],
+    PRIMEM["Greenwich",0,
+        AUTHORITY["EPSG","8901"]],
+    UNIT["degree",0.0174532925199433,
+        AUTHORITY["EPSG","9122"]],
+    AXIS["Longitude",EAST],
+    AXIS["Latitude",NORTH]]""")
+
+    t = osr.SpatialReference()
+    t.ImportFromEPSG(4326)
+    t.SetAxisMappingStrategy(osr.OAMS_AUTHORITY_COMPLIANT)
+
+    ct = osr.CoordinateTransformation(s_wrong_axis_order, t)
+    x, y, _ = ct.TransformPoint(2, 49, 0)
+    assert x == 49
+    assert y == 2
+
+###############################################################################
+# Test transformation for a CRS whose definition contradicts the one of the
+# authority. NOTE: it is arguable that this is the correct behaviour. One
+# could consider that the AUTHORITY would have precedence.
+
+def test_osr_ct_wkt_non_consistent_with_epsg_definition():
+
+    s_wrong_axis_order = osr.SpatialReference()
+    s_wrong_axis_order.SetFromUserInput("""GEOGCS["WGS 84",
+    DATUM["WGS_1984",
+        SPHEROID["WGS 84",6378137,298.257223563,
+            AUTHORITY["EPSG","7030"]],
+        AUTHORITY["EPSG","6326"]],
+    PRIMEM["Greenwich",0,
+        AUTHORITY["EPSG","8901"]],
+    UNIT["degree",0.0174532925199433,
+        AUTHORITY["EPSG","9122"]],
+    AXIS["Longitude",EAST],
+    AXIS["Latitude",NORTH],
+    AUTHORITY["EPSG","4326"]]""")
+
+    t = osr.SpatialReference()
+    t.ImportFromEPSG(4326)
+    t.SetAxisMappingStrategy(osr.OAMS_AUTHORITY_COMPLIANT)
+
+    ct = osr.CoordinateTransformation(s_wrong_axis_order, t)
+    x, y, _ = ct.TransformPoint(2, 49, 0)
+    assert x == 49
+    assert y == 2
+
+
+###############################################################################
+# Test effect of OGR_CT_PREFER_OFFICIAL_SRS_DEF=NO
+# https://github.com/OSGeo/PROJ/issues/2955
+
+def test_osr_ct_OGR_CT_PREFER_OFFICIAL_SRS_DEF():
+
+    # Not sure about the minimal version, but works as expected with 7.2.1
+    if osr.GetPROJVersionMajor() * 100 + osr.GetPROJVersionMinor() < 702:
+        pytest.skip('requires PROJ 7.2 or later')
+
+    wkt = "PROJCS[\"OSGB 1936 / British National Grid\",GEOGCS[\"OSGB 1936\",DATUM[\"OSGB_1936\",SPHEROID[\"Airy 1830\",6377563.396,299.3249646,AUTHORITY[\"EPSG\",\"7001\"]],TOWGS84[446.448,-125.157,542.06,0.15,0.247,0.842,-20.489],AUTHORITY[\"EPSG\",\"6277\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4277\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",49],PARAMETER[\"central_meridian\",-2],PARAMETER[\"scale_factor\",0.9996012717],PARAMETER[\"false_easting\",400000],PARAMETER[\"false_northing\",-100000],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"27700\"]]"
+    s = osr.SpatialReference()
+    s.SetFromUserInput(wkt)
+
+    t = osr.SpatialReference()
+    t.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+    t.ImportFromEPSG(4258) # ETRS 89
+
+    # No datum shift
+    ct = osr.CoordinateTransformation(s, t)
+    x, y, _ = ct.TransformPoint(826158.063, 2405844.125, 0)
+    assert abs(x -  9.873) < 0.001, x
+    assert abs(y - 71.127) < 0.001, y
+
+    # Datum shift implied by the TOWGS4 clause
+    with gdaltest.config_option('OGR_CT_PREFER_OFFICIAL_SRS_DEF', 'NO'):
+        ct = osr.CoordinateTransformation(s, t)
+        x, y, _ = ct.TransformPoint(826158.063, 2405844.125, 0)
+        assert abs(x -  9.867) < 0.001, x
+        assert abs(y - 71.125) < 0.001, y
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> OSGeo-master

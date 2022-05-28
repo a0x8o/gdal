@@ -67,7 +67,9 @@ init_list = [
     ('seperate_strip.tif', 2, 15234),  # TODO: Spelling.
     ('contig_tiled.tif', 2, 15234),
     ('contig_strip.tif', 2, 15234),
-    ('empty1bit.tif', 1, 0)
+    ('empty1bit.tif', 1, 0),
+    ('gtiff/int64.tif', 1, 65535),
+    ('gtiff/uint64.tif', 1, 1),
 ]
 
 
@@ -632,6 +634,7 @@ def test_tiff_GTModelTypeGeoKey_only():
 # Test reading a 12bit jpeg compressed geotiff.
 
 
+@pytest.mark.skipif('SKIP_TIFF_JPEG12' in os.environ, reason='Crashes on build-windows-msys2-mingw')
 def test_tiff_12bitjpeg():
 
     old_accum = gdal.GetConfigOption('CPL_ACCUM_ERROR_MSG', 'OFF')
@@ -1587,6 +1590,22 @@ def test_tiff_read_md1():
 
     assert not os.path.exists('data/md_dg.tif.aux.xml')
 
+###############################################################################
+# Test CPLKeywordParser on non-conformant .IMD files
+# See https://github.com/OSGeo/gdal/issues/4037
+
+
+def test_tiff_read_non_conformant_imd():
+
+    gdal.FileFromMemBuffer('/vsimem/test.imd',
+                           """BEGIN_GROUP = foo\n\tkey = value with space ' not quoted;\n\tkey2 = another one ;\r\nEND_GROUP\nEND\n""");
+    gdal.FileFromMemBuffer('/vsimem/test.tif', open('data/byte.tif', 'rb').read())
+    ds = gdal.Open('/vsimem/test.tif')
+    md = ds.GetMetadata('IMD')
+    gdal.Unlink('/vsimem/test.imd')
+    gdal.Unlink('/vsimem/test.tif')
+    assert md == { 'foo.key': "value with space ' not quoted",
+                   'foo.key2': "another one" }
 
 ###############################################################################
 # Check read Digital Globe metadata XML format

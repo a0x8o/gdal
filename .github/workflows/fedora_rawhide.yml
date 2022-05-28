@@ -3,11 +3,14 @@ name: Fedora Rawhide
 on:
     push:
         paths-ignore:
-            - 'gdal/doc/**'
+            - 'doc/**'
     pull_request:
         paths-ignore:
-            - 'gdal/doc/**'
+            - 'doc/**'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 
 jobs:
 
@@ -28,4 +31,4 @@ jobs:
           restore-keys: ${{ runner.os }}-cache-fedora-rawhide-
 
       - name: Build
-        run: docker run --privileged=true -e CI -e WORK_DIR="$PWD" -v $PWD:$PWD -v /var/run/docker.sock:/var/run/docker.sock fedora:34 $PWD/.github/workflows/fedora_rawhide/start.sh
+        run: docker run --privileged=true -e CI -e WORK_DIR="$PWD" -v $PWD:$PWD -v /var/run/docker.sock:/var/run/docker.sock fedora:rawhide $PWD/.github/workflows/fedora_rawhide/start.sh

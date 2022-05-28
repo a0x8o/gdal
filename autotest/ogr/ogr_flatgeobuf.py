@@ -435,6 +435,10 @@ def test_ogr_flatgeobuf_mixed():
     destDS = ogr.Open('/vsimem/test.fgb')
     srcLyr = srcDS.GetLayer(0)
     destLyr = destDS.GetLayer(0)
+    assert destLyr.TestCapability(ogr.OLCFastFeatureCount)
+    assert destLyr.TestCapability(ogr.OLCFastGetExtent)
+    assert destLyr.GetFeatureCount(force=0) == srcLyr.GetFeatureCount()
+    assert destLyr.GetExtent(force=0) == srcLyr.GetExtent()
     ogrtest.compare_layers(srcLyr, destLyr)
 
     ogr.GetDriverByName('FlatGeobuf').DeleteDataSource('/vsimem/test.fgb')
@@ -722,6 +726,10 @@ def test_ogr_flatgeobuf_editing():
     ds = ogr.Open('/vsimem/test.fgb', update=1)
     lyr = ds.GetLayer(0)
 
+    f = ogr.Feature(lyr.GetLayerDefn())
+    f.SetGeometry(ogr.CreateGeometryFromWkt('POINT (1 1)'))
+    assert lyr.CreateFeature(f) == ogr.OGRERR_NONE
+
     assert lyr.TestCapability(ogr.OLCDeleteFeature) == 1
     assert lyr.DeleteFeature(1) == 0
     assert lyr.DeleteFeature(1) == ogr.OGRERR_NON_EXISTING_FEATURE
@@ -739,7 +747,7 @@ def test_ogr_flatgeobuf_editing():
     lyr = ds.GetLayer(0)
 
     c = lyr.GetFeatureCount()
-    assert c == 1
+    assert c == 2
 
     f = lyr.GetNextFeature()
     assert f is not None
@@ -748,7 +756,16 @@ def test_ogr_flatgeobuf_editing():
     assert f.GetFieldCount() == 1
 
     f = lyr.GetNextFeature()
+    assert f is not None
+    assert f.GetGeometryRef().ExportToWkt() == 'POINT (1 1)'
+
+    f = lyr.GetNextFeature()
     assert f is None
+
+    f = ogr.Feature(lyr.GetLayerDefn())
+    f.SetGeometry(ogr.CreateGeometryFromWkt('POINT (1 1)'))
+    with gdaltest.error_handler():
+        assert lyr.CreateFeature(f) != ogr.OGRERR_NONE
 
     ogr.GetDriverByName('FlatGeobuf').DeleteDataSource('/vsimem/test.fgb')
     assert not gdal.VSIStatL('/vsimem/test.fgb')
@@ -796,6 +813,27 @@ def test_ogr_flatgeobuf_ossfuzz_bug_29462():
 
 
 ###############################################################################
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+# Check that we don't crash or leak
+
+
+@pytest.mark.parametrize("filename", ['data/flatgeobuf/invalid_polyhedralsurface_of_curvepolygon.fgb',
+                                      'data/flatgeobuf/invalid_compoundcurve_non_contiguous_curves.fgb',
+                                      'data/flatgeobuf/invalid_curvepolygon_linestring_three_points.fgb',
+                                      'data/flatgeobuf/invalid_multisurface_of_polyhedralsurface.fgb'])
+def test_ogr_flatgeobuf_read_invalid_geometries(filename):
+    with gdaltest.error_handler():
+        ds = gdal.OpenEx(filename)
+        lyr = ds.GetLayer(0)
+        for f in lyr:
+            pass
+
+###############################################################################
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> OSGeo-master
 
 
 def test_ogr_flatgeobuf_read_coordinate_metadata_wkt():
@@ -805,6 +843,13 @@ def test_ogr_flatgeobuf_read_coordinate_metadata_wkt():
     got_srs = lyr.GetSpatialRef()
     assert got_srs is not None
     assert got_srs.IsGeographic()
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> OSGeo-master
 
 
 ###############################################################################
@@ -869,3 +914,22 @@ def test_ogr_flatgeobuf_coordinate_epoch_custom_wkt():
     ds = None
 
     ogr.GetDriverByName('FlatGeobuf').DeleteDataSource(filename)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+
+
+###############################################################################
+
+
+def test_ogr_flatgeobuf_invalid_output_filename():
+
+    ds = ogr.GetDriverByName('FlatGeobuf').CreateDataSource("/i_do/not_exist/my.fgb")
+    with gdaltest.error_handler():
+        assert ds.CreateLayer('foo') is None
+
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> OSGeo-master

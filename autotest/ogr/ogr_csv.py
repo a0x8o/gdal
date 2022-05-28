@@ -943,7 +943,7 @@ def test_ogr_csv_27():
         feat.DumpReadable()
         pytest.fail()
 
-    
+
 ###############################################################################
 # Check that we don't rewrite erroneously a file that has no header (#5161).
 
@@ -1197,7 +1197,7 @@ def test_ogr_csv_32():
         f.DumpReadable()
         pytest.fail()
 
-    
+
 ###############################################################################
 # Test Boolean, Int16 and Float32 support
 
@@ -1507,7 +1507,7 @@ def test_ogr_csv_38():
 
     ds = ogr.Open('/vsimem/ogr_csv_38.csv')
     lyr = ds.GetLayer(0)
-    assert lyr.GetLayerDefn().GetGeomFieldDefn(0).GetName() == 'mygeom'
+    assert lyr.GetLayerDefn().GetGeomFieldDefn(0).GetName() == 'geom_mygeom'
     assert lyr.GetLayerDefn().GetGeomFieldDefn(0).GetSpatialRef().ExportToWkt().find('4326') >= 0
     f = lyr.GetNextFeature()
     if f.GetGeometryRef().ExportToWkt() != 'POINT (2 49)':
@@ -1630,7 +1630,8 @@ def test_ogr_csv_42():
 
 def test_ogr_csv_43():
 
-    ds = ogr.GetDriverByName('CSV').CreateDataSource('/vsimem/ogr_csv_43.csv')
+    filename = '/vsimem/ogr_csv_43.csv'
+    ds = ogr.GetDriverByName('CSV').CreateDataSource(filename)
     lyr = ds.CreateLayer('ogr_csv_43', options=['GEOMETRY=AS_WKT', 'CREATE_CSVT=YES'])
     lyr.CreateField(ogr.FieldDefn('id', ogr.OFTInteger))
     f = ogr.Feature(lyr.GetLayerDefn())
@@ -1689,7 +1690,7 @@ def test_ogr_csv_43():
 
     ds = None
 
-    ds = ogr.Open('/vsimem/ogr_csv_43.csv', update=1)
+    ds = ogr.Open(filename, update=1)
     lyr = ds.GetLayer(0)
     f = lyr.GetFeature(2)
     if f['id'] != 2 or f['foo'] != 'baz' or f.GetGeometryRef().ExportToWkt() != 'POINT (3 50)':
@@ -1724,7 +1725,7 @@ def test_ogr_csv_43():
     f = None
     ds = None
 
-    ds = ogr.Open('/vsimem/ogr_csv_43.csv', update=1)
+    ds = ogr.Open(filename, update=1)
     lyr = ds.GetLayer(0)
     f = lyr.GetFeature(2)
     if f['id'] != 3:
@@ -1790,7 +1791,7 @@ def test_ogr_csv_43():
     f = None
     ds = None
 
-    ds = ogr.Open('/vsimem/ogr_csv_43.csv', update=1)
+    ds = ogr.Open(filename, update=1)
     lyr = ds.GetLayer(0)
     f = lyr.GetFeature(2)
     if f['WKT'] != 'POINT (1 2)' or f['_WKT_2'] != 'POINT (3 4)':
@@ -1803,8 +1804,8 @@ def test_ogr_csv_43():
     assert lyr.DeleteFeature(2) == ogr.OGRERR_NON_EXISTING_FEATURE
     ds = None
 
-    gdal.Unlink('/vsimem/ogr_csv_43.csv')
-    gdal.Unlink('/vsimem/ogr_csv_43.csvt')
+    gdal.Unlink(filename)
+    gdal.Unlink(filename + 't')
 
 ###############################################################################
 # Test seeking back while creating
@@ -1968,10 +1969,10 @@ def test_ogr_csv_47():
 
 def test_ogr_csv_48():
 
-    gdal.FileFromMemBuffer('/vsimem/ogr_csv_48.csvt', 'JsonStringList,JsonIntegerList,JsonInteger64List,JsonRealList\n')
+    gdal.FileFromMemBuffer('/vsimem/ogr_csv_48.csvt', 'JsonStringList,JsonStringList,JsonIntegerList,JsonInteger64List,JsonRealList\n')
     gdal.FileFromMemBuffer('/vsimem/ogr_csv_48.csv',
-                           """stringlist,intlist,int64list,reallist
-"[""a"",null]","[1]","[1234567890123]","[0.125]"
+                           """stringlist,emptystringlist,intlist,int64list,reallist
+"[""a"",null]",[],"[1]","[1234567890123]","[0.125]"
 """)
 
     gdal.VectorTranslate('/vsimem/ogr_csv_48_out.csv', '/vsimem/ogr_csv_48.csv', format='CSV', layerCreationOptions=['CREATE_CSVT=YES', 'LINEFORMAT=LF'])
@@ -1980,13 +1981,13 @@ def test_ogr_csv_48():
     data = gdal.VSIFReadL(1, 10000, f).decode('ascii')
     gdal.VSIFCloseL(f)
 
-    assert data.startswith('stringlist,intlist,int64list,reallist\n"[ ""a"", """" ]",[ 1 ],[ 1234567890123 ],[ 0.125')
+    assert data.startswith('stringlist,emptystringlist,intlist,int64list,reallist\n"[ ""a"", """" ]",[],[ 1 ],[ 1234567890123 ],[ 0.125')
 
     f = gdal.VSIFOpenL('/vsimem/ogr_csv_48_out.csvt', 'rb')
     data = gdal.VSIFReadL(1, 10000, f).decode('ascii')
     gdal.VSIFCloseL(f)
 
-    assert data.startswith('JSonStringList,JSonIntegerList,JSonInteger64List,JSonRealList')
+    assert data.startswith('JSonStringList,JSonStringList,JSonIntegerList,JSonInteger64List,JSonRealList')
 
     gdal.Unlink('/vsimem/ogr_csv_48.csv')
     gdal.Unlink('/vsimem/ogr_csv_48.csvt')

@@ -1342,7 +1342,7 @@ def test_jp2openjpeg_38():
 
     # No metadata
     src_ds = gdal.GetDriverByName('MEM').Create('', 2, 2)
-    wkt = """PROJCS["UTM Zone 31, Northern Hemisphere",GEOGCS["unnamed ellipse",DATUM["unknown",SPHEROID["unnamed",100,1]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",3],PARAMETER["scale_factor",0.9996],PARAMETER["false_easting",500000],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH]]"""
+    wkt = """PROJCS["UTM Zone 31, Northern Hemisphere",GEOGCS["unnamed ellipse",DATUM["unknown",SPHEROID["unnamed",100,2]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",3],PARAMETER["scale_factor",0.9996],PARAMETER["false_easting",500000],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH]]"""
     src_ds.SetProjection(wkt)
     src_ds.SetGeoTransform([0, 60, 0, 0, 0, -60])
     out_ds = gdaltest.jp2openjpeg_drv.CreateCopy('/vsimem/jp2openjpeg_38.jp2', src_ds, options=['GeoJP2=NO'])
@@ -1675,21 +1675,6 @@ def test_jp2openjpeg_42():
     ds = None
 
     gdal.Unlink('/vsimem/jp2openjpeg_42.jp2')
-
-###############################################################################
-# Get structure of a JPEG2000 file
-
-
-def test_jp2openjpeg_43():
-
-    ret = gdal.GetJPEG2000StructureAsString('data/jpeg2000/byte.jp2', ['ALL=YES'])
-    assert ret is not None
-
-    ret = gdal.GetJPEG2000StructureAsString('data/jpeg2000/byte_tlm_plt.jp2', ['ALL=YES'])
-    assert ret is not None
-
-    ret = gdal.GetJPEG2000StructureAsString('data/jpeg2000/byte_one_poc.j2k', ['ALL=YES'])
-    assert ret is not None
 
 ###############################################################################
 # Check a file against a OrthoimageryCoverage document
@@ -3007,7 +2992,15 @@ def test_jp2openjpeg_tilesize_16():
 
 def test_jp2openjpeg_generate_PLT():
 
+<<<<<<< HEAD
     # Only try the rest with openjpeg >= 2.4.0 that supports it
+=======
+<<<<<<< HEAD
+    # Only try the test with openjpeg >= 2.4.0 that supports it
+=======
+    # Only try the rest with openjpeg >= 2.4.0 that supports it
+>>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> OSGeo-master
     if gdaltest.jp2openjpeg_drv.GetMetadataItem('DMD_CREATIONOPTIONLIST').find('PLT') < 0:
         pytest.skip()
 
@@ -3034,7 +3027,15 @@ def test_jp2openjpeg_generate_PLT():
 
 def test_jp2openjpeg_generate_TLM():
 
+<<<<<<< HEAD
     # Only try the rest with openjpeg >= 2.5.0 that supports it
+=======
+<<<<<<< HEAD
+    # Only try the test with openjpeg >= 2.5.0 that supports it
+=======
+    # Only try the rest with openjpeg >= 2.5.0 that supports it
+>>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> OSGeo-master
     if gdaltest.jp2openjpeg_drv.GetMetadataItem('DMD_CREATIONOPTIONLIST').find('TLM') < 0:
         pytest.skip()
 
@@ -3054,3 +3055,32 @@ def test_jp2openjpeg_generate_TLM():
 
     gdaltest.jp2openjpeg_drv.Delete(filename)
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+
+
+###############################################################################
+# Test STRICT=NO open option
+
+
+def test_jp2openjpeg_STRICT_NO():
+
+    # Only try the test with openjpeg >= 2.5.0 that supports it
+    if "'STRICT'" not in gdaltest.jp2openjpeg_drv.GetMetadataItem('DMD_OPENOPTIONLIST'):
+        pytest.skip()
+
+    filename = 'data/jpeg2000/small_world_truncated.jp2'
+
+    ds = gdal.Open(filename)
+    with gdaltest.error_handler():
+        assert ds.GetRasterBand(1).Checksum() == 0
+    ds = None
+
+    ds = gdal.OpenEx(filename, open_options=['STRICT=NO'])
+    with gdaltest.error_handler():
+        assert ds.GetRasterBand(1).Checksum() == 5058
+    ds = None
+=======
+>>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> OSGeo-master
