@@ -248,13 +248,19 @@ BRUNSLI
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bca6c4ae53 (Doc: build_hints: document discrepancies between name of CMake options controlling driver build and driver names (fixes #5809))
 The `Brunsli <https://github.com/google/brunsli>`_ JPEG repacking library, used
 =======
 The `Brunsli <https://github.com/google/brunsli>` JPEG repacking library, used
 >>>>>>> 737746b0ed (Doc: build_hints: document discrepancies between name of CMake options controlling driver build and driver names (fixes #5809))
+<<<<<<< HEAD
 =======
 The `Brunsli <https://github.com/google/brunsli>`_ JPEG repacking library, used
 >>>>>>> 6fada317a7 (Update doc/source/build_hints.rst)
+=======
+>>>>>>> bca6c4ae53 (Doc: build_hints: document discrepancies between name of CMake options controlling driver build and driver names (fixes #5809))
 by the :ref:`raster.marfa` driver.
 
 .. option:: BRUNSLI_INCLUDE_DIR
