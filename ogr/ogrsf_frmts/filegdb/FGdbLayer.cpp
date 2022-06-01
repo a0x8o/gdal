@@ -2730,6 +2730,7 @@ bool FGdbLayer::Initialize(FGdbDataSource* pParentDataSource, Table* pTable,
                 else if (EQUAL(psNode->pszValue,"ShapeFieldName") )
                 {
                     m_strShapeFieldName = CPLGetXMLValue(psNode, nullptr, "");
+<<<<<<< HEAD
                 }
                 else if (EQUAL(psNode->pszValue,"AreaFieldName") )
                 {
@@ -2738,6 +2739,8 @@ bool FGdbLayer::Initialize(FGdbDataSource* pParentDataSource, Table* pTable,
                 else if (EQUAL(psNode->pszValue,"LengthFieldName") )
                 {
                     osLengthFieldName = CPLGetXMLValue(psNode, nullptr, "");
+=======
+>>>>>>> 920a123dfb (FileGDB: avoid crash when reading layer with AliasName with XML special characters (issue with embedded libxml2 in SDK), and fallback to OpenFileGDB driver to reliably retrieve it (fixes #5841))
                 }
                 else if (EQUAL(psNode->pszValue,"Fields") )
                 {
