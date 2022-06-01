@@ -391,6 +391,7 @@ def test_ogr_arrow_extension_type():
     ds = None
 
     gdal.Unlink(outfilename)
+<<<<<<< HEAD
 
 
 ###############################################################################
@@ -424,3 +425,5 @@ def test_ogr_arrow_read_with_geoarrow_extension_registered():
         assert lyr.GetGeometryColumn() == 'geometry'
     finally:
         pa.unregister_extension_type(point_type.extension_name)
+=======
+>>>>>>> 1c0e5e40b8 (Arrow: fix extension name key in field metadata (#5829))
