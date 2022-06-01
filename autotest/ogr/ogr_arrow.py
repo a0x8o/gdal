@@ -393,8 +393,11 @@ def test_ogr_arrow_extension_type():
     gdal.Unlink(outfilename)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> c3927ff77e (Arrow: fix reading geometry columns whose type is registered as an Arrow extension (fixes #5834))
+=======
+>>>>>>> 007a555ca7 (Arrow: fix extension name key in field metadata (#5829))
 
 
 ###############################################################################
@@ -429,7 +432,12 @@ def test_ogr_arrow_read_with_geoarrow_extension_registered():
     finally:
         pa.unregister_extension_type(point_type.extension_name)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 1c0e5e40b8 (Arrow: fix extension name key in field metadata (#5829))
 =======
 >>>>>>> c3927ff77e (Arrow: fix reading geometry columns whose type is registered as an Arrow extension (fixes #5834))
+=======
+=======
+>>>>>>> 1c0e5e40b8 (Arrow: fix extension name key in field metadata (#5829))
+>>>>>>> 007a555ca7 (Arrow: fix extension name key in field metadata (#5829))
