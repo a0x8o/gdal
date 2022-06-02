@@ -4769,12 +4769,15 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c9e8f1d1c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 52db1c95a2 (ComputeRasterMinMax(): avoid potential crash due to recent improvements. Fixes https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=47786. master only)
 =======
     GUInt32* panSum = reinterpret_cast<GUInt32*>(paby32ByteAligned + 32*2);
     GUInt32* panSumSquare = reinterpret_cast<GUInt32*>(paby32ByteAligned + 32*3);
@@ -4790,6 +4793,7 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
     GUInt32* panSumSquare = COMPUTE_OTHER_STATS ? reinterpret_cast<GUInt32*>(paby32ByteAligned + 32*3): nullptr;
 >>>>>>> 5e5d54dced (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> de48f9207c (ComputeRasterMinMax(): avoid potential crash due to recent improvements. Fixes https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=47786. master only)
 =======
@@ -4800,6 +4804,10 @@ static void ComputeStatisticsByteNoNodata( GPtrDiff_t nBlockPixels,
 >>>>>>> 1c9e8f1d1c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 344140fb99 (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
+=======
+=======
+>>>>>>> de48f9207c (ComputeRasterMinMax(): avoid potential crash due to recent improvements. Fixes https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=47786. master only)
+>>>>>>> 52db1c95a2 (ComputeRasterMinMax(): avoid potential crash due to recent improvements. Fixes https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=47786. master only)
 
     GPtrDiff_t i = 0;
     // Make sure that sumSquare can fit on uint32
@@ -5706,7 +5714,8 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
 >>>>>>> 1c9e8f1d1c (Merge branch 'master' of github.com:OSGeo/gdal)
         }
     }
-    else if ( !COMPUTE_OTHER_STATS && !bHasNoData && nXCheck >= 32 )
+    else if ( !COMPUTE_OTHER_STATS && !bHasNoData && nXCheck >= 32 &&
+              (nBlockXSize % 32) == 0 )
     {
         for( int iY = 0; iY < nYCheck; iY++ )
         {
