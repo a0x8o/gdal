@@ -1437,6 +1437,7 @@ FileGDBIterator* OGROpenFileGDBLayer::BuildIteratorFromExprNode(swq_expr_node* p
                     if( poField->GetType() == FGFT_STRING &&
                         poFieldDefn->GetType() == OFTString )
                     {
+<<<<<<< HEAD
                         // As the index use ' ' as padding value, we cannot
                         // fully trust the index.
                         if( (eOp == FGSO_EQ && poNode->nOperation != SWQ_NE) || eOp == FGSO_GE )
@@ -1444,6 +1445,8 @@ FileGDBIterator* OGROpenFileGDBLayer::BuildIteratorFromExprNode(swq_expr_node* p
                         else
                             return nullptr;
 
+=======
+>>>>>>> eab5266748 (OpenFileGDB: fix use of indexes on strings when the searched value is longer than the max indexed string, or ending with space)
                         const int nMaxWidthIndexedStr =
                             poField->GetIndex()->GetMaxWidthInBytes(m_poLyrTable);
                         if( nMaxWidthIndexedStr > 0 )
@@ -1458,16 +1461,42 @@ FileGDBIterator* OGROpenFileGDBLayer::BuildIteratorFromExprNode(swq_expr_node* p
                                 {
                                     pWide[nMaxWidthIndexedStr / sizeof(uint16_t)] = 0;
                                     char* pszTruncated = CPLRecodeFromWChar( pWide, CPL_ENC_UCS2, CPL_ENC_UTF8 );
+<<<<<<< HEAD
+=======
+                                    CPLFree(pWide);
+                                    pWide = nullptr;
+>>>>>>> eab5266748 (OpenFileGDB: fix use of indexes on strings when the searched value is longer than the max indexed string, or ending with space)
                                     if( pszTruncated )
                                     {
                                         osTruncatedStr = pszTruncated;
                                         sValue.String = &osTruncatedStr[0];
                                         CPLFree(pszTruncated);
+<<<<<<< HEAD
+=======
+                                        if( (eOp == FGSO_EQ && poNode->nOperation != SWQ_NE) || eOp == FGSO_GE )
+                                            bIteratorSufficient = false;
+                                        else
+                                            return nullptr;
+>>>>>>> eab5266748 (OpenFileGDB: fix use of indexes on strings when the searched value is longer than the max indexed string, or ending with space)
                                     }
                                 }
                                 CPLFree(pWide);
                             }
                         }
+<<<<<<< HEAD
+=======
+
+                        // As the index use ' ' as padding value, we cannot
+                        // trust a searched key ending with a space
+                        const size_t nLen = strlen(sValue.String);
+                        if( nLen > 0 && sValue.String[nLen-1] == ' ' )
+                        {
+                            if( (eOp == FGSO_EQ && poNode->nOperation != SWQ_NE) || eOp == FGSO_GE )
+                                bIteratorSufficient = false;
+                            else
+                                return nullptr;
+                        }
+>>>>>>> eab5266748 (OpenFileGDB: fix use of indexes on strings when the searched value is longer than the max indexed string, or ending with space)
                     }
 
                     FileGDBIterator* poIter = FileGDBIterator::Build(
@@ -1586,11 +1615,20 @@ FileGDBIterator* OGROpenFileGDBLayer::BuildIteratorFromExprNode(swq_expr_node* p
                                 {
                                     pWide[nMaxWidthIndexedStr / sizeof(uint16_t)] = 0;
                                     char* pszTruncated = CPLRecodeFromWChar( pWide, CPL_ENC_UCS2, CPL_ENC_UTF8 );
+<<<<<<< HEAD
+=======
+                                    CPLFree(pWide);
+                                    pWide = nullptr;
+>>>>>>> eab5266748 (OpenFileGDB: fix use of indexes on strings when the searched value is longer than the max indexed string, or ending with space)
                                     if( pszTruncated )
                                     {
                                         osTruncatedStr = pszTruncated;
                                         sValue.String = &osTruncatedStr[0];
                                         CPLFree(pszTruncated);
+<<<<<<< HEAD
+=======
+                                        bIteratorSufficient = false;
+>>>>>>> eab5266748 (OpenFileGDB: fix use of indexes on strings when the searched value is longer than the max indexed string, or ending with space)
                                     }
                                 }
                                 CPLFree(pWide);
@@ -1598,8 +1636,15 @@ FileGDBIterator* OGROpenFileGDBLayer::BuildIteratorFromExprNode(swq_expr_node* p
                         }
 
                         // As the index use ' ' as padding value, we cannot
+<<<<<<< HEAD
                         // fully trust the index.
                         bIteratorSufficient = false;
+=======
+                        // trust a searched key ending with a space
+                        const size_t nLen = strlen(sValue.String);
+                        if( nLen > 0 && sValue.String[nLen-1] == ' ' )
+                            bIteratorSufficient = false;
+>>>>>>> eab5266748 (OpenFileGDB: fix use of indexes on strings when the searched value is longer than the max indexed string, or ending with space)
                     }
 
                     FileGDBIterator* poIter = FileGDBIterator::Build(
