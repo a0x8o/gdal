@@ -635,6 +635,9 @@ def test_ogr_openfilegdb_str_indexed_truncated():
     IDX_USED = 1
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> a7b1b099fe (OpenFileGDB: fix use of indexes on strings when the searched value is longer than the max indexed string, or ending with space)
 
     tests = [("str = 'a'", [1], IDX_USED),
              ("str = 'aa'", [2], IDX_USED),
@@ -659,6 +662,7 @@ def test_ogr_openfilegdb_str_indexed_truncated():
              ("str IN ('aaaX')", [], IDX_USED),
 =======
     IDX_USED_AND_ITER_SUFFICIENT = 2
+<<<<<<< HEAD
 =======
 >>>>>>> bc7931bb31 (OpenFileGDB: further fix for use of attribute index on strings)
 
@@ -688,6 +692,31 @@ def test_ogr_openfilegdb_str_indexed_truncated():
 =======
              ("str IN ('aaaX')", [], IDX_USED),
 >>>>>>> bc7931bb31 (OpenFileGDB: further fix for use of attribute index on strings)
+=======
+
+    tests = [("str = 'a'", [1], IDX_USED_AND_ITER_SUFFICIENT),
+             ("str = 'aa'", [2], IDX_USED_AND_ITER_SUFFICIENT),
+             ("str != 'aa'", [1, 3], IDX_USED_AND_ITER_SUFFICIENT),
+             ("str = 'aaa'", [3], IDX_USED_AND_ITER_SUFFICIENT),
+             ("str >= 'aaa'", [3], IDX_USED_AND_ITER_SUFFICIENT),
+             ("str > 'aaa'", [], IDX_USED_AND_ITER_SUFFICIENT),
+             ("str > 'aa_'", [3], IDX_USED_AND_ITER_SUFFICIENT),
+             ("str <= 'aab'", [1, 2, 3], IDX_USED_AND_ITER_SUFFICIENT),
+             ("str = 'aaa '", [], IDX_USED),
+             ("str != 'aaa '", [1, 2, 3], IDX_NOT_USED),
+             ("str <= 'aaa '", [1, 2, 3], IDX_NOT_USED),
+             ("str <= 'aaaX'", [1, 2, 3], IDX_USED_AND_ITER_SUFFICIENT),
+             ("str >= 'aaa '", [], IDX_USED),
+             ("str = 'aaaX'", [], IDX_USED_AND_ITER_SUFFICIENT),
+             ("str = 'aaaXX'", [], IDX_USED),
+             ("str = 'aaa  '", [], IDX_USED),
+             ("str IN ('a', 'b')", [1], IDX_USED_AND_ITER_SUFFICIENT),
+             ("str IN ('aaa')", [3], IDX_USED_AND_ITER_SUFFICIENT),
+             ("str IN ('aaa', 'aaa ')", [3], IDX_USED),
+             ("str IN ('aaa ')", [], IDX_USED),
+             ("str IN ('aaaX')", [], IDX_USED_AND_ITER_SUFFICIENT),
+>>>>>>> eab5266748 (OpenFileGDB: fix use of indexes on strings when the searched value is longer than the max indexed string, or ending with space)
+>>>>>>> a7b1b099fe (OpenFileGDB: fix use of indexes on strings when the searched value is longer than the max indexed string, or ending with space)
              ("str IN ('aaaXX')", [], IDX_USED),
             ]
     for where_clause, fids, expected_attr_index_use in tests:
