@@ -2655,13 +2655,9 @@ void NITFDataset::InitializeNITFMetadata()
 
     int nImageSubheaderLen = 0;
 
-    for( int i = 0; i < psFile->nSegmentCount; ++i )
+    if (STARTS_WITH(psFile->pasSegmentInfo[psImage->iSegment].szSegmentType, "IM"))
     {
-        if (STARTS_WITH(psFile->pasSegmentInfo[i].szSegmentType, "IM"))
-        {
-            nImageSubheaderLen = psFile->pasSegmentInfo[i].nSegmentHeaderSize;
-            break;
-        }
+        nImageSubheaderLen = psFile->pasSegmentInfo[psImage->iSegment].nSegmentHeaderSize;
     }
 
     if( nImageSubheaderLen < 0 )
