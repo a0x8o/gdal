@@ -1489,17 +1489,25 @@ FileGDBIterator* OGROpenFileGDBLayer::BuildIteratorFromExprNode(swq_expr_node* p
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> a7b1b099fe (OpenFileGDB: fix use of indexes on strings when the searched value is longer than the max indexed string, or ending with space)
+=======
+>>>>>>> a236c24556 (OpenFileGDB: fix previous commit)
 =======
                                     CPLFree(pWide);
                                     pWide = nullptr;
 >>>>>>> eab5266748 (OpenFileGDB: fix use of indexes on strings when the searched value is longer than the max indexed string, or ending with space)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> f134df99dd (OpenFileGDB: fix previous commit)
 =======
 >>>>>>> a7b1b099fe (OpenFileGDB: fix use of indexes on strings when the searched value is longer than the max indexed string, or ending with space)
+=======
+=======
+>>>>>>> f134df99dd (OpenFileGDB: fix previous commit)
+>>>>>>> a236c24556 (OpenFileGDB: fix previous commit)
                                     if( pszTruncated )
                                     {
                                         osTruncatedStr = pszTruncated;
@@ -1686,17 +1694,25 @@ FileGDBIterator* OGROpenFileGDBLayer::BuildIteratorFromExprNode(swq_expr_node* p
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> a7b1b099fe (OpenFileGDB: fix use of indexes on strings when the searched value is longer than the max indexed string, or ending with space)
+=======
+>>>>>>> a236c24556 (OpenFileGDB: fix previous commit)
 =======
                                     CPLFree(pWide);
                                     pWide = nullptr;
 >>>>>>> eab5266748 (OpenFileGDB: fix use of indexes on strings when the searched value is longer than the max indexed string, or ending with space)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> f134df99dd (OpenFileGDB: fix previous commit)
 =======
 >>>>>>> a7b1b099fe (OpenFileGDB: fix use of indexes on strings when the searched value is longer than the max indexed string, or ending with space)
+=======
+=======
+>>>>>>> f134df99dd (OpenFileGDB: fix previous commit)
+>>>>>>> a236c24556 (OpenFileGDB: fix previous commit)
                                     if( pszTruncated )
                                     {
                                         osTruncatedStr = pszTruncated;
@@ -1705,16 +1721,22 @@ FileGDBIterator* OGROpenFileGDBLayer::BuildIteratorFromExprNode(swq_expr_node* p
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> a236c24556 (OpenFileGDB: fix previous commit)
 =======
                                         bIteratorSufficient = false;
 >>>>>>> eab5266748 (OpenFileGDB: fix use of indexes on strings when the searched value is longer than the max indexed string, or ending with space)
 =======
 >>>>>>> f134df99dd (OpenFileGDB: fix previous commit)
+<<<<<<< HEAD
 =======
 =======
                                         bIteratorSufficient = false;
 >>>>>>> eab5266748 (OpenFileGDB: fix use of indexes on strings when the searched value is longer than the max indexed string, or ending with space)
 >>>>>>> a7b1b099fe (OpenFileGDB: fix use of indexes on strings when the searched value is longer than the max indexed string, or ending with space)
+=======
+>>>>>>> a236c24556 (OpenFileGDB: fix previous commit)
                                     }
                                 }
                                 CPLFree(pWide);
