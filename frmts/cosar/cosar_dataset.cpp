@@ -126,7 +126,11 @@ CPLErr COSARRasterBand::IReadBlock(CPL_UNUSED int nBlockXOff,
     }
 
     /* Read the valid samples: */
+<<<<<<< HEAD
     VSIFReadL(((char *)pImage)+(static_cast<size_t>(nRSFV - 1)*4),1,static_cast<size_t>(nRSLV - nRSFV + 1)*4,pCDS->fp);
+=======
+    VSIFReadL(((char *)pImage)+((nRSFV - 1)*4),1,(nRSLV - nRSFV + 1)*4,pCDS->fp);
+>>>>>>> 3409266fd2 (COSAR: fix reading the last sample of each line (fixes #5622))
 
 #ifdef CPL_LSB
     GDALSwapWords( pImage, 2, nBlockXSize * nBlockYSize * 2, 2 );
@@ -180,7 +184,11 @@ GDALDataset *COSARDataset::Open( GDALOpenInfo * pOpenInfo ) {
     pDS->nRasterXSize = CPL_MSBWORD32(nXSize);
 
     int32_t nYSize;
+<<<<<<< HEAD
     VSIFReadL(&nYSize, 1, sizeof(nYSize), pDS->fp);
+=======
+    VSIFReadL(&nYSize, 1, sizeof(nXSize), pDS->fp);
+>>>>>>> 3409266fd2 (COSAR: fix reading the last sample of each line (fixes #5622))
     pDS->nRasterYSize = CPL_MSBWORD32(nYSize);
 
     if( !GDALCheckDatasetDimensions(pDS->nRasterXSize, pDS->nRasterYSize) )
