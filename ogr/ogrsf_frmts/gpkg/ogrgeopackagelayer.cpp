@@ -271,6 +271,7 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
                 if( nSqlite3ColType == SQLITE_TEXT )
                 {
                     const char* pszTxt = reinterpret_cast<const char*>(sqlite3_column_text( hStmt, iRawField ));
+<<<<<<< HEAD
                     if( pszTxt == nullptr )
                     {
                         CPLError(CE_Failure, CPLE_AppDefined, "%s",
@@ -286,6 +287,18 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
                     {
                         if( !bNominalFormat || psField->Date.Hour != 0 ||
                             psField->Date.Minute != 0 || psField->Date.Second != 0 )
+=======
+                    const size_t nLen = strlen(pszTxt);
+                    // nominal format: "YYYY-MM-DD" (10 characters)
+                    const bool bNominalFormat = (
+                        nLen == 10 && pszTxt[4] == '-' && pszTxt[7] == '-');
+                    OGRField sField;
+                    if ( OGRParseDate(pszTxt, &sField, 0) )
+                    {
+                        poFeature->SetField(iField, &sField);
+                        if( !bNominalFormat || sField.Date.Hour != 0 ||
+                            sField.Date.Minute != 0 || sField.Date.Second != 0 )
+>>>>>>> 13ed9881df (GPKG: performance improvement in reading DateTime)
                         {
                             constexpr int line = __LINE__;
                             if( !m_poDS->m_oSetGPKGLayerWarnings[line] )
@@ -336,6 +349,7 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
                 if( nSqlite3ColType == SQLITE_TEXT )
                 {
                     const char* pszTxt = reinterpret_cast<const char*>(sqlite3_column_text( hStmt, iRawField ));
+<<<<<<< HEAD
                     if( pszTxt == nullptr )
                     {
                         CPLError(CE_Failure, CPLE_AppDefined, "%s",
@@ -354,6 +368,21 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
                         pszTxt[19] == '.');
                     if ( OGRParseDate(pszTxt, psField, 0) )
                     {
+=======
+                    const size_t nLen = strlen(pszTxt);
+                    OGRField sField;
+                    // nominal format: "YYYY-MM-DDTHH:MM:SS.SSSZ" (24 characters)
+                    // but we also silently accept without timezone as OGR can
+                    // write this
+                    const bool bNominalFormat = (
+                        nLen >= 23 &&
+                        pszTxt[4] == '-' && pszTxt[7] == '-' &&
+                        pszTxt[10] == 'T' && pszTxt[13] == ':' && pszTxt[16] == ':' &&
+                        pszTxt[19] == '.');
+                    if ( OGRParseDate(pszTxt, &sField, 0) )
+                    {
+                        poFeature->SetField(iField, &sField);
+>>>>>>> 13ed9881df (GPKG: performance improvement in reading DateTime)
                         if( !bNominalFormat )
                         {
                             constexpr int line = __LINE__;
