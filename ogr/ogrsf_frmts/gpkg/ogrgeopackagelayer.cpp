@@ -273,8 +273,11 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
                     const char* pszTxt = reinterpret_cast<const char*>(sqlite3_column_text( hStmt, iRawField ));
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 109c1d96f2 (GPKG: make GetNextFeature() robust to out-of-memory issues in sqlite3)
+=======
+>>>>>>> c402f9db3a (GPKG: performance improvement in reading DateTime)
                     if( pszTxt == nullptr )
                     {
                         CPLError(CE_Failure, CPLE_AppDefined, "%s",
@@ -295,18 +298,27 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
                     // nominal format: "YYYY-MM-DD" (10 characters)
                     const bool bNominalFormat = (
                         nLen == 10 && pszTxt[4] == '-' && pszTxt[7] == '-');
+<<<<<<< HEAD
                     auto psField = poFeature->GetRawFieldRef(iField);
                     if ( OGRParseDate(pszTxt, psField, 0) )
                     {
 <<<<<<< HEAD
+=======
+                    OGRField sField;
+                    if ( OGRParseDate(pszTxt, &sField, 0) )
+                    {
+>>>>>>> c402f9db3a (GPKG: performance improvement in reading DateTime)
                         poFeature->SetField(iField, &sField);
                         if( !bNominalFormat || sField.Date.Hour != 0 ||
                             sField.Date.Minute != 0 || sField.Date.Second != 0 )
 >>>>>>> 13ed9881df (GPKG: performance improvement in reading DateTime)
+<<<<<<< HEAD
 =======
                         if( !bNominalFormat || psField->Date.Hour != 0 ||
                             psField->Date.Minute != 0 || psField->Date.Second != 0 )
 >>>>>>> 2bd2a2f468 (GPKG: performance improvement in reading features)
+=======
+>>>>>>> c402f9db3a (GPKG: performance improvement in reading DateTime)
                         {
                             constexpr int line = __LINE__;
                             if( !m_poDS->m_oSetGPKGLayerWarnings[line] )
@@ -359,8 +371,11 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
                     const char* pszTxt = reinterpret_cast<const char*>(sqlite3_column_text( hStmt, iRawField ));
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 109c1d96f2 (GPKG: make GetNextFeature() robust to out-of-memory issues in sqlite3)
+=======
+>>>>>>> c402f9db3a (GPKG: performance improvement in reading DateTime)
                     if( pszTxt == nullptr )
                     {
                         CPLError(CE_Failure, CPLE_AppDefined, "%s",
@@ -381,7 +396,11 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
                     {
 =======
                     const size_t nLen = strlen(pszTxt);
+<<<<<<< HEAD
                     auto psField = poFeature->GetRawFieldRef(iField);
+=======
+                    OGRField sField;
+>>>>>>> c402f9db3a (GPKG: performance improvement in reading DateTime)
                     // nominal format: "YYYY-MM-DDTHH:MM:SS.SSSZ" (24 characters)
                     // but we also silently accept without timezone as OGR can
                     // write this
@@ -390,6 +409,7 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
                         pszTxt[4] == '-' && pszTxt[7] == '-' &&
                         pszTxt[10] == 'T' && pszTxt[13] == ':' && pszTxt[16] == ':' &&
                         pszTxt[19] == '.');
+<<<<<<< HEAD
                     if ( OGRParseDate(pszTxt, psField, 0) )
                     {
 <<<<<<< HEAD
@@ -397,6 +417,12 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
 >>>>>>> 13ed9881df (GPKG: performance improvement in reading DateTime)
 =======
 >>>>>>> 2bd2a2f468 (GPKG: performance improvement in reading features)
+=======
+                    if ( OGRParseDate(pszTxt, &sField, 0) )
+                    {
+                        poFeature->SetField(iField, &sField);
+>>>>>>> 13ed9881df (GPKG: performance improvement in reading DateTime)
+>>>>>>> c402f9db3a (GPKG: performance improvement in reading DateTime)
                         if( !bNominalFormat )
                         {
                             constexpr int line = __LINE__;
