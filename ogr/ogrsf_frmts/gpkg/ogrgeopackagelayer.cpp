@@ -272,6 +272,9 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
                 {
                     const char* pszTxt = reinterpret_cast<const char*>(sqlite3_column_text( hStmt, iRawField ));
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 109c1d96f2 (GPKG: make GetNextFeature() robust to out-of-memory issues in sqlite3)
                     if( pszTxt == nullptr )
                     {
                         CPLError(CE_Failure, CPLE_AppDefined, "%s",
@@ -355,6 +358,9 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
                 {
                     const char* pszTxt = reinterpret_cast<const char*>(sqlite3_column_text( hStmt, iRawField ));
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 109c1d96f2 (GPKG: make GetNextFeature() robust to out-of-memory issues in sqlite3)
                     if( pszTxt == nullptr )
                     {
                         CPLError(CE_Failure, CPLE_AppDefined, "%s",
@@ -439,6 +445,9 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
 
             case OFTString:
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 109c1d96f2 (GPKG: make GetNextFeature() robust to out-of-memory issues in sqlite3)
             {
                 const char* pszTxt = reinterpret_cast<const char*>(
                     sqlite3_column_text( hStmt, iRawField ));
@@ -455,10 +464,13 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
                     CPLError(CE_Failure, CPLE_AppDefined, "%s",
                              sqlite3_errmsg(m_poDS->GetDB()));
                 }
+<<<<<<< HEAD
 =======
                 poFeature->SetFieldSameTypeUnsafe( iField,
                         CPLStrdup((const char *) sqlite3_column_text( hStmt, iRawField )) );
 >>>>>>> 2bd2a2f468 (GPKG: performance improvement in reading features)
+=======
+>>>>>>> 109c1d96f2 (GPKG: make GetNextFeature() robust to out-of-memory issues in sqlite3)
                 break;
             }
 
