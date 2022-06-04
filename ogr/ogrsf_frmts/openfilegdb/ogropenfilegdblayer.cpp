@@ -1468,10 +1468,13 @@ FileGDBIterator* OGROpenFileGDBLayer::BuildIteratorFromExprNode(swq_expr_node* p
                                     pWide[nMaxWidthIndexedStr / sizeof(uint16_t)] = 0;
                                     char* pszTruncated = CPLRecodeFromWChar( pWide, CPL_ENC_UCS2, CPL_ENC_UTF8 );
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                                     CPLFree(pWide);
                                     pWide = nullptr;
 >>>>>>> eab5266748 (OpenFileGDB: fix use of indexes on strings when the searched value is longer than the max indexed string, or ending with space)
+=======
+>>>>>>> f134df99dd (OpenFileGDB: fix previous commit)
                                     if( pszTruncated )
                                     {
                                         osTruncatedStr = pszTruncated;
@@ -1628,19 +1631,25 @@ FileGDBIterator* OGROpenFileGDBLayer::BuildIteratorFromExprNode(swq_expr_node* p
                                     pWide[nMaxWidthIndexedStr / sizeof(uint16_t)] = 0;
                                     char* pszTruncated = CPLRecodeFromWChar( pWide, CPL_ENC_UCS2, CPL_ENC_UTF8 );
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                                     CPLFree(pWide);
                                     pWide = nullptr;
 >>>>>>> eab5266748 (OpenFileGDB: fix use of indexes on strings when the searched value is longer than the max indexed string, or ending with space)
+=======
+>>>>>>> f134df99dd (OpenFileGDB: fix previous commit)
                                     if( pszTruncated )
                                     {
                                         osTruncatedStr = pszTruncated;
                                         sValue.String = &osTruncatedStr[0];
                                         CPLFree(pszTruncated);
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                                         bIteratorSufficient = false;
 >>>>>>> eab5266748 (OpenFileGDB: fix use of indexes on strings when the searched value is longer than the max indexed string, or ending with space)
+=======
+>>>>>>> f134df99dd (OpenFileGDB: fix previous commit)
                                     }
                                 }
                                 CPLFree(pWide);
