@@ -274,10 +274,15 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 109c1d96f2 (GPKG: make GetNextFeature() robust to out-of-memory issues in sqlite3)
 =======
 >>>>>>> c402f9db3a (GPKG: performance improvement in reading DateTime)
+=======
+=======
+>>>>>>> 109c1d96f2 (GPKG: make GetNextFeature() robust to out-of-memory issues in sqlite3)
+>>>>>>> 86e406213b (GPKG: make GetNextFeature() robust to out-of-memory issues in sqlite3)
                     if( pszTxt == nullptr )
                     {
                         CPLError(CE_Failure, CPLE_AppDefined, "%s",
@@ -385,10 +390,15 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 109c1d96f2 (GPKG: make GetNextFeature() robust to out-of-memory issues in sqlite3)
 =======
 >>>>>>> c402f9db3a (GPKG: performance improvement in reading DateTime)
+=======
+=======
+>>>>>>> 109c1d96f2 (GPKG: make GetNextFeature() robust to out-of-memory issues in sqlite3)
+>>>>>>> 86e406213b (GPKG: make GetNextFeature() robust to out-of-memory issues in sqlite3)
                     if( pszTxt == nullptr )
                     {
                         CPLError(CE_Failure, CPLE_AppDefined, "%s",
@@ -500,10 +510,15 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 109c1d96f2 (GPKG: make GetNextFeature() robust to out-of-memory issues in sqlite3)
 =======
 >>>>>>> 451f9cbf11 (GPKG: performance improvement in reading features)
+=======
+=======
+>>>>>>> 109c1d96f2 (GPKG: make GetNextFeature() robust to out-of-memory issues in sqlite3)
+>>>>>>> 86e406213b (GPKG: make GetNextFeature() robust to out-of-memory issues in sqlite3)
             {
                 const char* pszTxt = reinterpret_cast<const char*>(
                     sqlite3_column_text( hStmt, iRawField ));
@@ -522,17 +537,25 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
                 }
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 451f9cbf11 (GPKG: performance improvement in reading features)
+=======
+>>>>>>> 86e406213b (GPKG: make GetNextFeature() robust to out-of-memory issues in sqlite3)
 =======
                 poFeature->SetFieldSameTypeUnsafe( iField,
                         CPLStrdup((const char *) sqlite3_column_text( hStmt, iRawField )) );
 >>>>>>> 2bd2a2f468 (GPKG: performance improvement in reading features)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 109c1d96f2 (GPKG: make GetNextFeature() robust to out-of-memory issues in sqlite3)
 =======
 >>>>>>> 451f9cbf11 (GPKG: performance improvement in reading features)
+=======
+=======
+>>>>>>> 109c1d96f2 (GPKG: make GetNextFeature() robust to out-of-memory issues in sqlite3)
+>>>>>>> 86e406213b (GPKG: make GetNextFeature() robust to out-of-memory issues in sqlite3)
                 break;
             }
 
