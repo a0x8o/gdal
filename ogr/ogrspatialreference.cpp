@@ -3787,8 +3787,12 @@ OGRErr OGRSpatialReference::SetFromUserInput( const char * pszDefinition,
             // PROJ < 9.0.1 doesn't like a datum_ensemble whose member have
             // a unknown id.
             CPLJSONDocument oCRSDoc;
+<<<<<<< HEAD
             if( !oCRSDoc.LoadMemory(pszDefinition) )
                 return OGRERR_CORRUPT_DATA;
+=======
+            oCRSDoc.LoadMemory(pszDefinition);
+>>>>>>> 35e94cc4b2 (OGRSpatialReference: PROJJSON import: be robust to a datum_ensemble with a member whose id is unknown (workarounds OSGeo/PROJ#3221, refs https://github.com/opengeospatial/geoparquet/discussions/110))
             CPLJSONObject oCRSRoot = oCRSDoc.GetRoot();
             RemoveIDFromMemberOfEnsembles(oCRSRoot);
             pj = proj_create(d->getPROJContext(), oCRSRoot.ToString().c_str());
