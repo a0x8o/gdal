@@ -5417,17 +5417,23 @@ template<bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal<GByte, COMPU
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 884464cdda (GDALRasterBand::ComputeMinMax(): make sure not to use uninitialized variables (CID 1489577, 1489578) (master only))
                 nValidCount ++;
 =======
 >>>>>>> 5e5d54dced (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
 =======
                 nValidCount ++;
 >>>>>>> b1abc11cce (GDALRasterBand::ComputeMinMax(): make sure not to use uninitialized variables (CID 1489577, 1489578) (master only))
+<<<<<<< HEAD
 =======
                 nValidCount ++;
 =======
 >>>>>>> 5e5d54dced (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
 >>>>>>> 344140fb99 (GDALRasterBand::ComputeRasterMinMax(): add optimized implementation for Byte and UInt16 data types)
+=======
+>>>>>>> 884464cdda (GDALRasterBand::ComputeMinMax(): make sure not to use uninitialized variables (CID 1489577, 1489578) (master only))
                 nSum += nValue;
                 nSumSquare += static_cast_for_coverity_scan<GUIntBig>(nValue) * nValue;
             }
