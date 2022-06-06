@@ -853,15 +853,21 @@ char** VSIGetFileMetadata( const char * pszFilename, const char* pszDomain,
  * <li>HEADERS: specific to /vsis3/ and /vsigs/: to set HTTP headers, such as
  * "Content-Type", or other file system specific header.
  * For /vsigs/, this also includes: x-goog-meta-{key}={value}. Note that you
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/port/cpl_vsil.cpp
  * should specify all metadata to be set, as existing metadata will be overriden.
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:port/cpl_vsil.cpp
  * should specify all metadata to be set, as existing metadata will be overridden.
 =======
  * should specify all metadata to be set, as existing metadata will be overriden.
 >>>>>>> 8d1efd1c06 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_vsil.cpp
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:port/cpl_vsil.cpp
+=======
+>>>>>>> OSGeo-master
  * </li>
  * <li>TAGS: Content of papszMetadata should be KEY=VALUE pairs.
  *    <ul>

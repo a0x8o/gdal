@@ -8,6 +8,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/docker/alpine-normal/Dockerfile
 ARG ALPINE_VERSION=3.14
 =======
@@ -21,11 +22,14 @@ ARG ALPINE_VERSION=3.14
 ARG ALPINE_VERSION=3.16
 >>>>>>> 0f99b0ef18 (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:docker/alpine-normal/Dockerfile
 ARG ALPINE_VERSION=3.16
 =======
 ARG ALPINE_VERSION=3.14
 >>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/docker/alpine-normal/Dockerfile
+<<<<<<< HEAD
 >>>>>>> c71573c49d (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD:docker/alpine-normal/Dockerfile
@@ -34,6 +38,8 @@ ARG ALPINE_VERSION=3.16
 ARG ALPINE_VERSION=3.14
 >>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/docker/alpine-normal/Dockerfile
 >>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 FROM alpine:${ALPINE_VERSION} as builder
 
 # Derived from osgeo/proj by Howard Butler <howard@hobu.co>
@@ -54,15 +60,21 @@ ARG POPPLER_DEV=poppler-dev
 RUN apk add --no-cache \
     linux-headers \
     curl-dev tiff-dev \
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/docker/alpine-normal/Dockerfile
     zlib-dev zstd-dev xz-dev \
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:docker/alpine-normal/Dockerfile
     zlib-dev zstd-dev xz-dev snappy-dev \
 =======
     zlib-dev zstd-dev xz-dev \
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/docker/alpine-normal/Dockerfile
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:docker/alpine-normal/Dockerfile
+=======
+>>>>>>> OSGeo-master
     libjpeg-turbo-dev libpng-dev openjpeg-dev libwebp-dev expat-dev \
     py3-numpy-dev python3-dev py3-setuptools py3-numpy \
     ${POPPLER_DEV} postgresql-dev \
@@ -359,15 +371,21 @@ RUN apk add --no-cache \
         libstdc++ \
         sqlite-libs \
         libcurl tiff \
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/docker/alpine-normal/Dockerfile
         zlib zstd-libs xz-libs \
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:docker/alpine-normal/Dockerfile
         zlib zstd-libs xz-libs snappy \
 =======
         zlib zstd-libs xz-libs \
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/docker/alpine-normal/Dockerfile
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:docker/alpine-normal/Dockerfile
+=======
+>>>>>>> OSGeo-master
         libjpeg-turbo libpng libwebp expat \
         icu-libs \
         python3 py3-numpy ${POPPLER} pcre libpq libxml2 portablexdr openjpeg \

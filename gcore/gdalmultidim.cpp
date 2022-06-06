@@ -35,13 +35,19 @@
 
 #include <ctype.h> // isalnum
 
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/gdalmultidim.cpp
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:gcore/gdalmultidim.cpp
 #include "cpl_error_internal.h"
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/gcore/gdalmultidim.cpp
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:gcore/gdalmultidim.cpp
+=======
+>>>>>>> OSGeo-master
 #include "gdal_priv.h"
 #include "gdal_pam.h"
 #include "gdal_utils.h"
@@ -3604,16 +3610,22 @@ bool GDALMDArray::IAdviseRead(const GUInt64*, const size_t*, CSLConstList /* pap
 /*                            MassageName()                             */
 /************************************************************************/
 
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/gdalmultidim.cpp
 static std::string MassageName(const std::string& inputName)
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:gcore/gdalmultidim.cpp
 //! @cond Doxygen_Suppress
 /*static*/ std::string GDALMDArray::MassageName(const std::string& inputName)
 =======
 static std::string MassageName(const std::string& inputName)
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/gcore/gdalmultidim.cpp
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:gcore/gdalmultidim.cpp
+=======
+>>>>>>> OSGeo-master
 {
     std::string ret;
     for( const char ch: inputName )
@@ -3625,8 +3637,11 @@ static std::string MassageName(const std::string& inputName)
     }
     return ret;
 }
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/gdalmultidim.cpp
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:gcore/gdalmultidim.cpp
 //! @endcond
 
@@ -3711,7 +3726,10 @@ std::shared_ptr<GDALGroup> GDALMDArray::GetCacheRootGroup(bool bCanCreate,
 //! @endcond
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/gcore/gdalmultidim.cpp
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:gcore/gdalmultidim.cpp
+=======
+>>>>>>> OSGeo-master
 
 /************************************************************************/
 /*                              Cache()                                 */
@@ -3725,8 +3743,11 @@ std::shared_ptr<GDALGroup> GDALMDArray::GetCacheRootGroup(bool bCanCreate,
  * The array will be stored in a file whose name is the one of
  * GetFilename(), with an extra .gmac extension (stands for GDAL Multidimensional
  * Array Cache). The cache is a netCDF dataset.
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/gdalmultidim.cpp
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:gcore/gdalmultidim.cpp
  *
  * If the .gmac file cannot be written next to the dataset, the
@@ -3735,7 +3756,10 @@ std::shared_ptr<GDALGroup> GDALMDArray::GetCacheRootGroup(bool bCanCreate,
  *
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/gcore/gdalmultidim.cpp
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:gcore/gdalmultidim.cpp
+=======
+>>>>>>> OSGeo-master
  * The GDALMDArray::Read() method will automatically use the cache when it exists.
  * There is no timestamp checks between the source array and the cached array.
  * If the source arrays changes, the cache must be manually deleted.
@@ -3751,15 +3775,21 @@ std::shared_ptr<GDALGroup> GDALMDArray::GetCacheRootGroup(bool bCanCreate,
  */
 bool GDALMDArray::Cache( CSLConstList papszOptions ) const
 {
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/gdalmultidim.cpp
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:gcore/gdalmultidim.cpp
     std::string osCacheFilename;
     auto poRG = GetCacheRootGroup(true, osCacheFilename);
     if( !poRG )
         return false;
 =======
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:gcore/gdalmultidim.cpp
+=======
+>>>>>>> OSGeo-master
     const auto& osFilename = GetFilename();
     if( osFilename.empty() )
     {
@@ -3792,10 +3822,14 @@ bool GDALMDArray::Cache( CSLConstList papszOptions ) const
     }
     auto poRG = poDS->GetRootGroup();
     assert( poRG );
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/gdalmultidim.cpp
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/gcore/gdalmultidim.cpp
 >>>>>>> OSGeo-master:gcore/gdalmultidim.cpp
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/gcore/gdalmultidim.cpp
+>>>>>>> OSGeo-master
 
     const std::string osCachedArrayName(MassageName(GetFullName()));
     if( poRG->OpenMDArray(osCachedArrayName) )
@@ -3877,6 +3911,7 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
                       const void* pDstBufferAllocStart,
                       size_t nDstBufferAllocSize) const
 {
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/gdalmultidim.cpp
 =======
 <<<<<<< HEAD:gcore/gdalmultidim.cpp
@@ -3895,6 +3930,10 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
 <<<<<<< HEAD:gcore/gdalmultidim.cpp
 >>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
 >>>>>>> d263d6ecd7 (Docker: alpine-normal: add lzma support [ci skip])
+=======
+<<<<<<< HEAD:gcore/gdalmultidim.cpp
+<<<<<<< HEAD:gcore/gdalmultidim.cpp
+>>>>>>> OSGeo-master
     if( !m_bHasTriedCachedArray )
     {
         m_bHasTriedCachedArray = true;
@@ -3944,6 +3983,9 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
     if( !m_bHasTriedCachedArray && !osFilename.empty() )
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> OSGeo-master
 =======
     if( !m_bHasTriedCachedArray )
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/gcore/gdalmultidim.cpp
@@ -3955,6 +3997,7 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
             if( !osFilename.empty() &&
                 !EQUAL(CPLGetExtension(osFilename.c_str()), "gmac") )
             {
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:gcore/gdalmultidim.cpp
                 const auto osCacheFilename = osFilename + ".gmac";
                 std::unique_ptr<GDALDataset> poDS(GDALDataset::Open(
@@ -3985,6 +4028,8 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
             if( !osFilename.empty() &&
                 !EQUAL(CPLGetExtension(osFilename.c_str()), "gmac") )
             {
+=======
+>>>>>>> OSGeo-master
                 const auto osCacheFilename = osFilename + ".gmac";
                 std::unique_ptr<GDALDataset> poDS(GDALDataset::Open(
                                 osCacheFilename.c_str(), GDAL_OF_MULTIDIM_RASTER));
@@ -3998,10 +4043,14 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
                     if( m_poCachedArray )
                     {
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 =======
 <<<<<<< HEAD:gcore/gdalmultidim.cpp
 >>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
+=======
+<<<<<<< HEAD:gcore/gdalmultidim.cpp
+>>>>>>> OSGeo-master
                         ok = dims[i]->GetSize() == cachedDims[i]->GetSize();
                     }
                     if( !ok )
@@ -4015,10 +4064,14 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/gcore/gdalmultidim.cpp
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
 =======
 >>>>>>> OSGeo-master:gcore/gdalmultidim.cpp
+=======
+=======
+>>>>>>> OSGeo-master
                         const auto& dims = GetDimensions();
                         const auto& cachedDims = m_poCachedArray->GetDimensions();
                         const size_t nDims = dims.size();
@@ -4038,6 +4091,7 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
                                      osCacheFilename.c_str());
                             m_poCachedArray.reset();
                         }
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/gdalmultidim.cpp
 =======
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/gcore/gdalmultidim.cpp
@@ -4054,6 +4108,9 @@ bool GDALMDArray::Read(const GUInt64* arrayStartIdx,
 =======
 >>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
 >>>>>>> d263d6ecd7 (Docker: alpine-normal: add lzma support [ci skip])
+=======
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/gcore/gdalmultidim.cpp
+>>>>>>> OSGeo-master
                     }
                 }
             }

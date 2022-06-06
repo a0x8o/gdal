@@ -1640,15 +1640,21 @@ OGRGMLLayer *OGRGMLDataSource::TranslateGMLSchema( GMLFeatureClass *poClass )
             OGRSpatialReference* poSRS2 = new OGRSpatialReference();
             poSRS2->SetAxisMappingStrategy(
                 m_bInvertAxisOrderIfLatLong ? OAMS_TRADITIONAL_GIS_ORDER : OAMS_AUTHORITY_COMPLIANT);
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gml/ogrgmldatasource.cpp
             if( poSRS2->SetFromUserInput(osSRSName.c_str()) == OGRERR_NONE )
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:ogr/ogrsf_frmts/gml/ogrgmldatasource.cpp
             if( poSRS2->SetFromUserInput(osSRSName.c_str(), OGRSpatialReference::SET_FROM_USER_INPUT_LIMITATIONS_get()) == OGRERR_NONE )
 =======
             if( poSRS2->SetFromUserInput(osSRSName.c_str()) == OGRERR_NONE )
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/ogr/ogrsf_frmts/gml/ogrgmldatasource.cpp
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/gml/ogrgmldatasource.cpp
+=======
+>>>>>>> OSGeo-master
             {
                 oField.SetSpatialRef(poSRS2);
             }

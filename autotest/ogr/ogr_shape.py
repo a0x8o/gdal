@@ -3827,8 +3827,11 @@ def test_ogr_shape_wgs84_with_zero_TOWGS84():
 
     ogr.GetDriverByName('ESRI Shapefile').DeleteDataSource('/vsimem/test_ogr_shape_wgs84_with_zero_TOWGS84.shp')
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> OSGeo-master
 
 ###############################################################################
 # Test a ETRS89-based CRS with a TOWGS84[0,0,0,0,0,0]
@@ -3851,6 +3854,9 @@ def test_ogr_shape_etrs89_with_zero_TOWGS84():
     ogr.GetDriverByName('ESRI Shapefile').DeleteDataSource('/vsimem/test_ogr_shape_etrs89_with_zero_TOWGS84.shp')
 =======
 >>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> OSGeo-master
+=======
 >>>>>>> OSGeo-master
 
 ###############################################################################

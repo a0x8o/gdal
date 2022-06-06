@@ -3332,15 +3332,21 @@ CPLErr GTIFMemBufFromSRS( OGRSpatialReferenceH hSRS, const double *padfGeoTransf
     if( hSRS != nullptr || bPixelIsPoint )
     {
         hGTIF = GTIFNew(hTIFF);
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/gtiff/gt_wkt_srs.cpp
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:frmts/gtiff/gt_wkt_srs.cpp
         if (hGTIF)
             GTIFAttachPROJContext(hGTIF, OSRGetProjTLSContext());
 
 =======
 >>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/gtiff/gt_wkt_srs.cpp
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/gtiff/gt_wkt_srs.cpp
+=======
+>>>>>>> OSGeo-master
         if( hSRS != nullptr )
             GTIFSetFromOGISDefnEx( hGTIF, hSRS,
                                    GEOTIFF_KEYS_STANDARD,

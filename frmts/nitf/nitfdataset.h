@@ -72,9 +72,12 @@ class NITFDataset final: public GDALPamDataset
 
     GDALDataset *poJ2KDataset;
     int         bJP2Writing;
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/nitf/nitfdataset.h
     int         m_nICOffset = 0;
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:frmts/nitf/nitfdataset.h
     vsi_l_offset m_nImageOffset = 0;
     int         m_nIMIndex = 0;
@@ -83,7 +86,10 @@ class NITFDataset final: public GDALPamDataset
 =======
     int         m_nICOffset = 0;
 >>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.h
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/nitf/nitfdataset.h
+=======
+>>>>>>> OSGeo-master
 
     GDALDataset *poJPEGDataset;
 

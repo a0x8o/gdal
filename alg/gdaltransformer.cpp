@@ -112,10 +112,13 @@ typedef struct {
 
 /************************************************************************/
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/alg/gdaltransformer.cpp
 =======
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:alg/gdaltransformer.cpp
 /* ==================================================================== */
 /*                       GDALReprojectionTransformer                    */
@@ -144,9 +147,12 @@ struct GDALReprojectionTransformInfo
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/alg/gdaltransformer.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:alg/gdaltransformer.cpp
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 /*                          GDALTransformFunc                           */
 /*                                                                      */
 /*      Documentation for GDALTransformFunc typedef.                    */
@@ -1072,6 +1078,7 @@ GDALSuggestedWarpOutput2( GDALDatasetH hSrcDS,
 
 /* -------------------------------------------------------------------- */
 <<<<<<< HEAD
+<<<<<<< HEAD
 /*      Special case for geolocation array, to quickly find the bounds. */
 /* -------------------------------------------------------------------- */
     bool bIsGeographicCoords = false;
@@ -1141,6 +1148,8 @@ GDALSuggestedWarpOutput2( GDALDatasetH hSrcDS,
 /* -------------------------------------------------------------------- */
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 /*      Compute the distance in "georeferenced" units from the top      */
 /*      corner of the transformed input image to the bottom left        */
 /*      corner of the transformed input.  Use this distance to          */
@@ -1254,11 +1263,14 @@ GDALSuggestedWarpOutput2( GDALDatasetH hSrcDS,
 /* -------------------------------------------------------------------- */
     double dfMaxXOutNew = dfMinXOut + (*pnPixels) * dfPixelSizeX;
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/alg/gdaltransformer.cpp
     if( bIsGeographicCoords && dfMaxXOut <= 180 && dfMaxXOutNew > 180 )
 =======
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:alg/gdaltransformer.cpp
     if( bIsGeographicCoords &&
         ((dfMaxXOut <= 180 && dfMaxXOutNew > 180) || dfMaxXOut == 180) )
@@ -1266,9 +1278,12 @@ GDALSuggestedWarpOutput2( GDALDatasetH hSrcDS,
     if( bIsGeographicCoords && dfMaxXOut <= 180 && dfMaxXOutNew > 180 )
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/alg/gdaltransformer.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:alg/gdaltransformer.cpp
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
     {
         dfMaxXOut = 180;
         dfPixelSizeX = (dfMaxXOut - dfMinXOut) / *pnPixels;

@@ -178,15 +178,21 @@ JPEG2000 compression (write support)
 
 JPEG2000 compression is available when using the IC=C8 creation option,
 if the JP2ECW (SDK 3.3, or for later versions assuming the user has the key to
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/doc/source/drivers/raster/nitf.rst
 enable JPEG2000 writing), JP2KAK, JP2OpenJPEG or Jasper driver are available.
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:doc/source/drivers/raster/nitf.rst
 enable JPEG2000 writing), JP2KAK or JP2OpenJPEG driver are available.
 =======
 enable JPEG2000 writing), JP2KAK, JP2OpenJPEG or Jasper driver are available.
 >>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/raster/nitf.rst
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:doc/source/drivers/raster/nitf.rst
+=======
+>>>>>>> OSGeo-master
 
 They are tried in that order when several ones are available, unless the
 JPEG2000_DRIVER creation option (added in GDAL 3.4) is set to explicitly specify
@@ -216,16 +222,22 @@ the JPEG2000 capable driver to use.
   When those profiles are specified, the J2KLRA TRE will also be written, unless
   the J2KLRA=NO creation option is specified.
 
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/doc/source/drivers/raster/nitf.rst
 -  Jasper JPEG2000 driver: only in the CreateCopy() case.
 
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:doc/source/drivers/raster/nitf.rst
 =======
 -  Jasper JPEG2000 driver: only in the CreateCopy() case.
 
 >>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/raster/nitf.rst
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:doc/source/drivers/raster/nitf.rst
+=======
+>>>>>>> OSGeo-master
 Links
 -----
 

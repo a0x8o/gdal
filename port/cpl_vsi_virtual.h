@@ -136,14 +136,20 @@ public:
                                     CSLConstList papszOptions );
 
     virtual bool    AbortPendingUploads(const char* /*pszFilename*/) { return true;}
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/port/cpl_vsi_virtual.h
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:port/cpl_vsi_virtual.h
 
     virtual std::string GetStreamingFilename(const std::string& osFilename) const { return osFilename; }
 =======
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_vsi_virtual.h
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:port/cpl_vsi_virtual.h
+=======
+>>>>>>> OSGeo-master
 };
 #endif /* #ifndef DOXYGEN_SKIP */
 

@@ -184,6 +184,10 @@ def test_gdal_polygonize_4():
     os.unlink('tmp/out.gml')
     os.unlink('tmp/out.xsd')
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> OSGeo-master
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
 >>>>>>> OSGeo-master
@@ -202,6 +206,10 @@ def test_gdal_polygonize_4():
     os.unlink('tmp/out.gml')
     os.unlink('tmp/out.xsd')
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> OSGeo-master
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
 >>>>>>> OSGeo-master

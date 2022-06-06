@@ -6532,8 +6532,11 @@ void GTiffRasterBand::NullBlock( void *pData )
     }
     else
     {
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/gtiff/geotiff.cpp
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:frmts/gtiff/geotiff.cpp
         double dfNoData = GetNoDataValue( &l_bNoDataSet );
         if( !l_bNoDataSet )
@@ -6565,7 +6568,10 @@ void GTiffRasterBand::NullBlock( void *pData )
                            pData, eDataType, nChunkSize, nWords);
         }
 =======
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/gtiff/geotiff.cpp
+=======
+>>>>>>> OSGeo-master
         // Hack for Signed Int8 case. As the data type is GDT_Byte (unsigned),
         // we have to convert a negative nodata value in the range [-128,-1] in
         // [128, 255]
@@ -8687,14 +8693,20 @@ void GTiffDataset::FillEmptyTiles()
         if( nDataTypeSize &&
             nDataTypeSize * 8 == static_cast<int>(m_nBitsPerSample) )
         {
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/gtiff/geotiff.cpp
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:frmts/gtiff/geotiff.cpp
             if( m_bNoDataSetAsInt64 )
             {
                 GDALCopyWords64( &m_nNoDataValueInt64, GDT_Int64, 0,
 =======
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/gtiff/geotiff.cpp
+=======
+>>>>>>> OSGeo-master
             double dfNoData = m_dfNoDataValue;
 
             // Hack for Signed Int8 case. As the data type is GDT_Byte (unsigned),
@@ -8709,10 +8721,14 @@ void GTiffDataset::FillEmptyTiles()
             }
 
             GDALCopyWords64( &dfNoData, GDT_Float64, 0,
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/gtiff/geotiff.cpp
 =======
 >>>>>>> 55d0ced90a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/gtiff/geotiff.cpp
 >>>>>>> OSGeo-master:frmts/gtiff/geotiff.cpp
+=======
+>>>>>>> 55d0ced90a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/gtiff/geotiff.cpp
+>>>>>>> OSGeo-master
                            pabyData, eDataType,
                            nDataTypeSize,
                            nBlockBytes / nDataTypeSize );
@@ -8960,14 +8976,20 @@ bool GTiffDataset::HasOnlyNoData( const void* pBuffer, int nWidth, int nHeight,
     if( m_nSampleFormat == SAMPLEFORMAT_COMPLEXINT ||
         m_nSampleFormat == SAMPLEFORMAT_COMPLEXIEEEFP )
         return false;
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/gtiff/geotiff.cpp
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:frmts/gtiff/geotiff.cpp
     if( m_bNoDataSetAsInt64 || m_bNoDataSetAsUInt64 )
         return false; // FIXME: over pessimistic
 =======
 >>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/gtiff/geotiff.cpp
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/gtiff/geotiff.cpp
+=======
+>>>>>>> OSGeo-master
     return GDALBufferHasOnlyNoData( pBuffer,
                                     m_bNoDataSet ? m_dfNoDataValue : 0.0,
                                     nWidth, nHeight,

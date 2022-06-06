@@ -279,6 +279,7 @@ class OGRSQLiteTableLayer final: public OGRSQLiteLayer
     bool                m_bIsTable = true;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/sqlite/ogr_sqlite.h
 =======
 <<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogr_sqlite.h
@@ -292,6 +293,10 @@ class OGRSQLiteTableLayer final: public OGRSQLiteLayer
 <<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogr_sqlite.h
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogr_sqlite.h
+=======
+>>>>>>> OSGeo-master
 
     int                 bLaunderColumnNames;
     int                 bSpatialite2D;

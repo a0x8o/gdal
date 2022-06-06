@@ -88,6 +88,7 @@ RFC list
     rfc78_gdal_utils_package
     rfc79_listing_service_providers
     rfc80_numfocus_relationship
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/doc/source/development/rfc/index.rst
     rfc81_coordinate_epoch
     rfc83_use_of_project_sponsorship
@@ -105,6 +106,12 @@ RFC list
 =======
 >>>>>>> b1792c641a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/development/rfc/index.rst
 >>>>>>> 4a3a424d06 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:doc/source/development/rfc/index.rst
+<<<<<<< HEAD:doc/source/development/rfc/index.rst
+=======
+>>>>>>> b1792c641a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/development/rfc/index.rst
+>>>>>>> OSGeo-master
     rfc81_coordinate_epoch
     rfc83_use_of_project_sponsorship
     rfc84_cmake
@@ -112,4 +119,7 @@ RFC list
 =======
     rfc83_use_of_project_sponsorship
 >>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/development/rfc/index.rst
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:doc/source/development/rfc/index.rst
+=======
+>>>>>>> OSGeo-master

@@ -4884,6 +4884,7 @@ def test_netcdf_metadata_sentinel5():
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     if not gdaltest.netcdf_drv_has_nc4:
         pytest.skip()
 
@@ -4891,15 +4892,20 @@ def test_netcdf_metadata_sentinel5():
 <<<<<<< HEAD
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 =======
     if not gdaltest.netcdf_drv_has_nc4:
         pytest.skip()
 
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
     ds = gdal.Open('data/netcdf/fake_ISO_METADATA.nc')
     assert ds is not None
     assert "json:ISO_METADATA" in ds.GetMetadataDomainList()
@@ -4943,10 +4949,13 @@ def test_netcdf_metadata_sentinel5():
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 ###############################################################################
 # Test opening a file with particular georeferencing encoding
 
@@ -5272,9 +5281,12 @@ def test_netcdf_read_geogcrs_component_names():
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 def test_clean_tmp():
     # [KEEP THIS AS THE LAST TEST]
     # i.e. please do not add any tests after this one. Put new ones above.

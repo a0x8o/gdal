@@ -9,12 +9,16 @@
  * Copyright (c) 2007-2013, Even Rouault <even dot rouault at spatialys.com>
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
  * Copyright (c) 2021, CLS
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
  * Copyright (c) 2021, CLS
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+ * Copyright (c) 2021, CLS
+>>>>>>> OSGeo-master
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -39,13 +43,17 @@
 #include "gdal_alg.h"
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 #include "gdal_alg_priv.h"
 
 #include <climits>
 #include <cmath>
 #include <cstddef>
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 
@@ -54,6 +62,8 @@
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 #include <cstdlib>
 #include <cstring>
 
@@ -69,12 +79,16 @@
 #include "gdal_priv.h"
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 #include "memdataset.h"
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 #include "memdataset.h"
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+#include "memdataset.h"
+>>>>>>> OSGeo-master
 
 CPL_CVSID("$Id$")
 
@@ -95,6 +109,7 @@ const double FSHIFT = 0.5;
 const double ISHIFT = 0.5;
 const double OVERSAMPLE_FACTOR=1.3;
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -140,6 +155,8 @@ typedef struct {
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 /************************************************************************/
 /*                         GeoLocLoadFullData()                         */
 /************************************************************************/
@@ -253,8 +270,11 @@ static bool GeoLocLoadFullData( GDALGeoLocTransformInfo *psTransform )
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 /* -------------------------------------------------------------------- */
 /*      Scan forward map for lat/long extents.                          */
 /* -------------------------------------------------------------------- */
@@ -294,10 +314,13 @@ static bool GeoLocLoadFullData( GDALGeoLocTransformInfo *psTransform )
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
     return true;
 }
 
@@ -310,6 +333,7 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 {
     const size_t nXSize = psTransform->nGeoLocXSize;
     const size_t nYSize = psTransform->nGeoLocYSize;
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -350,6 +374,8 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 
 /* -------------------------------------------------------------------- */
 /*      Decide on resolution for backmap.  We aim for slightly          */
@@ -358,6 +384,7 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 /*      is approximate.                                                 */
 /* -------------------------------------------------------------------- */
     const double dfTargetPixels = (static_cast<double>(nXSize) * nYSize * OVERSAMPLE_FACTOR);
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     const double dfPixelSize = sqrt(
@@ -372,12 +399,18 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
         (psTransform->dfMaxX - psTransform->dfMinX) *
         (psTransform->dfMaxY - psTransform->dfMinY) / dfTargetPixels);
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+    const double dfPixelSize = sqrt(
+        (psTransform->dfMaxX - psTransform->dfMinX) *
+        (psTransform->dfMaxY - psTransform->dfMinY) / dfTargetPixels);
+>>>>>>> OSGeo-master
     if( dfPixelSize == 0.0 )
     {
         CPLError(CE_Failure, CPLE_AppDefined, "Invalid pixel size for backmap");
         return false;
     }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     const double dfBMXSize = (psTransform->dfMaxX - psTransform->dfMinX) / dfPixelSize + 1;
@@ -390,6 +423,10 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
     const double dfBMXSize = (psTransform->dfMaxX - psTransform->dfMinX) / dfPixelSize + 1;
     const double dfBMYSize = (psTransform->dfMaxY - psTransform->dfMinY) / dfPixelSize + 1;
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+    const double dfBMXSize = (psTransform->dfMaxX - psTransform->dfMinX) / dfPixelSize + 1;
+    const double dfBMYSize = (psTransform->dfMaxY - psTransform->dfMinY) / dfPixelSize + 1;
+>>>>>>> OSGeo-master
 
     if( !(dfBMXSize > 0 && dfBMXSize < INT_MAX) ||
         !(dfBMYSize > 0 && dfBMYSize < INT_MAX) )
@@ -414,6 +451,7 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     const double dfMinX = psTransform->dfMinX - dfPixelSize / 2.0;
     const double dfMaxY = psTransform->dfMaxY + dfPixelSize / 2.0;
 =======
@@ -425,6 +463,10 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
     const double dfMinX = psTransform->dfMinX - dfPixelSize / 2.0;
     const double dfMaxY = psTransform->dfMaxY + dfPixelSize / 2.0;
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+    const double dfMinX = psTransform->dfMinX - dfPixelSize / 2.0;
+    const double dfMaxY = psTransform->dfMaxY + dfPixelSize / 2.0;
+>>>>>>> OSGeo-master
 
     psTransform->adfBackMapGeoTransform[0] = dfMinX;
     psTransform->adfBackMapGeoTransform[1] = dfPixelSize;
@@ -438,6 +480,7 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 /* -------------------------------------------------------------------- */
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     GByte *pabyValidFlag = static_cast<GByte *>(
         VSI_CALLOC_VERBOSE(nBMXSize, nBMYSize));
@@ -445,6 +488,8 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
     psTransform->pafBackMapX = static_cast<float *>(
         VSI_MALLOC3_VERBOSE(nBMXSize, nBMYSize, sizeof(float)));
     psTransform->pafBackMapY = static_cast<float *>(
@@ -455,10 +500,14 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> OSGeo-master
     if( psTransform->pafBackMapX == nullptr ||
         psTransform->pafBackMapY == nullptr ||
         wgtsBackMap == nullptr)
     {
+<<<<<<< HEAD
 =======
     if( pabyValidFlag == nullptr ||
         psTransform->pafBackMapX == nullptr ||
@@ -473,6 +522,8 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
         wgtsBackMap == nullptr)
     {
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
         CPLFree( wgtsBackMap );
         return false;
     }
@@ -480,6 +531,7 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
     const size_t nBMXYCount = nBMXSize * nBMYSize;
     for( size_t i = 0; i < nBMXYCount; i++ )
     {
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
         psTransform->pafBackMapX[i] = 0;
@@ -496,6 +548,11 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
         psTransform->pafBackMapY[i] = 0;
         wgtsBackMap[i] = 0.0;
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+        psTransform->pafBackMapX[i] = 0;
+        psTransform->pafBackMapY[i] = 0;
+        wgtsBackMap[i] = 0.0;
+>>>>>>> OSGeo-master
     }
 
 /* -------------------------------------------------------------------- */
@@ -503,6 +560,9 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 /*      pushing into the backmap.                                       */
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> OSGeo-master
 /* -------------------------------------------------------------------- */
 
     const auto UpdateBackmap = [&](std::ptrdiff_t iBMX, std::ptrdiff_t iBMY,
@@ -549,6 +609,7 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
         }
     };
 
+<<<<<<< HEAD
 =======
 /*      Initialize to the nMaxIter+1 value so we can spot genuinely     */
 /*      valid pixels in the hole-filling loop.                          */
@@ -603,6 +664,8 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
     };
 
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
     for( size_t iY = 0; iY < nYSize; iY++ )
     {
         for( size_t iX = 0; iX < nXSize; iX++ )
@@ -624,6 +687,7 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
             //Get top left index by truncation
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
             const std::ptrdiff_t iBMX = static_cast<std::ptrdiff_t>(dBMX);
             const std::ptrdiff_t iBMY = static_cast<std::ptrdiff_t>(dBMY);
 =======
@@ -634,6 +698,10 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
             const std::ptrdiff_t iBMX = static_cast<std::ptrdiff_t>(dBMX);
             const std::ptrdiff_t iBMY = static_cast<std::ptrdiff_t>(dBMY);
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+            const std::ptrdiff_t iBMX = static_cast<std::ptrdiff_t>(dBMX);
+            const std::ptrdiff_t iBMY = static_cast<std::ptrdiff_t>(dBMY);
+>>>>>>> OSGeo-master
             const double fracBMX = dBMX - iBMX;
             const double fracBMY = dBMY - iBMY;
 
@@ -649,6 +717,7 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
                 (static_cast<size_t>(iBMY) < nBMYSize))
             {
                 const double tempwt = (1.0 - fracBMX) * (1.0 - fracBMY);
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
                 UpdateBackmap(iBMX, iBMY, iX, iY, tempwt);
@@ -670,6 +739,9 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 =======
                 UpdateBackmap(iBMX, iBMY, iX, iY, tempwt);
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+                UpdateBackmap(iBMX, iBMY, iX, iY, tempwt);
+>>>>>>> OSGeo-master
             }
 
             //Check logic for top right pixel
@@ -678,6 +750,7 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
                 (static_cast<size_t>(iBMY) < nBMYSize))
             {
                 const double tempwt = fracBMX * (1.0 - fracBMY);
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
                 UpdateBackmap(iBMX + 1, iBMY, iX, iY, tempwt);
@@ -700,6 +773,9 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 =======
                 UpdateBackmap(iBMX + 1, iBMY, iX, iY, tempwt);
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+                UpdateBackmap(iBMX + 1, iBMY, iX, iY, tempwt);
+>>>>>>> OSGeo-master
             }
 
             //Check logic for bottom right pixel
@@ -707,6 +783,7 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
                 (static_cast<size_t>(iBMY+1) < nBMYSize))
             {
                 const double tempwt = fracBMX * fracBMY;
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
                 UpdateBackmap(iBMX + 1, iBMY + 1, iX, iY, tempwt);
@@ -728,6 +805,9 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 =======
                 UpdateBackmap(iBMX + 1, iBMY + 1, iX, iY, tempwt);
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+                UpdateBackmap(iBMX + 1, iBMY + 1, iX, iY, tempwt);
+>>>>>>> OSGeo-master
             }
 
             //Check logic for bottom left pixel
@@ -736,6 +816,7 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
                 (static_cast<size_t>(iBMY+1) < nBMYSize))
             {
                 const double tempwt = (1.0 - fracBMX) * fracBMY;
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
                 UpdateBackmap(iBMX, iBMY + 1, iX, iY, tempwt);
@@ -757,6 +838,9 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 =======
                 UpdateBackmap(iBMX, iBMY + 1, iX, iY, tempwt);
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+                UpdateBackmap(iBMX, iBMY + 1, iX, iY, tempwt);
+>>>>>>> OSGeo-master
             }
 
         }
@@ -769,13 +853,19 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
     {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
         //Check if pixel was only touch during neighbor scan
         //But no real weight was added as source point matched
         //backmap grid node
         if (wgtsBackMap[i] > 0)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> OSGeo-master
         {
             psTransform->pafBackMapX[i] /= wgtsBackMap[i];
             psTransform->pafBackMapY[i] /= wgtsBackMap[i];
@@ -884,6 +974,7 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 #endif
 
     CPLFree( wgtsBackMap );
+<<<<<<< HEAD
 =======
         //Setting these to -1 for backward compatibility
         if (pabyValidFlag[i] == 0)
@@ -1002,6 +1093,8 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 
     return true;
 }
@@ -1417,6 +1510,7 @@ int GDALGeoLocTransform( void *pTransformArg,
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
             const std::ptrdiff_t iBMX = static_cast<std::ptrdiff_t>(dfBMX);
             const std::ptrdiff_t iBMY = static_cast<std::ptrdiff_t>(dfBMY);
 =======
@@ -1427,6 +1521,10 @@ int GDALGeoLocTransform( void *pTransformArg,
             const std::ptrdiff_t iBMX = static_cast<std::ptrdiff_t>(dfBMX);
             const std::ptrdiff_t iBMY = static_cast<std::ptrdiff_t>(dfBMY);
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+            const std::ptrdiff_t iBMX = static_cast<std::ptrdiff_t>(dfBMX);
+            const std::ptrdiff_t iBMY = static_cast<std::ptrdiff_t>(dfBMY);
+>>>>>>> OSGeo-master
 
             const size_t iBM = iBMX + iBMY * psTransform->nBackMapWidth;
             if( psTransform->pafBackMapX[iBM] < 0 )

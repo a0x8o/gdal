@@ -2889,6 +2889,7 @@ def test_vsis3_write_multipart_retry(aws_test_config, webserver_port):
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 ###############################################################################
 # Test abort pending multipart uploads
 
@@ -2928,6 +2929,8 @@ def test_vsis3_abort_pending_uploads():
             assert gdal.AbortPendingUploads('/vsis3/my_bucket')
 
 
+=======
+>>>>>>> OSGeo-master
 =======
 >>>>>>> OSGeo-master
 ###############################################################################
@@ -3242,6 +3245,11 @@ def test_vsis3_7(aws_test_config, webserver_port):
 <<<<<<< HEAD
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> OSGeo-master
 =======
 
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -4242,8 +4250,11 @@ def test_vsis3_metadata(aws_test_config, webserver_port):
     # Write HEADERS domain
     handler = webserver.SequentialHandler()
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> OSGeo-master
     handler.add(
         'PUT',
         '/test_metadata/foo.txt',
@@ -4256,12 +4267,19 @@ def test_vsis3_metadata(aws_test_config, webserver_port):
         }
     )
 =======
+<<<<<<< HEAD
+>>>>>>> OSGeo-master
+=======
 >>>>>>> OSGeo-master
     handler.add('PUT', '/test_metadata/foo.txt', 200, {},
                 expected_headers = {'foo': 'bar',
                                     'x-amz-metadata-directive': 'REPLACE',
                                     'x-amz-copy-source': '/test_metadata/foo.txt'})
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8d1efd1c06 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> OSGeo-master
 =======
 >>>>>>> 8d1efd1c06 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> OSGeo-master
@@ -4275,10 +4293,13 @@ def test_vsis3_metadata(aws_test_config, webserver_port):
     # Write TAGS domain
     handler = webserver.SequentialHandler()
 <<<<<<< HEAD
+<<<<<<< HEAD
     handler.add('PUT', '/test_metadata/foo.txt?tagging', 200,
                 expected_body = b"""<?xml version="1.0" encoding="UTF-8"?>
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> OSGeo-master
     handler.add(
         'PUT',
         '/test_metadata/foo.txt?tagging',
@@ -4288,6 +4309,9 @@ def test_vsis3_metadata(aws_test_config, webserver_port):
     handler.add('PUT', '/test_metadata/foo.txt?tagging', 200,
                 expected_body = b"""<?xml version="1.0" encoding="UTF-8"?>
 >>>>>>> 8d1efd1c06 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> OSGeo-master
+=======
 >>>>>>> OSGeo-master
 <Tagging xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
   <TagSet>

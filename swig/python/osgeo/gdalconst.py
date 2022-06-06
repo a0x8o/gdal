@@ -205,6 +205,7 @@ DCAP_UNIQUE_FIELDS = _gdalconst.DCAP_UNIQUE_FIELDS
 DCAP_COORDINATE_EPOCH = _gdalconst.DCAP_COORDINATE_EPOCH
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/osgeo/gdalconst.py
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/osgeo/gdalconst.py
@@ -215,6 +216,9 @@ DCAP_COORDINATE_EPOCH = _gdalconst.DCAP_COORDINATE_EPOCH
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/osgeo/gdalconst.py
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/osgeo/gdalconst.py
+>>>>>>> OSGeo-master
 DIM_TYPE_HORIZONTAL_X = _gdalconst.DIM_TYPE_HORIZONTAL_X
 DIM_TYPE_HORIZONTAL_Y = _gdalconst.DIM_TYPE_HORIZONTAL_Y
 DIM_TYPE_VERTICAL = _gdalconst.DIM_TYPE_VERTICAL

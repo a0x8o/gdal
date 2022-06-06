@@ -358,6 +358,7 @@ Variables attributes for: tos, lon, lat and time
      time#original_units=seconds since 2001-1-1
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/doc/source/drivers/raster/netcdf.rst
 Product specific behaviour
 --------------------------
@@ -381,6 +382,8 @@ Can be discovered for example with:
 =======
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:doc/source/drivers/raster/netcdf.rst
 On writing, when using the CreateCopy() interface or gdal_translate, dataset
 level metadata that follows the naming convention NC_GLOBAL#key=value will be
@@ -428,9 +431,12 @@ Can be discovered for example with:
 
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/raster/netcdf.rst
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:doc/source/drivers/raster/netcdf.rst
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 
 Creation Options
 ----------------

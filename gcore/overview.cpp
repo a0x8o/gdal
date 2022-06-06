@@ -952,6 +952,7 @@ inline __m256 SQUARE(__m256 x)
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/overview.cpp
 =======
 <<<<<<< HEAD:gcore/overview.cpp
@@ -962,6 +963,9 @@ inline __m256 SQUARE(__m256 x)
 =======
 <<<<<<< HEAD:gcore/overview.cpp
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:gcore/overview.cpp
+>>>>>>> OSGeo-master
 #ifdef __SSE3__
 #define sse2_hadd_ps _mm_hadd_ps
 #else
@@ -998,6 +1002,7 @@ inline __m128 SQUARE(__m128 x)
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/overview.cpp
 =======
 <<<<<<< HEAD:gcore/overview.cpp
@@ -1006,6 +1011,9 @@ inline __m128 SQUARE(__m128 x)
 =======
 <<<<<<< HEAD
 >>>>>>> 22fd1623c9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:gcore/overview.cpp
+>>>>>>> OSGeo-master
 inline __m128 FIXUP_LANES(__m128 x)
 {
     return x;
@@ -1029,12 +1037,18 @@ inline __m128 FIXUP_LANES(__m128 x)
 #endif
 
 template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/overview.cpp
 =======
 =======
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/overview.cpp
 <<<<<<< HEAD
+=======
+=======
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/overview.cpp
+>>>>>>> OSGeo-master
 #ifdef __SSE3__
 #define sse2_hadd_ps _mm_hadd_ps
 #else
@@ -1073,6 +1087,7 @@ inline __m128 SQUARE(__m128 x)
     return _mm_mul_ps(x, x);
 }
 
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD:gcore/overview.cpp
@@ -1302,6 +1317,8 @@ inline __m128 SQUARE(__m128 x)
     return _mm_mul_ps(x, x);
 }
 
+=======
+>>>>>>> OSGeo-master
 inline __m128 FIXUP_LANES(__m128 x)
 {
     return x;
@@ -1326,7 +1343,10 @@ inline __m128 FIXUP_LANES(__m128 x)
 
 template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/overview.cpp
+<<<<<<< HEAD
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
                                                     int nChunkXSize,
                                                     const T*& CPL_RESTRICT pSrcScanlineShiftedInOut,
                                                     T* CPL_RESTRICT pDstScanline)
@@ -1337,6 +1357,7 @@ template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
 
     int iDstPixel = 0;
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/overview.cpp
 =======
 <<<<<<< HEAD:gcore/overview.cpp
@@ -1371,6 +1392,12 @@ template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/overview.cpp
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:gcore/overview.cpp
+<<<<<<< HEAD:gcore/overview.cpp
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/overview.cpp
+>>>>>>> OSGeo-master
     const auto minus_zero = set1_ps(-0.0f);
     const auto zeroDot25 = set1_ps(0.25f);
     const auto one = set1_ps(1.0f);
@@ -1380,6 +1407,7 @@ template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/overview.cpp
 =======
 =======
@@ -1398,12 +1426,18 @@ template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
 <<<<<<< HEAD:gcore/overview.cpp
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD:gcore/overview.cpp
+>>>>>>> OSGeo-master
+=======
     const auto minus_zero = _mm_set1_ps(-0.0f);
     const auto zeroDot25 = _mm_set1_ps(0.25f);
     const auto one = _mm_set1_ps(1.0f);
     const auto infv = _mm_set1_ps(std::numeric_limits<float>::infinity());
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/overview.cpp
+<<<<<<< HEAD
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 
     for( ; iDstPixel < nDstXWidth - (RMS_FLOAT_ELTS-1); iDstPixel += RMS_FLOAT_ELTS )
     {
@@ -1411,15 +1445,19 @@ template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 =======
 
     for( ; iDstPixel < nDstXWidth - (RMS_FLOAT_ELTS-1); iDstPixel += RMS_FLOAT_ELTS )
     {
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/overview.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -1428,6 +1466,8 @@ template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
         // Load 2*RMS_FLOAT_ELTS Float32 from each line
         auto firstLineLo = loadu_ps(reinterpret_cast<float const*>(pSrcScanlineShifted));
         auto firstLineHi = loadu_ps(reinterpret_cast<float const*>(pSrcScanlineShifted + RMS_FLOAT_ELTS));
@@ -1436,6 +1476,7 @@ template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gcore/overview.cpp
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -1446,6 +1487,10 @@ template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
 <<<<<<< HEAD:gcore/overview.cpp
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+=======
+<<<<<<< HEAD:gcore/overview.cpp
+=======
+>>>>>>> OSGeo-master
         // Load 8 Float32 from each line
         auto firstLineLo = _mm_loadu_ps(reinterpret_cast<float const*>(pSrcScanlineShifted));
         auto firstLineHi = _mm_loadu_ps(reinterpret_cast<float const*>(pSrcScanlineShifted + 4));
@@ -1454,6 +1499,7 @@ template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/overview.cpp
 =======
@@ -1465,6 +1511,10 @@ template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/overview.cpp
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/overview.cpp
+>>>>>>> OSGeo-master
 
         // Take the absolute value
         firstLineLo = andnot_ps(minus_zero, firstLineLo);
@@ -1497,12 +1547,18 @@ template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
         // Compute squares
 <<<<<<< HEAD:gcore/overview.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> OSGeo-master
         firstLineLo = SQUARE(firstLineLo);
         firstLineHi = SQUARE(firstLineHi);
         secondLineLo = SQUARE(secondLineLo);
         secondLineHi = SQUARE(secondLineHi);
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/overview.cpp
+<<<<<<< HEAD
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 
         // Take the absolute value
         firstLineLo = andnot_ps(minus_zero, firstLineLo);
@@ -1534,6 +1590,7 @@ template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
         secondLineOdd = mul_ps(secondLineOdd, invMax);
 
         // Compute squares
+<<<<<<< HEAD
 <<<<<<< HEAD:gcore/overview.cpp
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -1672,6 +1729,8 @@ template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
         secondLineOdd = mul_ps(secondLineOdd, invMax);
 
         // Compute squares
+=======
+>>>>>>> OSGeo-master
         firstLineEven = SQUARE(firstLineEven);
         firstLineOdd = SQUARE(firstLineOdd);
         secondLineEven = SQUARE(secondLineEven);
@@ -1689,6 +1748,7 @@ template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
         rms = FIXUP_LANES(rms);
 =======
         // Horizontal addition
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1720,6 +1780,9 @@ template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
 =======
         const auto sumSquares = sse2_hadd_ps(sumLo, sumHi);
 >>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+        const auto sumSquares = sse2_hadd_ps(sumLo, sumHi);
+>>>>>>> OSGeo-master
 
         auto rms = _mm_mul_ps(maxV, _mm_sqrt_ps(_mm_mul_ps(sumSquares, zeroDot25)));
 
@@ -1727,6 +1790,7 @@ template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
         const auto maskIsInf = _mm_cmpeq_ps(maxV, infv);
         rms = _mm_or_ps(_mm_andnot_ps(maskIsInf, rms), _mm_and_ps(maskIsInf, infv));
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/overview.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1746,6 +1810,9 @@ template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
 =======
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> OSGeo-master
         firstLineEven = SQUARE(firstLineEven);
         firstLineOdd = SQUARE(firstLineOdd);
         secondLineEven = SQUARE(secondLineEven);
@@ -1761,6 +1828,7 @@ template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
         rms = or_ps(andnot_ps(maskIsInf, rms), and_ps(maskIsInf, infv));
 
         rms = FIXUP_LANES(rms);
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/overview.cpp
@@ -1787,6 +1855,9 @@ template<class T> static int NOINLINE QuadraticMeanFloatSSE2(int nDstXWidth,
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/overview.cpp
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/overview.cpp
+>>>>>>> OSGeo-master
 
         // coverity[incompatible_cast]
         storeu_ps(reinterpret_cast<float*>(&pDstScanline[iDstPixel]), rms);

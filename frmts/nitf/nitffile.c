@@ -544,8 +544,11 @@ int NITFCreate( const char *pszFilename,
 
 {
     return NITFCreateEx(pszFilename, nPixels, nLines, nBands, nBitsPerSample,
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/nitf/nitffile.c
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:frmts/nitf/nitffile.c
                         pszPVType, papszOptions, NULL, NULL, NULL, NULL);
 }
@@ -559,7 +562,10 @@ int NITFCreateEx( const char *pszFilename,
                   vsi_l_offset* pnImageOffset,
                   vsi_l_offset* pnICOffset )
 =======
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/nitf/nitffile.c
+=======
+>>>>>>> OSGeo-master
                         pszPVType, papszOptions, NULL);
 }
 
@@ -567,10 +573,14 @@ int NITFCreateEx( const char *pszFilename,
                       int nPixels, int nLines, int nBands,
                       int nBitsPerSample, const char *pszPVType,
                       char **papszOptions,  int* pnICOffset )
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/nitf/nitffile.c
 =======
 >>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitffile.c
 >>>>>>> OSGeo-master:frmts/nitf/nitffile.c
+=======
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitffile.c
+>>>>>>> OSGeo-master
 
 {
     VSILFILE	*fp;
@@ -1108,10 +1118,13 @@ int NITFCreateEx( const char *pszFilename,
         }
     }
 
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/nitf/nitffile.c
     if( pnICOffset && iIM == 0 )
         *pnICOffset = (int)(nCur+nOffset+1);
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:frmts/nitf/nitffile.c
     if( pnICOffset )
     {
@@ -1122,7 +1135,10 @@ int NITFCreateEx( const char *pszFilename,
     if( pnICOffset && iIM == 0 )
         *pnICOffset = (int)(nCur+nOffset+1);
 >>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitffile.c
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/nitf/nitffile.c
+=======
+>>>>>>> OSGeo-master
     OVR( 2,nCur+nOffset+1, IC     , "NC"                           );
 
     if( pszIC[0] != 'N' )

@@ -190,6 +190,7 @@ def test_vsigs_1(gs_test_config):
 ###############################################################################
 # Test GS_NO_SIGN_REQUEST=YES
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 
 def test_vsigs_no_sign_request():
@@ -219,6 +220,9 @@ def test_vsigs_no_sign_request():
 ###############################################################################
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> OSGeo-master
+=======
 =======
 >>>>>>> OSGeo-master
 
@@ -384,6 +388,9 @@ def test_vsigs_2(gs_test_config, webserver_port, use_config_options):
 
 <<<<<<< HEAD
 =======
+<<<<<<< HEAD
+>>>>>>> OSGeo-master
+=======
 >>>>>>> OSGeo-master
     # Test GS_USER_PROJECT
     handler = webserver.SequentialHandler()
@@ -402,6 +409,10 @@ def test_vsigs_2(gs_test_config, webserver_port, use_config_options):
             assert data == 'foo'
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> OSGeo-master
 =======
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> OSGeo-master
@@ -488,6 +499,7 @@ def test_vsigs_write(gs_test_config, webserver_port):
 
     gdal.VSICurlClearCache()
 <<<<<<< HEAD
+<<<<<<< HEAD
     with webserver.install_http_handler(webserver.SequentialHandler()):
         f = gdal.VSIFOpenL('/vsigs/gs_fake_bucket3/another_file.bin', 'wb')
         assert f is not None
@@ -530,6 +542,8 @@ def test_vsigs_write(gs_test_config, webserver_port):
     assert gdal.GetLastErrorMsg() == ''
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> OSGeo-master
 
     with gdaltest.config_options(
         { 'GS_SECRET_ACCESS_KEY': 'GS_SECRET_ACCESS_KEY',
@@ -589,6 +603,9 @@ def test_vsigs_write(gs_test_config, webserver_port):
         assert gdal.VSIFWriteL('foo', 1, 3, f) == 3
         assert gdal.VSIFSeekL(f, gdal.VSIFTellL(f), 0) == 0
         assert gdal.VSIFWriteL('bar', 1, 3, f) == 3
+<<<<<<< HEAD
+>>>>>>> OSGeo-master
+=======
 >>>>>>> OSGeo-master
 
     handler = webserver.SequentialHandler()
@@ -853,8 +870,11 @@ def test_vsigs_acl():
 ###############################################################################
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 # Test reading/writing HEADERS
 
 
@@ -881,6 +901,7 @@ def test_vsigs_headers():
         assert gdal.SetFileMetadata('/vsigs/test_metadata/foo.txt', {'x-goog-meta-foo': 'bar'}, 'HEADERS')
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     # Test GS_USER_PROJECT
     handler = webserver.SequentialHandler()
     handler.add('GET', '/gs_fake_bucket/resource_under_requester_pays', 200,
@@ -906,6 +927,10 @@ def test_vsigs_headers():
 >>>>>>> b39a831ddf (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+
+###############################################################################
+>>>>>>> OSGeo-master
 # Read credentials with OAuth2 refresh_token
 
 
@@ -1528,6 +1553,7 @@ Content-Length: 0
     assert ret
 
 
+<<<<<<< HEAD
     # Test UnlinkBatch()
     handler = webserver.SequentialHandler()
     handler.add('POST', '/batch/storage/v1', 200,
@@ -1570,6 +1596,8 @@ Content-Length: 0
     assert ret
 
 
+=======
+>>>>>>> OSGeo-master
     gdal.SetConfigOption('CPL_GS_CREDENTIALS_FILE', '')
     gdal.SetConfigOption('GOA2_AUTH_URL_TOKEN', None)
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -1705,6 +1733,7 @@ def test_vsigs_cleanup():
         gdal.SetConfigOption(var, gdaltest.gs_vars[var])
 
 ###############################################################################
+<<<<<<< HEAD
 
 
 def test_vsigs_cleanup():
@@ -1713,6 +1742,8 @@ def test_vsigs_cleanup():
         gdal.SetConfigOption(var, gdaltest.gs_vars[var])
 
 ###############################################################################
+=======
+>>>>>>> OSGeo-master
 # Nominal cases (require valid credentials)
 
 

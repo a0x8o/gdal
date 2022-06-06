@@ -95,11 +95,14 @@ int      CPL_DLL  NITFCreate( const char *pszFilename,
                               char **papszOptions );
 
 int        NITFCreateEx( const char *pszFilename,
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/nitf/nitflib.h
                               int nPixels, int nLines, int nBands,
                               int nBitsPerSample, const char *pszPVType,
                               char **papszOptions, int* pnICOffset );
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:frmts/nitf/nitflib.h
                          int nPixels, int nLines, int nBands,
                          int nBitsPerSample, const char *pszPVType,
@@ -113,7 +116,10 @@ int        NITFCreateEx( const char *pszFilename,
                               int nBitsPerSample, const char *pszPVType,
                               char **papszOptions, int* pnICOffset );
 >>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitflib.h
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/nitf/nitflib.h
+=======
+>>>>>>> OSGeo-master
 
 const char CPL_DLL *NITFFindTRE( const char *pszTREData, int nTREBytes,
                                  const char *pszTag, int *pnFoundTRESize );

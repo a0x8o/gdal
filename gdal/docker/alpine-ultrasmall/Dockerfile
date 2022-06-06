@@ -8,6 +8,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 ARG ALPINE_VERSION=3.14
 =======
 ARG ALPINE_VERSION=3.13
@@ -18,6 +19,9 @@ ARG ALPINE_VERSION=3.14
 =======
 ARG ALPINE_VERSION=3.14
 >>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+ARG ALPINE_VERSION=3.14
+>>>>>>> OSGeo-master
 FROM alpine:${ALPINE_VERSION} as builder
 
 # Derived from osgeo/proj by Howard Butler <howard@hobu.co>

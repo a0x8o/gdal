@@ -1914,8 +1914,11 @@ namespace tut
         ensure( !GDALBufferHasOnlyNoData(&float64nan, 0.0, 1, 1, 1, 1, 64, GSF_FLOATING_POINT) );
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> OSGeo-master
 
     // Test GDALRasterBand::GetIndexColorTranslationTo()
     template<> template<> void object::test<23>()
@@ -2082,5 +2085,8 @@ namespace tut
 
 =======
 >>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> OSGeo-master
+=======
 >>>>>>> OSGeo-master
 } // namespace tut

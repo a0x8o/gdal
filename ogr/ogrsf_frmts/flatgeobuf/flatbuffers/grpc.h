@@ -22,13 +22,19 @@
 #include "flatbuffers/flatbuffers.h"
 #include "grpc/byte_buffer_reader.h"
 #include "grpcpp/support/byte_buffer.h"
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/grpc.h
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/grpc.h
 #include "grpcpp/support/slice.h"
 =======
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/grpc.h
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/grpc.h
+=======
+>>>>>>> OSGeo-master
 
 namespace flatbuffers {
 namespace grpc {
@@ -279,8 +285,11 @@ template<class T> class SerializationTraits<flatbuffers::grpc::Message<T>> {
   // Deserialize by pulling the
   static grpc::Status Deserialize(ByteBuffer *buf,
                                   flatbuffers::grpc::Message<T> *msg) {
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/grpc.h
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/grpc.h
     Slice slice;
     if (!buf->TrySingleSlice(&slice).ok()) {
@@ -289,7 +298,10 @@ template<class T> class SerializationTraits<flatbuffers::grpc::Message<T>> {
         return ::grpc::Status(::grpc::StatusCode::INTERNAL, "No payload");
       }
 =======
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/grpc.h
+=======
+>>>>>>> OSGeo-master
     grpc_byte_buffer *buffer = *reinterpret_cast<grpc_byte_buffer **>(buf);
     if (!buffer) {
       return ::grpc::Status(::grpc::StatusCode::INTERNAL, "No payload");

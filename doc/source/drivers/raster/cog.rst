@@ -38,12 +38,18 @@ General creation options
 -  **BLOCKSIZE=n**: Sets the tile width and height in pixels. Defaults to 512.
 
 -  **COMPRESS=[NONE/LZW/JPEG/DEFLATE/ZSTD/WEBP/LERC/LERC_DEFLATE/LERC_ZSTD/LZMA]**: Set the compression to use.
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/doc/source/drivers/raster/cog.rst
 =======
 <<<<<<< HEAD:doc/source/drivers/raster/cog.rst
    Defaults to ``LZW`` starting with GDAL 3.4 (default in previous version is ``NONE``).
 =======
 >>>>>>> OSGeo-master:doc/source/drivers/raster/cog.rst
+=======
+<<<<<<< HEAD:doc/source/drivers/raster/cog.rst
+   Defaults to ``LZW`` starting with GDAL 3.4 (default in previous version is ``NONE``).
+=======
+>>>>>>> OSGeo-master
    Defaults to ``NONE``.
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/raster/cog.rst
 

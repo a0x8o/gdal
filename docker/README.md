@@ -10,6 +10,7 @@ best of our knowledge and not guaranteed. Users should check by themselves.
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/docker/README.md
 =======
 <<<<<<< HEAD:docker/README.md
@@ -37,6 +38,9 @@ See [alpine-ultrasmall/Dockerfile](alpine-ultrasmall/Dockerfile)
 =======
 <<<<<<< HEAD:docker/README.md
 >>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:docker/README.md
+>>>>>>> OSGeo-master
 # Alpine based
 =======
 # Alpine based (3.14)
@@ -45,7 +49,10 @@ See [alpine-ultrasmall/Dockerfile](alpine-ultrasmall/Dockerfile)
 Alpine version:
 * 3.15 for 3.5
 * 3.16 for GDAL 3.6dev
+<<<<<<< HEAD
 >>>>>>> 0f99b0ef18 (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
+=======
+>>>>>>> OSGeo-master
 
 ## Small: `osgeo/gdal:alpine-small-latest`
 
@@ -67,6 +74,7 @@ See [alpine-small/Dockerfile](alpine-small/Dockerfile)
 * Vector drivers: small + Spatialite, XLS
 * Using internal libtiff and libgeotiff
 * External libraries enabled: small + libgeos, libhdf5, libhdf5, libkea, libnetcdf, libfreexl,
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -98,6 +106,15 @@ See [alpine-small/Dockerfile](alpine-small/Dockerfile)
   libspatialite, libxml2, libpoppler, openexr, libheif, libdeflate
 * GDAL Python (Python 3.9)
 >>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:docker/README.md
+  libspatialite, libxml2, libpoppler, openexr, libheif, libdeflate, libparquet
+* GDAL Python
+* Base PROJ grid package (http://download.osgeo.org/proj/proj-datumgrid-1.8.zip)
+=======
+  libspatialite, libxml2, libpoppler, openexr, libheif, libdeflate
+* GDAL Python (Python 3.9)
+>>>>>>> OSGeo-master
 * Base PROJ grid package
 >>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/docker/README.md
 * Overall licensing terms of the GDAL build: copy-left (GPL) + LGPL + permissive

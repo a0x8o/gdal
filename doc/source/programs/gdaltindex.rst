@@ -98,6 +98,7 @@ Examples
 
     gdaltindex doq_index.shp doq/*.tif
 
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/doc/source/programs/gdaltindex.rst
 - Perform the same command as before, but now we create a GeoPackage instead of a Shapefile. 
 =======
@@ -137,6 +138,17 @@ Examples
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/programs/gdaltindex.rst
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 9105b4f6b6 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:doc/source/programs/gdaltindex.rst
+<<<<<<< HEAD:doc/source/programs/gdaltindex.rst
+- Perform the same command as before, but now we create a GeoPackage instead of a Shapefile. 
+=======
+- Perform the same command as before, but now we create a GeoPacakge instead of a Shapefile. 
+>>>>>>> 137c8e8f4e (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/programs/gdaltindex.rst
+=======
+- Perform the same command as before, but now we create a GeoPackage instead of a Shapefile. 
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/programs/gdaltindex.rst
+>>>>>>> OSGeo-master
 
 ::
 

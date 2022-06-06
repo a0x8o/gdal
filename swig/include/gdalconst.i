@@ -220,6 +220,7 @@
 %constant char *DCAP_COORDINATE_EPOCH    = GDAL_DCAP_COORDINATE_EPOCH;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/include/gdalconst.i
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/include/gdalconst.i
@@ -230,6 +231,9 @@
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/include/gdalconst.i
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/include/gdalconst.i
+>>>>>>> OSGeo-master
 
 %constant char *DIM_TYPE_HORIZONTAL_X       = GDAL_DIM_TYPE_HORIZONTAL_X;
 %constant char *DIM_TYPE_HORIZONTAL_Y       = GDAL_DIM_TYPE_HORIZONTAL_Y;
@@ -264,12 +268,15 @@
 #define DCAP_COORDINATE_EPOCH "DCAP_COORDINATE_EPOCH"
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/include/gdalconst.i
 =======
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:swig/include/gdalconst.i
 #define DCAP_FIELD_DOMAINS    "DCAP_FIELD_DOMAINS"
 #define DCAP_RENAME_LAYERS    "DCAP_RENAME_LAYERS"
@@ -277,11 +284,14 @@
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/include/gdalconst.i
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/include/gdalconst.i
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 
 #define DIM_TYPE_HORIZONTAL_X "HORIZONTAL_X"
 #define DIM_TYPE_HORIZONTAL_Y "HORIZONTAL_Y"

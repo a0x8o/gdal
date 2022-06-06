@@ -10699,15 +10699,21 @@ SWIGINTERN PyObject *_wrap_CPLBinaryToHex(PyObject *SWIGUNUSEDPARM(self), PyObje
       size_t safeLen = 0;
       int ret;
       try {
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(obj0, (char**) &arg2, &safeLen, &alloc1);
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[0], (char**) &arg2, &safeLen, &alloc1);
 =======
         ret = SWIG_AsCharPtrAndSize(obj0, (char**) &arg2, &safeLen, &alloc1);
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
+=======
+>>>>>>> OSGeo-master
       }
       catch( const std::exception& )
       {
@@ -10879,15 +10885,21 @@ SWIGINTERN PyObject *_wrap_FileFromMemBuffer(PyObject *SWIGUNUSEDPARM(self), PyO
       size_t safeLen = 0;
       int ret;
       try {
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(obj1, (char**) &arg3, &safeLen, &alloc2);
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[1], (char**) &arg3, &safeLen, &alloc2);
 =======
         ret = SWIG_AsCharPtrAndSize(obj1, (char**) &arg3, &safeLen, &alloc2);
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
+=======
+>>>>>>> OSGeo-master
       }
       catch( const std::exception& )
       {
@@ -11685,8 +11697,11 @@ SWIGINTERN PyObject *_wrap_AbortPendingUploads(PyObject *SWIGUNUSEDPARM(self), P
   PyObject *resultobj = 0; int bLocalUseExceptionsCode = bUseExceptions;
   char *arg1 = (char *) 0 ;
   int bToFree1 = 0 ;
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
   PyObject *swig_obj[1] ;
   bool result;
@@ -11697,7 +11712,10 @@ SWIGINTERN PyObject *_wrap_AbortPendingUploads(PyObject *SWIGUNUSEDPARM(self), P
     /* %typemap(in) (const char *utf8_path) */
     arg1 = GDALPythonObjectToCStr( swig_obj[0], &bToFree1 );
 =======
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
+=======
+>>>>>>> OSGeo-master
   PyObject * obj0 = 0 ;
   bool result;
   
@@ -11705,10 +11723,14 @@ SWIGINTERN PyObject *_wrap_AbortPendingUploads(PyObject *SWIGUNUSEDPARM(self), P
   {
     /* %typemap(in) (const char *utf8_path) */
     arg1 = GDALPythonObjectToCStr( obj0, &bToFree1 );
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
+=======
+>>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
+>>>>>>> OSGeo-master
     if (arg1 == NULL)
     {
       PyErr_SetString( PyExc_RuntimeError, "not a string" );
@@ -13240,15 +13262,21 @@ SWIGINTERN PyObject *_wrap_VSIFWriteL(PyObject *SWIGUNUSEDPARM(self), PyObject *
       size_t safeLen = 0;
       int ret;
       try {
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(obj0, (char**) &arg2, &safeLen, &alloc1);
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[0], (char**) &arg2, &safeLen, &alloc1);
 =======
         ret = SWIG_AsCharPtrAndSize(obj0, (char**) &arg2, &safeLen, &alloc1);
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
+=======
+>>>>>>> OSGeo-master
       }
       catch( const std::exception& )
       {
@@ -24879,15 +24907,21 @@ SWIGINTERN PyObject *_wrap_MDArray_Write(PyObject *SWIGUNUSEDPARM(self), PyObjec
       size_t safeLen = 0;
       int ret;
       try {
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(obj6, (char**) &arg12, &safeLen, &alloc11);
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[6], (char**) &arg12, &safeLen, &alloc11);
 =======
         ret = SWIG_AsCharPtrAndSize(obj6, (char**) &arg12, &safeLen, &alloc11);
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
+=======
+>>>>>>> OSGeo-master
       }
       catch( const std::exception& )
       {
@@ -26023,15 +26057,21 @@ SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueRaw(PyObject *SWIGUNUSEDPARM(se
       size_t safeLen = 0;
       int ret;
       try {
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(obj1, (char**) &arg3, &safeLen, &alloc2);
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[1], (char**) &arg3, &safeLen, &alloc2);
 =======
         ret = SWIG_AsCharPtrAndSize(obj1, (char**) &arg3, &safeLen, &alloc2);
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
+=======
+>>>>>>> OSGeo-master
       }
       catch( const std::exception& )
       {
@@ -27341,8 +27381,11 @@ SWIGINTERN PyObject *_wrap_MDArray_Cache(PyObject *SWIGUNUSEDPARM(self), PyObjec
   char **arg2 = (char **) NULL ;
   void *argp1 = 0 ;
   int res1 = 0 ;
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
   PyObject *swig_obj[2] ;
   bool result;
@@ -27350,23 +27393,33 @@ SWIGINTERN PyObject *_wrap_MDArray_Cache(PyObject *SWIGUNUSEDPARM(self), PyObjec
   if (!SWIG_Python_UnpackTuple(args, "MDArray_Cache", 1, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
 =======
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
+=======
+>>>>>>> OSGeo-master
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   bool result;
   
   if (!PyArg_ParseTuple(args,(char *)"O|O:MDArray_Cache",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/swig/python/extensions/gdal_wrap.cpp
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/swig/python/extensions/gdal_wrap.cpp
+>>>>>>> OSGeo-master
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "MDArray_Cache" "', argument " "1"" of type '" "GDALMDArrayHS *""'"); 
   }
   arg1 = reinterpret_cast< GDALMDArrayHS * >(argp1);
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
   if (swig_obj[1]) {
     {
@@ -27374,16 +27427,23 @@ SWIGINTERN PyObject *_wrap_MDArray_Cache(PyObject *SWIGUNUSEDPARM(self), PyObjec
       int bErr = FALSE;
       arg2 = CSLFromPySequence(swig_obj[1], &bErr);
 =======
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
+=======
+>>>>>>> OSGeo-master
   if (obj1) {
     {
       /* %typemap(in) char **options */
       int bErr = FALSE;
       arg2 = CSLFromPySequence(obj1, &bErr);
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/swig/python/extensions/gdal_wrap.cpp
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/swig/python/extensions/gdal_wrap.cpp
+>>>>>>> OSGeo-master
       if( bErr )
       {
         SWIG_fail;
@@ -28154,15 +28214,21 @@ SWIGINTERN PyObject *_wrap_Attribute_WriteRaw(PyObject *SWIGUNUSEDPARM(self), Py
       size_t safeLen = 0;
       int ret;
       try {
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(obj1, (char**) &arg3, &safeLen, &alloc2);
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[1], (char**) &arg3, &safeLen, &alloc2);
 =======
         ret = SWIG_AsCharPtrAndSize(obj1, (char**) &arg3, &safeLen, &alloc2);
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
+=======
+>>>>>>> OSGeo-master
       }
       catch( const std::exception& )
       {
@@ -29301,10 +29367,13 @@ SWIGINTERN PyObject *_wrap_ExtendedDataType_GetSubType(PyObject *SWIGUNUSEDPARM(
   void *argp1 = 0 ;
   int res1 = 0 ;
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
   PyObject *swig_obj[1] ;
   GDALExtendedDataTypeSubType result;
@@ -29314,14 +29383,18 @@ SWIGINTERN PyObject *_wrap_ExtendedDataType_GetSubType(PyObject *SWIGUNUSEDPARM(
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_GDALExtendedDataTypeHS, 0 |  0 );
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
   PyObject * obj0 = 0 ;
   GDALExtendedDataTypeSubType result;
   
   if (!PyArg_ParseTuple(args,(char *)"O:ExtendedDataType_GetSubType",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_GDALExtendedDataTypeHS, 0 |  0 );
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
@@ -29330,6 +29403,9 @@ SWIGINTERN PyObject *_wrap_ExtendedDataType_GetSubType(PyObject *SWIGUNUSEDPARM(
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
+>>>>>>> OSGeo-master
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ExtendedDataType_GetSubType" "', argument " "1"" of type '" "GDALExtendedDataTypeHS *""'"); 
   }
@@ -45471,12 +45547,16 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"MDArray_GetNoDataValueAsRaw", _wrap_MDArray_GetNoDataValueAsRaw, METH_VARARGS, (char *)"MDArray_GetNoDataValueAsRaw(MDArray self) -> CPLErr"},
 	 { (char *)"MDArray_GetNoDataValueAsDouble", _wrap_MDArray_GetNoDataValueAsDouble, METH_VARARGS, (char *)"MDArray_GetNoDataValueAsDouble(MDArray self)"},
 <<<<<<< HEAD
+<<<<<<< HEAD
 	 { (char *)"MDArray_GetNoDataValueAsString", _wrap_MDArray_GetNoDataValueAsString, METH_VARARGS, (char *)"MDArray_GetNoDataValueAsString(MDArray self) -> retStringAndCPLFree *"},
 	 { (char *)"MDArray_SetNoDataValueDouble", _wrap_MDArray_SetNoDataValueDouble, METH_VARARGS, (char *)"MDArray_SetNoDataValueDouble(MDArray self, double d) -> CPLErr"},
 	 { (char *)"MDArray_SetNoDataValueString", _wrap_MDArray_SetNoDataValueString, METH_VARARGS, (char *)"MDArray_SetNoDataValueString(MDArray self, char const * nodata) -> CPLErr"},
 =======
 	 { (char *)"MDArray_SetNoDataValueDouble", _wrap_MDArray_SetNoDataValueDouble, METH_VARARGS, (char *)"MDArray_SetNoDataValueDouble(MDArray self, double d) -> CPLErr"},
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+=======
+	 { (char *)"MDArray_SetNoDataValueDouble", _wrap_MDArray_SetNoDataValueDouble, METH_VARARGS, (char *)"MDArray_SetNoDataValueDouble(MDArray self, double d) -> CPLErr"},
+>>>>>>> OSGeo-master
 	 { (char *)"MDArray_SetNoDataValueRaw", _wrap_MDArray_SetNoDataValueRaw, METH_VARARGS, (char *)"MDArray_SetNoDataValueRaw(MDArray self, GIntBig nLen) -> CPLErr"},
 	 { (char *)"MDArray_DeleteNoDataValue", _wrap_MDArray_DeleteNoDataValue, METH_VARARGS, (char *)"MDArray_DeleteNoDataValue(MDArray self) -> CPLErr"},
 	 { (char *)"MDArray_GetOffset", _wrap_MDArray_GetOffset, METH_VARARGS, (char *)"MDArray_GetOffset(MDArray self)"},
@@ -45540,12 +45620,16 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"ExtendedDataType_GetMaxStringLength", _wrap_ExtendedDataType_GetMaxStringLength, METH_VARARGS, (char *)"ExtendedDataType_GetMaxStringLength(ExtendedDataType self) -> size_t"},
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 =======
 	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
+>>>>>>> OSGeo-master
 	 { (char *)"ExtendedDataType_GetComponents", _wrap_ExtendedDataType_GetComponents, METH_VARARGS, (char *)"ExtendedDataType_GetComponents(ExtendedDataType self)"},
 	 { (char *)"ExtendedDataType_CanConvertTo", _wrap_ExtendedDataType_CanConvertTo, METH_VARARGS, (char *)"ExtendedDataType_CanConvertTo(ExtendedDataType self, ExtendedDataType other) -> bool"},
 	 { (char *)"ExtendedDataType_Equals", _wrap_ExtendedDataType_Equals, METH_VARARGS, (char *)"ExtendedDataType_Equals(ExtendedDataType self, ExtendedDataType other) -> bool"},

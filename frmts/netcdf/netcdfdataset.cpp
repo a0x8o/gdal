@@ -2903,20 +2903,26 @@ char **netCDFDataset::GetMetadata( const char *pszDomain )
         auto iter = m_oMapDomainToJSon.find(pszDomain + strlen("json:"));
         if( iter != m_oMapDomainToJSon.end() )
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/netcdf/netcdfdataset.cpp
             return iter->second.apszMD;
 =======
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:frmts/netcdf/netcdfdataset.cpp
             return iter->second.List();
 =======
             return iter->second.apszMD;
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/netcdf/netcdfdataset.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/netcdf/netcdfdataset.cpp
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
     }
 
     return GDALDataset::GetMetadata(pszDomain);
@@ -6494,23 +6500,30 @@ CPLErr netCDFDataset::ReadAttributes( int cdfidIn, int var)
             {
                 CPLFree(pszVarFullName);
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/netcdf/netcdfdataset.cpp
 =======
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:frmts/netcdf/netcdfdataset.cpp
                 CPLStringList aosList;
                 aosList.AddString(CPLString(NCDFReadMetadataAsJson(cdfidIn)).replaceAll("\\/", '/'));
                 m_oMapDomainToJSon[key] = std::move(aosList);
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/netcdf/netcdfdataset.cpp
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
                 JSonMetadata md;
                 md.osJSon = CPLString(NCDFReadMetadataAsJson(cdfidIn)).replaceAll("\\/", '/');
                 md.apszMD[0] = &md.osJSon[0];
                 m_oMapDomainToJSon[key] = std::move(md);
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/netcdf/netcdfdataset.cpp
 =======
@@ -6519,6 +6532,9 @@ CPLErr netCDFDataset::ReadAttributes( int cdfidIn, int var)
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/netcdf/netcdfdataset.cpp
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/netcdf/netcdfdataset.cpp
+>>>>>>> OSGeo-master
                 return CE_None;
             }
         }
@@ -6527,23 +6543,30 @@ CPLErr netCDFDataset::ReadAttributes( int cdfidIn, int var)
     {
         CPLFree(pszVarFullName);
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/netcdf/netcdfdataset.cpp
 =======
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:frmts/netcdf/netcdfdataset.cpp
         CPLStringList aosList;
         aosList.AddString(CPLString(NCDFReadMetadataAsJson(cdfidIn)).replaceAll("\\/", '/'));
         m_oMapDomainToJSon["SUPPORT_DATA"] = std::move(aosList);
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/netcdf/netcdfdataset.cpp
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
         JSonMetadata md;
         md.osJSon = CPLString(NCDFReadMetadataAsJson(cdfidIn)).replaceAll("\\/", '/');
         md.apszMD[0] = &md.osJSon[0];
         m_oMapDomainToJSon["SUPPORT_DATA"] = std::move(md);
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/netcdf/netcdfdataset.cpp
 =======
@@ -6552,6 +6575,9 @@ CPLErr netCDFDataset::ReadAttributes( int cdfidIn, int var)
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/netcdf/netcdfdataset.cpp
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/netcdf/netcdfdataset.cpp
+>>>>>>> OSGeo-master
         return CE_None;
     }
 #endif
@@ -6829,8 +6855,11 @@ NetCDFFormatEnum netCDFDataset::IdentifyFormat( GDALOpenInfo *poOpenInfo,
                   EQUAL(pszExtension, "nc2") || EQUAL(pszExtension, "nc4") ||
                   EQUAL(pszExtension, "nc3") || EQUAL(pszExtension, "grd") ||
                   EQUAL(pszExtension, "gmac") ) )
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/netcdf/netcdfdataset.cpp
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:frmts/netcdf/netcdfdataset.cpp
             {
                 if( GDALGetDriverByName("HDF5") != nullptr )
@@ -6839,7 +6868,10 @@ NetCDFFormatEnum netCDFDataset::IdentifyFormat( GDALOpenInfo *poOpenInfo,
                 }
             }
 =======
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/netcdf/netcdfdataset.cpp
+=======
+>>>>>>> OSGeo-master
                 return NCDF_FORMAT_HDF5;
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/frmts/netcdf/netcdfdataset.cpp
         }

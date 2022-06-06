@@ -388,15 +388,21 @@ const char* VSISwiftFSHandler::GetOptions()
         "description='Project domain name'/>"
     "  <Option name='OS_REGION_NAME' type='string' "
         "description='Region name'/>"
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/port/cpl_vsil_swift.cpp
     +  VSICurlFilesystemHandler::GetOptionsStatic() +
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:port/cpl_vsil_swift.cpp
     +  VSICurlFilesystemHandlerBase::GetOptionsStatic() +
 =======
     +  VSICurlFilesystemHandler::GetOptionsStatic() +
 >>>>>>> a8a68b1126 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_vsil_swift.cpp
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:port/cpl_vsil_swift.cpp
+=======
+>>>>>>> OSGeo-master
         "</Options>");
     return osOptions.c_str();
 }

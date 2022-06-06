@@ -517,6 +517,7 @@ MEMDataset::~MEMDataset()
     FlushCache();
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/mem/memdataset.cpp
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/mem/memdataset.cpp
@@ -527,6 +528,9 @@ MEMDataset::~MEMDataset()
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/mem/memdataset.cpp
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/mem/memdataset.cpp
+>>>>>>> OSGeo-master
 
     GDALDeinitGCPs( m_nGCPCount, m_pasGCPs );
     CPLFree( m_pasGCPs );
@@ -1321,6 +1325,7 @@ GDALDataset *MEMDataset::Create( const char * /* pszFilename */,
 }
 
 /************************************************************************/
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/mem/memdataset.cpp
 =======
 <<<<<<< HEAD:frmts/mem/memdataset.cpp
@@ -1333,6 +1338,11 @@ GDALDataset *MEMDataset::Create( const char * /* pszFilename */,
 <<<<<<< HEAD:frmts/mem/memdataset.cpp
 >>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
 =======
+=======
+<<<<<<< HEAD:frmts/mem/memdataset.cpp
+<<<<<<< HEAD:frmts/mem/memdataset.cpp
+=======
+>>>>>>> OSGeo-master
 /*                               MEMGroup                               */
 /************************************************************************/
 
@@ -1583,6 +1593,7 @@ public:
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/frmts/mem/memdataset.cpp
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memdataset.cpp
 <<<<<<< HEAD
@@ -1598,6 +1609,10 @@ public:
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memdataset.cpp
 >>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
 >>>>>>> d263d6ecd7 (Docker: alpine-normal: add lzma support [ci skip])
+=======
+=======
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memdataset.cpp
+>>>>>>> OSGeo-master
 /*                           GetMDArrayNames()                          */
 /************************************************************************/
 

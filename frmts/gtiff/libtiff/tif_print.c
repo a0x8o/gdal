@@ -81,15 +81,21 @@ _TIFFPrintField(FILE* fd, const TIFFField *fip,
     /* Print a user-friendly name for tags of relatively common use, but */
     /* which aren't registered by libtiff itself. */
     const char* field_name = fip->field_name;
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/gtiff/libtiff/tif_print.c
     if( strncmp(fip->field_name, "Tag ", 4) == 0 ) {
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:frmts/gtiff/libtiff/tif_print.c
     if( TIFFFieldIsAnonymous(fip) ) {
 =======
     if( strncmp(fip->field_name, "Tag ", 4) == 0 ) {
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/gtiff/libtiff/tif_print.c
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/gtiff/libtiff/tif_print.c
+=======
+>>>>>>> OSGeo-master
         for( size_t i = 0; i < NTAGS; ++i ) {
             if( fip->field_tag == tagnames[i].tag ) {
                 field_name = tagnames[i].name;

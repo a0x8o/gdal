@@ -237,6 +237,7 @@ void OGRSQLiteLayer::BuildFeatureDefn( const char *pszLayerName,
         char* pszSQL = sqlite3_mprintf("PRAGMA table_info('%q')", pszLayerName);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitelayer.cpp
         auto oResultTable = SQLQuery(poDS->GetDB(), pszSQL);
         sqlite3_free(pszSQL);
@@ -246,6 +247,8 @@ void OGRSQLiteLayer::BuildFeatureDefn( const char *pszLayerName,
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogrsqlitelayer.cpp
         auto oResultTable = SQLQuery(m_poDS->GetDB(), pszSQL);
         sqlite3_free(pszSQL);
@@ -257,11 +260,14 @@ void OGRSQLiteLayer::BuildFeatureDefn( const char *pszLayerName,
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitelayer.cpp
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/sqlite/ogrsqlitelayer.cpp
 =======
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
         {
             for ( int iRecord = 0; iRecord < oResultTable->RowCount(); iRecord++ )
             {

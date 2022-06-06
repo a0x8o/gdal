@@ -2437,9 +2437,12 @@ class CPL_DLL GDALMDArray: virtual public GDALAbstractMDArray, public GDALIHasAt
     mutable bool m_bHasTriedCachedArray = false;
     mutable std::shared_ptr<GDALMDArray> m_poCachedArray{};
 
+<<<<<<< HEAD
     mutable bool m_bHasTriedCachedArray = false;
     mutable std::shared_ptr<GDALMDArray> m_poCachedArray{};
 
+=======
+>>>>>>> OSGeo-master
 protected:
 //! @cond Doxygen_Suppress
     GDALMDArray(const std::string& osParentName, const std::string& osName);
@@ -2449,8 +2452,11 @@ protected:
                              CSLConstList papszOptions) const;
 
     virtual bool IsCacheable() const { return true; }
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/gdal_priv.h
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:gcore/gdal_priv.h
 
     virtual bool SetStatistics( bool bApproxStats,
@@ -2464,7 +2470,10 @@ protected:
                                                  std::string& osCacheFilenameOut) const;
 =======
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/gcore/gdal_priv.h
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:gcore/gdal_priv.h
+=======
+>>>>>>> OSGeo-master
 //! @endcond
 
 public:
@@ -2486,6 +2495,7 @@ public:
      *
      * This is used in particular for caching.
      *
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/gdal_priv.h
 =======
 <<<<<<< HEAD:gcore/gdal_priv.h
@@ -2501,6 +2511,10 @@ public:
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:gcore/gdal_priv.h
+<<<<<<< HEAD:gcore/gdal_priv.h
+>>>>>>> OSGeo-master
      * Might be empty if the array is not linked to a file.
      *
      * @since GDAL 3.4
@@ -2508,6 +2522,7 @@ public:
 =======
      * Might be empty if the array is not linked to a file. */
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/gcore/gdal_priv.h
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -2521,10 +2536,14 @@ public:
 =======
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> OSGeo-master
      * Might be empty if the array is not linked to a file.
      * 
      * @since GDAL 3.4
      */
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/gdal_priv.h
@@ -2549,6 +2568,9 @@ public:
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdal_priv.h
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdal_priv.h
+>>>>>>> OSGeo-master
     virtual const std::string& GetFilename() const = 0;
 
     virtual CSLConstList GetStructuralInfo() const;
@@ -3066,8 +3088,11 @@ bool CPL_DLL GDALBufferHasOnlyNoData(const void* pBuffer,
                                      int nBitsPerSample,
                                      GDALBufferSampleFormat nSampleFormat);
 
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/gdal_priv.h
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:gcore/gdal_priv.h
 void CPL_DLL GDALCopyNoDataValue(GDALRasterBand* poDstBand,
                                  GDALRasterBand* poSrcBand);
@@ -3077,7 +3102,10 @@ double CPL_DLL GDALGetNoDataValueCastToDouble(uint64_t nVal);
 
 =======
 >>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdal_priv.h
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:gcore/gdal_priv.h
+=======
+>>>>>>> OSGeo-master
 //! @endcond
 
 #endif /* ndef GDAL_PRIV_H_INCLUDED */

@@ -269,13 +269,19 @@ namespace tut
     {
         ensure(poCT != nullptr);
 <<<<<<< HEAD
+<<<<<<< HEAD
         ensure((poCT->GetSourceCS() == nullptr) == 
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> OSGeo-master
         ensure((poCT->GetSourceCS() == nullptr) ==
 =======
         ensure((poCT->GetSourceCS() == nullptr) == 
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
+<<<<<<< HEAD
+>>>>>>> OSGeo-master
+=======
 >>>>>>> OSGeo-master
                (poSRSSource == nullptr) );
         if(poSRSSource != nullptr)
@@ -283,13 +289,19 @@ namespace tut
             ensure(poCT->GetSourceCS()->IsSame(poSRSSource));
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
         ensure((poCT->GetTargetCS() == nullptr) == 
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> OSGeo-master
         ensure((poCT->GetTargetCS() == nullptr) ==
 =======
         ensure((poCT->GetTargetCS() == nullptr) == 
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
+<<<<<<< HEAD
+>>>>>>> OSGeo-master
+=======
 >>>>>>> OSGeo-master
                (poSRSTarget == nullptr));
         if(poSRSTarget != nullptr)
@@ -306,13 +318,19 @@ namespace tut
             poCT->Clone());
         ensure(poClone != nullptr );
 <<<<<<< HEAD
+<<<<<<< HEAD
         ensure((poClone->GetSourceCS() == nullptr) == 
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> OSGeo-master
         ensure((poClone->GetSourceCS() == nullptr) ==
 =======
         ensure((poClone->GetSourceCS() == nullptr) == 
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
+<<<<<<< HEAD
+>>>>>>> OSGeo-master
+=======
 >>>>>>> OSGeo-master
                (poSRSSource == nullptr));
         if(poSRSSource != nullptr)
@@ -320,13 +338,19 @@ namespace tut
             ensure(poClone->GetSourceCS()->IsSame(poSRSSource));
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
         ensure((poClone->GetTargetCS() == nullptr) == 
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> OSGeo-master
         ensure((poClone->GetTargetCS() == nullptr) ==
 =======
         ensure((poClone->GetTargetCS() == nullptr) == 
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
+<<<<<<< HEAD
+>>>>>>> OSGeo-master
+=======
 >>>>>>> OSGeo-master
                (poSRSTarget == nullptr));
         if(poSRSTarget != nullptr)
@@ -337,12 +361,18 @@ namespace tut
         y = ySrc;
         ensure(poClone->Transform(1, &x, &y));
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> OSGeo-master
         ensure(fabs(x - xTransformed) < 1e-15);
         ensure(fabs(y - yTransformed) < 1e-15);
     }
 
+=======
+<<<<<<< HEAD
+>>>>>>> OSGeo-master
 =======
 >>>>>>> OSGeo-master
         ensure(abs(x - xTransformed) < 1e-15);
@@ -350,6 +380,10 @@ namespace tut
     }
     
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> OSGeo-master
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
 >>>>>>> OSGeo-master
@@ -403,6 +437,7 @@ namespace tut
         test_clone(poCT.get(), &oSRSSource, &oSRSTarget, 44, -60);
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -423,6 +458,11 @@ namespace tut
 >>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 913c3ef6c1 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> OSGeo-master
 
     // Test OGRCoordinateTransformation in pure "C" API
     // OCTClone/OCTGetSourceCS/OCTGetTargetCS/OCTGetInverse
@@ -464,14 +504,18 @@ namespace tut
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD
 =======
+>>>>>>> OSGeo-master
+=======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
 =======
 >>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> OSGeo-master
@@ -488,4 +532,6 @@ namespace tut
 =======
 >>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 913c3ef6c1 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
 } // namespace tut

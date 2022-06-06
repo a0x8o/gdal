@@ -511,8 +511,11 @@ Offset<const Table *> CopyTable(FlatBufferBuilder &fbb,
 bool Verify(const reflection::Schema &schema, const reflection::Object &root,
             const uint8_t *buf, size_t length, uoffset_t max_depth = 64,
             uoffset_t max_tables = 1000000);
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection.h
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection.h
 
 bool VerifySizePrefixed(const reflection::Schema &schema,
@@ -521,7 +524,10 @@ bool VerifySizePrefixed(const reflection::Schema &schema,
                         uoffset_t max_tables = 1000000);
 =======
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection.h
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection.h
+=======
+>>>>>>> OSGeo-master
 
 }  // namespace flatbuffers
 

@@ -75,14 +75,20 @@ public:
     bool GetIsInIndexingVariable() const { return m_bIsInIndexingVariable; }
 
     const std::string& GetFilename() const { return m_osFilename; }
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/netcdf/netcdfmultidim.cpp
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:frmts/netcdf/netcdfmultidim.cpp
 
     const std::shared_ptr<GDALPamMultiDim>& GetPAM() { return m_poPAM; }
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/frmts/netcdf/netcdfmultidim.cpp
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/netcdf/netcdfmultidim.cpp
+=======
+>>>>>>> OSGeo-master
 };
 
 /************************************************************************/
@@ -4129,10 +4135,14 @@ GDALDataset* netCDFDataset::CreateMultiDimensional( const char * pszFilename,
 =======
     auto poSharedResources(std::make_shared<netCDFSharedResources>());
     poSharedResources->m_osFilename = pszFilename;
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/netcdf/netcdfmultidim.cpp
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/frmts/netcdf/netcdfmultidim.cpp
 >>>>>>> OSGeo-master:frmts/netcdf/netcdfmultidim.cpp
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/frmts/netcdf/netcdfmultidim.cpp
+>>>>>>> OSGeo-master
     poSharedResources->m_cdfid = cdfid;
     poSharedResources->m_bReadOnly = false;
     poSharedResources->m_bDefineMode = true;

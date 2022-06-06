@@ -136,15 +136,21 @@ def copy_raster_and_add_overviews(
     shutil.copy(filename_src, ds_base)
     files_list.append(ds_base)
 
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/raster_creation.py
     ds = open_ds(ds_with_ovrs, gdal.GA_Update)
 =======
+=======
+>>>>>>> OSGeo-master
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/raster_creation.py
     ds = open_ds(ds_with_ovrs, access_mode = gdal.OF_UPDATE | gdal.OF_RASTER)
 =======
     ds = open_ds(ds_with_ovrs, gdal.GA_Update)
 >>>>>>> b6b690a901 (Merge pull request #3834 from talos-gis/locationinfo_fixes):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/raster_creation.py
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/gdal-utils/osgeo_utils/auxiliary/raster_creation.py
+=======
+>>>>>>> OSGeo-master
     size = (ds.RasterXSize, ds.RasterYSize)
     ds.BuildOverviews(overview_alg, overviewlist=overview_list)
 
