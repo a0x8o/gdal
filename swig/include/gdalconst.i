@@ -192,6 +192,7 @@
 %constant char *DMD_CREATIONFIELDDATASUBTYPES  = GDAL_DMD_CREATIONFIELDDATASUBTYPES;
 %constant char *DMD_SUBDATASETS        = GDAL_DMD_SUBDATASETS;
 %constant char *DMD_CREATION_FIELD_DOMAIN_TYPES    = GDAL_DMD_CREATION_FIELD_DOMAIN_TYPES;
+%constant char *DMD_ALTER_GEOM_FIELD_DEFN_FLAGS    = GDAL_DMD_ALTER_GEOM_FIELD_DEFN_FLAGS;
 
 %constant char *DCAP_OPEN       = GDAL_DCAP_OPEN;
 %constant char *DCAP_CREATE     = GDAL_DCAP_CREATE;
@@ -221,6 +222,14 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/include/gdalconst.i
+=======
+=======
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:gdal/swig/include/gdalconst.i
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/include/gdalconst.i
@@ -228,12 +237,25 @@
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/include/gdalconst.i
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/include/gdalconst.i
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/include/gdalconst.i
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/include/gdalconst.i
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/include/gdalconst.i
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 
 %constant char *DIM_TYPE_HORIZONTAL_X       = GDAL_DIM_TYPE_HORIZONTAL_X;
 %constant char *DIM_TYPE_HORIZONTAL_Y       = GDAL_DIM_TYPE_HORIZONTAL_Y;
@@ -254,6 +276,7 @@
 #define GDAL_DMD_CREATIONFIELDDATATYPES "DMD_CREATIONFIELDDATATYPES"
 #define GDAL_DMD_SUBDATASETS "DMD_SUBDATASETS"
 #define GDAL_DMD_CREATION_FIELD_DOMAIN_TYPES "DMD_CREATION_FIELD_DOMAIN_TYPES"
+#define GDAL_DMD_ALTER_GEOM_FIELD_DEFN_FLAGS "DMD_ALTER_GEOM_FIELD_DEFN_FLAGS"
 
 #define GDAL_DCAP_OPEN       "DCAP_OPEN"
 #define GDAL_DCAP_CREATE     "DCAP_CREATE"
@@ -269,19 +292,38 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+=======
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:gdal/swig/include/gdalconst.i
 =======
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:swig/include/gdalconst.i
 #define DCAP_FIELD_DOMAINS    "DCAP_FIELD_DOMAINS"
 #define DCAP_RENAME_LAYERS    "DCAP_RENAME_LAYERS"
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/include/gdalconst.i
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -292,6 +334,23 @@
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> OSGeo-master
+=======
+=======
+=======
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> OSGeo-master:swig/include/gdalconst.i
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 
 #define DIM_TYPE_HORIZONTAL_X "HORIZONTAL_X"
 #define DIM_TYPE_HORIZONTAL_Y "HORIZONTAL_Y"

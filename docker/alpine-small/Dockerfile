@@ -9,6 +9,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/docker/alpine-small/Dockerfile
 ARG ALPINE_VERSION=3.14
 =======
@@ -24,13 +25,51 @@ ARG ALPINE_VERSION=3.16
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+=======
+=======
+>>>>>>> d8608c8f1e (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 8e8bcf6841 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD:gdal/docker/alpine-small/Dockerfile
+ARG ALPINE_VERSION=3.14
+=======
+>>>>>>> 126d56369a (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
+<<<<<<< HEAD:docker/alpine-small/Dockerfile
+<<<<<<< HEAD
+ARG ALPINE_VERSION=3.16
+=======
+ARG ALPINE_VERSION=3.15
+>>>>>>> 9fdcdc669b (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+ARG ALPINE_VERSION=3.14
+>>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/docker/alpine-small/Dockerfile
+<<<<<<< HEAD
+=======
+>>>>>>> OSGeo-master:docker/alpine-small/Dockerfile
+=======
+ARG ALPINE_VERSION=3.16
+>>>>>>> 0f99b0ef18 (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
+<<<<<<< HEAD
+>>>>>>> 126d56369a (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
+=======
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:docker/alpine-small/Dockerfile
 ARG ALPINE_VERSION=3.16
 =======
 ARG ALPINE_VERSION=3.14
 >>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/docker/alpine-small/Dockerfile
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> c71573c49d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> c71573c49d (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> d8608c8f1e (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 <<<<<<< HEAD:docker/alpine-small/Dockerfile
 ARG ALPINE_VERSION=3.16
@@ -38,8 +77,19 @@ ARG ALPINE_VERSION=3.16
 ARG ALPINE_VERSION=3.14
 >>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/docker/alpine-small/Dockerfile
 >>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> 8e8bcf6841 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:docker/alpine-small/Dockerfile
+ARG ALPINE_VERSION=3.16
+=======
+ARG ALPINE_VERSION=3.14
+>>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/docker/alpine-small/Dockerfile
+>>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 FROM alpine:${ALPINE_VERSION} as builder
 
 # Derived from osgeo/proj by Howard Butler <howard@hobu.co>

@@ -1785,11 +1785,25 @@ def test_warp_rms_2():
 =======
 <<<<<<< HEAD
 =======
+<<<<<<< HEAD
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 
 
 def test_warp_mode_ties():
@@ -1817,6 +1831,7 @@ def test_warp_mode_ties():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master
 =======
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -1824,3 +1839,20 @@ def test_warp_mode_ties():
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> OSGeo-master
+=======
+=======
+=======
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> OSGeo-master
+=======
+>>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation

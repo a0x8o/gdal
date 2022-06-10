@@ -119,6 +119,16 @@ Creation Options:
    NITF file and have specified "N" or "S" for ICORDS, you need to call
    later the SetProjection method with a consistent UTM SRS to set the
    UTM zone number (otherwise it will default to zone 0).
+   Starting with GDAL 3.5.1, when using the CreateCopy() interface with an
+   image whose source SRS is a UTM WGS84 projection and specifying ICORDS=G or D,
+   the NITF driver will reproject the image corner coordinates to longitude-latitude.
+   This can be useful when it is not possible to encode in the IGEOLO field
+   the coordinates of an image in the equatorial zone, whose one of the northing
+   expressed in a UTM northern hemisphere projection is below -1e6.
+-  **IGEOLO=string**: (GDAL >= 3.5.1) Image corner coordinates specified as a
+   string of 60 characters (cf MIL-STD-2500C for expected format). Normally
+   automatically set from source geotransform and SRS when using the CreateCopy()
+   interface. If specified, ICORDS must also be specified.
 -  **FHDR**: File version can be selected though currently the only two
    variations supported are "NITF02.10" (the default), and "NSIF01.00".
 -  **IREP**: Set to "RGB/LUT" to reserve space for a color table for
@@ -179,20 +189,26 @@ JPEG2000 compression (write support)
 JPEG2000 compression is available when using the IC=C8 creation option,
 if the JP2ECW (SDK 3.3, or for later versions assuming the user has the key to
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/doc/source/drivers/raster/nitf.rst
 enable JPEG2000 writing), JP2KAK, JP2OpenJPEG or Jasper driver are available.
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:doc/source/drivers/raster/nitf.rst
 enable JPEG2000 writing), JP2KAK or JP2OpenJPEG driver are available.
 =======
 enable JPEG2000 writing), JP2KAK, JP2OpenJPEG or Jasper driver are available.
 >>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/raster/nitf.rst
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:doc/source/drivers/raster/nitf.rst
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 
 They are tried in that order when several ones are available, unless the
 JPEG2000_DRIVER creation option (added in GDAL 3.4) is set to explicitly specify
@@ -223,21 +239,27 @@ the JPEG2000 capable driver to use.
   the J2KLRA=NO creation option is specified.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/doc/source/drivers/raster/nitf.rst
 -  Jasper JPEG2000 driver: only in the CreateCopy() case.
 
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:doc/source/drivers/raster/nitf.rst
 =======
 -  Jasper JPEG2000 driver: only in the CreateCopy() case.
 
 >>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/raster/nitf.rst
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:doc/source/drivers/raster/nitf.rst
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 Links
 -----
 

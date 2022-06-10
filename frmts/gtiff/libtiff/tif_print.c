@@ -82,20 +82,26 @@ _TIFFPrintField(FILE* fd, const TIFFField *fip,
     /* which aren't registered by libtiff itself. */
     const char* field_name = fip->field_name;
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/gtiff/libtiff/tif_print.c
     if( strncmp(fip->field_name, "Tag ", 4) == 0 ) {
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:frmts/gtiff/libtiff/tif_print.c
     if( TIFFFieldIsAnonymous(fip) ) {
 =======
     if( strncmp(fip->field_name, "Tag ", 4) == 0 ) {
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/gtiff/libtiff/tif_print.c
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/gtiff/libtiff/tif_print.c
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
         for( size_t i = 0; i < NTAGS; ++i ) {
             if( fip->field_tag == tagnames[i].tag ) {
                 field_name = tagnames[i].name;

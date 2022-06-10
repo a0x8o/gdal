@@ -51,14 +51,29 @@ def get_color_table_from_raster(path_or_ds: PathOrDS) -> Optional[gdal.ColorTabl
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
 =======
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
@@ -66,9 +81,34 @@ def get_color_table_from_raster(path_or_ds: PathOrDS) -> Optional[gdal.ColorTabl
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
+>>>>>>> 9a931cd0f4 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
+>>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> OSGeo-master:swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
+=======
+>>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> gdal-raster-parallelisation
+=======
+=======
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 >>>>>>> 2767799a55 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
@@ -76,26 +116,48 @@ def get_color_table_from_raster(path_or_ds: PathOrDS) -> Optional[gdal.ColorTabl
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 9105b4f6b6 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
 >>>>>>> OSGeo-master
+=======
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 def color_table_from_color_palette(pal: ColorPalette, color_table: gdal.ColorTable,
                                    fill_missing_colors=True, min_key=0, max_key=255) -> bool:
     """ returns None if pal has no values, otherwise returns a gdal.ColorTable from the given ColorPalette"""
     if not pal.pal or not pal.is_numeric():
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+<<<<<<< HEAD
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:gdal/swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
         # palette has no values or not numeric
         return False
 =======
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
         raise Exception('palette has no values or not fully numeric')
 =======
@@ -118,10 +180,26 @@ def get_color_table(color_palette_or_path_or_strings_or_ds: Optional[ColorTableL
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 =======
         # palette has no values or not numeric
         return False
@@ -130,6 +208,22 @@ def get_color_table(color_palette_or_path_or_strings_or_ds: Optional[ColorTableL
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 9a931cd0f4 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master:swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
+=======
+>>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 >>>>>>> OSGeo-master:swig/python/gdal-utils/osgeo_utils/auxiliary/color_table.py
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -137,14 +231,28 @@ def get_color_table(color_palette_or_path_or_strings_or_ds: Optional[ColorTableL
 =======
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 2767799a55 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 9105b4f6b6 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
     if fill_missing_colors:
         keys = sorted(list(pal.pal.keys()))
         if min_key is None:

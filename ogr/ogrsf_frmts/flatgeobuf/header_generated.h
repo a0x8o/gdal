@@ -547,6 +547,7 @@ struct Header FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_HAS_T) &&
            VerifyField<uint8_t>(verifier, VT_HAS_TM) &&
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/header_generated.h
 =======
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/header_generated.h
@@ -554,6 +555,9 @@ struct Header FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 =======
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/header_generated.h
 >>>>>>> OSGeo-master
+=======
+>>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/header_generated.h
+>>>>>>> gdal-raster-parallelisation
            VerifyOffset(verifier, VT_COLUMNS) &&
            verifier.VerifyVector(columns()) &&
            verifier.VerifyVectorOfTables(columns()) &&

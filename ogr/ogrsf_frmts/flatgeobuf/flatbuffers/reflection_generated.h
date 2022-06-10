@@ -125,18 +125,24 @@ inline const char *EnumNameBaseType(BaseType e) {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 /// New schema language features that are not supported by old code generators.
 =======
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 enum AdvancedFeatures {
   AdvancedArrayFeatures = 1ULL,
   AdvancedUnionFeatures = 2ULL,
@@ -598,11 +604,14 @@ struct Field FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_ATTRIBUTES = 22,
     VT_DOCUMENTATION = 24,
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
     VT_OPTIONAL = 26
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
     VT_OPTIONAL = 26,
     VT_PADDING = 28
@@ -610,9 +619,12 @@ struct Field FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_OPTIONAL = 26
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
   };
   const flatbuffers::String *name() const {
     return GetPointer<const flatbuffers::String *>(VT_NAME);
@@ -657,10 +669,13 @@ struct Field FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return GetField<uint8_t>(VT_OPTIONAL, 0) != 0;
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
   /// Number of padding octets to always add after this field. Structs only.
   uint16_t padding() const {
@@ -669,9 +684,12 @@ struct Field FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 =======
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_NAME) &&
@@ -692,11 +710,14 @@ struct Field FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyVector(documentation()) &&
            verifier.VerifyVectorOfStrings(documentation()) &&
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
            VerifyField<uint8_t>(verifier, VT_OPTIONAL) &&
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
            VerifyField<uint8_t>(verifier, VT_OPTIONAL, 1) &&
            VerifyField<uint16_t>(verifier, VT_PADDING, 2) &&
@@ -704,9 +725,12 @@ struct Field FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_OPTIONAL) &&
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
            verifier.EndTable();
   }
 };
@@ -752,10 +776,13 @@ struct FieldBuilder {
     fbb_.AddElement<uint8_t>(Field::VT_OPTIONAL, static_cast<uint8_t>(optional), 0);
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
   void add_padding(uint16_t padding) {
     fbb_.AddElement<uint16_t>(Field::VT_PADDING, padding, 0);
@@ -763,9 +790,12 @@ struct FieldBuilder {
 =======
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
   explicit FieldBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -793,11 +823,14 @@ inline flatbuffers::Offset<Field> CreateField(
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<reflection::KeyValue>>> attributes = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> documentation = 0,
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
     bool optional = false) {
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
     bool optional = false,
     uint16_t padding = 0) {
@@ -805,9 +838,12 @@ inline flatbuffers::Offset<Field> CreateField(
     bool optional = false) {
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
   FieldBuilder builder_(_fbb);
   builder_.add_default_real(default_real);
   builder_.add_default_integer(default_integer);
@@ -839,11 +875,14 @@ inline flatbuffers::Offset<Field> CreateFieldDirect(
     std::vector<flatbuffers::Offset<reflection::KeyValue>> *attributes = nullptr,
     const std::vector<flatbuffers::Offset<flatbuffers::String>> *documentation = nullptr,
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
     bool optional = false) {
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
     bool optional = false,
     uint16_t padding = 0) {
@@ -851,9 +890,12 @@ inline flatbuffers::Offset<Field> CreateFieldDirect(
     bool optional = false) {
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
   auto name__ = name ? _fbb.CreateString(name) : 0;
   auto attributes__ = attributes ? _fbb.CreateVectorOfSortedTables<reflection::KeyValue>(attributes) : 0;
   auto documentation__ = documentation ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*documentation) : 0;
@@ -871,11 +913,14 @@ inline flatbuffers::Offset<Field> CreateFieldDirect(
       attributes__,
       documentation__,
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
       optional);
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
       optional,
       padding);
@@ -883,9 +928,12 @@ inline flatbuffers::Offset<Field> CreateFieldDirect(
       optional);
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 }
 
 struct Object FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -1365,11 +1413,14 @@ struct Schema FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_ROOT_TABLE = 12,
     VT_SERVICES = 14,
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
     VT_ADVANCED_FEATURES = 16
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
     VT_ADVANCED_FEATURES = 16,
     VT_FBS_FILES = 18
@@ -1377,9 +1428,12 @@ struct Schema FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_ADVANCED_FEATURES = 16
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
   };
   const flatbuffers::Vector<flatbuffers::Offset<reflection::Object>> *objects() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<reflection::Object>> *>(VT_OBJECTS);
@@ -1403,10 +1457,13 @@ struct Schema FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return static_cast<reflection::AdvancedFeatures>(GetField<uint64_t>(VT_ADVANCED_FEATURES, 0));
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
   /// All the files used in this compilation. Files are relative to where
   /// flatc was invoked.
@@ -1416,9 +1473,12 @@ struct Schema FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 =======
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_OBJECTS) &&
@@ -1437,11 +1497,14 @@ struct Schema FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyVector(services()) &&
            verifier.VerifyVectorOfTables(services()) &&
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
            VerifyField<uint64_t>(verifier, VT_ADVANCED_FEATURES) &&
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
            VerifyField<uint64_t>(verifier, VT_ADVANCED_FEATURES, 8) &&
            VerifyOffset(verifier, VT_FBS_FILES) &&
@@ -1451,9 +1514,12 @@ struct Schema FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint64_t>(verifier, VT_ADVANCED_FEATURES) &&
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
            verifier.EndTable();
   }
 };
@@ -1484,10 +1550,13 @@ struct SchemaBuilder {
     fbb_.AddElement<uint64_t>(Schema::VT_ADVANCED_FEATURES, static_cast<uint64_t>(advanced_features), 0);
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
   void add_fbs_files(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<reflection::SchemaFile>>> fbs_files) {
     fbb_.AddOffset(Schema::VT_FBS_FILES, fbs_files);
@@ -1495,9 +1564,12 @@ struct SchemaBuilder {
 =======
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
   explicit SchemaBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -1520,6 +1592,7 @@ inline flatbuffers::Offset<Schema> CreateSchema(
     flatbuffers::Offset<reflection::Object> root_table = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<reflection::Service>>> services = 0,
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
     reflection::AdvancedFeatures advanced_features = static_cast<reflection::AdvancedFeatures>(0)) {
   SchemaBuilder builder_(_fbb);
@@ -1527,6 +1600,8 @@ inline flatbuffers::Offset<Schema> CreateSchema(
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
     reflection::AdvancedFeatures advanced_features = static_cast<reflection::AdvancedFeatures>(0),
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<reflection::SchemaFile>>> fbs_files = 0) {
@@ -1539,9 +1614,12 @@ inline flatbuffers::Offset<Schema> CreateSchema(
   builder_.add_advanced_features(advanced_features);
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
   builder_.add_services(services);
   builder_.add_root_table(root_table);
   builder_.add_file_ext(file_ext);
@@ -1560,11 +1638,14 @@ inline flatbuffers::Offset<Schema> CreateSchemaDirect(
     flatbuffers::Offset<reflection::Object> root_table = 0,
     std::vector<flatbuffers::Offset<reflection::Service>> *services = nullptr,
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
     reflection::AdvancedFeatures advanced_features = static_cast<reflection::AdvancedFeatures>(0)) {
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
     reflection::AdvancedFeatures advanced_features = static_cast<reflection::AdvancedFeatures>(0),
     std::vector<flatbuffers::Offset<reflection::SchemaFile>> *fbs_files = nullptr) {
@@ -1572,9 +1653,12 @@ inline flatbuffers::Offset<Schema> CreateSchemaDirect(
     reflection::AdvancedFeatures advanced_features = static_cast<reflection::AdvancedFeatures>(0)) {
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
   auto objects__ = objects ? _fbb.CreateVectorOfSortedTables<reflection::Object>(objects) : 0;
   auto enums__ = enums ? _fbb.CreateVectorOfSortedTables<reflection::Enum>(enums) : 0;
   auto file_ident__ = file_ident ? _fbb.CreateString(file_ident) : 0;
@@ -1590,11 +1674,14 @@ inline flatbuffers::Offset<Schema> CreateSchemaDirect(
       root_table,
       services__,
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
       advanced_features);
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
       advanced_features,
       fbs_files__);
@@ -1602,9 +1689,12 @@ inline flatbuffers::Offset<Schema> CreateSchemaDirect(
       advanced_features);
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/reflection_generated.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 }
 
 inline const reflection::Schema *GetSchema(const void *buf) {

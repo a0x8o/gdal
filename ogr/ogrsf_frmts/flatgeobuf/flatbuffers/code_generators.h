@@ -97,21 +97,27 @@ class BaseGenerator {
                                   const Namespace &ns,
                                   const bool dasherize = false);
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/code_generators.h
 
   static std::string ToDasherizedCase(const std::string pascal_case);
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/code_generators.h
 =======
 
   static std::string ToDasherizedCase(const std::string pascal_case);
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/code_generators.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/code_generators.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 
   std::string GeneratedFileName(const std::string &path,
                                 const std::string &file_name,

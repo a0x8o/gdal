@@ -405,6 +405,13 @@ Examples
       ogrinfo file1.dbf -sql "RESIZE file1"
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD:doc/source/drivers/vector/shapefile.rst
+=======
+=======
+<<<<<<< HEAD
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:gdal/doc/source/drivers/vector/shapefile.rst
 =======
 <<<<<<< HEAD:doc/source/drivers/vector/shapefile.rst
@@ -414,10 +421,18 @@ Examples
 <<<<<<< HEAD:doc/source/drivers/vector/shapefile.rst
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD:doc/source/drivers/vector/shapefile.rst
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:doc/source/drivers/vector/shapefile.rst
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 
 Advanced topics
 ---------------

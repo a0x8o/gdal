@@ -3634,6 +3634,7 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "DMD_CREATIONFIELDDATASUBTYPES",SWIG_FromCharPtr(GDAL_DMD_CREATIONFIELDDATASUBTYPES));
   SWIG_Python_SetConstant(d, "DMD_SUBDATASETS",SWIG_FromCharPtr(GDAL_DMD_SUBDATASETS));
   SWIG_Python_SetConstant(d, "DMD_CREATION_FIELD_DOMAIN_TYPES",SWIG_FromCharPtr(GDAL_DMD_CREATION_FIELD_DOMAIN_TYPES));
+  SWIG_Python_SetConstant(d, "DMD_ALTER_GEOM_FIELD_DEFN_FLAGS",SWIG_FromCharPtr(GDAL_DMD_ALTER_GEOM_FIELD_DEFN_FLAGS));
   SWIG_Python_SetConstant(d, "DCAP_OPEN",SWIG_FromCharPtr(GDAL_DCAP_OPEN));
   SWIG_Python_SetConstant(d, "DCAP_CREATE",SWIG_FromCharPtr(GDAL_DCAP_CREATE));
   SWIG_Python_SetConstant(d, "DCAP_CREATE_MULTIDIMENSIONAL",SWIG_FromCharPtr(GDAL_DCAP_CREATE_MULTIDIMENSIONAL));
@@ -3662,6 +3663,14 @@ SWIG_init(void) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdalconst_wrap.c
+=======
+=======
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:gdal/swig/python/extensions/gdalconst_wrap.c
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdalconst_wrap.c
@@ -3669,12 +3678,25 @@ SWIG_init(void) {
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdalconst_wrap.c
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdalconst_wrap.c
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdalconst_wrap.c
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdalconst_wrap.c
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdalconst_wrap.c
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
   SWIG_Python_SetConstant(d, "DIM_TYPE_HORIZONTAL_X",SWIG_FromCharPtr(GDAL_DIM_TYPE_HORIZONTAL_X));
   SWIG_Python_SetConstant(d, "DIM_TYPE_HORIZONTAL_Y",SWIG_FromCharPtr(GDAL_DIM_TYPE_HORIZONTAL_Y));
   SWIG_Python_SetConstant(d, "DIM_TYPE_VERTICAL",SWIG_FromCharPtr(GDAL_DIM_TYPE_VERTICAL));

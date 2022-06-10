@@ -76,19 +76,25 @@ public:
 
     const std::string& GetFilename() const { return m_osFilename; }
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/netcdf/netcdfmultidim.cpp
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:frmts/netcdf/netcdfmultidim.cpp
 
     const std::shared_ptr<GDALPamMultiDim>& GetPAM() { return m_poPAM; }
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/frmts/netcdf/netcdfmultidim.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/netcdf/netcdfmultidim.cpp
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 };
 
 /************************************************************************/
@@ -4136,6 +4142,7 @@ GDALDataset* netCDFDataset::CreateMultiDimensional( const char * pszFilename,
     auto poSharedResources(std::make_shared<netCDFSharedResources>());
     poSharedResources->m_osFilename = pszFilename;
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/netcdf/netcdfmultidim.cpp
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/frmts/netcdf/netcdfmultidim.cpp
@@ -4143,6 +4150,9 @@ GDALDataset* netCDFDataset::CreateMultiDimensional( const char * pszFilename,
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/frmts/netcdf/netcdfmultidim.cpp
 >>>>>>> OSGeo-master
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/frmts/netcdf/netcdfmultidim.cpp
+>>>>>>> gdal-raster-parallelisation
     poSharedResources->m_cdfid = cdfid;
     poSharedResources->m_bReadOnly = false;
     poSharedResources->m_bDefineMode = true;

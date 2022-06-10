@@ -69,10 +69,22 @@ static bool NITFPatchImageLength( const char *pszFilename,
                                   GIntBig nPixelCount,
                                   const char *pszIC,
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/nitf/nitfdataset.cpp
                                   int nICOffset,
 =======
 <<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
+=======
+>>>>>>> 8da24d86c4 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
@@ -85,6 +97,28 @@ static bool NITFPatchImageLength( const char *pszFilename,
 <<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
 <<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
 >>>>>>> OSGeo-master
+=======
+>>>>>>> 9a931cd0f4 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
+=======
+>>>>>>> 61f974f82f (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> b90cc3ab17 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+<<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
+>>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61f974f82f (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
+>>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
                                   vsi_l_offset nICOffset,
                                   CSLConstList papszCreationOptions );
 static bool NITFWriteExtraSegments( const char *pszFilename,
@@ -95,6 +129,25 @@ static bool NITFWriteExtraSegments( const char *pszFilename,
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+                                  int nICOffset,
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
+=======
+>>>>>>> 8da24d86c4 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+                                  int nICOffset,
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
+>>>>>>> 9a931cd0f4 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 =======
                                   int nICOffset,
 >>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
@@ -105,6 +158,12 @@ static bool NITFWriteExtraSegments( const char *pszFilename,
 >>>>>>> 61f974f82f (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 >>>>>>> 86d4bf43e3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> b90cc3ab17 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
 =======
@@ -112,11 +171,21 @@ static bool NITFWriteExtraSegments( const char *pszFilename,
 >>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 2767799a55 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+>>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61f974f82f (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
                                   int nICOffset,
 >>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
+<<<<<<< HEAD
 >>>>>>> OSGeo-master
+=======
+>>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
                                   CSLConstList papszCreationOptions );
 static bool NITFWriteCGMSegments( const char *pszFilename, char **papszList );
 static bool NITFWriteTextSegments( const char *pszFilename, char **papszList );
@@ -256,19 +325,42 @@ int NITFDataset::CloseDependentDatasets()
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9a931cd0f4 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:gdal/frmts/nitf/nitfdataset.cpp
                                   "C8", m_nICOffset, nullptr ));
 =======
 =======
 <<<<<<< HEAD
 >>>>>>> 86d4bf43e3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> b90cc3ab17 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 <<<<<<< HEAD
 =======
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 2767799a55 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
                                   "C8", nullptr ));
 >>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
@@ -278,6 +370,19 @@ int NITFDataset::CloseDependentDatasets()
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+                                  "C8", nullptr ));
+>>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
+>>>>>>> 8da24d86c4 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 9a931cd0f4 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 >>>>>>> OSGeo-master:frmts/nitf/nitfdataset.cpp
 =======
 =======
@@ -288,12 +393,28 @@ int NITFDataset::CloseDependentDatasets()
 >>>>>>> 61f974f82f (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 >>>>>>> 86d4bf43e3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> b90cc3ab17 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 2767799a55 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+                                  "C8", nullptr ));
+>>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
+>>>>>>> 61f974f82f (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
     }
 
     bJP2Writing = FALSE;
@@ -4280,10 +4401,13 @@ NITFDataset::NITFDatasetCreate( const char *pszFilename, int nXSize, int nYSize,
 /* -------------------------------------------------------------------- */
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/nitf/nitfdataset.cpp
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
     int nIMIndex = 0;
     int nImageCount = 0;
@@ -4295,13 +4419,17 @@ NITFDataset::NITFDatasetCreate( const char *pszFilename, int nXSize, int nYSize,
                        &nIMIndex, &nImageCount, &nImageOffset, &nICOffset ) )
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/nitf/nitfdataset.cpp
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
     int nICOffset = 0;
     if( !NITFCreateEx( pszFilename, nXSize, nYSize, nBands,
                        GDALGetDataTypeSize( eType ), pszPVType,
                        papszFullOptions, &nICOffset ) )
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/nitf/nitfdataset.cpp
 =======
@@ -4310,6 +4438,9 @@ NITFDataset::NITFDatasetCreate( const char *pszFilename, int nXSize, int nYSize,
 =======
 >>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
 >>>>>>> OSGeo-master
+=======
+>>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
+>>>>>>> gdal-raster-parallelisation
     {
         CSLDestroy(papszTextMD);
         CSLDestroy(papszCgmMD);
@@ -4352,10 +4483,13 @@ NITFDataset::NITFDatasetCreate( const char *pszFilename, int nXSize, int nYSize,
     if (poDS)
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/nitf/nitfdataset.cpp
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
         poDS->m_nImageOffset = nImageOffset;
         poDS->m_nIMIndex = nIMIndex;
@@ -4363,9 +4497,12 @@ NITFDataset::NITFDatasetCreate( const char *pszFilename, int nXSize, int nYSize,
 =======
 >>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/nitf/nitfdataset.cpp
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
         poDS->m_nICOffset = nICOffset;
         poDS->papszTextMDToWrite = papszTextMD;
         poDS->papszCgmMDToWrite = papszCgmMD;
@@ -4440,6 +4577,7 @@ NITFDataset::NITFCreateCopy(
                         GetGDALDriverManager()->GetDriverByName( "JP2OPENJPEG" );
                 }
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/nitf/nitfdataset.cpp
 =======
 <<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
@@ -4449,12 +4587,17 @@ NITFDataset::NITFCreateCopy(
 <<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
 =======
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
+=======
+>>>>>>> gdal-raster-parallelisation
                 if( poJ2KDriver == nullptr )
                 {
                     /* Try with Jasper as an alternate driver */
                     poJ2KDriver =
                         GetGDALDriverManager()->GetDriverByName( "JPEG2000" );
                 }
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/nitf/nitfdataset.cpp
 =======
@@ -4463,6 +4606,9 @@ NITFDataset::NITFCreateCopy(
 =======
 >>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
 >>>>>>> OSGeo-master
+=======
+>>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
+>>>>>>> gdal-raster-parallelisation
             }
             if( poJ2KDriver == nullptr )
             {
@@ -4670,6 +4816,16 @@ NITFDataset::NITFCreateCopy(
     int nZone = 0;
     OGRSpatialReference oSRS;
     OGRSpatialReference oSRS_WGS84;
+    int nGCIFFlags = GCIF_PAM_DEFAULT;
+    double dfIGEOLOULX = 0;
+    double dfIGEOLOULY = 0;
+    double dfIGEOLOURX = 0;
+    double dfIGEOLOURY = 0;
+    double dfIGEOLOLRX = 0;
+    double dfIGEOLOLRY = 0;
+    double dfIGEOLOLLX = 0;
+    double dfIGEOLOLLY = 0;
+    bool bManualWriteOfIGEOLO = false;
 
     if( pszWKT != nullptr && pszWKT[0] != '\0' )
     {
@@ -4800,7 +4956,33 @@ NITFDataset::NITFCreateCopy(
         bWriteGCPs = ( !bWriteGeoTransform && poSrcDS->GetGCPCount() == 4 );
 
         int bNorth;
-        if( oSRS.IsGeographic() && oSRS.GetPrimeMeridian() == 0.0 )
+        const bool bHasIGEOLO = CSLFetchNameValue(papszFullOptions, "IGEOLO") != nullptr;
+        if( bHasIGEOLO && pszICORDS == nullptr )
+        {
+            CPLError((bStrict) ? CE_Failure : CE_Warning, CPLE_AppDefined,
+                     "IGEOLO specified, but ICORDS not.%s",
+                     bStrict ? "": " Ignoring IGEOLO");
+            if( bStrict )
+            {
+                CSLDestroy(papszFullOptions);
+                CSLDestroy(papszCgmMD);
+                CSLDestroy(papszTextMD);
+                return nullptr;
+            }
+        }
+
+        if( CSLFetchNameValue(papszFullOptions, "IGEOLO") != nullptr &&
+            pszICORDS != nullptr )
+        {
+            // if both IGEOLO and ICORDS are specified, do not try to write
+            // computed values
+
+            bWriteGeoTransform = false;
+            bWriteGCPs = false;
+            nGCIFFlags &= ~GCIF_PROJECTION;
+            nGCIFFlags &= ~GCIF_GEOTRANSFORM;
+        }
+        else if( oSRS.IsGeographic() && oSRS.GetPrimeMeridian() == 0.0 )
         {
             if (pszICORDS == nullptr)
             {
@@ -4830,14 +5012,78 @@ NITFDataset::NITFCreateCopy(
 
         else if( oSRS.GetUTMZone( &bNorth ) > 0 )
         {
-            if( bNorth )
-                papszFullOptions =
-                    CSLSetNameValue( papszFullOptions, "ICORDS", "N" );
-            else
-                papszFullOptions =
-                    CSLSetNameValue( papszFullOptions, "ICORDS", "S" );
-
+            const char* pszComputedICORDS = bNorth ? "N" : "S";
             nZone = oSRS.GetUTMZone( nullptr );
+            if( pszICORDS == nullptr )
+            {
+                papszFullOptions =
+                    CSLSetNameValue( papszFullOptions, "ICORDS", pszComputedICORDS );
+            }
+            else if( EQUAL(pszICORDS, pszComputedICORDS) )
+            {
+                // ok
+            }
+            else if( (EQUAL(pszICORDS, "G") || EQUAL(pszICORDS, "D")) && bWriteGeoTransform )
+            {
+                // Reproject UTM corner coordinates to geographic.
+                // This can be used when there is no way to write an
+                // equatorial image whose one of the northing value is below -1e6
+
+                const int nXSize = poSrcDS->GetRasterXSize();
+                const int nYSize = poSrcDS->GetRasterYSize();
+
+                dfIGEOLOULX = adfGeoTransform[0] + 0.5 * adfGeoTransform[1]
+                                           + 0.5 * adfGeoTransform[2];
+                dfIGEOLOULY = adfGeoTransform[3] + 0.5 * adfGeoTransform[4]
+                                           + 0.5 * adfGeoTransform[5];
+                dfIGEOLOURX = dfIGEOLOULX + adfGeoTransform[1] * (nXSize - 1);
+                dfIGEOLOURY = dfIGEOLOULY + adfGeoTransform[4] * (nXSize - 1);
+                dfIGEOLOLRX = dfIGEOLOULX + adfGeoTransform[1] * (nXSize - 1)
+                                   + adfGeoTransform[2] * (nYSize - 1);
+                dfIGEOLOLRY = dfIGEOLOULY + adfGeoTransform[4] * (nXSize - 1)
+                                   + adfGeoTransform[5] * (nYSize - 1);
+                dfIGEOLOLLX = dfIGEOLOULX + adfGeoTransform[2] * (nYSize - 1);
+                dfIGEOLOLLY = dfIGEOLOULY + adfGeoTransform[5] * (nYSize - 1);
+
+                oSRS_WGS84.SetWellKnownGeogCS( "WGS84" );
+                oSRS_WGS84.SetAxisMappingStrategy(OAMS_TRADITIONAL_GIS_ORDER);
+
+                auto poCT = std::unique_ptr<OGRCoordinateTransformation>(
+                    OGRCreateCoordinateTransformation(&oSRS, &oSRS_WGS84));
+                if( poCT &&
+                    poCT->Transform(1, &dfIGEOLOULX, &dfIGEOLOULY) &&
+                    poCT->Transform(1, &dfIGEOLOURX, &dfIGEOLOURY) &&
+                    poCT->Transform(1, &dfIGEOLOLRX, &dfIGEOLOLRY) &&
+                    poCT->Transform(1, &dfIGEOLOLLX, &dfIGEOLOLLY) )
+                {
+                    nZone = 0;
+                    bWriteGeoTransform = false;
+                    bManualWriteOfIGEOLO = true;
+                    nGCIFFlags &= ~GCIF_PROJECTION;
+                    nGCIFFlags &= ~GCIF_GEOTRANSFORM;
+                }
+                else
+                {
+                    CPLError(CE_Failure, CPLE_AppDefined,
+                             "Cannot reproject UTM coordinates to geographic ones");
+                    CSLDestroy(papszFullOptions);
+                    CSLDestroy(papszCgmMD);
+                    CSLDestroy(papszTextMD);
+                    return nullptr;
+                }
+            }
+            else
+            {
+                CPLError((bStrict) ? CE_Failure : CE_Warning, CPLE_NotSupported,
+                         "Inconsistent ICORDS value with SRS : %s.", pszICORDS);
+                if (bStrict)
+                {
+                    CSLDestroy(papszFullOptions);
+                    CSLDestroy(papszCgmMD);
+                    CSLDestroy(papszTextMD);
+                    return nullptr;
+                }
+            }
         }
         else
         {
@@ -4856,7 +5102,6 @@ NITFDataset::NITFCreateCopy(
 /* -------------------------------------------------------------------- */
 /*      Do we have RPC information?                                     */
 /* -------------------------------------------------------------------- */
-    int nGCIFFlags = GCIF_PAM_DEFAULT;
     if( !bUseSrcNITFMetadata )
         nGCIFFlags &= ~GCIF_METADATA;
 
@@ -5059,6 +5304,7 @@ NITFDataset::NITFCreateCopy(
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/nitf/nitfdataset.cpp
     int nICOffset = 0;
     if (!NITFCreateEx( pszFilename, nXSize, nYSize, poSrcDS->GetRasterCount(),
@@ -5067,6 +5313,8 @@ NITFDataset::NITFCreateCopy(
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
     int nIMIndex = 0;
     int nImageCount = 0;
@@ -5083,9 +5331,12 @@ NITFDataset::NITFCreateCopy(
                 papszFullOptions, &nICOffset ))
 >>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/nitf/nitfdataset.cpp
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
     {
         CSLDestroy( papszFullOptions );
         CSLDestroy(papszCgmMD);
@@ -5160,10 +5411,13 @@ NITFDataset::NITFCreateCopy(
             poSrcDS->GetRasterCount();
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/nitf/nitfdataset.cpp
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
         bool bOK = NITFPatchImageLength( pszFilename,
                                          nIMIndex,
@@ -5178,6 +5432,7 @@ NITFDataset::NITFCreateCopy(
         }
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/nitf/nitfdataset.cpp
         bool bOK = NITFPatchImageLength( pszFilename, nImageOffset, nPixelCount,
 <<<<<<< HEAD
@@ -5185,14 +5440,49 @@ NITFDataset::NITFCreateCopy(
                                          "C8", nICOffset, papszFullOptions );
 =======
                                          "C8", papszFullOptions );
+=======
+        bool bOK = NITFPatchImageLength( pszFilename, nImageOffset, nPixelCount,
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+                                         "C8", nICOffset, papszFullOptions );
+=======
+                                         "C8", papszFullOptions );
+>>>>>>> 8da24d86c4 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+                                         "C8", nICOffset, papszFullOptions );
+>>>>>>> 9a931cd0f4 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+                                         "C8", nICOffset, papszFullOptions );
+=======
+                                         "C8", papszFullOptions );
+>>>>>>> 61f974f82f (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> b90cc3ab17 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+                                         "C8", nICOffset, papszFullOptions );
+>>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+                                         "C8", papszFullOptions );
+>>>>>>> gdal-raster-parallelisation
 >>>>>>> 61f974f82f (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
                                          "C8", nICOffset, papszFullOptions );
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
         bool bOK = NITFPatchImageLength( pszFilename, nImageOffset, nPixelCount,
                                          "C8", nICOffset, papszFullOptions );
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
         bOK &= NITFWriteCGMSegments( pszFilename, papszCgmMD );
         bOK &= NITFWriteTextSegments( pszFilename, papszTextMD );
 >>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
@@ -5270,16 +5560,48 @@ NITFDataset::NITFCreateCopy(
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+                              nPixelCount, pszIC, nICOffset, papszFullOptions );
+=======
+                              nPixelCount, pszIC, papszFullOptions );
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+                              nPixelCount, pszIC, nICOffset, papszFullOptions );
+=======
+                              nPixelCount, pszIC, papszFullOptions );
+>>>>>>> 8da24d86c4 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+                              nPixelCount, pszIC, nICOffset, papszFullOptions );
+>>>>>>> 9a931cd0f4 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
                               nPixelCount, pszIC, nICOffset, papszFullOptions );
 =======
                               nPixelCount, pszIC, papszFullOptions );
 >>>>>>> 61f974f82f (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> b90cc3ab17 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
 =======
                               nPixelCount, pszIC, nICOffset, papszFullOptions );
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+                              nPixelCount, pszIC, papszFullOptions );
+>>>>>>> gdal-raster-parallelisation
+>>>>>>> 61f974f82f (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+                              nPixelCount, pszIC, nICOffset, papszFullOptions );
+>>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
                               nPixelCount, pszIC, nICOffset, papszFullOptions );
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 
         bOK &= NITFWriteCGMSegments( pszFilename, papszCgmMD );
         bOK &= NITFWriteTextSegments( pszFilename, papszTextMD );
@@ -5414,7 +5736,22 @@ NITFDataset::NITFCreateCopy(
 /* -------------------------------------------------------------------- */
 /*      Set the georeferencing.                                         */
 /* -------------------------------------------------------------------- */
-    if( bWriteGeoTransform )
+    if( bManualWriteOfIGEOLO )
+    {
+        if( !NITFWriteIGEOLO(poDstDS->psImage,
+                             poDstDS->psImage->chICORDS,
+                             poDstDS->psImage->nZone,
+                             dfIGEOLOULX, dfIGEOLOULY, dfIGEOLOURX, dfIGEOLOURY,
+                             dfIGEOLOLRX, dfIGEOLOLRY, dfIGEOLOLLX, dfIGEOLOLLY ) )
+        {
+            delete poDstDS;
+            CSLDestroy(papszCgmMD);
+            CSLDestroy(papszTextMD);
+            CSLDestroy( papszFullOptions );
+            return nullptr;
+        }
+    }
+    else if( bWriteGeoTransform )
     {
         poDstDS->psImage->nZone = nZone;
         poDstDS->SetGeoTransform( adfGeoTransform );
@@ -5482,6 +5819,7 @@ static bool NITFPatchImageLength( const char *pszFilename,
                                   GIntBig nPixelCount,
                                   const char *pszIC,
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/nitf/nitfdataset.cpp
                                   int nICOffset,
 =======
@@ -5493,6 +5831,25 @@ static bool NITFPatchImageLength( const char *pszFilename,
 =======
 <<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9a931cd0f4 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> b90cc3ab17 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
                                   vsi_l_offset nICOffset,
 =======
@@ -5503,23 +5860,58 @@ static bool NITFPatchImageLength( const char *pszFilename,
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/nitf/nitfdataset.cpp
 =======
+=======
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> OSGeo-master:frmts/nitf/nitfdataset.cpp
+=======
+>>>>>>> b90cc3ab17 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 =======
 >>>>>>> 2767799a55 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
                                   vsi_l_offset nICOffset,
 =======
 >>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
+<<<<<<< HEAD
 >>>>>>> 61f974f82f (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 >>>>>>> 86d4bf43e3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
+>>>>>>> 8da24d86c4 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 9a931cd0f4 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61f974f82f (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 86d4bf43e3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> b90cc3ab17 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> gdal-raster-parallelisation
+=======
 =======
 >>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 2767799a55 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> e7a1893785 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+                                  vsi_l_offset nICOffset,
+=======
+>>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
+>>>>>>> 61f974f82f (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1663519ad8 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
                                   CSLConstList papszCreationOptions )
 
 {
@@ -6831,11 +7223,14 @@ void NITFDriver::InitCreationOptionList()
 "   <Option name='RESTART_INTERVAL' type='int' description='Restart interval (in MCUs). -1 for auto, 0 for none, > 0 for user specified' default='-1'/>"
 #endif
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/nitf/nitfdataset.cpp
 "   <Option name='NUMI' type='int' default='1' description='Number of images to create (1-999). Only works with IC=NC'/>";
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:frmts/nitf/nitfdataset.cpp
 "   <Option name='NUMI' type='int' default='1' description='Number of images to create (1-999). Only works with IC=NC if WRITE_ONLY_FIRST_IMAGE=NO'/>"
 "   <Option name='WRITE_ONLY_FIRST_IMAGE' type='boolean' default='NO' description='To be used with NUMI. If YES, only write first image. Subsequent one must be written with APPEND_SUBDATASET=YES'/>";
@@ -6843,9 +7238,12 @@ void NITFDriver::InitCreationOptionList()
 "   <Option name='NUMI' type='int' default='1' description='Number of images to create (1-999). Only works with IC=NC'/>";
 >>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitfdataset.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/nitf/nitfdataset.cpp
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 
     if( bHasJPEG2000Drivers)
     {
@@ -6890,6 +7288,8 @@ void NITFDriver::InitCreationOptionList()
 "       <Value>N</Value>"
 "       <Value>S</Value>"
 "   </Option>"
+"   <Option name='IGEOLO' type='string' description='Image corner coordinates. "
+"Normally automatically set. If specified, ICORDS must also be specified'/>"
 "   <Option name='FHDR' type='string-select' description='File version' default='NITF02.10'>"
 "       <Value>NITF02.10</Value>"
 "       <Value>NSIF01.00</Value>"

@@ -3757,7 +3757,7 @@ def test_ogr_gpkg_48():
     # No geom field, one single field with default value
     lyr = ds.CreateLayer('default_field_no_geom', geom_type=ogr.wkbNone)
     fld_defn = ogr.FieldDefn('foo')
-    fld_defn.SetDefault('x')
+    fld_defn.SetDefault("'x'")
     lyr.CreateField(fld_defn)
     f = ogr.Feature(lyr.GetLayerDefn())
     assert lyr.CreateFeature(f) == 0
@@ -5342,37 +5342,85 @@ def test_ogr_gpkg_fixup_wrong_mr_column_name_update_trigger():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 145dd38d72 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 >>>>>>> OSGeo-master
 =======
 <<<<<<< HEAD
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
 >>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 >>>>>>> 913c3ef6c1 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 39cde30c78 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> a57f04675f (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> OSGeo-master
+=======
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 
 ###############################################################################
 # Test support for CRS coordinate_epoch
@@ -5464,11 +5512,25 @@ def test_ogr_gpkg_crs_coordinate_epoch():
 =======
 <<<<<<< HEAD
 =======
+<<<<<<< HEAD
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 
 
 ###############################################################################
@@ -5496,6 +5558,171 @@ def test_ogr_gpkg_CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE():
     assert gdal.VSIStatL(filename) is not None
     assert gdal.ReadDir('/vsimem/temporary_location') is None
     gdal.Unlink(filename)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+
+###############################################################################
+# Test (currently minimum) support for related tables extension
+
+
+def test_ogr_gpkg_relations():
+
+    filename = '/vsimem/test_ogr_gpkg_relations.gpkg'
+    ds = gdaltest.gpkg_dr.CreateDataSource(filename)
+    lyr = ds.CreateLayer('a')
+    lyr.CreateField(ogr.FieldDefn('some_id', ogr.OFTInteger))
+    lyr = ds.CreateLayer('b')
+    lyr.CreateField(ogr.FieldDefn('other_id', ogr.OFTInteger))
+    ds.ExecuteSQL("""CREATE TABLE 'gpkgext_relations' (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          base_table_name TEXT NOT NULL,
+          base_primary_column TEXT NOT NULL DEFAULT 'id',
+          related_table_name TEXT NOT NULL,
+          related_primary_column TEXT NOT NULL DEFAULT 'id',
+          relation_name TEXT NOT NULL,
+          mapping_table_name TEXT NOT NULL UNIQUE
+         );""")
+    ds.ExecuteSQL("""CREATE TABLE my_mapping_table(base_id INTEGER NOT NULL, related_id INTEGER NOT NULL);""")
+    ds.ExecuteSQL("INSERT INTO gpkgext_relations VALUES(1, 'a', 'some_id', 'b', 'other_id', 'attributes', 'my_mapping_table')")
+    ds.ExecuteSQL("INSERT INTO gpkg_extensions VALUES('gpkgext_relations',NULL,'gpkg_related_tables','http://www.geopackage.org/18-000.html','read-write');")
+    ds.ExecuteSQL("INSERT INTO gpkg_extensions VALUES('my_mapping_table',NULL,'gpkg_related_tables','http://www.geopackage.org/18-000.html','read-write');")
+    ds = None
+
+    assert validate(filename), 'validation failed'
+
+    ds = ogr.Open(filename, update=1)
+    lyr = ds.GetLayer('a')
+    lyr.Rename('a_renamed')
+    lyr.AlterFieldDefn(lyr.GetLayerDefn().GetFieldIndex('some_id'),
+                       ogr.FieldDefn('some_id_renamed', ogr.OFTInteger),
+                       ogr.ALTER_ALL_FLAG)
+    lyr = ds.GetLayer('b')
+    lyr.Rename('b_renamed')
+    lyr.AlterFieldDefn(lyr.GetLayerDefn().GetFieldIndex('other_id'),
+                       ogr.FieldDefn('other_id_renamed', ogr.OFTInteger),
+                       ogr.ALTER_ALL_FLAG)
+    ds = None
+
+    assert validate(filename), 'validation failed'
+
+    ds = ogr.Open(filename, update=1)
+    ds.ExecuteSQL('DELLAYER:a_renamed')
+    sql_lyr = ds.ExecuteSQL("SELECT * FROM gpkg_extensions WHERE extension_name IN ('related_tables', 'gpkg_related_tables')")
+    f = sql_lyr.GetNextFeature()
+    assert f is None
+    ds.ReleaseResultSet(sql_lyr)
+    ds = None
+
+    assert validate(filename), 'validation failed'
+
+    gdal.Unlink(filename)
+
+###############################################################################
+# Test AlterGeomFieldDefn()
+
+
+def test_ogr_gpkg_alter_geom_field_defn():
+
+    filename = '/vsimem/test_ogr_gpkg_alter_geom_field_defn.gpkg'
+    ds = gdaltest.gpkg_dr.CreateDataSource(filename)
+    srs_4326 = osr.SpatialReference()
+    srs_4326.ImportFromEPSG(4326)
+    lyr = ds.CreateLayer('test', geom_type = ogr.wkbPoint, srs = srs_4326)
+    f = ogr.Feature(lyr.GetLayerDefn())
+    f.SetGeometryDirectly(ogr.CreateGeometryFromWkt('POINT (1 2)'))
+    lyr.CreateFeature(f)
+    f = ogr.Feature(lyr.GetLayerDefn())
+    lyr.CreateFeature(f)
+
+    sql_lyr = ds.ExecuteSQL('SELECT sqlite_version()')
+    f = sql_lyr.GetNextFeature()
+    version = f.GetField(0)
+    ds.ReleaseResultSet(sql_lyr)
+
+    ds = None
+
+    # Test renaming column (only supported for SQLite >= 3.26)
+    if tuple([int(x) for x in version.split('.')[0:2]]) >= (3,26):
+        ds = ogr.Open(filename, update=1)
+        lyr = ds.GetLayer(0)
+        assert lyr.TestCapability(ogr.OLCAlterGeomFieldDefn)
+
+        new_geom_field_defn = ogr.GeomFieldDefn('new_geom_name', ogr.wkbNone)
+        assert lyr.AlterGeomFieldDefn(0, new_geom_field_defn, ogr.ALTER_GEOM_FIELD_DEFN_NAME_FLAG) == ogr.OGRERR_NONE
+        assert lyr.GetGeometryColumn() == 'new_geom_name'
+
+        ds = None
+
+        assert validate(filename), 'validation failed'
+
+        ds = ogr.Open(filename)
+        lyr = ds.GetLayer(0)
+        assert lyr.GetGeometryColumn() == 'new_geom_name'
+        srs = lyr.GetSpatialRef()
+        assert srs is not None
+        assert srs.GetAuthorityCode(None) == '4326'
+        ds = None
+
+    ds = ogr.Open(filename, update=1)
+    lyr = ds.GetLayer(0)
+    new_geom_field_defn = ogr.GeomFieldDefn('', ogr.wkbNone)
+    assert lyr.AlterGeomFieldDefn(0, new_geom_field_defn, ogr.ALTER_GEOM_FIELD_DEFN_SRS_FLAG) == ogr.OGRERR_NONE
+    ds = None
+
+    assert validate(filename), 'validation failed'
+
+    ds = ogr.Open(filename, update=1)
+    lyr = ds.GetLayer(0)
+    srs = lyr.GetSpatialRef()
+    assert srs is not None
+    assert srs.GetName() == 'Undefined geographic SRS'
+
+    new_geom_field_defn = ogr.GeomFieldDefn('', ogr.wkbNone)
+    new_geom_field_defn.SetSpatialRef(srs_4326)
+    assert lyr.AlterGeomFieldDefn(0, new_geom_field_defn, ogr.ALTER_GEOM_FIELD_DEFN_SRS_FLAG) == ogr.OGRERR_NONE
+    ds = None
+
+    assert validate(filename), 'validation failed'
+
+    ds = ogr.Open(filename, update=1)
+    lyr = ds.GetLayer(0)
+    srs = lyr.GetSpatialRef()
+    assert srs is not None
+    assert srs.GetAuthorityCode(None) == '4326'
+
+    new_geom_field_defn = ogr.GeomFieldDefn('', ogr.wkbNone)
+    other_srs = osr.SpatialReference()
+    other_srs.ImportFromEPSG(4269)
+    new_geom_field_defn.SetSpatialRef(other_srs)
+    assert lyr.AlterGeomFieldDefn(0, new_geom_field_defn, ogr.ALTER_GEOM_FIELD_DEFN_SRS_FLAG) == ogr.OGRERR_NONE
+    ds = None
+
+    ds = ogr.Open(filename, update=1)
+    lyr = ds.GetLayer(0)
+    srs = lyr.GetSpatialRef()
+    assert srs is not None
+    assert srs.GetAuthorityCode(None) == '4269'
+
+    new_geom_field_defn = ogr.GeomFieldDefn('', ogr.wkbNone)
+    srs = osr.SpatialReference()
+    srs.ImportFromEPSG(4269)
+    srs.SetCoordinateEpoch(2022)
+    new_geom_field_defn.SetSpatialRef(srs)
+    assert lyr.AlterGeomFieldDefn(0, new_geom_field_defn, ogr.ALTER_GEOM_FIELD_DEFN_SRS_COORD_EPOCH_FLAG) == ogr.OGRERR_NONE
+    ds = None
+
+    ds = ogr.Open(filename, update=1)
+    lyr = ds.GetLayer(0)
+    srs = lyr.GetSpatialRef()
+    assert srs is not None
+    assert srs.GetAuthorityCode(None) == '4269'
+    assert srs.GetCoordinateEpoch() == 2022
+    ds = None
+
+    gdal.Unlink(filename)
+>>>>>>> gdal-raster-parallelisation
 =======
 >>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
@@ -5506,6 +5733,22 @@ def test_ogr_gpkg_CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE():
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 145dd38d72 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> OSGeo-master
+=======
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> gdal-raster-parallelisation
 >>>>>>> OSGeo-master
 =======
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -5514,17 +5757,41 @@ def test_ogr_gpkg_CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE():
 >>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 >>>>>>> 913c3ef6c1 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 39cde30c78 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> a57f04675f (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> OSGeo-master
+=======
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation

@@ -185,12 +185,16 @@ def test_gdal_polygonize_4():
     os.unlink('tmp/out.xsd')
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
 >>>>>>> OSGeo-master
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
 >>>>>>> OSGeo-master
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> gdal-raster-parallelisation
 
     assert '<gml:Polygon srsName="urn:ogc:def:crs:EPSG::26711" gml:id="out.geom.0"><gml:exterior><gml:LinearRing><gml:posList>440720 3751320 440720 3750120 441920 3750120 441920 3751320 440720 3751320</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>' in content
 
@@ -207,12 +211,16 @@ def test_gdal_polygonize_4():
     os.unlink('tmp/out.xsd')
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
 >>>>>>> OSGeo-master
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
 >>>>>>> OSGeo-master
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> gdal-raster-parallelisation
 
     assert '<gml:Polygon srsName="urn:ogc:def:crs:EPSG::26711" gml:id="out.geom.0"><gml:exterior><gml:LinearRing><gml:posList>440720 3751320 440720 3750120 441920 3750120 441920 3751320 440720 3751320</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>' in content
 

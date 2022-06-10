@@ -518,6 +518,14 @@ MEMDataset::~MEMDataset()
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/mem/memdataset.cpp
+=======
+=======
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:gdal/frmts/mem/memdataset.cpp
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/mem/memdataset.cpp
@@ -525,12 +533,25 @@ MEMDataset::~MEMDataset()
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/mem/memdataset.cpp
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/mem/memdataset.cpp
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/mem/memdataset.cpp
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/mem/memdataset.cpp
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/mem/memdataset.cpp
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 
     GDALDeinitGCPs( m_nGCPCount, m_pasGCPs );
     CPLFree( m_pasGCPs );
@@ -1326,23 +1347,52 @@ GDALDataset *MEMDataset::Create( const char * /* pszFilename */,
 
 /************************************************************************/
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/mem/memdataset.cpp
 =======
 <<<<<<< HEAD:frmts/mem/memdataset.cpp
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:frmts/mem/memdataset.cpp
+=======
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD:frmts/mem/memdataset.cpp
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD:frmts/mem/memdataset.cpp
+=======
+>>>>>>> a153e8e338 (Docker: alpine-normal: add lzma support [ci skip])
+=======
+=======
+>>>>>>> 9b650fdeac (Docker: alpine-normal: add lzma support [ci skip])
+<<<<<<< HEAD
+<<<<<<< HEAD:frmts/mem/memdataset.cpp
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> gdal-raster-parallelisation
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 =======
 <<<<<<< HEAD:frmts/mem/memdataset.cpp
 >>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
 =======
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD:frmts/mem/memdataset.cpp
 <<<<<<< HEAD:frmts/mem/memdataset.cpp
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+=======
+<<<<<<< HEAD:frmts/mem/memdataset.cpp
+>>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
+=======
+>>>>>>> gdal-raster-parallelisation
 /*                               MEMGroup                               */
 /************************************************************************/
 
@@ -1594,6 +1644,23 @@ public:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memdataset.cpp
+=======
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+=======
+=======
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memdataset.cpp
+>>>>>>> a153e8e338 (Docker: alpine-normal: add lzma support [ci skip])
+=======
+=======
+>>>>>>> 9b650fdeac (Docker: alpine-normal: add lzma support [ci skip])
+>>>>>>> gdal-raster-parallelisation
 =======
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memdataset.cpp
 <<<<<<< HEAD
@@ -1603,16 +1670,32 @@ public:
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 <<<<<<< HEAD
 >>>>>>> df05d90486 (Merge pull request #3822 from rouault/gml_srs)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
 =======
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memdataset.cpp
 >>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
 >>>>>>> d263d6ecd7 (Docker: alpine-normal: add lzma support [ci skip])
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memdataset.cpp
 >>>>>>> OSGeo-master
+=======
+>>>>>>> 9b650fdeac (Docker: alpine-normal: add lzma support [ci skip])
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+=======
+=======
+>>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memdataset.cpp
+>>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
+>>>>>>> gdal-raster-parallelisation
 /*                           GetMDArrayNames()                          */
 /************************************************************************/
 

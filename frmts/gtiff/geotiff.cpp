@@ -1331,6 +1331,9 @@ public:
     virtual CPLErr IReadBlock( int, int, void * ) override;
     virtual CPLErr IWriteBlock( int, int, void * ) override;
 
+    virtual GDALSuggestedBlockAccessPattern GetSuggestedBlockAccessPattern()
+        const override { return GSBAP_RANDOM; }
+
     virtual int IGetDataCoverageStatus( int nXOff, int nYOff,
                                         int nXSize, int nYSize,
                                         int nMaskFlagStop,
@@ -6533,10 +6536,13 @@ void GTiffRasterBand::NullBlock( void *pData )
     else
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/gtiff/geotiff.cpp
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:frmts/gtiff/geotiff.cpp
         double dfNoData = GetNoDataValue( &l_bNoDataSet );
         if( !l_bNoDataSet )
@@ -6569,9 +6575,12 @@ void GTiffRasterBand::NullBlock( void *pData )
         }
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/gtiff/geotiff.cpp
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
         // Hack for Signed Int8 case. As the data type is GDT_Byte (unsigned),
         // we have to convert a negative nodata value in the range [-128,-1] in
         // [128, 255]
@@ -8694,19 +8703,25 @@ void GTiffDataset::FillEmptyTiles()
             nDataTypeSize * 8 == static_cast<int>(m_nBitsPerSample) )
         {
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/gtiff/geotiff.cpp
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:frmts/gtiff/geotiff.cpp
             if( m_bNoDataSetAsInt64 )
             {
                 GDALCopyWords64( &m_nNoDataValueInt64, GDT_Int64, 0,
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/gtiff/geotiff.cpp
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
             double dfNoData = m_dfNoDataValue;
 
             // Hack for Signed Int8 case. As the data type is GDT_Byte (unsigned),
@@ -8722,6 +8737,7 @@ void GTiffDataset::FillEmptyTiles()
 
             GDALCopyWords64( &dfNoData, GDT_Float64, 0,
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/gtiff/geotiff.cpp
 =======
 >>>>>>> 55d0ced90a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/gtiff/geotiff.cpp
@@ -8729,6 +8745,9 @@ void GTiffDataset::FillEmptyTiles()
 =======
 >>>>>>> 55d0ced90a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/gtiff/geotiff.cpp
 >>>>>>> OSGeo-master
+=======
+>>>>>>> 55d0ced90a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/gtiff/geotiff.cpp
+>>>>>>> gdal-raster-parallelisation
                            pabyData, eDataType,
                            nDataTypeSize,
                            nBlockBytes / nDataTypeSize );
@@ -8977,19 +8996,25 @@ bool GTiffDataset::HasOnlyNoData( const void* pBuffer, int nWidth, int nHeight,
         m_nSampleFormat == SAMPLEFORMAT_COMPLEXIEEEFP )
         return false;
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/gtiff/geotiff.cpp
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:frmts/gtiff/geotiff.cpp
     if( m_bNoDataSetAsInt64 || m_bNoDataSetAsUInt64 )
         return false; // FIXME: over pessimistic
 =======
 >>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/gtiff/geotiff.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/gtiff/geotiff.cpp
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
     return GDALBufferHasOnlyNoData( pBuffer,
                                     m_bNoDataSet ? m_dfNoDataValue : 0.0,
                                     nWidth, nHeight,

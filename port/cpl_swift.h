@@ -47,11 +47,14 @@ class VSISwiftHandleHelper final: public IVSIS3LikeHandleHelper
         CPLString m_osObjectKey;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/port/cpl_swift.h
         static bool GetConfiguration(CPLString& osStorageURL,
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:port/cpl_swift.h
         static bool GetConfiguration(const std::string& osPathForOption,
                                      CPLString& osStorageURL,
@@ -59,9 +62,12 @@ class VSISwiftHandleHelper final: public IVSIS3LikeHandleHelper
         static bool GetConfiguration(CPLString& osStorageURL,
 >>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_swift.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:port/cpl_swift.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
                                      CPLString& osAuthToken);
 
         static bool GetCached(const std::string& osPathForOption,
@@ -85,6 +91,7 @@ class VSISwiftHandleHelper final: public IVSIS3LikeHandleHelper
 
         // V3 Authentication
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/port/cpl_swift.h
         static bool CheckCredentialsV3(const CPLString& osAuthType);
         static bool AuthV3(const CPLString& osAuthType,
@@ -93,6 +100,8 @@ class VSISwiftHandleHelper final: public IVSIS3LikeHandleHelper
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:port/cpl_swift.h
         static bool CheckCredentialsV3(const std::string& osPathForOption,
                                        const CPLString& osAuthType);
@@ -110,9 +119,12 @@ class VSISwiftHandleHelper final: public IVSIS3LikeHandleHelper
                            CPLString& osStorageURL,
                            CPLString& osAuthToken);
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:port/cpl_swift.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
         static CPLJSONObject CreateAuthV3RequestObject(const CPLString& osAuthType);
         static bool GetAuthV3StorageURL(const CPLHTTPResult *psResult,
 >>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_swift.h

@@ -10,11 +10,14 @@ if version_info >= (3, 8, 0) and platform == 'win32':
                 try:
                     os.add_dll_directory(p)
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/osgeo/__init__.py
                 except FileNotFoundError:
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:swig/python/osgeo/__init__.py
                 except (FileNotFoundError, OSError):
                     continue
@@ -30,9 +33,12 @@ if version_info >= (3, 8, 0) and platform == 'win32':
                 except FileNotFoundError:
 >>>>>>> ac60fc417f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/osgeo/__init__.py
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/osgeo/__init__.py
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
                     continue
 
 

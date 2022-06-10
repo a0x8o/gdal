@@ -67,6 +67,7 @@ for the shared lib, *e.g.* ``set (GDAL_LIB_OUTPUT_NAME gdal_x64 CACHE STRING "" 
     conflict with new settings. If strange errors appear during cmake run,
     you may try removing CMakeCache.txt to start from a clean state.
 
+Refer to :ref:`using_gdal_in_cmake` for how to use GDAL in a CMake project.
 
 CMake general configure options
 +++++++++++++++++++++++++++++++
@@ -245,7 +246,15 @@ It is used by the :ref:`raster.zarr` driver.
 BRUNSLI
 *******
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 The `Brunsli <https://github.com/google/brunsli>`_ JPEG repacking library, used
+=======
+The `Brunsli <https://github.com/google/brunsli>` JPEG repacking library, used
+>>>>>>> 737746b0ed (Doc: build_hints: document discrepancies between name of CMake options controlling driver build and driver names (fixes #5809))
+=======
+The `Brunsli <https://github.com/google/brunsli>`_ JPEG repacking library, used
+>>>>>>> 6fada317a7 (Update doc/source/build_hints.rst)
 by the :ref:`raster.marfa` driver.
 
 .. option:: BRUNSLI_INCLUDE_DIR
@@ -2066,6 +2075,8 @@ Option only to be used by maintainers:
 C# bindings options
 +++++++++++++++++++
 
+For more details on how to build and use the C# bindings read the dedicated section :ref:`csharp_compile_cmake`.
+
 .. option:: BUILD_CSHARP_BINDINGS:BOOL=ON/OFF
 
     Whether C# bindings should be built. It is ON by default, but only
@@ -2073,6 +2084,22 @@ C# bindings options
     SDK can be used or Mono. The relevant options that can be set are described
     in ``cmake/modules/thirdparty/FindDotNetFrameworkSdk.cmake`` and
     ``cmake/modules/thirdparty/FindMono.cmake``.
+
+.. option:: CSHARP_MONO=ON/OFF
+
+    Forces the use of Mono as opposed to .NET to compile the C# bindings.
+
+.. option:: CSHARP_LIBRARY_VERSION
+
+    Sets the .NET (or Mono) target SDK to be used when compiling the C# binding libraries. `List of acceptable contents for .NET <https://docs.microsoft.com/en-us/dotnet/standard/frameworks#supported-target-frameworks>`_
+
+.. option:: CSHARP_APPLICATION_VERSION
+
+    Sets the .NET (or Mono) target SDK to be used when compiling the C# sample applications. `List of acceptable contents for .NET <https://docs.microsoft.com/en-us/dotnet/standard/frameworks#supported-target-frameworks>`_
+
+.. option:: GDAL_CSHARP_ONLY=OFF/ON
+
+    Build the C# bindings without building GDAL. This should be used when building the bindings on top of an existing GDAL installation - for instance on top of the CONDA package.
 
 Driver specific options
 +++++++++++++++++++++++

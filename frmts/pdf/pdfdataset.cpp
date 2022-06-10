@@ -54,6 +54,16 @@
 
 #define GDAL_DEFAULT_DPI 150.0
 
+#ifdef HAVE_PDFIUM
+// To be able to use https://github.com/rouault/pdfium_build_gdal_3_5/releases/download/v1_pdfium_5106/install-win10-vs2019-x64-rev5106.zip
+// with newer Visual Studio versions.
+// Trick from https://github.com/conan-io/conan-center-index/issues/4826
+#if _MSC_VER >= 1932 // Visual Studio 2022 version 17.2+
+#    pragma comment(linker, "/alternatename:__imp___std_init_once_complete=__imp_InitOnceComplete")
+#    pragma comment(linker, "/alternatename:__imp___std_init_once_begin_initialize=__imp_InitOnceBeginInitialize")
+#endif
+#endif
+
 /* g++ -fPIC -g -Wall frmts/pdf/pdfdataset.cpp -shared -o gdal_PDF.so -Iport -Igcore -Iogr -L. -lgdal -lpoppler -I/usr/include/poppler */
 
 CPL_CVSID("$Id$")
@@ -859,6 +869,18 @@ CPLErr PDFRasterBand::IReadBlockFromTile( int nBlockXOff, int nBlockYOff,
     }
 
     return CE_None;
+}
+
+/************************************************************************/
+/*                     GetSuggestedBlockAccessPattern()                 */
+/************************************************************************/
+
+GDALSuggestedBlockAccessPattern PDFRasterBand::GetSuggestedBlockAccessPattern() const
+{
+    PDFDataset *poGDS = cpl::down_cast<PDFDataset *>(poDS);
+    if (!poGDS->aiTiles.empty() )
+        return GSBAP_RANDOM;
+    return GSBAP_LARGEST_CHUNK_POSSIBLE;
 }
 
 /************************************************************************/
@@ -1676,12 +1698,23 @@ void myRenderPageImpl(PDFDataset* poDS,
         pContext->m_pDevice->GetDeviceType() != DeviceType::kDisplay;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+<<<<<<< HEAD
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:gdal/frmts/pdf/pdfdataset.cpp
 =======
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:frmts/pdf/pdfdataset.cpp
 
     // TODO(https://crbug.com/pdfium/993) - maybe pass true here.
@@ -1692,11 +1725,22 @@ void myRenderPageImpl(PDFDataset* poDS,
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/pdf/pdfdataset.cpp
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> OSGeo-master
+=======
+=======
+<<<<<<< HEAD
+>>>>>>> OSGeo-master:frmts/pdf/pdfdataset.cpp
+=======
+>>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
     pList->DisplayAnnots(pPage, pContext->m_pDevice.get(),
                          pContext->m_pContext.get(), bPrinting, matrix,
                          false, nullptr);

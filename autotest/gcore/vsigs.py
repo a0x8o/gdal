@@ -191,6 +191,7 @@ def test_vsigs_1(gs_test_config):
 # Test GS_NO_SIGN_REQUEST=YES
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 
 def test_vsigs_no_sign_request():
@@ -225,6 +226,9 @@ def test_vsigs_no_sign_request():
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+=======
+>>>>>>> gdal-raster-parallelisation
 
 
 def test_vsigs_no_sign_request():
@@ -389,9 +393,12 @@ def test_vsigs_2(gs_test_config, webserver_port, use_config_options):
 <<<<<<< HEAD
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
     # Test GS_USER_PROJECT
     handler = webserver.SequentialHandler()
     handler.add('GET', '/gs_fake_bucket/resource_under_requester_pays', 200,
@@ -410,12 +417,16 @@ def test_vsigs_2(gs_test_config, webserver_port, use_config_options):
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> OSGeo-master
 =======
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> OSGeo-master
+=======
+>>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 ###############################################################################
 # Test ReadDir() with a fake Google Cloud Storage server
 
@@ -500,6 +511,7 @@ def test_vsigs_write(gs_test_config, webserver_port):
     gdal.VSICurlClearCache()
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     with webserver.install_http_handler(webserver.SequentialHandler()):
         f = gdal.VSIFOpenL('/vsigs/gs_fake_bucket3/another_file.bin', 'wb')
         assert f is not None
@@ -544,6 +556,8 @@ def test_vsigs_write(gs_test_config, webserver_port):
 <<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 
     with gdaltest.config_options(
         { 'GS_SECRET_ACCESS_KEY': 'GS_SECRET_ACCESS_KEY',
@@ -604,9 +618,12 @@ def test_vsigs_write(gs_test_config, webserver_port):
         assert gdal.VSIFSeekL(f, gdal.VSIFTellL(f), 0) == 0
         assert gdal.VSIFWriteL('bar', 1, 3, f) == 3
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 
     handler = webserver.SequentialHandler()
 
@@ -871,10 +888,26 @@ def test_vsigs_acl():
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> d42a2ed026 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 # Test reading/writing HEADERS
 
 
@@ -902,6 +935,7 @@ def test_vsigs_headers():
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     # Test GS_USER_PROJECT
     handler = webserver.SequentialHandler()
     handler.add('GET', '/gs_fake_bucket/resource_under_requester_pays', 200,
@@ -924,13 +958,38 @@ def test_vsigs_headers():
 ###############################################################################
 <<<<<<< HEAD
 =======
+
+###############################################################################
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 264c5ccbb0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> b39a831ddf (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> d42a2ed026 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> gdal-raster-parallelisation
+=======
 >>>>>>> b39a831ddf (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 
 ###############################################################################
 >>>>>>> OSGeo-master
+=======
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> b39a831ddf (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 # Read credentials with OAuth2 refresh_token
 
 
@@ -1554,6 +1613,7 @@ Content-Length: 0
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     # Test UnlinkBatch()
     handler = webserver.SequentialHandler()
     handler.add('POST', '/batch/storage/v1', 200,
@@ -1598,6 +1658,8 @@ Content-Length: 0
 
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
     gdal.SetConfigOption('CPL_GS_CREDENTIALS_FILE', '')
     gdal.SetConfigOption('GOA2_AUTH_URL_TOKEN', None)
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -1734,6 +1796,7 @@ def test_vsigs_cleanup():
 
 ###############################################################################
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 
 def test_vsigs_cleanup():
@@ -1744,6 +1807,8 @@ def test_vsigs_cleanup():
 ###############################################################################
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 # Nominal cases (require valid credentials)
 
 

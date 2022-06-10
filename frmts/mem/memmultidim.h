@@ -36,20 +36,26 @@
 /************************************************************************/
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/mem/memmultidim.h
 class MEMGroup CPL_NON_FINAL: public GDALGroup
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:frmts/mem/memmultidim.h
 class CPL_DLL MEMGroup CPL_NON_FINAL: public GDALGroup
 =======
 class MEMGroup CPL_NON_FINAL: public GDALGroup
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memmultidim.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/mem/memmultidim.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 {
     std::map<CPLString, std::shared_ptr<GDALGroup>> m_oMapGroups{};
     std::map<CPLString, std::shared_ptr<GDALMDArray>> m_oMapMDArrays{};
@@ -99,20 +105,26 @@ public:
 /************************************************************************/
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/mem/memmultidim.h
 class MEMAbstractMDArray: virtual public GDALAbstractMDArray
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:frmts/mem/memmultidim.h
 class CPL_DLL MEMAbstractMDArray: virtual public GDALAbstractMDArray
 =======
 class MEMAbstractMDArray: virtual public GDALAbstractMDArray
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memmultidim.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/mem/memmultidim.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 {
     std::vector<std::shared_ptr<GDALDimension>> m_aoDims;
     size_t m_nTotalSize = 0;
@@ -156,10 +168,13 @@ protected:
                       const void* pSrcBuffer) override;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/mem/memmultidim.h
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:frmts/mem/memmultidim.h
     bool m_bWritable = true;
     bool m_bModified = false;
@@ -167,9 +182,12 @@ protected:
 =======
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memmultidim.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/mem/memmultidim.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 public:
     MEMAbstractMDArray(const std::string& osParentName,
                        const std::string& osName,
@@ -184,10 +202,13 @@ public:
     bool Init(GByte* pData = nullptr,
               const std::vector<GPtrDiff_t>& anStrides = std::vector<GPtrDiff_t>());
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/mem/memmultidim.h
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:frmts/mem/memmultidim.h
 
     void SetWritable(bool bWritable) { m_bWritable = bWritable; }
@@ -198,9 +219,12 @@ public:
 =======
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memmultidim.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/mem/memmultidim.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 };
 
 /************************************************************************/
@@ -250,20 +274,26 @@ public:
     ~MEMMDArray();
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/mem/memmultidim.h
     bool IsWritable() const override { return true; }
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:frmts/mem/memmultidim.h
     bool IsWritable() const override { return m_bWritable; }
 =======
     bool IsWritable() const override { return true; }
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memmultidim.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/mem/memmultidim.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 
     const std::string& GetFilename() const override { return m_osFilename; }
 

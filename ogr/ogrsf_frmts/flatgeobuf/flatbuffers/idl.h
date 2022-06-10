@@ -307,19 +307,25 @@ struct FieldDef : public Definition {
     return IsScalar(value.type.base_type) && IsOptional();
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
   bool IsOptional() const { return presence == kOptional; }
   bool IsRequired() const { return presence == kRequired; }
   bool IsDefault() const { return presence == kDefault; }
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
   bool IsOptional() const {
     return presence == kOptional;
   }
@@ -330,6 +336,7 @@ struct FieldDef : public Definition {
     return presence == kDefault;
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 =======
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
@@ -337,6 +344,9 @@ struct FieldDef : public Definition {
 =======
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 >>>>>>> OSGeo-master
+=======
+>>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
+>>>>>>> gdal-raster-parallelisation
 
   Value value;
   bool deprecated;  // Field is allowed to be present in old data, but can't be.
@@ -568,10 +578,13 @@ struct ServiceDef : public Definition {
 // Container of options that may apply to any of the source/text generators.
 struct IDLOptions {
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
   // field case style options for C++
   enum CaseStyle { CaseStyle_Unchanged = 0, CaseStyle_Upper, CaseStyle_Lower };
@@ -579,9 +592,12 @@ struct IDLOptions {
 =======
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
   bool gen_jvmstatic;
   // Use flexbuffers instead for binary and text generation
   bool use_flexbuffers;
@@ -606,18 +622,24 @@ struct IDLOptions {
   std::string cpp_object_api_string_type;
   bool cpp_object_api_string_flexible_constructor;
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
   CaseStyle cpp_object_api_field_case_style;
 =======
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
   bool cpp_direct_copy;
   bool gen_nullable;
   bool java_checkerframework;
@@ -649,10 +671,13 @@ struct IDLOptions {
   std::string filename_extension;
   bool no_warnings;
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
   bool warnings_as_errors;
   std::string project_root;
@@ -664,9 +689,12 @@ struct IDLOptions {
 =======
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 
   // Possible options for the more general generator below.
   enum Language {
@@ -697,10 +725,13 @@ struct IDLOptions {
   bool require_explicit_ids;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
   // If set, implement serde::Serialize for generated Rust types
   bool rust_serialize;
@@ -711,9 +742,12 @@ struct IDLOptions {
 =======
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
   // The corresponding language bit will be set if a language is included
   // for code generation.
   unsigned long lang_to_generate;
@@ -749,18 +783,24 @@ struct IDLOptions {
         cpp_object_api_pointer_type("std::unique_ptr"),
         cpp_object_api_string_flexible_constructor(false),
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
         cpp_object_api_field_case_style(CaseStyle_Unchanged),
 =======
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
         cpp_direct_copy(true),
         gen_nullable(false),
         java_checkerframework(false),
@@ -784,6 +824,7 @@ struct IDLOptions {
         filename_extension(),
         no_warnings(false),
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
         lang(IDLOptions::kJava),
         mini_reflect(IDLOptions::kNone),
@@ -791,6 +832,8 @@ struct IDLOptions {
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
         warnings_as_errors(false),
         project_root(""),
@@ -809,9 +852,12 @@ struct IDLOptions {
         require_explicit_ids(false),
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
         lang_to_generate(0),
         set_empty_strings_to_null(true),
         set_empty_vectors_to_null(true) {}
@@ -912,18 +958,24 @@ class Parser : public ParserState {
         opts(options),
         uses_flexbuffers_(false),
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
         has_warning_(false),
 =======
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
         advanced_features_(0),
         source_(nullptr),
         anonymous_counter_(0),
@@ -1165,10 +1217,13 @@ class Parser : public ParserState {
   uint64_t advanced_features_;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   uint64_t advanced_features_;
 
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
  private:
   const char *source_;
 
@@ -1177,10 +1232,13 @@ class Parser : public ParserState {
   std::vector<std::pair<Value, FieldDef *>> field_stack_;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
   // TODO(cneo): Refactor parser to use string_cache more often to save
   // on memory usage.
@@ -1189,9 +1247,12 @@ class Parser : public ParserState {
 =======
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
   int anonymous_counter_;
   int parse_depth_counter_;  // stack-overflow guard
 };
@@ -1362,10 +1423,13 @@ extern bool GenerateSwiftGRPC(const Parser &parser, const std::string &path,
 extern bool GenerateTSGRPC(const Parser &parser, const std::string &path,
                            const std::string &file_name);
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 
 extern bool GenerateRustModuleRootFile(const Parser &parser,
@@ -1373,9 +1437,12 @@ extern bool GenerateRustModuleRootFile(const Parser &parser,
 =======
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/idl.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 }  // namespace flatbuffers
 
 #endif  // FLATBUFFERS_IDL_H_

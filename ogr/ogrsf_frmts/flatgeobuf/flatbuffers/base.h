@@ -50,6 +50,7 @@
   #include <unistd.h>
 #endif
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/base.h
 =======
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/base.h
@@ -59,10 +60,15 @@
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/base.h
 =======
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/base.h
+=======
+>>>>>>> gdal-raster-parallelisation
 
 #ifdef _STLPORT_VERSION
   #define FLATBUFFERS_CPP98_STL
 #endif
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/base.h
 =======
@@ -71,6 +77,9 @@
 =======
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/base.h
 >>>>>>> OSGeo-master
+=======
+>>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/base.h
+>>>>>>> gdal-raster-parallelisation
 
 #ifdef __ANDROID__
   #include <android/api-level.h>
@@ -163,6 +172,7 @@
 #define FLATBUFFERS_VERSION_MAJOR 2
 #define FLATBUFFERS_VERSION_MINOR 0
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/base.h
 =======
 <<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/base.h
@@ -174,6 +184,11 @@
 #define FLATBUFFERS_VERSION_REVISION 6
 =======
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/base.h
+#define FLATBUFFERS_VERSION_REVISION 6
+=======
+>>>>>>> gdal-raster-parallelisation
 #define FLATBUFFERS_VERSION_REVISION 0
 >>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/base.h
 #define FLATBUFFERS_STRING_EXPAND(X) #X
@@ -382,6 +397,7 @@ inline bool VerifyAlignmentRequirements(size_t align, size_t min_align = 1) {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 inline bool VerifyAlignmentRequirements(size_t align, size_t min_align = 1) {
   return (min_align <= align) && (align <= (FLATBUFFERS_MAX_ALIGNMENT)) &&
          (align & (align - 1)) == 0;  // must be power of 2
@@ -389,6 +405,8 @@ inline bool VerifyAlignmentRequirements(size_t align, size_t min_align = 1) {
 
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 #if defined(_MSC_VER)
   #pragma warning(disable: 4351) // C4351: new behavior: elements of array ... will be default initialized
   #pragma warning(push)

@@ -1517,18 +1517,24 @@ struct GRIBSharedResource
     std::vector<double> m_adfCurData{};
     std::string m_osFilename;
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/grib/gribdataset.cpp
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:frmts/grib/gribdataset.cpp
     std::shared_ptr<GDALPamMultiDim> m_poPAM{};
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/frmts/grib/gribdataset.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:frmts/grib/gribdataset.cpp
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 
     GRIBSharedResource(const std::string& osFilename,
                        VSILFILE* fp);
@@ -2192,6 +2198,7 @@ GDALDataset *GRIBDataset::OpenMultiDim( GDALOpenInfo *poOpenInfo )
     auto poShared = std::make_shared<GRIBSharedResource>(poOpenInfo->fpL);
     poShared->m_osFilename = poOpenInfo->pszFilename;
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/frmts/grib/gribdataset.cpp
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/frmts/grib/gribdataset.cpp
@@ -2199,6 +2206,9 @@ GDALDataset *GRIBDataset::OpenMultiDim( GDALOpenInfo *poOpenInfo )
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/frmts/grib/gribdataset.cpp
 >>>>>>> OSGeo-master
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/frmts/grib/gribdataset.cpp
+>>>>>>> gdal-raster-parallelisation
     auto poRootGroup = std::make_shared<GRIBGroup>(poShared);
     poOpenInfo->fpL = nullptr;
 

@@ -544,6 +544,7 @@ class OGRProjCT : public OGRCoordinateTransformation
         }
         PjPtr(const PjPtr& other) :
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrct.cpp
             m_pj((other.m_pj != nullptr) ?
                  (proj_clone(OSRGetProjTLSContext(), other.m_pj)) :
@@ -560,9 +561,47 @@ class OGRProjCT : public OGRCoordinateTransformation
             m_pj((other.m_pj != nullptr) ?
                  (proj_clone(OSRGetProjTLSContext(), other.m_pj)) :
 =======
+=======
+<<<<<<< HEAD:ogr/ogrct.cpp
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD:ogr/ogrct.cpp
+=======
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+=======
+<<<<<<< HEAD:ogr/ogrct.cpp
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 0ca587e694 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> d9b2222466 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD:ogr/ogrct.cpp
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+<<<<<<< HEAD
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
+=======
+=======
+<<<<<<< HEAD:ogr/ogrct.cpp
+>>>>>>> 4a3a424d06 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> d9b2222466 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+=======
+<<<<<<< HEAD:ogr/ogrct.cpp
+>>>>>>> 4a3a424d06 (Merge branch 'master' of github.com:OSGeo/gdal)
+            m_pj((other.m_pj != nullptr) ?
+                 (proj_clone(OSRGetProjTLSContext(), other.m_pj)) :
+=======
+>>>>>>> gdal-raster-parallelisation
             m_pj((other.m_pj != nullptr) ? 
                  (proj_clone(OSRGetProjTLSContext(), other.m_pj)) : 
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/ogr/ogrct.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -577,6 +616,22 @@ class OGRProjCT : public OGRCoordinateTransformation
                  (proj_clone(OSRGetProjTLSContext(), other.m_pj)) : 
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/ogr/ogrct.cpp
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0ca587e694 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
+=======
+=======
+>>>>>>> 4a3a424d06 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> d9b2222466 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 4a3a424d06 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 =======
             m_pj((other.m_pj != nullptr) ?
                  (proj_clone(OSRGetProjTLSContext(), other.m_pj)) :
@@ -584,19 +639,44 @@ class OGRProjCT : public OGRCoordinateTransformation
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> 0ca587e694 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> d9b2222466 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 >>>>>>> OSGeo-master:ogr/ogrct.cpp
 =======
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 >>>>>>> df05d90486 (Merge pull request #3822 from rouault/gml_srs)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 =======
 >>>>>>> 4a3a424d06 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 15befc7cef (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> d9b2222466 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> 4a3a424d06 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
                  (nullptr))
         {}
         PjPtr(PjPtr&& other) :
@@ -610,6 +690,7 @@ class OGRProjCT : public OGRCoordinateTransformation
             {
                 reset();
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrct.cpp
                 m_pj = (other.m_pj != nullptr) ?
                        (proj_clone(OSRGetProjTLSContext(), other.m_pj)) :
@@ -626,9 +707,47 @@ class OGRProjCT : public OGRCoordinateTransformation
                 m_pj = (other.m_pj != nullptr) ?
                        (proj_clone(OSRGetProjTLSContext(), other.m_pj)) :
 =======
+=======
+<<<<<<< HEAD:ogr/ogrct.cpp
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD:ogr/ogrct.cpp
+=======
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+=======
+<<<<<<< HEAD:ogr/ogrct.cpp
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 0ca587e694 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> d9b2222466 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD:ogr/ogrct.cpp
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+<<<<<<< HEAD
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
+=======
+=======
+<<<<<<< HEAD:ogr/ogrct.cpp
+>>>>>>> 4a3a424d06 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> d9b2222466 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+=======
+<<<<<<< HEAD:ogr/ogrct.cpp
+>>>>>>> 4a3a424d06 (Merge branch 'master' of github.com:OSGeo/gdal)
+                m_pj = (other.m_pj != nullptr) ?
+                       (proj_clone(OSRGetProjTLSContext(), other.m_pj)) :
+=======
+>>>>>>> gdal-raster-parallelisation
                 m_pj = (other.m_pj != nullptr) ? 
                        (proj_clone(OSRGetProjTLSContext(), other.m_pj)) : 
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/ogr/ogrct.cpp
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -643,6 +762,22 @@ class OGRProjCT : public OGRCoordinateTransformation
                        (proj_clone(OSRGetProjTLSContext(), other.m_pj)) : 
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/ogr/ogrct.cpp
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0ca587e694 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
+=======
+=======
+>>>>>>> 4a3a424d06 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> d9b2222466 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 4a3a424d06 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 =======
                 m_pj = (other.m_pj != nullptr) ?
                        (proj_clone(OSRGetProjTLSContext(), other.m_pj)) :
@@ -650,19 +785,44 @@ class OGRProjCT : public OGRCoordinateTransformation
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> 0ca587e694 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> d9b2222466 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 >>>>>>> OSGeo-master:ogr/ogrct.cpp
 =======
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 >>>>>>> df05d90486 (Merge pull request #3822 from rouault/gml_srs)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 =======
 >>>>>>> 4a3a424d06 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 15befc7cef (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> d9b2222466 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> 4a3a424d06 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
                        (nullptr);
             }
             return *this;
@@ -1182,12 +1342,47 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
  *
  * @return handle to transformation's clone or NULL on error,
  *         must be freed with OCTDestroyCoordinateTransformation
  *
 =======
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+=======
+ *
+ * @return handle to transformation's clone or NULL on error,
+ *         must be freed with OCTDestroyCoordinateTransformation
+ *
+>>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+<<<<<<< HEAD
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
+=======
+=======
+ *
+ * @return handle to transformation's clone or NULL on error,
+ *         must be freed with OCTDestroyCoordinateTransformation
+ *
+>>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+
+>>>>>>> gdal-raster-parallelisation
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 =======
  *
@@ -1210,6 +1405,21 @@ OCTClone(OGRCoordinateTransformationH hTransform)
 /************************************************************************/
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
+=======
+=======
+>>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 =======
 >>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
 /*                             OCTGetSourceCS()                         */
@@ -1270,13 +1480,42 @@ OGRSpatialReferenceH OCTGetTargetCS(OGRCoordinateTransformationH hTransform)
  *
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+ * @return handle to inverse transformation or NULL on error,
+=======
+ * @return handle to inverse transformation or NULL on error, 
+>>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+ * @return handle to inverse transformation or NULL on error,
+>>>>>>> 0ca587e694 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> d9b2222466 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
  * @return handle to inverse transformation or NULL on error,
 =======
  * @return handle to inverse transformation or NULL on error, 
 >>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
  * @return handle to inverse transformation or NULL on error,
 >>>>>>> 4a3a424d06 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD
+>>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+ * @return handle to inverse transformation or NULL on error,
+>>>>>>> 4a3a424d06 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> d9b2222466 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+ * @return handle to inverse transformation or NULL on error, 
+>>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
  *         must be freed with OCTDestroyCoordinateTransformation
  *
  * @since GDAL 3.4
@@ -1293,6 +1532,18 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
 /************************************************************************/
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 /*                              OCTClone()                              */
 /************************************************************************/
 
@@ -1300,8 +1551,11 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
  * Clone transformation object.
  *
  * This is the same as the C++ function OGRCreateCoordinateTransformation::Clone
+<<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
  *
  * @return handle to transformation's clone or NULL on error,
  *         must be freed with OCTDestroyCoordinateTransformation
@@ -1391,18 +1645,35 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
 
 /************************************************************************/
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 >>>>>>> df05d90486 (Merge pull request #3822 from rouault/gml_srs)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 =======
 >>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 913c3ef6c1 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 /*                             OGRProjCT()                             */
 /************************************************************************/
 
@@ -1416,56 +1687,74 @@ OGRProjCT::OGRProjCT()
 /************************************************************************/
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrct.cpp
 //! @cond Doxygen_Suppress
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrct.cpp
 =======
 //! @cond Doxygen_Suppress
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/ogr/ogrct.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrct.cpp
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 OGRProjCT::OGRProjCT(const OGRProjCT& other) :
     poSRSSource((other.poSRSSource != nullptr) ? (other.poSRSSource->Clone()) : (nullptr)),
     bSourceLatLong(other.bSourceLatLong),
     bSourceWrap(other.bSourceWrap),
     dfSourceWrapLong(other.dfSourceWrapLong),
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrct.cpp
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrct.cpp
     bSourceIsDynamicCRS(other.bSourceIsDynamicCRS),
     dfSourceCoordinateEpoch(other.dfSourceCoordinateEpoch),
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/ogr/ogrct.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrct.cpp
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
     poSRSTarget((other.poSRSTarget != nullptr) ? (other.poSRSTarget->Clone()) : (nullptr)),
     bTargetLatLong(other.bTargetLatLong),
     bTargetWrap(other.bTargetWrap),
     dfTargetWrapLong(other.dfTargetWrapLong),
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogrct.cpp
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:ogr/ogrct.cpp
     bTargetIsDynamicCRS(other.bTargetIsDynamicCRS),
     dfTargetCoordinateEpoch(other.dfTargetCoordinateEpoch),
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/ogr/ogrct.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:ogr/ogrct.cpp
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
     bWebMercatorToWGS84LongLat(other.bWebMercatorToWGS84LongLat),
     nErrorCount(other.nErrorCount),
     dfThreshold(other.dfThreshold),
@@ -3533,6 +3822,7 @@ OGRCoordinateTransformation* OGRProjCT::Clone() const
 
 /************************************************************************/
 <<<<<<< HEAD
+<<<<<<< HEAD
 /*                               Clone()                                */
 /************************************************************************/
 
@@ -3559,6 +3849,8 @@ OGRCoordinateTransformation* OGRProjCT::Clone() const
 /************************************************************************/
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 /*                            GetInverse()                              */
 /************************************************************************/
 

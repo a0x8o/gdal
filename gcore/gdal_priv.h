@@ -1144,6 +1144,23 @@ typedef enum
     GMVR_0_AND_255_ONLY,    /*! Only 0 and 255 */
 } GDALMaskValueRange;
 
+/** Suggested/most efficient access pattern to blocks. */
+typedef int GDALSuggestedBlockAccessPattern;
+
+/** Unknown, or no particular read order is suggested. */
+constexpr GDALSuggestedBlockAccessPattern GSBAP_UNKNOWN = 0;
+
+/** Random access to blocks is efficient. */
+constexpr GDALSuggestedBlockAccessPattern GSBAP_RANDOM = 1;
+
+/** Reading by strips from top to bottom is the most efficient. */
+constexpr GDALSuggestedBlockAccessPattern GSBAP_TOP_TO_BOTTOM = 2;
+
+/** Reading by strips from bottom to top is the most efficient. */
+constexpr GDALSuggestedBlockAccessPattern GSBAP_BOTTOM_TO_TOP = 3;
+
+/** Reading the largest chunk from the raster is the most efficient (can be combined with above values). */
+constexpr GDALSuggestedBlockAccessPattern GSBAP_LARGEST_CHUNK_POSSIBLE = 0x100;
 
 /** A single raster band (or channel). */
 
@@ -1245,6 +1262,9 @@ class CPL_DLL GDALRasterBand : public GDALMajorObject
     GDALDataType GetRasterDataType( void );
     void        GetBlockSize( int *, int * );
     CPLErr      GetActualBlockSize ( int, int, int *, int * );
+
+    virtual GDALSuggestedBlockAccessPattern GetSuggestedBlockAccessPattern() const;
+
     GDALAccess  GetAccess();
 
     CPLErr      RasterIO( GDALRWFlag, int, int, int, int,
@@ -2438,11 +2458,14 @@ class CPL_DLL GDALMDArray: virtual public GDALAbstractMDArray, public GDALIHasAt
     mutable std::shared_ptr<GDALMDArray> m_poCachedArray{};
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     mutable bool m_bHasTriedCachedArray = false;
     mutable std::shared_ptr<GDALMDArray> m_poCachedArray{};
 
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 protected:
 //! @cond Doxygen_Suppress
     GDALMDArray(const std::string& osParentName, const std::string& osName);
@@ -2453,10 +2476,13 @@ protected:
 
     virtual bool IsCacheable() const { return true; }
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/gdal_priv.h
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:gcore/gdal_priv.h
 
     virtual bool SetStatistics( bool bApproxStats,
@@ -2471,9 +2497,12 @@ protected:
 =======
 >>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/gcore/gdal_priv.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:gcore/gdal_priv.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 //! @endcond
 
 public:
@@ -2496,10 +2525,26 @@ public:
      * This is used in particular for caching.
      *
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/gdal_priv.h
 =======
 <<<<<<< HEAD:gcore/gdal_priv.h
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gcore/gdal_priv.h
+=======
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+=======
+<<<<<<< HEAD:gcore/gdal_priv.h
+<<<<<<< HEAD
+>>>>>>> 8d6f7a8fd1 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD:gcore/gdal_priv.h
+<<<<<<< HEAD:gcore/gdal_priv.h
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -2515,6 +2560,35 @@ public:
 <<<<<<< HEAD:gcore/gdal_priv.h
 <<<<<<< HEAD:gcore/gdal_priv.h
 >>>>>>> OSGeo-master
+=======
+>>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> b93670d45a (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD:gcore/gdal_priv.h
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+<<<<<<< HEAD
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
+=======
+=======
+<<<<<<< HEAD:gcore/gdal_priv.h
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> b93670d45a (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+=======
+<<<<<<< HEAD:gcore/gdal_priv.h
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
      * Might be empty if the array is not linked to a file.
      *
      * @since GDAL 3.4
@@ -2526,19 +2600,50 @@ public:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8d6f7a8fd1 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
+=======
+=======
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> b93670d45a (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 =======
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:gcore/gdal_priv.h
 =======
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD
+>>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
      * Might be empty if the array is not linked to a file.
      * 
      * @since GDAL 3.4
@@ -2546,6 +2651,19 @@ public:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdal_priv.h
+<<<<<<< HEAD
+=======
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> 8d6f7a8fd1 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:gdal/gcore/gdal_priv.h
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdal_priv.h
@@ -2555,22 +2673,49 @@ public:
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdal_priv.h
 >>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 >>>>>>> df05d90486 (Merge pull request #3822 from rouault/gml_srs)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 =======
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> d9da6eb2a3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdal_priv.h
 >>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdal_priv.h
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD
+>>>>>>> b93670d45a (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdal_priv.h
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdal_priv.h
+>>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
     virtual const std::string& GetFilename() const = 0;
 
     virtual CSLConstList GetStructuralInfo() const;
@@ -3089,10 +3234,13 @@ bool CPL_DLL GDALBufferHasOnlyNoData(const void* pBuffer,
                                      GDALBufferSampleFormat nSampleFormat);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/gcore/gdal_priv.h
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:gcore/gdal_priv.h
 void CPL_DLL GDALCopyNoDataValue(GDALRasterBand* poDstBand,
                                  GDALRasterBand* poSrcBand);
@@ -3103,9 +3251,12 @@ double CPL_DLL GDALGetNoDataValueCastToDouble(uint64_t nVal);
 =======
 >>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdal_priv.h
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:gcore/gdal_priv.h
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 //! @endcond
 
 #endif /* ndef GDAL_PRIV_H_INCLUDED */

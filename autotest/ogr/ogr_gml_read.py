@@ -675,10 +675,13 @@ def test_ogr_gml_16():
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 ###############################################################################
 # Test reading CityGML of Project PLATEAU
 
@@ -707,9 +710,12 @@ def test_gml_read_compound_crs_lat_long():
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 
 ###############################################################################
 # Read layer SRS for WFS 1.0.0 return
@@ -840,12 +846,15 @@ def test_ogr_gml_20():
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 @pytest.mark.parametrize('frmt', ['GML3', 'GML3Deegree', 'GML3.2'])
 def test_ogr_gml_21(frmt):
 =======
 <<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 @pytest.mark.parametrize('frmt,base_filename',
                          [('GML3', 'expected_gml_gml3'),
                           ('GML3Deegree', 'expected_gml_gml3degree'),
@@ -857,9 +866,12 @@ def test_ogr_gml_21(frmt,base_filename):
 def test_ogr_gml_21(frmt):
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 
     if not gdaltest.have_gml_reader:
         pytest.skip()
@@ -931,19 +943,25 @@ def test_ogr_gml_21(frmt):
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
     for ext in ('gml', 'gfs', 'xsd'):
         gdal.Unlink('tmp/' + base_filename + '.' + ext)
 
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 ###############################################################################
 # Read a OpenLS DetermineRouteResponse document
 
@@ -3931,10 +3949,13 @@ def test_ogr_gml_srs_name_in_xsd(gml_format):
     gdal.Unlink(xsdfilename)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 
 
 ###############################################################################
@@ -3963,6 +3984,9 @@ def test_ogr_gml_too_nested():
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation

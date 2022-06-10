@@ -11,6 +11,7 @@ best of our knowledge and not guaranteed. Users should check by themselves.
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/docker/README.md
 =======
 <<<<<<< HEAD:docker/README.md
@@ -41,6 +42,22 @@ See [alpine-ultrasmall/Dockerfile](alpine-ultrasmall/Dockerfile)
 =======
 <<<<<<< HEAD:docker/README.md
 >>>>>>> OSGeo-master
+=======
+=======
+=======
+>>>>>>> d8608c8f1e (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 8e8bcf6841 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD:gdal/docker/README.md
+=======
+>>>>>>> 126d56369a (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
+<<<<<<< HEAD:docker/README.md
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD:docker/README.md
+>>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 # Alpine based
 =======
 # Alpine based (3.14)
@@ -50,9 +67,49 @@ Alpine version:
 * 3.15 for 3.5
 * 3.16 for GDAL 3.6dev
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 0f99b0ef18 (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
 =======
 >>>>>>> OSGeo-master
+=======
+=======
+# Alpine based (3.15)
+=======
+# Alpine based (3.14)
+
+## Ultra small: `osgeo/gdal:alpine-ultrasmall-latest`
+
+* Image size: ~ 50 MB
+* Raster drivers: VRT, GTiff, HFA, PNG, JPEG, MEM, JP2OpenJPEG, WEB, GPKG
+* Vector drivers: Shapefile, MapInfo, VRT, Memory, GeoJSON, GPKG, SQLite
+* External libraries enabled: libsqlite3, libproj, libcurl, libjpeg, libpng, libwebp, libzstd, libtiff (no LERC support at time of writing)
+* No GDAL Python
+* Base PROJ grid package
+* Overall licensing terms of the GDAL build: permissive (X/MIT, BSD style, Apache, etc..)
+
+See [alpine-ultrasmall/Dockerfile](alpine-ultrasmall/Dockerfile)
+>>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/docker/README.md
+<<<<<<< HEAD
+>>>>>>> 9fdcdc669b (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+<<<<<<< HEAD:docker/README.md
+>>>>>>> c71573c49d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:docker/README.md
+>>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
+# Alpine based
+=======
+# Alpine based (3.14)
+>>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/docker/README.md
+
+Alpine version:
+* 3.15 for 3.5
+* 3.16 for GDAL 3.6dev
+>>>>>>> 0f99b0ef18 (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
+>>>>>>> 126d56369a (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
+>>>>>>> gdal-raster-parallelisation
 
 ## Small: `osgeo/gdal:alpine-small-latest`
 
@@ -74,6 +131,7 @@ See [alpine-small/Dockerfile](alpine-small/Dockerfile)
 * Vector drivers: small + Spatialite, XLS
 * Using internal libtiff and libgeotiff
 * External libraries enabled: small + libgeos, libhdf5, libhdf5, libkea, libnetcdf, libfreexl,
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -107,14 +165,72 @@ See [alpine-small/Dockerfile](alpine-small/Dockerfile)
 * GDAL Python (Python 3.9)
 >>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+=======
+=======
+>>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:docker/README.md
   libspatialite, libxml2, libpoppler, openexr, libheif, libdeflate, libparquet
 * GDAL Python
 * Base PROJ grid package (http://download.osgeo.org/proj/proj-datumgrid-1.8.zip)
 =======
+<<<<<<< HEAD
   libspatialite, libxml2, libpoppler, openexr, libheif, libdeflate
 * GDAL Python (Python 3.9)
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 126d56369a (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
+=======
+<<<<<<< HEAD
+>>>>>>> d8608c8f1e (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD
+>>>>>>> 8e8bcf6841 (Merge branch 'master' of github.com:OSGeo/gdal)
+  libspatialite, libxml2, libpoppler, openexr, libheif, libdeflate
+* GDAL Python (Python 3.9)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD:docker/README.md
+=======
+=======
+<<<<<<< HEAD:docker/README.md
+>>>>>>> c71573c49d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD:docker/README.md
+>>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
+  libspatialite, libxml2, libpoppler, openexr, libheif, libdeflate, libparquet
+* GDAL Python
+>>>>>>> 0f99b0ef18 (Docker: update Alpine based images to 3.16, and add Apache Arrow/Parquet to alpine-normal image [ci skip])
+* Base PROJ grid package (http://download.osgeo.org/proj/proj-datumgrid-1.8.zip)
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 9fdcdc669b (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 8e8bcf6841 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> OSGeo-master:docker/README.md
+=======
+  libspatialite, libxml2, libpoppler, openexr, libheif, libdeflate
+* GDAL Python (Python 3.9)
+>>>>>>> c71573c49d (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> d8608c8f1e (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+  libspatialite, libxml2, libpoppler, openexr, libheif, libdeflate
+* GDAL Python (Python 3.9)
+>>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8e8bcf6841 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+  libspatialite, libxml2, libpoppler, openexr, libheif, libdeflate
+* GDAL Python (Python 3.9)
+>>>>>>> accab8c0ec (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 * Base PROJ grid package
 >>>>>>> 2e13b33fc5 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/docker/README.md
 * Overall licensing terms of the GDAL build: copy-left (GPL) + LGPL + permissive

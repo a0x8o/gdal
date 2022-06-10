@@ -63,20 +63,26 @@ if ! test -d fix_typos; then
 fi
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/scripts/fix_typos.sh
 EXCLUDED_FILES="*/.svn*,configure,config.status,config.guess,config.sub,*/autom4te.cache/*,*.ai,*.svg"
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:scripts/fix_typos.sh
 EXCLUDED_FILES="*/.svn*,*/.git/*,configure,config.log,config.status,config.guess,config.sub,*/autom4te.cache/*,*.ai,*.svg"
 =======
 EXCLUDED_FILES="*/.svn*,configure,config.status,config.guess,config.sub,*/autom4te.cache/*,*.ai,*.svg"
 >>>>>>> 542a97ffd1 (PostgisRaster: hopuflly fix CSA warning):gdal/scripts/fix_typos.sh
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:scripts/fix_typos.sh
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 EXCLUDED_FILES="$EXCLUDED_FILES,*/hdf-eos/*,teststream.out,ogrogdilayer.cpp"
 EXCLUDED_FILES="$EXCLUDED_FILES,*/doc/build/*,*/data/*,figures.mp,*/tmp/*,*/ruby/*"
 EXCLUDED_FILES="$EXCLUDED_FILES,*/fix_typos/*,fix_typos.sh,*.eps,geopackage_aspatial.html"

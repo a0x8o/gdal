@@ -1077,15 +1077,51 @@ OCTNewCoordinateTransformationEx( OGRSpatialReferenceH hSourceSRS,
 
 OGRCoordinateTransformationH CPL_DLL OCTClone(OGRCoordinateTransformationH hTransform);
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/ogr/ogr_srs_api.h
 =======
 <<<<<<< HEAD:ogr/ogr_srs_api.h
 <<<<<<< HEAD:ogr/ogr_srs_api.h
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD:ogr/ogr_srs_api.h
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD:ogr/ogr_srs_api.h
+=======
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+=======
+<<<<<<< HEAD:ogr/ogr_srs_api.h
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD:ogr/ogr_srs_api.h
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+<<<<<<< HEAD
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
+=======
+=======
+<<<<<<< HEAD:ogr/ogr_srs_api.h
+>>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+=======
+<<<<<<< HEAD:ogr/ogr_srs_api.h
+>>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 OGRSpatialReferenceH CPL_DLL OCTGetSourceCS(OGRCoordinateTransformationH hTransform);
 OGRSpatialReferenceH CPL_DLL OCTGetTargetCS(OGRCoordinateTransformationH hTransform);
 OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH hTransform);
 =======
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD:ogr/ogr_srs_api.h
 <<<<<<< HEAD
@@ -1108,6 +1144,25 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/ogr/ogr_srs_api.h
 >>>>>>> OSGeo-master
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/ogr/ogr_srs_api.h
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
+=======
+=======
+>>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 =======
 OGRSpatialReferenceH CPL_DLL OCTGetSourceCS(OGRCoordinateTransformationH hTransform);
 OGRSpatialReferenceH CPL_DLL OCTGetTargetCS(OGRCoordinateTransformationH hTransform);
@@ -1116,19 +1171,44 @@ OGRCoordinateTransformationH CPL_DLL OCTGetInverse(OGRCoordinateTransformationH 
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 >>>>>>> OSGeo-master:ogr/ogr_srs_api.h
 =======
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 >>>>>>> df05d90486 (Merge pull request #3822 from rouault/gml_srs)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 =======
 >>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 913c3ef6c1 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 
 void CPL_DLL CPL_STDCALL
       OCTDestroyCoordinateTransformation( OGRCoordinateTransformationH );

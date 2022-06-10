@@ -66,13 +66,47 @@ RUN wget -q https://github.com/ubarsc/kealib/archive/kealib-${KEA_VERSION}.zip \
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+ARG MONGO_C_DRIVER_VERSION=1.17.6
+=======
+ARG MONGO_C_DRIVER_VERSION=1.17.5
+>>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+ARG MONGO_C_DRIVER_VERSION=1.17.6
+>>>>>>> 145dd38d72 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> a57f04675f (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 ARG MONGO_C_DRIVER_VERSION=1.17.6
 =======
 ARG MONGO_C_DRIVER_VERSION=1.17.5
 >>>>>>> 9457c72950 (Docker: update to use an alternate repo to OSGeo/gdal)
+<<<<<<< HEAD
 =======
 ARG MONGO_C_DRIVER_VERSION=1.17.6
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD
+>>>>>>> a20945fa20 (Docker: update to use an alternate repo to OSGeo/gdal)
+=======
+=======
+ARG MONGO_C_DRIVER_VERSION=1.17.6
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
 >>>>>>> 39cde30c78 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -82,17 +116,39 @@ ARG MONGO_C_DRIVER_VERSION=1.17.5
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 >>>>>>> 9105b4f6b6 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
 ARG MONGO_C_DRIVER_VERSION=1.17.6
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 39cde30c78 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 ARG MONGO_C_DRIVER_VERSION=1.17.6
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 ARG MONGO_C_DRIVER_VERSION=1.17.6
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD
+>>>>>>> a57f04675f (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+ARG MONGO_C_DRIVER_VERSION=1.17.6
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+ARG MONGO_C_DRIVER_VERSION=1.17.5
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+ARG MONGO_C_DRIVER_VERSION=1.17.6
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 RUN mkdir mongo-c-driver \
     && wget -q https://github.com/mongodb/mongo-c-driver/releases/download/${MONGO_C_DRIVER_VERSION}/mongo-c-driver-${MONGO_C_DRIVER_VERSION}.tar.gz -O - \
         | tar xz -C mongo-c-driver --strip-components=1 \
@@ -116,13 +172,47 @@ RUN mkdir mongo-c-driver \
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+ARG MONGOCXX_VERSION=3.6.5
+=======
+ARG MONGOCXX_VERSION=3.6.3
+>>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+ARG MONGOCXX_VERSION=3.6.5
+>>>>>>> 145dd38d72 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> a57f04675f (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 ARG MONGOCXX_VERSION=3.6.5
 =======
 ARG MONGOCXX_VERSION=3.6.3
 >>>>>>> 9457c72950 (Docker: update to use an alternate repo to OSGeo/gdal)
+<<<<<<< HEAD
 =======
 ARG MONGOCXX_VERSION=3.6.5
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD
+>>>>>>> a20945fa20 (Docker: update to use an alternate repo to OSGeo/gdal)
+=======
+=======
+ARG MONGOCXX_VERSION=3.6.5
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
 >>>>>>> 39cde30c78 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -132,17 +222,39 @@ ARG MONGOCXX_VERSION=3.6.3
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 >>>>>>> 9105b4f6b6 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
 ARG MONGOCXX_VERSION=3.6.5
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 39cde30c78 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 ARG MONGOCXX_VERSION=3.6.5
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 ARG MONGOCXX_VERSION=3.6.5
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD
+>>>>>>> a57f04675f (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+ARG MONGOCXX_VERSION=3.6.5
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+ARG MONGOCXX_VERSION=3.6.3
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+ARG MONGOCXX_VERSION=3.6.5
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 RUN mkdir mongocxx \
     && wget -q https://github.com/mongodb/mongo-cxx-driver/archive/r${MONGOCXX_VERSION}.tar.gz -O - \
         | tar xz -C mongocxx --strip-components=1 \
@@ -165,13 +277,47 @@ RUN mkdir mongocxx \
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+ARG TILEDB_VERSION=2.3.0
+=======
+ARG TILEDB_VERSION=2.2.7
+>>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+ARG TILEDB_VERSION=2.3.0
+>>>>>>> 145dd38d72 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> a57f04675f (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 ARG TILEDB_VERSION=2.3.0
 =======
 ARG TILEDB_VERSION=2.2.7
 >>>>>>> 9457c72950 (Docker: update to use an alternate repo to OSGeo/gdal)
+<<<<<<< HEAD
 =======
 ARG TILEDB_VERSION=2.3.0
 >>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+<<<<<<< HEAD
+>>>>>>> a20945fa20 (Docker: update to use an alternate repo to OSGeo/gdal)
+=======
+=======
+ARG TILEDB_VERSION=2.3.0
+>>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
 >>>>>>> 39cde30c78 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -181,17 +327,39 @@ ARG TILEDB_VERSION=2.2.7
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 >>>>>>> 9105b4f6b6 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> gdal-raster-parallelisation
 =======
 =======
 ARG TILEDB_VERSION=2.3.0
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 39cde30c78 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 ARG TILEDB_VERSION=2.3.0
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 ARG TILEDB_VERSION=2.3.0
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD
+>>>>>>> a57f04675f (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+ARG TILEDB_VERSION=2.3.0
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+ARG TILEDB_VERSION=2.2.7
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+ARG TILEDB_VERSION=2.3.0
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 RUN mkdir tiledb \
     && wget -q https://github.com/TileDB-Inc/TileDB/archive/${TILEDB_VERSION}.tar.gz -O - \
         | tar xz -C tiledb --strip-components=1 \
@@ -258,7 +426,11 @@ RUN if echo "$WITH_PDFIUM" | grep -Eiq "^(y(es)?|1|true)$"  ; then ( \
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
+<<<<<<< HEAD
 >>>>>>> OSGeo-master
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
   wget -q https://github.com/rouault/pdfium_build_gdal_3_4/releases/download/v1_pdfium_4538/install-ubuntu2004-rev4538.tar.gz \
   && tar -xzf install-ubuntu2004-rev4538.tar.gz \
   && chown -R root:root install \
@@ -283,7 +455,11 @@ RUN if echo "$WITH_PDFIUM" | grep -Eiq "^(y(es)?|1|true)$"  ; then ( \
   && rm -rf install-ubuntu2004-rev4538.tar.gz install \
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
 >>>>>>> OSGeo-master
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
   && apt-get update -y \
   && apt-get install -y --fix-missing --no-install-recommends liblcms2-dev \
   && rm -rf /var/lib/apt/lists/* \

@@ -5798,11 +5798,21 @@ SWIGINTERN void GDALMDArrayHS_GetNoDataValueAsDouble(GDALMDArrayHS *self,double 
     *val = GDALMDArrayGetNoDataValueAsDouble( self, hasval );
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
+=======
+<<<<<<< HEAD
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
 =======
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+<<<<<<< HEAD
+=======
+>>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+>>>>>>> gdal-raster-parallelisation
 SWIGINTERN void GDALMDArrayHS_GetNoDataValueAsInt64(GDALMDArrayHS *self,GIntBig *val,int *hasval){
     *val = GDALMDArrayGetNoDataValueAsInt64( self, hasval );
   }
@@ -5810,11 +5820,22 @@ SWIGINTERN void GDALMDArrayHS_GetNoDataValueAsUInt64(GDALMDArrayHS *self,GUIntBi
     *val = GDALMDArrayGetNoDataValueAsUInt64( self, hasval );
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
+=======
+<<<<<<< HEAD
+>>>>>>> gdal-raster-parallelisation
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
 =======
 =======
 >>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+<<<<<<< HEAD
+=======
+>>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+>>>>>>> gdal-raster-parallelisation
 SWIGINTERN retStringAndCPLFree *GDALMDArrayHS_GetNoDataValueAsString(GDALMDArrayHS *self){
     GDALExtendedDataTypeHS* selfType = GDALMDArrayGetDataType(self);
     const size_t typeClass = GDALExtendedDataTypeGetClass(selfType);
@@ -5839,11 +5860,21 @@ SWIGINTERN CPLErr GDALMDArrayHS_SetNoDataValueDouble(GDALMDArrayHS *self,double 
     return GDALMDArraySetNoDataValueAsDouble( self, d ) ? CE_None : CE_Failure;
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
+=======
+<<<<<<< HEAD
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
 =======
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+<<<<<<< HEAD
+=======
+>>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+>>>>>>> gdal-raster-parallelisation
 SWIGINTERN CPLErr GDALMDArrayHS_SetNoDataValueInt64(GDALMDArrayHS *self,GIntBig v){
     return GDALMDArraySetNoDataValueAsInt64( self, v ) ? CE_None : CE_Failure;
   }
@@ -5851,11 +5882,22 @@ SWIGINTERN CPLErr GDALMDArrayHS_SetNoDataValueUInt64(GDALMDArrayHS *self,GUIntBi
     return GDALMDArraySetNoDataValueAsUInt64( self, v ) ? CE_None : CE_Failure;
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
+=======
+<<<<<<< HEAD
+>>>>>>> gdal-raster-parallelisation
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
 =======
 =======
 >>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+<<<<<<< HEAD
+=======
+>>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+>>>>>>> gdal-raster-parallelisation
 SWIGINTERN CPLErr GDALMDArrayHS_SetNoDataValueString(GDALMDArrayHS *self,char const *nodata){
     GDALExtendedDataTypeHS* selfType = GDALMDArrayGetDataType(self);
     const size_t typeClass = GDALExtendedDataTypeGetClass(selfType);
@@ -10700,20 +10742,26 @@ SWIGINTERN PyObject *_wrap_CPLBinaryToHex(PyObject *SWIGUNUSEDPARM(self), PyObje
       int ret;
       try {
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(obj0, (char**) &arg2, &safeLen, &alloc1);
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[0], (char**) &arg2, &safeLen, &alloc1);
 =======
         ret = SWIG_AsCharPtrAndSize(obj0, (char**) &arg2, &safeLen, &alloc1);
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
       }
       catch( const std::exception& )
       {
@@ -10886,20 +10934,26 @@ SWIGINTERN PyObject *_wrap_FileFromMemBuffer(PyObject *SWIGUNUSEDPARM(self), PyO
       int ret;
       try {
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(obj1, (char**) &arg3, &safeLen, &alloc2);
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[1], (char**) &arg3, &safeLen, &alloc2);
 =======
         ret = SWIG_AsCharPtrAndSize(obj1, (char**) &arg3, &safeLen, &alloc2);
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
       }
       catch( const std::exception& )
       {
@@ -11698,10 +11752,13 @@ SWIGINTERN PyObject *_wrap_AbortPendingUploads(PyObject *SWIGUNUSEDPARM(self), P
   char *arg1 = (char *) 0 ;
   int bToFree1 = 0 ;
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
   PyObject *swig_obj[1] ;
   bool result;
@@ -11713,9 +11770,12 @@ SWIGINTERN PyObject *_wrap_AbortPendingUploads(PyObject *SWIGUNUSEDPARM(self), P
     arg1 = GDALPythonObjectToCStr( swig_obj[0], &bToFree1 );
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
   PyObject * obj0 = 0 ;
   bool result;
   
@@ -11724,6 +11784,7 @@ SWIGINTERN PyObject *_wrap_AbortPendingUploads(PyObject *SWIGUNUSEDPARM(self), P
     /* %typemap(in) (const char *utf8_path) */
     arg1 = GDALPythonObjectToCStr( obj0, &bToFree1 );
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
@@ -11731,6 +11792,9 @@ SWIGINTERN PyObject *_wrap_AbortPendingUploads(PyObject *SWIGUNUSEDPARM(self), P
 =======
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
 >>>>>>> OSGeo-master
+=======
+>>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
+>>>>>>> gdal-raster-parallelisation
     if (arg1 == NULL)
     {
       PyErr_SetString( PyExc_RuntimeError, "not a string" );
@@ -13263,20 +13327,26 @@ SWIGINTERN PyObject *_wrap_VSIFWriteL(PyObject *SWIGUNUSEDPARM(self), PyObject *
       int ret;
       try {
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(obj0, (char**) &arg2, &safeLen, &alloc1);
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[0], (char**) &arg2, &safeLen, &alloc1);
 =======
         ret = SWIG_AsCharPtrAndSize(obj0, (char**) &arg2, &safeLen, &alloc1);
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
       }
       catch( const std::exception& )
       {
@@ -24908,20 +24978,26 @@ SWIGINTERN PyObject *_wrap_MDArray_Write(PyObject *SWIGUNUSEDPARM(self), PyObjec
       int ret;
       try {
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(obj6, (char**) &arg12, &safeLen, &alloc11);
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[6], (char**) &arg12, &safeLen, &alloc11);
 =======
         ret = SWIG_AsCharPtrAndSize(obj6, (char**) &arg12, &safeLen, &alloc11);
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
       }
       catch( const std::exception& )
       {
@@ -25572,11 +25648,21 @@ fail:
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
+=======
+<<<<<<< HEAD
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
 =======
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+<<<<<<< HEAD
+=======
+>>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+>>>>>>> gdal-raster-parallelisation
 SWIGINTERN PyObject *_wrap_MDArray_GetNoDataValueAsInt64(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0; int bLocalUseExceptionsCode = bUseExceptions;
   GDALMDArrayHS *arg1 = (GDALMDArrayHS *) 0 ;
@@ -25702,17 +25788,34 @@ fail:
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
+=======
+<<<<<<< HEAD
+>>>>>>> gdal-raster-parallelisation
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
 =======
 =======
 >>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+<<<<<<< HEAD
+=======
+>>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+>>>>>>> gdal-raster-parallelisation
 SWIGINTERN PyObject *_wrap_MDArray_GetNoDataValueAsString(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0; int bLocalUseExceptionsCode = bUseExceptions;
   GDALMDArrayHS *arg1 = (GDALMDArrayHS *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
+=======
+<<<<<<< HEAD
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
   PyObject * obj0 = 0 ;
   retStringAndCPLFree *result = 0 ;
@@ -25723,6 +25826,10 @@ SWIGINTERN PyObject *_wrap_MDArray_GetNoDataValueAsString(PyObject *SWIGUNUSEDPA
 =======
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+<<<<<<< HEAD
+=======
+>>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+>>>>>>> gdal-raster-parallelisation
   PyObject *swig_obj[1] ;
   retStringAndCPLFree *result = 0 ;
   
@@ -25730,8 +25837,16 @@ SWIGINTERN PyObject *_wrap_MDArray_GetNoDataValueAsString(PyObject *SWIGUNUSEDPA
   swig_obj[0] = args;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
 =======
+=======
+=======
+<<<<<<< HEAD
+>>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
+=======
+>>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+>>>>>>> gdal-raster-parallelisation
 =======
   PyObject * obj0 = 0 ;
   retStringAndCPLFree *result = 0 ;
@@ -25739,7 +25854,14 @@ SWIGINTERN PyObject *_wrap_MDArray_GetNoDataValueAsString(PyObject *SWIGUNUSEDPA
   if (!PyArg_ParseTuple(args,(char *)"O:MDArray_GetNoDataValueAsString",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
 >>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
+<<<<<<< HEAD
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+>>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+>>>>>>> gdal-raster-parallelisation
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "MDArray_GetNoDataValueAsString" "', argument " "1"" of type '" "GDALMDArrayHS *""'"); 
   }
@@ -25832,11 +25954,21 @@ fail:
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
+=======
+<<<<<<< HEAD
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
 =======
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+<<<<<<< HEAD
+=======
+>>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+>>>>>>> gdal-raster-parallelisation
 SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueInt64(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0; int bLocalUseExceptionsCode = bUseExceptions;
   GDALMDArrayHS *arg1 = (GDALMDArrayHS *) 0 ;
@@ -25926,11 +26058,22 @@ fail:
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
+=======
+<<<<<<< HEAD
+>>>>>>> gdal-raster-parallelisation
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
 =======
 =======
 >>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+<<<<<<< HEAD
+=======
+>>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+>>>>>>> gdal-raster-parallelisation
 SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueString(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0; int bLocalUseExceptionsCode = bUseExceptions;
   GDALMDArrayHS *arg1 = (GDALMDArrayHS *) 0 ;
@@ -25941,6 +26084,7 @@ SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueString(PyObject *SWIGUNUSEDPARM
   char *buf2 = 0 ;
   int alloc2 = 0 ;
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -25948,6 +26092,34 @@ SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueString(PyObject *SWIGUNUSEDPARM
   
   if (!PyArg_ParseTuple(args,(char *)"OO:MDArray_SetNoDataValueString",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
+=======
+=======
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
+>>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+=======
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
+>>>>>>> gdal-raster-parallelisation
+  PyObject *swig_obj[2] ;
+  CPLErr result;
+  
+  if (!SWIG_Python_UnpackTuple(args, "MDArray_SetNoDataValueString", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
+<<<<<<< HEAD
+=======
+=======
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
+>>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  CPLErr result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:MDArray_SetNoDataValueString",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
+<<<<<<< HEAD
+>>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
+=======
 =======
 =======
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
@@ -25957,6 +26129,7 @@ SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueString(PyObject *SWIGUNUSEDPARM
   
   if (!SWIG_Python_UnpackTuple(args, "MDArray_SetNoDataValueString", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
 =======
@@ -25969,15 +26142,33 @@ SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueString(PyObject *SWIGUNUSEDPARM
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
 >>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+<<<<<<< HEAD
+=======
+>>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+>>>>>>> gdal-raster-parallelisation
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "MDArray_SetNoDataValueString" "', argument " "1"" of type '" "GDALMDArrayHS *""'"); 
   }
   arg1 = reinterpret_cast< GDALMDArrayHS * >(argp1);
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
   res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
 =======
   res2 = SWIG_AsCharPtrAndSize(swig_obj[1], &buf2, NULL, &alloc2);
+=======
+<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
+  res2 = SWIG_AsCharPtrAndSize(swig_obj[1], &buf2, NULL, &alloc2);
+=======
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+>>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+=======
+  res2 = SWIG_AsCharPtrAndSize(swig_obj[1], &buf2, NULL, &alloc2);
+>>>>>>> gdal-raster-parallelisation
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
 =======
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
@@ -25986,6 +26177,10 @@ SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueString(PyObject *SWIGUNUSEDPARM
   res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
 >>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+<<<<<<< HEAD
+=======
+>>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
+>>>>>>> gdal-raster-parallelisation
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "MDArray_SetNoDataValueString" "', argument " "2"" of type '" "char const *""'");
   }
@@ -26058,20 +26253,26 @@ SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueRaw(PyObject *SWIGUNUSEDPARM(se
       int ret;
       try {
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(obj1, (char**) &arg3, &safeLen, &alloc2);
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[1], (char**) &arg3, &safeLen, &alloc2);
 =======
         ret = SWIG_AsCharPtrAndSize(obj1, (char**) &arg3, &safeLen, &alloc2);
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
       }
       catch( const std::exception& )
       {
@@ -27382,10 +27583,13 @@ SWIGINTERN PyObject *_wrap_MDArray_Cache(PyObject *SWIGUNUSEDPARM(self), PyObjec
   void *argp1 = 0 ;
   int res1 = 0 ;
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
   PyObject *swig_obj[2] ;
   bool result;
@@ -27394,9 +27598,12 @@ SWIGINTERN PyObject *_wrap_MDArray_Cache(PyObject *SWIGUNUSEDPARM(self), PyObjec
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   bool result;
@@ -27404,6 +27611,7 @@ SWIGINTERN PyObject *_wrap_MDArray_Cache(PyObject *SWIGUNUSEDPARM(self), PyObjec
   if (!PyArg_ParseTuple(args,(char *)"O|O:MDArray_Cache",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/swig/python/extensions/gdal_wrap.cpp
@@ -27411,15 +27619,21 @@ SWIGINTERN PyObject *_wrap_MDArray_Cache(PyObject *SWIGUNUSEDPARM(self), PyObjec
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/swig/python/extensions/gdal_wrap.cpp
 >>>>>>> OSGeo-master
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/swig/python/extensions/gdal_wrap.cpp
+>>>>>>> gdal-raster-parallelisation
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "MDArray_Cache" "', argument " "1"" of type '" "GDALMDArrayHS *""'"); 
   }
   arg1 = reinterpret_cast< GDALMDArrayHS * >(argp1);
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
   if (swig_obj[1]) {
     {
@@ -27428,14 +27642,18 @@ SWIGINTERN PyObject *_wrap_MDArray_Cache(PyObject *SWIGUNUSEDPARM(self), PyObjec
       arg2 = CSLFromPySequence(swig_obj[1], &bErr);
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
   if (obj1) {
     {
       /* %typemap(in) char **options */
       int bErr = FALSE;
       arg2 = CSLFromPySequence(obj1, &bErr);
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
@@ -27444,6 +27662,9 @@ SWIGINTERN PyObject *_wrap_MDArray_Cache(PyObject *SWIGUNUSEDPARM(self), PyObjec
 =======
 >>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/swig/python/extensions/gdal_wrap.cpp
 >>>>>>> OSGeo-master
+=======
+>>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/swig/python/extensions/gdal_wrap.cpp
+>>>>>>> gdal-raster-parallelisation
       if( bErr )
       {
         SWIG_fail;
@@ -28215,20 +28436,26 @@ SWIGINTERN PyObject *_wrap_Attribute_WriteRaw(PyObject *SWIGUNUSEDPARM(self), Py
       int ret;
       try {
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(obj1, (char**) &arg3, &safeLen, &alloc2);
 =======
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[1], (char**) &arg3, &safeLen, &alloc2);
 =======
         ret = SWIG_AsCharPtrAndSize(obj1, (char**) &arg3, &safeLen, &alloc2);
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
       }
       catch( const std::exception& )
       {
@@ -29368,12 +29595,23 @@ SWIGINTERN PyObject *_wrap_ExtendedDataType_GetSubType(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+<<<<<<< HEAD
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
   PyObject *swig_obj[1] ;
   GDALExtendedDataTypeSubType result;
@@ -29384,11 +29622,22 @@ SWIGINTERN PyObject *_wrap_ExtendedDataType_GetSubType(PyObject *SWIGUNUSEDPARM(
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
 =======
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> OSGeo-master
+=======
+=======
+<<<<<<< HEAD
+>>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
+=======
+>>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
   PyObject * obj0 = 0 ;
   GDALExtendedDataTypeSubType result;
   
@@ -29396,6 +29645,12 @@ SWIGINTERN PyObject *_wrap_ExtendedDataType_GetSubType(PyObject *SWIGUNUSEDPARM(
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_GDALExtendedDataTypeHS, 0 |  0 );
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
+=======
+<<<<<<< HEAD
+>>>>>>> gdal-raster-parallelisation
 <<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
@@ -29403,9 +29658,16 @@ SWIGINTERN PyObject *_wrap_ExtendedDataType_GetSubType(PyObject *SWIGUNUSEDPARM(
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
 >>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
 >>>>>>> OSGeo-master
+=======
+>>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ExtendedDataType_GetSubType" "', argument " "1"" of type '" "GDALExtendedDataTypeHS *""'"); 
   }
@@ -45553,10 +45815,21 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"MDArray_SetNoDataValueString", _wrap_MDArray_SetNoDataValueString, METH_VARARGS, (char *)"MDArray_SetNoDataValueString(MDArray self, char const * nodata) -> CPLErr"},
 =======
 	 { (char *)"MDArray_SetNoDataValueDouble", _wrap_MDArray_SetNoDataValueDouble, METH_VARARGS, (char *)"MDArray_SetNoDataValueDouble(MDArray self, double d) -> CPLErr"},
+<<<<<<< HEAD
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 =======
 	 { (char *)"MDArray_SetNoDataValueDouble", _wrap_MDArray_SetNoDataValueDouble, METH_VARARGS, (char *)"MDArray_SetNoDataValueDouble(MDArray self, double d) -> CPLErr"},
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
+=======
+	 { (char *)"MDArray_SetNoDataValueDouble", _wrap_MDArray_SetNoDataValueDouble, METH_VARARGS, (char *)"MDArray_SetNoDataValueDouble(MDArray self, double d) -> CPLErr"},
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> gdal-raster-parallelisation
 	 { (char *)"MDArray_SetNoDataValueRaw", _wrap_MDArray_SetNoDataValueRaw, METH_VARARGS, (char *)"MDArray_SetNoDataValueRaw(MDArray self, GIntBig nLen) -> CPLErr"},
 	 { (char *)"MDArray_DeleteNoDataValue", _wrap_MDArray_DeleteNoDataValue, METH_VARARGS, (char *)"MDArray_DeleteNoDataValue(MDArray self) -> CPLErr"},
 	 { (char *)"MDArray_GetOffset", _wrap_MDArray_GetOffset, METH_VARARGS, (char *)"MDArray_GetOffset(MDArray self)"},
@@ -45621,15 +45894,42 @@ static PyMethodDef SwigMethods[] = {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
+=======
+>>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
+=======
+	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
+>>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+>>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
+=======
+>>>>>>> gdal-raster-parallelisation
 	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
 =======
 >>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
 =======
 	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
 >>>>>>> OSGeo-master
+=======
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
+=======
+	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 	 { (char *)"ExtendedDataType_GetComponents", _wrap_ExtendedDataType_GetComponents, METH_VARARGS, (char *)"ExtendedDataType_GetComponents(ExtendedDataType self)"},
 	 { (char *)"ExtendedDataType_CanConvertTo", _wrap_ExtendedDataType_CanConvertTo, METH_VARARGS, (char *)"ExtendedDataType_CanConvertTo(ExtendedDataType self, ExtendedDataType other) -> bool"},
 	 { (char *)"ExtendedDataType_Equals", _wrap_ExtendedDataType_Equals, METH_VARARGS, (char *)"ExtendedDataType_Equals(ExtendedDataType self, ExtendedDataType other) -> bool"},

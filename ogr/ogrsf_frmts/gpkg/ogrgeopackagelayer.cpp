@@ -271,6 +271,10 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
                 if( nSqlite3ColType == SQLITE_TEXT )
                 {
                     const char* pszTxt = reinterpret_cast<const char*>(sqlite3_column_text( hStmt, iRawField ));
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 109c1d96f2 (GPKG: make GetNextFeature() robust to out-of-memory issues in sqlite3)
                     if( pszTxt == nullptr )
                     {
                         CPLError(CE_Failure, CPLE_AppDefined, "%s",
@@ -286,6 +290,23 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
                     {
                         if( !bNominalFormat || psField->Date.Hour != 0 ||
                             psField->Date.Minute != 0 || psField->Date.Second != 0 )
+=======
+                    const size_t nLen = strlen(pszTxt);
+                    // nominal format: "YYYY-MM-DD" (10 characters)
+                    const bool bNominalFormat = (
+                        nLen == 10 && pszTxt[4] == '-' && pszTxt[7] == '-');
+                    auto psField = poFeature->GetRawFieldRef(iField);
+                    if ( OGRParseDate(pszTxt, psField, 0) )
+                    {
+<<<<<<< HEAD
+                        poFeature->SetField(iField, &sField);
+                        if( !bNominalFormat || sField.Date.Hour != 0 ||
+                            sField.Date.Minute != 0 || sField.Date.Second != 0 )
+>>>>>>> 13ed9881df (GPKG: performance improvement in reading DateTime)
+=======
+                        if( !bNominalFormat || psField->Date.Hour != 0 ||
+                            psField->Date.Minute != 0 || psField->Date.Second != 0 )
+>>>>>>> 2bd2a2f468 (GPKG: performance improvement in reading features)
                         {
                             constexpr int line = __LINE__;
                             if( !m_poDS->m_oSetGPKGLayerWarnings[line] )
@@ -336,6 +357,10 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
                 if( nSqlite3ColType == SQLITE_TEXT )
                 {
                     const char* pszTxt = reinterpret_cast<const char*>(sqlite3_column_text( hStmt, iRawField ));
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 109c1d96f2 (GPKG: make GetNextFeature() robust to out-of-memory issues in sqlite3)
                     if( pszTxt == nullptr )
                     {
                         CPLError(CE_Failure, CPLE_AppDefined, "%s",
@@ -354,6 +379,24 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
                         pszTxt[19] == '.');
                     if ( OGRParseDate(pszTxt, psField, 0) )
                     {
+=======
+                    const size_t nLen = strlen(pszTxt);
+                    auto psField = poFeature->GetRawFieldRef(iField);
+                    // nominal format: "YYYY-MM-DDTHH:MM:SS.SSSZ" (24 characters)
+                    // but we also silently accept without timezone as OGR can
+                    // write this
+                    const bool bNominalFormat = (
+                        nLen >= 23 &&
+                        pszTxt[4] == '-' && pszTxt[7] == '-' &&
+                        pszTxt[10] == 'T' && pszTxt[13] == ':' && pszTxt[16] == ':' &&
+                        pszTxt[19] == '.');
+                    if ( OGRParseDate(pszTxt, psField, 0) )
+                    {
+<<<<<<< HEAD
+                        poFeature->SetField(iField, &sField);
+>>>>>>> 13ed9881df (GPKG: performance improvement in reading DateTime)
+=======
+>>>>>>> 2bd2a2f468 (GPKG: performance improvement in reading features)
                         if( !bNominalFormat )
                         {
                             constexpr int line = __LINE__;
@@ -401,6 +444,10 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
             }
 
             case OFTString:
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 109c1d96f2 (GPKG: make GetNextFeature() robust to out-of-memory issues in sqlite3)
             {
                 const char* pszTxt = reinterpret_cast<const char*>(
                     sqlite3_column_text( hStmt, iRawField ));
@@ -417,6 +464,13 @@ OGRFeature *OGRGeoPackageLayer::TranslateFeature( sqlite3_stmt* hStmt )
                     CPLError(CE_Failure, CPLE_AppDefined, "%s",
                              sqlite3_errmsg(m_poDS->GetDB()));
                 }
+<<<<<<< HEAD
+=======
+                poFeature->SetFieldSameTypeUnsafe( iField,
+                        CPLStrdup((const char *) sqlite3_column_text( hStmt, iRawField )) );
+>>>>>>> 2bd2a2f468 (GPKG: performance improvement in reading features)
+=======
+>>>>>>> 109c1d96f2 (GPKG: make GetNextFeature() robust to out-of-memory issues in sqlite3)
                 break;
             }
 

@@ -980,7 +980,15 @@ do {                                                    \
 /*  Write out the extended header.                                      */
 /* -------------------------------------------------------------------- */
 
+<<<<<<< HEAD
+<<<<<<< HEAD
     if( sHeader.nExtHdrOffset && sHeader.nExtHdrSize >= RMF_MIN_EXT_HEADER_SIZE )
+=======
+    if( sHeader.nExtHdrOffset && sHeader.nExtHdrSize >= 36 + 4 )
+>>>>>>> 8541009388 (RMF: fix potential heap-buffer-overflow in RMFDataset::WriteHeader. triggered by recent master commit. Fixes https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=47716)
+=======
+    if( sHeader.nExtHdrOffset && sHeader.nExtHdrSize >= RMF_MIN_EXT_HEADER_SIZE )
+>>>>>>> dff6e26c3a (RMF: Ext header size checks improved)
     {
         if(sHeader.nExtHdrSize > RMF_MAX_EXT_HEADER_SIZE)
         {

@@ -633,6 +633,8 @@ def test_ogr_openfilegdb_str_indexed_truncated():
 
     IDX_NOT_USED = 0
     IDX_USED = 1
+<<<<<<< HEAD
+<<<<<<< HEAD
 
     tests = [("str = 'a'", [1], IDX_USED),
              ("str = 'aa'", [2], IDX_USED),
@@ -655,6 +657,37 @@ def test_ogr_openfilegdb_str_indexed_truncated():
              ("str IN ('aaa', 'aaa ')", [3], IDX_USED),
              ("str IN ('aaa ')", [], IDX_USED),
              ("str IN ('aaaX')", [], IDX_USED),
+=======
+    IDX_USED_AND_ITER_SUFFICIENT = 2
+=======
+>>>>>>> bc7931bb31 (OpenFileGDB: further fix for use of attribute index on strings)
+
+    tests = [("str = 'a'", [1], IDX_USED),
+             ("str = 'aa'", [2], IDX_USED),
+             ("str != 'aa'", [1, 3], IDX_NOT_USED),
+             ("str = 'aaa'", [3], IDX_USED),
+             ("str >= 'aaa'", [3], IDX_USED),
+             ("str > 'aaa'", [], IDX_NOT_USED),
+             ("str > 'aa_'", [3], IDX_NOT_USED),
+             ("str <= 'aab'", [1, 2, 3], IDX_NOT_USED),
+             ("str = 'aaa '", [], IDX_USED),
+             ("str != 'aaa '", [1, 2, 3], IDX_NOT_USED),
+             ("str <= 'aaa '", [1, 2, 3], IDX_NOT_USED),
+             ("str <= 'aaaX'", [1, 2, 3], IDX_NOT_USED),
+             ("str >= 'aaa '", [], IDX_USED),
+             ("str = 'aaaX'", [], IDX_USED),
+             ("str = 'aaaXX'", [], IDX_USED),
+             ("str = 'aaa  '", [], IDX_USED),
+             ("str IN ('a', 'b')", [1], IDX_USED),
+             ("str IN ('aaa')", [3], IDX_USED),
+             ("str IN ('aaa', 'aaa ')", [3], IDX_USED),
+             ("str IN ('aaa ')", [], IDX_USED),
+<<<<<<< HEAD
+             ("str IN ('aaaX')", [], IDX_USED_AND_ITER_SUFFICIENT),
+>>>>>>> eab5266748 (OpenFileGDB: fix use of indexes on strings when the searched value is longer than the max indexed string, or ending with space)
+=======
+             ("str IN ('aaaX')", [], IDX_USED),
+>>>>>>> bc7931bb31 (OpenFileGDB: further fix for use of attribute index on strings)
              ("str IN ('aaaXX')", [], IDX_USED),
             ]
     for where_clause, fids, expected_attr_index_use in tests:
@@ -1737,6 +1770,31 @@ def test_ogr_openfilegdb_inconsistent_crs_feature_dataset_and_feature_table():
     srs = lyr.GetSpatialRef()
     assert srs is not None
     assert srs.GetAuthorityCode(None) == '4326'
+
+
+###############################################################################
+# Test reading a .spx file with the value_count field at 0
+# (https://github.com/OSGeo/gdal/issues/5888)
+
+
+def test_ogr_openfilegdb_spx_zero_in_value_count_trailer():
+    ds = ogr.Open('data/filegdb/spx_zero_in_value_count_trailer.gdb')
+    assert ds is not None
+    lyr = ds.GetLayer(0)
+    lyr.SetSpatialFilterRect(1,1,2,2)
+    assert lyr.GetFeatureCount() == 1
+
+
+###############################################################################
+# Test reading .gdb with LengthFieldName / AreaFieldName
+
+
+def test_ogr_openfilegdb_shape_length_shape_area_as_default_in_field_defn():
+    ds = ogr.Open('data/filegdb/filegdb_polygonzm_m_not_closing_with_curves.gdb')
+    lyr = ds.GetLayer(0)
+    lyr_defn = lyr.GetLayerDefn()
+    assert lyr_defn.GetFieldDefn(lyr_defn.GetFieldIndex('Shape_Area')).GetDefault() == 'FILEGEODATABASE_SHAPE_AREA'
+    assert lyr_defn.GetFieldDefn(lyr_defn.GetFieldIndex('Shape_Length')).GetDefault() == 'FILEGEODATABASE_SHAPE_LENGTH'
 
 
 ###############################################################################

@@ -1742,7 +1742,11 @@ prepare_JPEGTables(TIFF* tif)
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
 >>>>>>> OSGeo-master
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 #if defined(JPEG_LIB_VERSION_MAJOR) && (JPEG_LIB_VERSION_MAJOR > 9 || \
     (JPEG_LIB_VERSION_MAJOR == 9 && JPEG_LIB_VERSION_MINOR >= 4))
 /* This is a modified version of std_huff_tables() from jcparam.c
@@ -1754,7 +1758,11 @@ prepare_JPEGTables(TIFF* tif)
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
 >>>>>>> OSGeo-master
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 static void
 TIFF_std_huff_tables (j_compress_ptr cinfo)
 {
@@ -1840,7 +1848,11 @@ TIFF_std_huff_tables (j_compress_ptr cinfo)
 =======
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
 >>>>>>> OSGeo-master
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
   }
 }
 #endif
@@ -2035,7 +2047,11 @@ JPEGSetupEncode(TIFF* tif)
 =======
 #if defined(JPEG_LIB_VERSION_MAJOR) && (JPEG_LIB_VERSION_MAJOR > 9 || \
     (JPEG_LIB_VERSION_MAJOR == 9 && JPEG_LIB_VERSION_MINOR >= 4))
+<<<<<<< HEAD
 >>>>>>> OSGeo-master
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
             if( (sp->jpegtablesmode & JPEGTABLESMODE_HUFF) != 0 &&
                 (sp->cinfo.c.dc_huff_tbl_ptrs[0] == NULL ||
                  sp->cinfo.c.dc_huff_tbl_ptrs[1] == NULL ||
@@ -2059,7 +2075,11 @@ JPEGSetupEncode(TIFF* tif)
 >>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
                 /* jpeg_set_defaults() */
+<<<<<<< HEAD
 >>>>>>> OSGeo-master
+=======
+>>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
                 TIFF_std_huff_tables(&sp->cinfo.c);
             }
 #endif

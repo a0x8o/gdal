@@ -224,18 +224,51 @@ const char* VSIGSFSHandler::GetOptions()
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     "  <Option name='GS_NO_SIGN_REQUEST' type='boolean' "
         "description='Whether to disable signing of requests' default='NO'/>"
 =======
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+    "  <Option name='GS_NO_SIGN_REQUEST' type='boolean' "
+        "description='Whether to disable signing of requests' default='NO'/>"
+=======
+>>>>>>> 264c5ccbb0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+    "  <Option name='GS_NO_SIGN_REQUEST' type='boolean' "
+        "description='Whether to disable signing of requests' default='NO'/>"
+>>>>>>> 75e8911b1c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 77a87224da (Merge branch 'master' of github.com:OSGeo/gdal)
+    "  <Option name='GS_NO_SIGN_REQUEST' type='boolean' "
+        "description='Whether to disable signing of requests' default='NO'/>"
+=======
+>>>>>>> b39a831ddf (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> d42a2ed026 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+    "  <Option name='GS_NO_SIGN_REQUEST' type='boolean' "
+        "description='Whether to disable signing of requests' default='NO'/>"
+>>>>>>> baada40179 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 77a87224da (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> gdal-raster-parallelisation
 >>>>>>> b39a831ddf (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
     "  <Option name='GS_NO_SIGN_REQUEST' type='boolean' "
         "description='Whether to disable signing of requests' default='NO'/>"
 >>>>>>> baada40179 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
     "  <Option name='GS_NO_SIGN_REQUEST' type='boolean' "
         "description='Whether to disable signing of requests' default='NO'/>"
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
     "  <Option name='GS_OAUTH2_REFRESH_TOKEN' type='string' "
         "description='OAuth2 refresh token. For OAuth2 client authentication. "
         "To use with GS_OAUTH2_CLIENT_ID and GS_OAUTH2_CLIENT_SECRET'/>"
@@ -269,20 +302,55 @@ const char* VSIGSFSHandler::GetOptions()
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d42a2ed026 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 77a87224da (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
         "default='~/.boto'/>"
     + VSICurlFilesystemHandler::GetOptionsStatic() +
 =======
         "default='~/.boto'/>" +
         VSICurlFilesystemHandler::GetOptionsStatic() +
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 264c5ccbb0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+        "default='~/.boto'/>"
+    + VSICurlFilesystemHandler::GetOptionsStatic() +
+>>>>>>> 75e8911b1c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> b39a831ddf (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> d42a2ed026 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+        "default='~/.boto'/>"
+    + VSICurlFilesystemHandler::GetOptionsStatic() +
+>>>>>>> baada40179 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 77a87224da (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+        "default='~/.boto'/>" +
+        VSICurlFilesystemHandler::GetOptionsStatic() +
+>>>>>>> gdal-raster-parallelisation
 >>>>>>> b39a831ddf (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
         "default='~/.boto'/>"
     + VSICurlFilesystemHandler::GetOptionsStatic() +
 >>>>>>> baada40179 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
         "default='~/.boto'/>"
     + VSICurlFilesystemHandler::GetOptionsStatic() +
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
         "</Options>");
     return osOptions.c_str();
 }
@@ -447,8 +515,18 @@ bool VSIGSFSHandler::SetFileMetadata( const char * pszFilename,
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d42a2ed026 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
     if( pszDomain == nullptr ||
         !(EQUAL(pszDomain, "HEADERS") || EQUAL(pszDomain, "ACL")) )
     {
@@ -463,6 +541,58 @@ bool VSIGSFSHandler::SetFileMetadata( const char * pszFilename,
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+    if( pszDomain == nullptr || !(EQUAL(pszDomain, "ACL")) )
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    if( pszDomain == nullptr ||
+        !(EQUAL(pszDomain, "HEADERS") || EQUAL(pszDomain, "ACL")) )
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+    {
+        CPLError(CE_Failure, CPLE_NotSupported,
+                 "Only HEADERS and ACL domain are supported");
+        return false;
+    }
+
+<<<<<<< HEAD
+>>>>>>> 264c5ccbb0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+    if( EQUAL(pszDomain, "HEADERS") )
+    {
+        return CopyObject(pszFilename, pszFilename, papszMetadata) == 0;
+    }
+
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+    if( pszDomain == nullptr ||
+        !(EQUAL(pszDomain, "HEADERS") || EQUAL(pszDomain, "ACL")) )
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+    {
+        CPLError(CE_Failure, CPLE_NotSupported,
+                 "Only HEADERS and ACL domain are supported");
+        return false;
+    }
+
+<<<<<<< HEAD
+>>>>>>> b39a831ddf (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> d42a2ed026 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+    if( EQUAL(pszDomain, "HEADERS") )
+    {
+        return CopyObject(pszFilename, pszFilename, papszMetadata) == 0;
+    }
+
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> gdal-raster-parallelisation
 =======
     if( pszDomain == nullptr || !(EQUAL(pszDomain, "ACL")) )
 =======
@@ -484,8 +614,11 @@ bool VSIGSFSHandler::SetFileMetadata( const char * pszFilename,
     }
 
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
+=======
+>>>>>>> gdal-raster-parallelisation
     const char* pszXML = CSLFetchNameValue(papszMetadata, "XML");
     if( pszXML == nullptr )
     {

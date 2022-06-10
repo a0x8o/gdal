@@ -39,6 +39,7 @@ General creation options
 
 -  **COMPRESS=[NONE/LZW/JPEG/DEFLATE/ZSTD/WEBP/LERC/LERC_DEFLATE/LERC_ZSTD/LZMA]**: Set the compression to use.
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:gdal/doc/source/drivers/raster/cog.rst
 =======
 <<<<<<< HEAD:doc/source/drivers/raster/cog.rst
@@ -50,6 +51,11 @@ General creation options
    Defaults to ``LZW`` starting with GDAL 3.4 (default in previous version is ``NONE``).
 =======
 >>>>>>> OSGeo-master
+=======
+<<<<<<< HEAD:doc/source/drivers/raster/cog.rst
+   Defaults to ``LZW`` starting with GDAL 3.4 (default in previous version is ``NONE``).
+=======
+>>>>>>> gdal-raster-parallelisation
    Defaults to ``NONE``.
 >>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/raster/cog.rst
 
