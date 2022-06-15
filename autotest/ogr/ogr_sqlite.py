@@ -3167,32 +3167,6 @@ def test_ogr_sqlite_view_type():
     f = lyr.GetNextFeature()
     assert f['c'] == 1
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
 
 ###############################################################################
 # Test table WITHOUT ROWID
@@ -3310,36 +3284,6 @@ def test_ogr_sqlite_CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE():
     assert gdal.VSIStatL(filename) is not None
     assert gdal.ReadDir('/vsimem/temporary_location') is None
 
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
 ###############################################################################
 #
 

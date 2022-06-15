@@ -1913,15 +1913,6 @@ namespace tut
         ensure( GDALBufferHasOnlyNoData(&float64nan, float64nan, 1, 1, 1, 1, 64, GSF_FLOATING_POINT) );
         ensure( !GDALBufferHasOnlyNoData(&float64nan, 0.0, 1, 1, 1, 1, 64, GSF_FLOATING_POINT) );
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
 
     // Test GDALRasterBand::GetIndexColorTranslationTo()
     template<> template<> void object::test<23>()
@@ -2086,13 +2077,4 @@ namespace tut
         TestCachedPixelAccessor<double>();
     }
 
-=======
->>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
 } // namespace tut

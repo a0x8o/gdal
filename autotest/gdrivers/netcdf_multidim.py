@@ -35,25 +35,7 @@ import gdaltest
 import os
 import pytest
 import shutil
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
 import stat
-=======
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
->>>>>>> OSGeo-master
-=======
-import stat
-=======
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
->>>>>>> OSGeo-master
-=======
-import stat
-=======
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
->>>>>>> gdal-raster-parallelisation
 import struct
 import sys
 
@@ -1737,38 +1719,7 @@ def test_netcdf_multidim_getresampled_with_geoloc():
     assert warped_ds.ReadRaster() == resampled_ar.Read()
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
 def test_netcdf_multidim_cache():
-=======
->>>>>>> OSGeo-master
-=======
-def test_netcdf_multidim_cache():
-=======
->>>>>>> OSGeo-master
-=======
-def test_netcdf_multidim_cache():
-=======
->>>>>>> gdal-raster-parallelisation
-def test_netcdf_multidim_cache(netcdf_setup):  # noqa
-
-    if not gdaltest.netcdf_drv_has_nc4:
-        pytest.skip()
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
->>>>>>> OSGeo-master
-=======
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
->>>>>>> OSGeo-master
-=======
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
->>>>>>> gdal-raster-parallelisation
 
     tmpfilename = 'tmp/test.nc'
     shutil.copy('data/netcdf/alldatatypes.nc', tmpfilename)
@@ -1837,15 +1788,6 @@ def test_netcdf_multidim_cache(netcdf_setup):  # noqa
 
     gdal.Unlink(tmpfilename)
     gdal.Unlink(tmpfilename + ".gmac")
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
 
 
 def test_netcdf_multidim_cache_pamproxydb():
@@ -1972,12 +1914,3 @@ def test_netcdf_multidim_open_char_2d_zero_dim():
     assert ar
     ar.GetNoDataValueAsRaw()
     ar.GetBlockSize()
-=======
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation

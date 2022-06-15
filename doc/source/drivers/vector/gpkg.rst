@@ -174,7 +174,6 @@ The following open options are available:
    This corresponds to the nolock=1 query parameter described at
    https://www.sqlite.org/uri.html
 
-<<<<<<< HEAD:doc/source/drivers/vector/gpkg.rst
 Note: open options are typically specified with "-oo name=value" syntax
 in most OGR utilities, or with the ``GDALOpenEx()`` API call.
 
@@ -183,44 +182,6 @@ be used to set the journal mode of the GeoPackage (and thus SQLite)
 file, see also https://www.sqlite.org/pragma.html#pragma_journal_mode.
 
 Creation issues
-=======
-Note: configuration option :decl_configoption:`OGR_SQLITE_JOURNAL` can 
-be used to set the journal mode of the GeoPackage (and thus SQLite)
-file, see also https://www.sqlite.org/pragma.html#pragma_journal_mode.
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-Note: configuration option :decl_configoption:`OGR_SQLITE_JOURNAL` can 
-be used to set the journal mode of the GeoPackage (and thus SQLite)
-file, see also https://www.sqlite.org/pragma.html#pragma_journal_mode.
-
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-Creation Issues
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/vector/gpkg.rst
 ---------------
 
 When creating a new GeoPackage file, the driver will attempt to force
@@ -491,26 +452,6 @@ Examples
    ::
 
       ogr2ogr -f GPKG filename.gpkg abc.shp
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/doc/source/drivers/vector/gpkg.rst
-=======
-=======
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:doc/source/drivers/vector/gpkg.rst
 
 -  Update of an existing GeoPackage file – e.g. a GeoPackage template – 
    by adding features to it from another GeoPackage file containing 
@@ -520,26 +461,6 @@ Examples
    ::
 
       ogr2ogr -append output.gpkg input.gpkg
-=======
->>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/vector/gpkg.rst
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:doc/source/drivers/vector/gpkg.rst
-=======
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-<<<<<<< HEAD
->>>>>>> OSGeo-master:doc/source/drivers/vector/gpkg.rst
-=======
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
 
 -  Translation of a directory of shapefiles into a GeoPackage. Each file
    will end up as a new table within the GPKG file. The file

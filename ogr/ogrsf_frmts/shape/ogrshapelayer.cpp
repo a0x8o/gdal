@@ -2320,15 +2320,6 @@ OGRSpatialReference *OGRShapeGeomFieldDefn::GetSpatialRef() const
                     poSRS->SetAxisMappingStrategy(OAMS_TRADITIONAL_GIS_ORDER);
                     CPLFree(pahSRS);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/shape/ogrshapelayer.cpp
-=======
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/shape/ogrshapelayer.cpp
                     auto poBaseGeogCRS = std::unique_ptr<OGRSpatialReference>(
                         poSRS->CloneGeogCS());
 
@@ -2343,46 +2334,10 @@ OGRSpatialReference *OGRShapeGeomFieldDefn::GetSpatialRef() const
                     const char* pszAuthorityCode = nullptr;
                     const char* pszBaseAuthorityName = nullptr;
                     const char* pszBaseAuthorityCode = nullptr;
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/shape/ogrshapelayer.cpp
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-                    // If the SRS is EPSG:4326 with TOWGS84[0,0,0,0,0,0], then
-                    // just use plain EPSG:4326
-                    const char* pszAuthorityName = nullptr;
-                    const char* pszAuthorityCode = nullptr;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/shape/ogrshapelayer.cpp
-=======
->>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/shape/ogrshapelayer.cpp
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/shape/ogrshapelayer.cpp
-=======
->>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/shape/ogrshapelayer.cpp
->>>>>>> OSGeo-master
-=======
->>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/shape/ogrshapelayer.cpp
->>>>>>> gdal-raster-parallelisation
                     if( adfTOWGS84 == std::vector<double>(7) &&
                         (pszAuthorityName = poSRS->GetAuthorityName(nullptr)) != nullptr &&
                         EQUAL(pszAuthorityName, "EPSG") &&
                         (pszAuthorityCode = poSRS->GetAuthorityCode(nullptr)) != nullptr &&
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/shape/ogrshapelayer.cpp
-                        EQUAL(pszAuthorityCode, "4326") )
-                    {
-                        poSRS->importFromEPSG(4326);
-=======
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/shape/ogrshapelayer.cpp
                         (pszBaseAuthorityName = poBaseGeogCRS->GetAuthorityName(nullptr)) != nullptr &&
                         EQUAL(pszBaseAuthorityName, "EPSG") &&
                         (pszBaseAuthorityCode = poBaseGeogCRS->GetAuthorityCode(nullptr)) != nullptr &&
@@ -2390,18 +2345,6 @@ OGRSpatialReference *OGRShapeGeomFieldDefn::GetSpatialRef() const
                          EQUAL(pszBaseAuthorityCode, "4258")) )
                     {
                         poSRS->importFromEPSG(atoi(pszAuthorityCode));
-=======
-                        EQUAL(pszAuthorityCode, "4326") )
-                    {
-                        poSRS->importFromEPSG(4326);
->>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/shape/ogrshapelayer.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/shape/ogrshapelayer.cpp
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
                     }
                 }
                 else

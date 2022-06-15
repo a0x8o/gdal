@@ -546,74 +546,10 @@ def test_osr_ct_take_into_account_srs_coordinate_epoch():
 
     s = osr.SpatialReference()
     s.SetFromUserInput("EPSG:7844") # GDA2020
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-
-    t_2020 = osr.SpatialReference()
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
     s.SetAxisMappingStrategy(osr.OAMS_AUTHORITY_COMPLIANT)
 
     t_2020 = osr.SpatialReference()
     t_2020.SetAxisMappingStrategy(osr.OAMS_AUTHORITY_COMPLIANT)
-=======
-
-    t_2020 = osr.SpatialReference()
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
     t_2020.SetFromUserInput("EPSG:9000") # ITRF2014
     t_2020.SetCoordinateEpoch(2020)
 
@@ -625,60 +561,7 @@ def test_osr_ct_take_into_account_srs_coordinate_epoch():
     assert y == pytest.approx(150, abs=1e-10)
 
     t_2030 = osr.SpatialReference()
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
     t_2030.SetAxisMappingStrategy(osr.OAMS_AUTHORITY_COMPLIANT)
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-    t_2030.SetAxisMappingStrategy(osr.OAMS_AUTHORITY_COMPLIANT)
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-    t_2030.SetAxisMappingStrategy(osr.OAMS_AUTHORITY_COMPLIANT)
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
->>>>>>> OSGeo-master
-=======
-    t_2030.SetAxisMappingStrategy(osr.OAMS_AUTHORITY_COMPLIANT)
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> gdal-raster-parallelisation
-=======
-    t_2030.SetAxisMappingStrategy(osr.OAMS_AUTHORITY_COMPLIANT)
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-=======
-    t_2030.SetAxisMappingStrategy(osr.OAMS_AUTHORITY_COMPLIANT)
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
     t_2030.SetFromUserInput("EPSG:9000") # ITRF2014
     t_2030.SetCoordinateEpoch(2030)
 
@@ -697,32 +580,6 @@ def test_osr_ct_take_into_account_srs_coordinate_epoch():
     with gdaltest.error_handler():
         ct = osr.CoordinateTransformation(t_2020, t_2030)
     assert gdal.GetLastErrorMsg() != ''
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
 
 ###############################################################################
 # Test transformation between CRS that only differ by axis order
@@ -812,33 +669,3 @@ def test_osr_ct_OGR_CT_PREFER_OFFICIAL_SRS_DEF():
         x, y, _ = ct.TransformPoint(826158.063, 2405844.125, 0)
         assert abs(x -  9.867) < 0.001, x
         assert abs(y - 71.125) < 0.001, y
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation

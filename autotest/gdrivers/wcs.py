@@ -340,32 +340,6 @@ class WCSHTTPHandler(BaseHTTPRequestHandler):
         if 'test' in query2:
             test = query2['test'][0]
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
         key = server + '-' + version
         if key in urls and test in urls[key]:
             _, got = self.path.split('SERVICE=WCS')
@@ -379,54 +353,6 @@ class WCSHTTPHandler(BaseHTTPRequestHandler):
                 global wcs_6_ok
                 wcs_6_ok = False
             print('test ' + server + ' ' + test + ' WCS ' + version + ' ' + ok)
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-        if gdaltest.is_travis_branch('s390x') or gdaltest.is_travis_branch('graviton2') or gdaltest.is_travis_branch('ubuntu_2004'):
-            # cannot strictly compare URL due to subtle difference of roundings
-            # in BOUNDINGBOX computations.
-            pass
-        else:
-            key = server + '-' + version
-            if key in urls and test in urls[key]:
-                _, got = self.path.split('SERVICE=WCS')
-                got = re.sub(r'\&test=.*', '', got)
-                _, have = urls[key][test].split('SERVICE=WCS')
-                have += '&server=' + server
-                if got == have:
-                    ok = 'ok'
-                else:
-                    ok = "not ok\ngot:  " + got + "\nhave: " + have
-                    global wcs_6_ok
-                    wcs_6_ok = False
-                print('test ' + server + ' ' + test + ' WCS ' + version + ' ' + ok)
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
 
         self.Respond(request, server, version, test)
 

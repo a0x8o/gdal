@@ -268,53 +268,13 @@ namespace tut
                            const double xSrc, const double ySrc)
     {
         ensure(poCT != nullptr);
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-        ensure((poCT->GetSourceCS() == nullptr) == 
-=======
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
         ensure((poCT->GetSourceCS() == nullptr) ==
-=======
-        ensure((poCT->GetSourceCS() == nullptr) == 
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
                (poSRSSource == nullptr) );
         if(poSRSSource != nullptr)
         {
             ensure(poCT->GetSourceCS()->IsSame(poSRSSource));
         }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-        ensure((poCT->GetTargetCS() == nullptr) == 
-=======
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
         ensure((poCT->GetTargetCS() == nullptr) ==
-=======
-        ensure((poCT->GetTargetCS() == nullptr) == 
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
                (poSRSTarget == nullptr));
         if(poSRSTarget != nullptr)
         {
@@ -329,53 +289,13 @@ namespace tut
         auto poClone =std::unique_ptr<OGRCoordinateTransformation>(
             poCT->Clone());
         ensure(poClone != nullptr );
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-        ensure((poClone->GetSourceCS() == nullptr) == 
-=======
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
         ensure((poClone->GetSourceCS() == nullptr) ==
-=======
-        ensure((poClone->GetSourceCS() == nullptr) == 
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
                (poSRSSource == nullptr));
         if(poSRSSource != nullptr)
         {
             ensure(poClone->GetSourceCS()->IsSame(poSRSSource));
         }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-        ensure((poClone->GetTargetCS() == nullptr) == 
-=======
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
         ensure((poClone->GetTargetCS() == nullptr) ==
-=======
-        ensure((poClone->GetTargetCS() == nullptr) == 
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
                (poSRSTarget == nullptr));
         if(poSRSTarget != nullptr)
         {
@@ -384,43 +304,10 @@ namespace tut
         x = xSrc;
         y = ySrc;
         ensure(poClone->Transform(1, &x, &y));
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
         ensure(fabs(x - xTransformed) < 1e-15);
         ensure(fabs(y - yTransformed) < 1e-15);
     }
 
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-        ensure(abs(x - xTransformed) < 1e-15);
-        ensure(abs(y - yTransformed) < 1e-15);
-    }
-    
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
->>>>>>> OSGeo-master
-=======
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
->>>>>>> OSGeo-master
-=======
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
->>>>>>> gdal-raster-parallelisation
     // Test OGRCoordinateTransformation::Clone() with usual case
     template<>
     template<>
@@ -470,65 +357,6 @@ namespace tut
 
         test_clone(poCT.get(), &oSRSSource, &oSRSTarget, 44, -60);
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
-=======
-=======
->>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
->>>>>>> OSGeo-master
-=======
-=======
->>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
-<<<<<<< HEAD
->>>>>>> df05d90486 (Merge pull request #3822 from rouault/gml_srs)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
-=======
->>>>>>> gdal-raster-parallelisation
-=======
-=======
-=======
->>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 913c3ef6c1 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> OSGeo-master
-=======
->>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
-=======
-=======
->>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
 
     // Test OGRCoordinateTransformation in pure "C" API
     // OCTClone/OCTGetSourceCS/OCTGetTargetCS/OCTGetInverse
@@ -567,80 +395,4 @@ namespace tut
         OSRDestroySpatialReference(hSource);
         OSRDestroySpatialReference(hTarget);
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-=======
->>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-=======
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
-=======
->>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
-=======
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
->>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
-=======
->>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
->>>>>>> OSGeo-master
-=======
-=======
->>>>>>> 913c3ef6c1 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
->>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
-<<<<<<< HEAD
->>>>>>> df05d90486 (Merge pull request #3822 from rouault/gml_srs)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
-=======
->>>>>>> gdal-raster-parallelisation
-=======
-=======
->>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 913c3ef6c1 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
->>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
-=======
->>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
 } // namespace tut

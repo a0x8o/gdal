@@ -4162,15 +4162,6 @@ def test_nitf_invalid_udid():
         'BLOCKA metadata has unexpected value.'
 
 ###############################################################################
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
 # Verify ISUBCAT is present when non-empty.
 
 def test_nitf_isubcat_populated():
@@ -4190,15 +4181,6 @@ def test_nitf_isubcat_populated():
 
 
 ###############################################################################
-=======
->>>>>>> 65582e8834 (IVSIS3LikeFSHandler::Sync(): add missing lock)
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
 # Test limits on creation
 
 
@@ -4213,41 +4195,12 @@ def test_nitf_create_too_large_file():
     # Test 1e12 byte limit for while file
     gdal.ErrorReset()
     with gdaltest.error_handler():
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-        gdal.GetDriverByName('NITF').Create('/vsimem/out.ntf', int(1e5), int(1e5) // 2, options = ['NUMI=200'])
-=======
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
         gdal.GetDriverByName('NITF').Create('/vsimem/out.ntf', int(1e5), int(1e5) // 2,
                                             options = ['NUMI=200', 'WRITE_ALL_IMAGES=YES'])
-=======
-        gdal.GetDriverByName('NITF').Create('/vsimem/out.ntf', int(1e5), int(1e5) // 2, options = ['NUMI=200'])
->>>>>>> 65582e8834 (IVSIS3LikeFSHandler::Sync(): add missing lock)
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
     assert gdal.GetLastErrorMsg() != ''
 
     gdal.Unlink('/vsimem/out.ntf')
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
 
 ###############################################################################
 # Test creating file with multiple image segments
@@ -4426,15 +4379,6 @@ def test_nitf_pam_metadata_several_images():
 
     gdal.GetDriverByName('NITF').Delete(out_filename)
 
-=======
->>>>>>> 65582e8834 (IVSIS3LikeFSHandler::Sync(): add missing lock)
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
 ###############################################################################
 # Test NITF21_CGM_ANNO_Uncompressed_unmasked.ntf for bug #1313 and #1714
 

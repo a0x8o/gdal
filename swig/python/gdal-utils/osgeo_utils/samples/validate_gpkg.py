@@ -199,14 +199,6 @@ class GPKGChecker(object):
                 "as gpkg_spatial_ref_sys has a epoch column")
 
         if has_definition_12_063:
-
-            has_epoch_column = False
-            try:
-                c.execute("SELECT epoch FROM gpkg_spatial_ref_sys")
-                has_epoch_column = True
-            except:
-                pass
-
             expected_columns = [
                 (0, 'srs_name', 'TEXT', 1, None, 0),
                 (1, 'srs_id', 'INTEGER', 1, None, 1),
@@ -216,69 +208,7 @@ class GPKGChecker(object):
                 (5, 'description', 'TEXT', 0, None, 0),
                 (6, 'definition_12_063', 'TEXT', 1, None, 0)
             ]
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/swig/python/gdal-utils/osgeo_utils/samples/validate_gpkg.py
-            if has_epoch_column:
-=======
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:swig/python/gdal-utils/osgeo_utils/samples/validate_gpkg.py
             if has_epoch:
-=======
-            if has_epoch_column:
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/gdal-utils/osgeo_utils/samples/validate_gpkg.py
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:swig/python/gdal-utils/osgeo_utils/samples/validate_gpkg.py
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master:swig/python/gdal-utils/osgeo_utils/samples/validate_gpkg.py
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
                 expected_columns += [(7, 'epoch', 'DOUBLE', 0, None, 0)]
         else:
             expected_columns = [

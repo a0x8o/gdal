@@ -673,15 +673,6 @@ def test_ogr_gml_16():
         feat.DumpReadable()
         pytest.fail('did not get expected values')
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
 ###############################################################################
 # Test reading CityGML of Project PLATEAU
 
@@ -707,15 +698,6 @@ def test_gml_read_compound_crs_lat_long():
     # check the first feature
     feat = lyr.GetNextFeature()
     assert not ogrtest.check_feature_geometry(feat, wkt), 'Wrong geometry'
-=======
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
 
 ###############################################################################
 # Read layer SRS for WFS 1.0.0 return
@@ -844,34 +826,12 @@ def test_ogr_gml_20():
 # Test writing GML3
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-@pytest.mark.parametrize('frmt', ['GML3', 'GML3Deegree', 'GML3.2'])
-def test_ogr_gml_21(frmt):
-=======
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
 @pytest.mark.parametrize('frmt,base_filename',
                          [('GML3', 'expected_gml_gml3'),
                           ('GML3Deegree', 'expected_gml_gml3degree'),
                           ('GML3.2', 'expected_gml_gml32')
                          ])
 def test_ogr_gml_21(frmt,base_filename):
-=======
-@pytest.mark.parametrize('frmt', ['GML3', 'GML3Deegree', 'GML3.2'])
-def test_ogr_gml_21(frmt):
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
 
     if not gdaltest.have_gml_reader:
         pytest.skip()
@@ -941,27 +901,9 @@ def test_ogr_gml_21(frmt):
     f1.close()
     f2.close()
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
     for ext in ('gml', 'gfs', 'xsd'):
         gdal.Unlink('tmp/' + base_filename + '.' + ext)
 
-=======
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
 ###############################################################################
 # Read a OpenLS DetermineRouteResponse document
 
@@ -3947,15 +3889,6 @@ def test_ogr_gml_srs_name_in_xsd(gml_format):
 
     gdal.Unlink(filename)
     gdal.Unlink(xsdfilename)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
 
 
 ###############################################################################
@@ -3981,12 +3914,3 @@ def test_ogr_gml_too_nested():
         assert lyr.GetNextFeature() is not None
 
     gdal.Unlink('data/gml/too_nested.gfs')
-=======
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs)
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation

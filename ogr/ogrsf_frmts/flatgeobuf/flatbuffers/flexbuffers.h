@@ -158,28 +158,8 @@ inline uint64_t ReadUInt64(const uint8_t *data, uint8_t byte_width) {
   // the conditionals in ReadSizedScalar. Can also use inline asm.
 
   // clang-format off
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/flexbuffers.h
-  #if defined(_MSC_VER) && ((defined(_M_X64) && !defined(_M_ARM64EC)) || defined _M_IX86)
-=======
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/flexbuffers.h
   #if defined(_MSC_VER) && defined(_M_X64) && !defined(_M_ARM64EC)
   // This is 64-bit Windows only, __movsb does not work on 32-bit Windows.
-=======
-  #if defined(_MSC_VER) && ((defined(_M_X64) && !defined(_M_ARM64EC)) || defined _M_IX86)
->>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/flexbuffers.h
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/flexbuffers.h
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
     uint64_t u = 0;
     __movsb(reinterpret_cast<uint8_t *>(&u),
             reinterpret_cast<const uint8_t *>(data), byte_width);
@@ -1135,7 +1115,7 @@ class Builder FLATBUFFERS_FINAL_CLASS {
     return stack_.size();
   }
 
-  // TODO(wvo): allow this to specify an aligment greater than the natural
+  // TODO(wvo): allow this to specify an alignment greater than the natural
   // alignment.
   size_t EndVector(size_t start, bool typed, bool fixed) {
     auto vec = CreateVector(start, stack_.size() - start, 1, typed, fixed);
@@ -1170,7 +1150,6 @@ class Builder FLATBUFFERS_FINAL_CLASS {
     // step automatically when appliccable, and encourage people to write in
     // sorted fashion.
     // std::sort is typically already a lot faster on sorted data though.
-<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/flatbuffers/flexbuffers.h
     auto dict = reinterpret_cast<TwoValue *>(stack_.data() + start);
     std::sort(
         dict, dict + len, [&](const TwoValue &a, const TwoValue &b) -> bool {
@@ -1189,29 +1168,6 @@ class Builder FLATBUFFERS_FINAL_CLASS {
           if (!comp && &a != &b) has_duplicate_keys_ = true;
           return comp < 0;
         });
-=======
-    auto dict =
-        reinterpret_cast<TwoValue *>(flatbuffers::vector_data(stack_) + start);
-    std::sort(dict, dict + len,
-              [&](const TwoValue &a, const TwoValue &b) -> bool {
-                auto as = reinterpret_cast<const char *>(
-                    flatbuffers::vector_data(buf_) + a.key.u_);
-                auto bs = reinterpret_cast<const char *>(
-                    flatbuffers::vector_data(buf_) + b.key.u_);
-                auto comp = strcmp(as, bs);
-                // We want to disallow duplicate keys, since this results in a
-                // map where values cannot be found.
-                // But we can't assert here (since we don't want to fail on
-                // random JSON input) or have an error mechanism.
-                // Instead, we set has_duplicate_keys_ in the builder to
-                // signal this.
-                // TODO: Have to check for pointer equality, as some sort
-                // implementation apparently call this function with the same
-                // element?? Why?
-                if (!comp && &a != &b) has_duplicate_keys_ = true;
-                return comp < 0;
-              });
->>>>>>> 98488c2119 (Merge pull request #3837 from bjornharrtell/fgb-flatbuffers-2.0):gdal/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/flexbuffers.h
     // First create a vector out of all keys.
     // TODO(wvo): if kBuilderFlagShareKeyVectors is true, see if we can share
     // the first vector.

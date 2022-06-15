@@ -5797,45 +5797,12 @@ SWIGINTERN CPLErr GDALMDArrayHS_GetNoDataValueAsRaw(GDALMDArrayHS *self,void **b
 SWIGINTERN void GDALMDArrayHS_GetNoDataValueAsDouble(GDALMDArrayHS *self,double *val,int *hasval){
     *val = GDALMDArrayGetNoDataValueAsDouble( self, hasval );
   }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
-=======
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
-=======
-=======
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
->>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
-<<<<<<< HEAD
-=======
->>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
->>>>>>> gdal-raster-parallelisation
 SWIGINTERN void GDALMDArrayHS_GetNoDataValueAsInt64(GDALMDArrayHS *self,GIntBig *val,int *hasval){
     *val = GDALMDArrayGetNoDataValueAsInt64( self, hasval );
   }
 SWIGINTERN void GDALMDArrayHS_GetNoDataValueAsUInt64(GDALMDArrayHS *self,GUIntBig *val,int *hasval){
     *val = GDALMDArrayGetNoDataValueAsUInt64( self, hasval );
   }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
-=======
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
->>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
-=======
-=======
->>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
->>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
-<<<<<<< HEAD
-=======
->>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
->>>>>>> gdal-raster-parallelisation
 SWIGINTERN retStringAndCPLFree *GDALMDArrayHS_GetNoDataValueAsString(GDALMDArrayHS *self){
     GDALExtendedDataTypeHS* selfType = GDALMDArrayGetDataType(self);
     const size_t typeClass = GDALExtendedDataTypeGetClass(selfType);
@@ -5859,45 +5826,12 @@ SWIGINTERN retStringAndCPLFree *GDALMDArrayHS_GetNoDataValueAsString(GDALMDArray
 SWIGINTERN CPLErr GDALMDArrayHS_SetNoDataValueDouble(GDALMDArrayHS *self,double d){
     return GDALMDArraySetNoDataValueAsDouble( self, d ) ? CE_None : CE_Failure;
   }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
-=======
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
-=======
-=======
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
->>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
-<<<<<<< HEAD
-=======
->>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
->>>>>>> gdal-raster-parallelisation
 SWIGINTERN CPLErr GDALMDArrayHS_SetNoDataValueInt64(GDALMDArrayHS *self,GIntBig v){
     return GDALMDArraySetNoDataValueAsInt64( self, v ) ? CE_None : CE_Failure;
   }
 SWIGINTERN CPLErr GDALMDArrayHS_SetNoDataValueUInt64(GDALMDArrayHS *self,GUIntBig v){
     return GDALMDArraySetNoDataValueAsUInt64( self, v ) ? CE_None : CE_Failure;
   }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
-=======
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
->>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
-=======
-=======
->>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
->>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
-<<<<<<< HEAD
-=======
->>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
->>>>>>> gdal-raster-parallelisation
 SWIGINTERN CPLErr GDALMDArrayHS_SetNoDataValueString(GDALMDArrayHS *self,char const *nodata){
     GDALExtendedDataTypeHS* selfType = GDALMDArrayGetDataType(self);
     const size_t typeClass = GDALExtendedDataTypeGetClass(selfType);
@@ -10741,27 +10675,7 @@ SWIGINTERN PyObject *_wrap_CPLBinaryToHex(PyObject *SWIGUNUSEDPARM(self), PyObje
       size_t safeLen = 0;
       int ret;
       try {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
-        ret = SWIG_AsCharPtrAndSize(obj0, (char**) &arg2, &safeLen, &alloc1);
-=======
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[0], (char**) &arg2, &safeLen, &alloc1);
-=======
-        ret = SWIG_AsCharPtrAndSize(obj0, (char**) &arg2, &safeLen, &alloc1);
->>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
       }
       catch( const std::exception& )
       {
@@ -10933,27 +10847,7 @@ SWIGINTERN PyObject *_wrap_FileFromMemBuffer(PyObject *SWIGUNUSEDPARM(self), PyO
       size_t safeLen = 0;
       int ret;
       try {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
-        ret = SWIG_AsCharPtrAndSize(obj1, (char**) &arg3, &safeLen, &alloc2);
-=======
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[1], (char**) &arg3, &safeLen, &alloc2);
-=======
-        ret = SWIG_AsCharPtrAndSize(obj1, (char**) &arg3, &safeLen, &alloc2);
->>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
       }
       catch( const std::exception& )
       {
@@ -11751,15 +11645,6 @@ SWIGINTERN PyObject *_wrap_AbortPendingUploads(PyObject *SWIGUNUSEDPARM(self), P
   PyObject *resultobj = 0; int bLocalUseExceptionsCode = bUseExceptions;
   char *arg1 = (char *) 0 ;
   int bToFree1 = 0 ;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
-=======
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
   PyObject *swig_obj[1] ;
   bool result;
   
@@ -11768,33 +11653,6 @@ SWIGINTERN PyObject *_wrap_AbortPendingUploads(PyObject *SWIGUNUSEDPARM(self), P
   {
     /* %typemap(in) (const char *utf8_path) */
     arg1 = GDALPythonObjectToCStr( swig_obj[0], &bToFree1 );
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-  PyObject * obj0 = 0 ;
-  bool result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:AbortPendingUploads",&obj0)) SWIG_fail;
-  {
-    /* %typemap(in) (const char *utf8_path) */
-    arg1 = GDALPythonObjectToCStr( obj0, &bToFree1 );
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
-=======
->>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
->>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
-=======
->>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
->>>>>>> OSGeo-master
-=======
->>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
->>>>>>> gdal-raster-parallelisation
     if (arg1 == NULL)
     {
       PyErr_SetString( PyExc_RuntimeError, "not a string" );
@@ -13326,27 +13184,7 @@ SWIGINTERN PyObject *_wrap_VSIFWriteL(PyObject *SWIGUNUSEDPARM(self), PyObject *
       size_t safeLen = 0;
       int ret;
       try {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
-        ret = SWIG_AsCharPtrAndSize(obj0, (char**) &arg2, &safeLen, &alloc1);
-=======
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[0], (char**) &arg2, &safeLen, &alloc1);
-=======
-        ret = SWIG_AsCharPtrAndSize(obj0, (char**) &arg2, &safeLen, &alloc1);
->>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
       }
       catch( const std::exception& )
       {
@@ -24977,27 +24815,7 @@ SWIGINTERN PyObject *_wrap_MDArray_Write(PyObject *SWIGUNUSEDPARM(self), PyObjec
       size_t safeLen = 0;
       int ret;
       try {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
-        ret = SWIG_AsCharPtrAndSize(obj6, (char**) &arg12, &safeLen, &alloc11);
-=======
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[6], (char**) &arg12, &safeLen, &alloc11);
-=======
-        ret = SWIG_AsCharPtrAndSize(obj6, (char**) &arg12, &safeLen, &alloc11);
->>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
       }
       catch( const std::exception& )
       {
@@ -25647,22 +25465,6 @@ fail:
 }
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
-=======
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
-=======
-=======
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
->>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
-<<<<<<< HEAD
-=======
->>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
->>>>>>> gdal-raster-parallelisation
 SWIGINTERN PyObject *_wrap_MDArray_GetNoDataValueAsInt64(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0; int bLocalUseExceptionsCode = bUseExceptions;
   GDALMDArrayHS *arg1 = (GDALMDArrayHS *) 0 ;
@@ -25787,81 +25589,17 @@ fail:
 }
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
-=======
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
->>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
-=======
-=======
->>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
->>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
-<<<<<<< HEAD
-=======
->>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
->>>>>>> gdal-raster-parallelisation
 SWIGINTERN PyObject *_wrap_MDArray_GetNoDataValueAsString(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0; int bLocalUseExceptionsCode = bUseExceptions;
   GDALMDArrayHS *arg1 = (GDALMDArrayHS *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
-=======
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
-  PyObject * obj0 = 0 ;
-  retStringAndCPLFree *result = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:MDArray_GetNoDataValueAsString",&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
-=======
-=======
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
->>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
-<<<<<<< HEAD
-=======
->>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
->>>>>>> gdal-raster-parallelisation
   PyObject *swig_obj[1] ;
   retStringAndCPLFree *result = 0 ;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
-=======
-=======
-=======
-<<<<<<< HEAD
->>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
-=======
->>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
->>>>>>> gdal-raster-parallelisation
-=======
-  PyObject * obj0 = 0 ;
-  retStringAndCPLFree *result = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:MDArray_GetNoDataValueAsString",&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
->>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
-<<<<<<< HEAD
->>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
->>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
->>>>>>> gdal-raster-parallelisation
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "MDArray_GetNoDataValueAsString" "', argument " "1"" of type '" "GDALMDArrayHS *""'"); 
   }
@@ -25953,22 +25691,6 @@ fail:
 }
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
-=======
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
-=======
-=======
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
->>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
-<<<<<<< HEAD
-=======
->>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
->>>>>>> gdal-raster-parallelisation
 SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueInt64(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0; int bLocalUseExceptionsCode = bUseExceptions;
   GDALMDArrayHS *arg1 = (GDALMDArrayHS *) 0 ;
@@ -26057,23 +25779,6 @@ fail:
 }
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
-=======
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
->>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
-=======
-=======
->>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
->>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
-<<<<<<< HEAD
-=======
->>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
->>>>>>> gdal-raster-parallelisation
 SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueString(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0; int bLocalUseExceptionsCode = bUseExceptions;
   GDALMDArrayHS *arg1 = (GDALMDArrayHS *) 0 ;
@@ -26083,104 +25788,16 @@ SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueString(PyObject *SWIGUNUSEDPARM
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  CPLErr result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OO:MDArray_SetNoDataValueString",&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
-=======
-=======
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
->>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
-=======
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
->>>>>>> gdal-raster-parallelisation
   PyObject *swig_obj[2] ;
   CPLErr result;
   
   if (!SWIG_Python_UnpackTuple(args, "MDArray_SetNoDataValueString", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
-<<<<<<< HEAD
-=======
-=======
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
->>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  CPLErr result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OO:MDArray_SetNoDataValueString",&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
-<<<<<<< HEAD
->>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
-=======
-=======
-=======
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
->>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
-  PyObject *swig_obj[2] ;
-  CPLErr result;
-  
-  if (!SWIG_Python_UnpackTuple(args, "MDArray_SetNoDataValueString", 2, 2, swig_obj)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD
->>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
-=======
-=======
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  CPLErr result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OO:MDArray_SetNoDataValueString",&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
->>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
->>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
-<<<<<<< HEAD
-=======
->>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
->>>>>>> gdal-raster-parallelisation
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "MDArray_SetNoDataValueString" "', argument " "1"" of type '" "GDALMDArrayHS *""'"); 
   }
   arg1 = reinterpret_cast< GDALMDArrayHS * >(argp1);
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
-=======
   res2 = SWIG_AsCharPtrAndSize(swig_obj[1], &buf2, NULL, &alloc2);
-=======
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
-  res2 = SWIG_AsCharPtrAndSize(swig_obj[1], &buf2, NULL, &alloc2);
-=======
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
->>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
-=======
-  res2 = SWIG_AsCharPtrAndSize(swig_obj[1], &buf2, NULL, &alloc2);
->>>>>>> gdal-raster-parallelisation
->>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
-=======
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
-  res2 = SWIG_AsCharPtrAndSize(swig_obj[1], &buf2, NULL, &alloc2);
-=======
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
->>>>>>> 9612b72434 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString()):gdal/swig/python/extensions/gdal_wrap.cpp
->>>>>>> 3ffd362329 (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
-<<<<<<< HEAD
-=======
->>>>>>> 499a69d6fc (SWIG bindings: add MDArray.GetNoDataValueAsString() / SetNoDataValueString())
->>>>>>> gdal-raster-parallelisation
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "MDArray_SetNoDataValueString" "', argument " "2"" of type '" "char const *""'");
   }
@@ -26252,27 +25869,7 @@ SWIGINTERN PyObject *_wrap_MDArray_SetNoDataValueRaw(PyObject *SWIGUNUSEDPARM(se
       size_t safeLen = 0;
       int ret;
       try {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
-        ret = SWIG_AsCharPtrAndSize(obj1, (char**) &arg3, &safeLen, &alloc2);
-=======
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[1], (char**) &arg3, &safeLen, &alloc2);
-=======
-        ret = SWIG_AsCharPtrAndSize(obj1, (char**) &arg3, &safeLen, &alloc2);
->>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
       }
       catch( const std::exception& )
       {
@@ -27582,89 +27179,20 @@ SWIGINTERN PyObject *_wrap_MDArray_Cache(PyObject *SWIGUNUSEDPARM(self), PyObjec
   char **arg2 = (char **) NULL ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
-=======
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
   PyObject *swig_obj[2] ;
   bool result;
   
   if (!SWIG_Python_UnpackTuple(args, "MDArray_Cache", 1, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  bool result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O|O:MDArray_Cache",&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_GDALMDArrayHS, 0 |  0 );
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
-=======
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/swig/python/extensions/gdal_wrap.cpp
->>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
-=======
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/swig/python/extensions/gdal_wrap.cpp
->>>>>>> OSGeo-master
-=======
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/swig/python/extensions/gdal_wrap.cpp
->>>>>>> gdal-raster-parallelisation
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "MDArray_Cache" "', argument " "1"" of type '" "GDALMDArrayHS *""'"); 
   }
   arg1 = reinterpret_cast< GDALMDArrayHS * >(argp1);
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
-=======
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
   if (swig_obj[1]) {
     {
       /* %typemap(in) char **options */
       int bErr = FALSE;
       arg2 = CSLFromPySequence(swig_obj[1], &bErr);
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-  if (obj1) {
-    {
-      /* %typemap(in) char **options */
-      int bErr = FALSE;
-      arg2 = CSLFromPySequence(obj1, &bErr);
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
-=======
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/swig/python/extensions/gdal_wrap.cpp
->>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
-=======
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/swig/python/extensions/gdal_wrap.cpp
->>>>>>> OSGeo-master
-=======
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/swig/python/extensions/gdal_wrap.cpp
->>>>>>> gdal-raster-parallelisation
       if( bErr )
       {
         SWIG_fail;
@@ -28435,27 +27963,7 @@ SWIGINTERN PyObject *_wrap_Attribute_WriteRaw(PyObject *SWIGUNUSEDPARM(self), Py
       size_t safeLen = 0;
       int ret;
       try {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
-        ret = SWIG_AsCharPtrAndSize(obj1, (char**) &arg3, &safeLen, &alloc2);
-=======
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
         ret = SWIG_AsCharPtrAndSize(swig_obj[1], (char**) &arg3, &safeLen, &alloc2);
-=======
-        ret = SWIG_AsCharPtrAndSize(obj1, (char**) &arg3, &safeLen, &alloc2);
->>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
       }
       catch( const std::exception& )
       {
@@ -29593,81 +29101,12 @@ SWIGINTERN PyObject *_wrap_ExtendedDataType_GetSubType(PyObject *SWIGUNUSEDPARM(
   GDALExtendedDataTypeHS *arg1 = (GDALExtendedDataTypeHS *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
-=======
-=======
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
   PyObject *swig_obj[1] ;
   GDALExtendedDataTypeSubType result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_GDALExtendedDataTypeHS, 0 |  0 );
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
-=======
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-<<<<<<< HEAD
->>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
-=======
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-  PyObject * obj0 = 0 ;
-  GDALExtendedDataTypeSubType result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:ExtendedDataType_GetSubType",&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_GDALExtendedDataTypeHS, 0 |  0 );
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
-=======
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/swig/python/extensions/gdal_wrap.cpp
-=======
->>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
->>>>>>> OSGeo-master:swig/python/extensions/gdal_wrap.cpp
-=======
->>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
->>>>>>> OSGeo-master
-=======
->>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
->>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ExtendedDataType_GetSubType" "', argument " "1"" of type '" "GDALExtendedDataTypeHS *""'"); 
   }
@@ -45054,7 +44493,6 @@ fail:
 
 
 static PyMethodDef SwigMethods[] = {
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
 	 { "SWIG_PyInstanceMethod_New", SWIG_PyInstanceMethod_New, METH_O, NULL},
 	 { "GetUseExceptions", _wrap_GetUseExceptions, METH_NOARGS, "GetUseExceptions() -> int"},
 	 { "UseExceptions", _wrap_UseExceptions, METH_NOARGS, "UseExceptions()"},
@@ -45162,109 +44600,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "MajorObject_SetMetadata", _wrap_MajorObject_SetMetadata, METH_VARARGS, "\n"
 		"MajorObject_SetMetadata(MajorObject self, char ** papszMetadata, char const * pszDomain=\"\") -> CPLErr\n"
 		"MajorObject_SetMetadata(MajorObject self, char * pszMetadataString, char const * pszDomain=\"\") -> CPLErr\n"
-=======
-	 { (char *)"SWIG_PyInstanceMethod_New", (PyCFunction)SWIG_PyInstanceMethod_New, METH_O, NULL},
-	 { (char *)"GetUseExceptions", _wrap_GetUseExceptions, METH_VARARGS, (char *)"GetUseExceptions() -> int"},
-	 { (char *)"UseExceptions", _wrap_UseExceptions, METH_VARARGS, (char *)"UseExceptions()"},
-	 { (char *)"DontUseExceptions", _wrap_DontUseExceptions, METH_VARARGS, (char *)"DontUseExceptions()"},
-	 { (char *)"VSIFReadL", _wrap_VSIFReadL, METH_VARARGS, (char *)"VSIFReadL(unsigned int nMembSize, unsigned int nMembCount, VSILFILE fp) -> unsigned int"},
-	 { (char *)"VSIGetMemFileBuffer_unsafe", _wrap_VSIGetMemFileBuffer_unsafe, METH_VARARGS, (char *)"VSIGetMemFileBuffer_unsafe(char const * utf8_path)"},
-	 { (char *)"Debug", _wrap_Debug, METH_VARARGS, (char *)"Debug(char const * msg_class, char const * message)"},
-	 { (char *)"SetErrorHandler", _wrap_SetErrorHandler, METH_VARARGS, (char *)"SetErrorHandler(CPLErrorHandler pfnErrorHandler=0) -> CPLErr"},
-	 { (char *)"SetCurrentErrorHandlerCatchDebug", _wrap_SetCurrentErrorHandlerCatchDebug, METH_VARARGS, (char *)"SetCurrentErrorHandlerCatchDebug(int bCatchDebug)"},
-	 { (char *)"PushErrorHandler", _wrap_PushErrorHandler, METH_VARARGS, (char *)"PushErrorHandler(CPLErrorHandler pfnErrorHandler=0) -> CPLErr"},
-	 { (char *)"PopErrorHandler", _wrap_PopErrorHandler, METH_VARARGS, (char *)"PopErrorHandler()"},
-	 { (char *)"Error", _wrap_Error, METH_VARARGS, (char *)"Error(CPLErr msg_class, int err_code=0, char const * msg)"},
-	 { (char *)"GOA2GetAuthorizationURL", _wrap_GOA2GetAuthorizationURL, METH_VARARGS, (char *)"GOA2GetAuthorizationURL(char const * pszScope) -> retStringAndCPLFree *"},
-	 { (char *)"GOA2GetRefreshToken", _wrap_GOA2GetRefreshToken, METH_VARARGS, (char *)"GOA2GetRefreshToken(char const * pszAuthToken, char const * pszScope) -> retStringAndCPLFree *"},
-	 { (char *)"GOA2GetAccessToken", _wrap_GOA2GetAccessToken, METH_VARARGS, (char *)"GOA2GetAccessToken(char const * pszRefreshToken, char const * pszScope) -> retStringAndCPLFree *"},
-	 { (char *)"ErrorReset", _wrap_ErrorReset, METH_VARARGS, (char *)"ErrorReset()"},
-	 { (char *)"EscapeString", (PyCFunction) _wrap_EscapeString, METH_VARARGS | METH_KEYWORDS, (char *)"EscapeString(int len, int scheme) -> retStringAndCPLFree *"},
-	 { (char *)"GetLastErrorNo", _wrap_GetLastErrorNo, METH_VARARGS, (char *)"GetLastErrorNo() -> int"},
-	 { (char *)"GetLastErrorType", _wrap_GetLastErrorType, METH_VARARGS, (char *)"GetLastErrorType() -> int"},
-	 { (char *)"GetLastErrorMsg", _wrap_GetLastErrorMsg, METH_VARARGS, (char *)"GetLastErrorMsg() -> char const *"},
-	 { (char *)"GetErrorCounter", _wrap_GetErrorCounter, METH_VARARGS, (char *)"GetErrorCounter() -> unsigned int"},
-	 { (char *)"VSIGetLastErrorNo", _wrap_VSIGetLastErrorNo, METH_VARARGS, (char *)"VSIGetLastErrorNo() -> int"},
-	 { (char *)"VSIGetLastErrorMsg", _wrap_VSIGetLastErrorMsg, METH_VARARGS, (char *)"VSIGetLastErrorMsg() -> char const *"},
-	 { (char *)"VSIErrorReset", _wrap_VSIErrorReset, METH_VARARGS, (char *)"VSIErrorReset()"},
-	 { (char *)"PushFinderLocation", _wrap_PushFinderLocation, METH_VARARGS, (char *)"PushFinderLocation(char const * utf8_path)"},
-	 { (char *)"PopFinderLocation", _wrap_PopFinderLocation, METH_VARARGS, (char *)"PopFinderLocation()"},
-	 { (char *)"FinderClean", _wrap_FinderClean, METH_VARARGS, (char *)"FinderClean()"},
-	 { (char *)"FindFile", _wrap_FindFile, METH_VARARGS, (char *)"FindFile(char const * pszClass, char const * utf8_path) -> char const *"},
-	 { (char *)"ReadDir", _wrap_ReadDir, METH_VARARGS, (char *)"ReadDir(char const * utf8_path, int nMaxFiles=0) -> char **"},
-	 { (char *)"ReadDirRecursive", _wrap_ReadDirRecursive, METH_VARARGS, (char *)"ReadDirRecursive(char const * utf8_path) -> char **"},
-	 { (char *)"OpenDir", _wrap_OpenDir, METH_VARARGS, (char *)"OpenDir(char const * utf8_path, int nRecurseDepth=-1, char ** options=None) -> VSIDIR *"},
-	 { (char *)"DirEntry_name_get", _wrap_DirEntry_name_get, METH_VARARGS, (char *)"DirEntry_name_get(DirEntry self) -> char *"},
-	 { (char *)"DirEntry_mode_get", _wrap_DirEntry_mode_get, METH_VARARGS, (char *)"DirEntry_mode_get(DirEntry self) -> int"},
-	 { (char *)"DirEntry_size_get", _wrap_DirEntry_size_get, METH_VARARGS, (char *)"DirEntry_size_get(DirEntry self) -> GIntBig"},
-	 { (char *)"DirEntry_mtime_get", _wrap_DirEntry_mtime_get, METH_VARARGS, (char *)"DirEntry_mtime_get(DirEntry self) -> GIntBig"},
-	 { (char *)"DirEntry_modeKnown_get", _wrap_DirEntry_modeKnown_get, METH_VARARGS, (char *)"DirEntry_modeKnown_get(DirEntry self) -> bool"},
-	 { (char *)"DirEntry_sizeKnown_get", _wrap_DirEntry_sizeKnown_get, METH_VARARGS, (char *)"DirEntry_sizeKnown_get(DirEntry self) -> bool"},
-	 { (char *)"DirEntry_mtimeKnown_get", _wrap_DirEntry_mtimeKnown_get, METH_VARARGS, (char *)"DirEntry_mtimeKnown_get(DirEntry self) -> bool"},
-	 { (char *)"DirEntry_extra_get", _wrap_DirEntry_extra_get, METH_VARARGS, (char *)"DirEntry_extra_get(DirEntry self) -> char **"},
-	 { (char *)"new_DirEntry", _wrap_new_DirEntry, METH_VARARGS, (char *)"new_DirEntry(DirEntry entryIn) -> DirEntry"},
-	 { (char *)"delete_DirEntry", _wrap_delete_DirEntry, METH_VARARGS, (char *)"delete_DirEntry(DirEntry self)"},
-	 { (char *)"DirEntry_IsDirectory", _wrap_DirEntry_IsDirectory, METH_VARARGS, (char *)"DirEntry_IsDirectory(DirEntry self) -> bool"},
-	 { (char *)"DirEntry_swigregister", DirEntry_swigregister, METH_VARARGS, NULL},
-	 { (char *)"GetNextDirEntry", _wrap_GetNextDirEntry, METH_VARARGS, (char *)"GetNextDirEntry(VSIDIR * dir) -> DirEntry"},
-	 { (char *)"CloseDir", _wrap_CloseDir, METH_VARARGS, (char *)"CloseDir(VSIDIR * dir)"},
-	 { (char *)"SetConfigOption", _wrap_SetConfigOption, METH_VARARGS, (char *)"SetConfigOption(char const * pszKey, char const * pszValue)"},
-	 { (char *)"GetConfigOption", _wrap_GetConfigOption, METH_VARARGS, (char *)"GetConfigOption(char const * pszKey, char const * pszDefault=None) -> char const *"},
-	 { (char *)"CPLBinaryToHex", _wrap_CPLBinaryToHex, METH_VARARGS, (char *)"CPLBinaryToHex(int nBytes) -> retStringAndCPLFree *"},
-	 { (char *)"CPLHexToBinary", _wrap_CPLHexToBinary, METH_VARARGS, (char *)"CPLHexToBinary(char const * pszHex, int * pnBytes) -> GByte *"},
-	 { (char *)"FileFromMemBuffer", _wrap_FileFromMemBuffer, METH_VARARGS, (char *)"FileFromMemBuffer(char const * utf8_path, GIntBig nBytes)"},
-	 { (char *)"Unlink", _wrap_Unlink, METH_VARARGS, (char *)"Unlink(char const * utf8_path) -> VSI_RETVAL"},
-	 { (char *)"UnlinkBatch", _wrap_UnlinkBatch, METH_VARARGS, (char *)"UnlinkBatch(char ** files) -> bool"},
-	 { (char *)"HasThreadSupport", _wrap_HasThreadSupport, METH_VARARGS, (char *)"HasThreadSupport() -> int"},
-	 { (char *)"Mkdir", _wrap_Mkdir, METH_VARARGS, (char *)"Mkdir(char const * utf8_path, int mode) -> VSI_RETVAL"},
-	 { (char *)"Rmdir", _wrap_Rmdir, METH_VARARGS, (char *)"Rmdir(char const * utf8_path) -> VSI_RETVAL"},
-	 { (char *)"MkdirRecursive", _wrap_MkdirRecursive, METH_VARARGS, (char *)"MkdirRecursive(char const * utf8_path, int mode) -> VSI_RETVAL"},
-	 { (char *)"RmdirRecursive", _wrap_RmdirRecursive, METH_VARARGS, (char *)"RmdirRecursive(char const * utf8_path) -> VSI_RETVAL"},
-	 { (char *)"Rename", _wrap_Rename, METH_VARARGS, (char *)"Rename(char const * pszOld, char const * pszNew) -> VSI_RETVAL"},
-	 { (char *)"Sync", (PyCFunction) _wrap_Sync, METH_VARARGS | METH_KEYWORDS, (char *)"Sync(char const * pszSource, char const * pszTarget, char ** options=None, GDALProgressFunc callback=0, void * callback_data=None) -> bool"},
-	 { (char *)"AbortPendingUploads", _wrap_AbortPendingUploads, METH_VARARGS, (char *)"AbortPendingUploads(char const * utf8_path) -> bool"},
-	 { (char *)"GetActualURL", _wrap_GetActualURL, METH_VARARGS, (char *)"GetActualURL(char const * utf8_path) -> char const *"},
-	 { (char *)"GetSignedURL", _wrap_GetSignedURL, METH_VARARGS, (char *)"GetSignedURL(char const * utf8_path, char ** options=None) -> retStringAndCPLFree *"},
-	 { (char *)"GetFileSystemsPrefixes", _wrap_GetFileSystemsPrefixes, METH_VARARGS, (char *)"GetFileSystemsPrefixes() -> char **"},
-	 { (char *)"GetFileSystemOptions", _wrap_GetFileSystemOptions, METH_VARARGS, (char *)"GetFileSystemOptions(char const * utf8_path) -> char const *"},
-	 { (char *)"VSILFILE_swigregister", VSILFILE_swigregister, METH_VARARGS, NULL},
-	 { (char *)"StatBuf_mode_get", _wrap_StatBuf_mode_get, METH_VARARGS, (char *)"StatBuf_mode_get(StatBuf self) -> int"},
-	 { (char *)"StatBuf_size_get", _wrap_StatBuf_size_get, METH_VARARGS, (char *)"StatBuf_size_get(StatBuf self) -> GIntBig"},
-	 { (char *)"StatBuf_mtime_get", _wrap_StatBuf_mtime_get, METH_VARARGS, (char *)"StatBuf_mtime_get(StatBuf self) -> GIntBig"},
-	 { (char *)"new_StatBuf", _wrap_new_StatBuf, METH_VARARGS, (char *)"new_StatBuf(StatBuf psStatBuf) -> StatBuf"},
-	 { (char *)"delete_StatBuf", _wrap_delete_StatBuf, METH_VARARGS, (char *)"delete_StatBuf(StatBuf self)"},
-	 { (char *)"StatBuf_IsDirectory", _wrap_StatBuf_IsDirectory, METH_VARARGS, (char *)"StatBuf_IsDirectory(StatBuf self) -> int"},
-	 { (char *)"StatBuf_swigregister", StatBuf_swigregister, METH_VARARGS, NULL},
-	 { (char *)"VSIStatL", _wrap_VSIStatL, METH_VARARGS, (char *)"VSIStatL(char const * utf8_path, int nFlags=0) -> int"},
-	 { (char *)"GetFileMetadata", _wrap_GetFileMetadata, METH_VARARGS, (char *)"GetFileMetadata(char const * utf8_path, char const * domain, char ** options=None) -> char **"},
-	 { (char *)"SetFileMetadata", _wrap_SetFileMetadata, METH_VARARGS, (char *)"SetFileMetadata(char const * utf8_path, char ** metadata, char const * domain, char ** options=None) -> bool"},
-	 { (char *)"VSIFOpenL", _wrap_VSIFOpenL, METH_VARARGS, (char *)"VSIFOpenL(char const * utf8_path, char const * pszMode) -> VSILFILE"},
-	 { (char *)"VSIFOpenExL", _wrap_VSIFOpenExL, METH_VARARGS, (char *)"VSIFOpenExL(char const * utf8_path, char const * pszMode, int bSetError=False, char ** options=None) -> VSILFILE"},
-	 { (char *)"VSIFEofL", _wrap_VSIFEofL, METH_VARARGS, (char *)"VSIFEofL(VSILFILE fp) -> int"},
-	 { (char *)"VSIFFlushL", _wrap_VSIFFlushL, METH_VARARGS, (char *)"VSIFFlushL(VSILFILE fp) -> int"},
-	 { (char *)"VSIFCloseL", _wrap_VSIFCloseL, METH_VARARGS, (char *)"VSIFCloseL(VSILFILE fp) -> VSI_RETVAL"},
-	 { (char *)"VSIFSeekL", _wrap_VSIFSeekL, METH_VARARGS, (char *)"VSIFSeekL(VSILFILE fp, GIntBig offset, int whence) -> int"},
-	 { (char *)"VSIFTellL", _wrap_VSIFTellL, METH_VARARGS, (char *)"VSIFTellL(VSILFILE fp) -> GIntBig"},
-	 { (char *)"VSIFTruncateL", _wrap_VSIFTruncateL, METH_VARARGS, (char *)"VSIFTruncateL(VSILFILE fp, GIntBig length) -> int"},
-	 { (char *)"VSISupportsSparseFiles", _wrap_VSISupportsSparseFiles, METH_VARARGS, (char *)"VSISupportsSparseFiles(char const * utf8_path) -> int"},
-	 { (char *)"VSIFGetRangeStatusL", _wrap_VSIFGetRangeStatusL, METH_VARARGS, (char *)"VSIFGetRangeStatusL(VSILFILE fp, GIntBig offset, GIntBig length) -> int"},
-	 { (char *)"VSIFWriteL", _wrap_VSIFWriteL, METH_VARARGS, (char *)"VSIFWriteL(int nLen, int size, int memb, VSILFILE fp) -> int"},
-	 { (char *)"VSICurlClearCache", _wrap_VSICurlClearCache, METH_VARARGS, (char *)"VSICurlClearCache()"},
-	 { (char *)"VSICurlPartialClearCache", _wrap_VSICurlPartialClearCache, METH_VARARGS, (char *)"VSICurlPartialClearCache(char const * utf8_path)"},
-	 { (char *)"NetworkStatsReset", _wrap_NetworkStatsReset, METH_VARARGS, (char *)"NetworkStatsReset()"},
-	 { (char *)"NetworkStatsGetAsSerializedJSON", _wrap_NetworkStatsGetAsSerializedJSON, METH_VARARGS, (char *)"NetworkStatsGetAsSerializedJSON(char ** options=None) -> retStringAndCPLFree *"},
-	 { (char *)"ParseCommandLine", _wrap_ParseCommandLine, METH_VARARGS, (char *)"ParseCommandLine(char const * utf8_path) -> char **"},
-	 { (char *)"MajorObject_GetDescription", _wrap_MajorObject_GetDescription, METH_VARARGS, (char *)"MajorObject_GetDescription(MajorObject self) -> char const *"},
-	 { (char *)"MajorObject_SetDescription", _wrap_MajorObject_SetDescription, METH_VARARGS, (char *)"MajorObject_SetDescription(MajorObject self, char const * pszNewDesc)"},
-	 { (char *)"MajorObject_GetMetadataDomainList", _wrap_MajorObject_GetMetadataDomainList, METH_VARARGS, (char *)"MajorObject_GetMetadataDomainList(MajorObject self) -> char **"},
-	 { (char *)"MajorObject_GetMetadata_Dict", _wrap_MajorObject_GetMetadata_Dict, METH_VARARGS, (char *)"MajorObject_GetMetadata_Dict(MajorObject self, char const * pszDomain) -> char **"},
-	 { (char *)"MajorObject_GetMetadata_List", _wrap_MajorObject_GetMetadata_List, METH_VARARGS, (char *)"MajorObject_GetMetadata_List(MajorObject self, char const * pszDomain) -> char **"},
-	 { (char *)"MajorObject_SetMetadata", _wrap_MajorObject_SetMetadata, METH_VARARGS, (char *)"\n"
-		"SetMetadata(char ** papszMetadata, char const * pszDomain) -> CPLErr\n"
-		"MajorObject_SetMetadata(MajorObject self, char * pszMetadataString, char const * pszDomain) -> CPLErr\n"
->>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/extensions/gdal_wrap.cpp
 		""},
-<<<<<<< HEAD:swig/python/extensions/gdal_wrap.cpp
 	 { "MajorObject_GetMetadataItem", _wrap_MajorObject_GetMetadataItem, METH_VARARGS, "MajorObject_GetMetadataItem(MajorObject self, char const * pszName, char const * pszDomain=\"\") -> char const *"},
 	 { "MajorObject_SetMetadataItem", _wrap_MajorObject_SetMetadataItem, METH_VARARGS, "MajorObject_SetMetadataItem(MajorObject self, char const * pszName, char const * pszValue, char const * pszDomain=\"\") -> CPLErr"},
 	 { "MajorObject_swigregister", MajorObject_swigregister, METH_O, NULL},
@@ -45639,422 +44975,6 @@ static PyMethodDef SwigMethods[] = {
 	 { "delete_GDALTransformerInfoShadow", _wrap_delete_GDALTransformerInfoShadow, METH_O, "delete_GDALTransformerInfoShadow(GDALTransformerInfoShadow self)"},
 	 { "GDALTransformerInfoShadow_TransformPoint", _wrap_GDALTransformerInfoShadow_TransformPoint, METH_VARARGS, "\n"
 		"GDALTransformerInfoShadow_TransformPoint(GDALTransformerInfoShadow self, int bDstToSrc, double [3] inout) -> int\n"
-=======
-	 { (char *)"MajorObject_GetMetadataItem", _wrap_MajorObject_GetMetadataItem, METH_VARARGS, (char *)"MajorObject_GetMetadataItem(MajorObject self, char const * pszName, char const * pszDomain) -> char const *"},
-	 { (char *)"MajorObject_SetMetadataItem", _wrap_MajorObject_SetMetadataItem, METH_VARARGS, (char *)"MajorObject_SetMetadataItem(MajorObject self, char const * pszName, char const * pszValue, char const * pszDomain) -> CPLErr"},
-	 { (char *)"MajorObject_swigregister", MajorObject_swigregister, METH_VARARGS, NULL},
-	 { (char *)"Driver_ShortName_get", _wrap_Driver_ShortName_get, METH_VARARGS, (char *)"Driver_ShortName_get(Driver self) -> char const *"},
-	 { (char *)"Driver_LongName_get", _wrap_Driver_LongName_get, METH_VARARGS, (char *)"Driver_LongName_get(Driver self) -> char const *"},
-	 { (char *)"Driver_HelpTopic_get", _wrap_Driver_HelpTopic_get, METH_VARARGS, (char *)"Driver_HelpTopic_get(Driver self) -> char const *"},
-	 { (char *)"Driver_Create", (PyCFunction) _wrap_Driver_Create, METH_VARARGS | METH_KEYWORDS, (char *)"Driver_Create(Driver self, char const * utf8_path, int xsize, int ysize, int bands=1, GDALDataType eType, char ** options=None) -> Dataset"},
-	 { (char *)"Driver_CreateMultiDimensional", (PyCFunction) _wrap_Driver_CreateMultiDimensional, METH_VARARGS | METH_KEYWORDS, (char *)"Driver_CreateMultiDimensional(Driver self, char const * utf8_path, char ** root_group_options=None, char ** options=None) -> Dataset"},
-	 { (char *)"Driver_CreateCopy", (PyCFunction) _wrap_Driver_CreateCopy, METH_VARARGS | METH_KEYWORDS, (char *)"Driver_CreateCopy(Driver self, char const * utf8_path, Dataset src, int strict=1, char ** options=None, GDALProgressFunc callback=0, void * callback_data=None) -> Dataset"},
-	 { (char *)"Driver_Delete", _wrap_Driver_Delete, METH_VARARGS, (char *)"Driver_Delete(Driver self, char const * utf8_path) -> CPLErr"},
-	 { (char *)"Driver_Rename", _wrap_Driver_Rename, METH_VARARGS, (char *)"Driver_Rename(Driver self, char const * newName, char const * oldName) -> CPLErr"},
-	 { (char *)"Driver_CopyFiles", _wrap_Driver_CopyFiles, METH_VARARGS, (char *)"Driver_CopyFiles(Driver self, char const * newName, char const * oldName) -> CPLErr"},
-	 { (char *)"Driver_Register", _wrap_Driver_Register, METH_VARARGS, (char *)"Driver_Register(Driver self) -> int"},
-	 { (char *)"Driver_Deregister", _wrap_Driver_Deregister, METH_VARARGS, (char *)"Driver_Deregister(Driver self)"},
-	 { (char *)"Driver_swigregister", Driver_swigregister, METH_VARARGS, NULL},
-	 { (char *)"ColorEntry_c1_set", _wrap_ColorEntry_c1_set, METH_VARARGS, (char *)"ColorEntry_c1_set(ColorEntry self, short c1)"},
-	 { (char *)"ColorEntry_c1_get", _wrap_ColorEntry_c1_get, METH_VARARGS, (char *)"ColorEntry_c1_get(ColorEntry self) -> short"},
-	 { (char *)"ColorEntry_c2_set", _wrap_ColorEntry_c2_set, METH_VARARGS, (char *)"ColorEntry_c2_set(ColorEntry self, short c2)"},
-	 { (char *)"ColorEntry_c2_get", _wrap_ColorEntry_c2_get, METH_VARARGS, (char *)"ColorEntry_c2_get(ColorEntry self) -> short"},
-	 { (char *)"ColorEntry_c3_set", _wrap_ColorEntry_c3_set, METH_VARARGS, (char *)"ColorEntry_c3_set(ColorEntry self, short c3)"},
-	 { (char *)"ColorEntry_c3_get", _wrap_ColorEntry_c3_get, METH_VARARGS, (char *)"ColorEntry_c3_get(ColorEntry self) -> short"},
-	 { (char *)"ColorEntry_c4_set", _wrap_ColorEntry_c4_set, METH_VARARGS, (char *)"ColorEntry_c4_set(ColorEntry self, short c4)"},
-	 { (char *)"ColorEntry_c4_get", _wrap_ColorEntry_c4_get, METH_VARARGS, (char *)"ColorEntry_c4_get(ColorEntry self) -> short"},
-	 { (char *)"ColorEntry_swigregister", ColorEntry_swigregister, METH_VARARGS, NULL},
-	 { (char *)"GCP_GCPX_set", _wrap_GCP_GCPX_set, METH_VARARGS, (char *)"GCP_GCPX_set(GCP self, double GCPX)"},
-	 { (char *)"GCP_GCPX_get", _wrap_GCP_GCPX_get, METH_VARARGS, (char *)"GCP_GCPX_get(GCP self) -> double"},
-	 { (char *)"GCP_GCPY_set", _wrap_GCP_GCPY_set, METH_VARARGS, (char *)"GCP_GCPY_set(GCP self, double GCPY)"},
-	 { (char *)"GCP_GCPY_get", _wrap_GCP_GCPY_get, METH_VARARGS, (char *)"GCP_GCPY_get(GCP self) -> double"},
-	 { (char *)"GCP_GCPZ_set", _wrap_GCP_GCPZ_set, METH_VARARGS, (char *)"GCP_GCPZ_set(GCP self, double GCPZ)"},
-	 { (char *)"GCP_GCPZ_get", _wrap_GCP_GCPZ_get, METH_VARARGS, (char *)"GCP_GCPZ_get(GCP self) -> double"},
-	 { (char *)"GCP_GCPPixel_set", _wrap_GCP_GCPPixel_set, METH_VARARGS, (char *)"GCP_GCPPixel_set(GCP self, double GCPPixel)"},
-	 { (char *)"GCP_GCPPixel_get", _wrap_GCP_GCPPixel_get, METH_VARARGS, (char *)"GCP_GCPPixel_get(GCP self) -> double"},
-	 { (char *)"GCP_GCPLine_set", _wrap_GCP_GCPLine_set, METH_VARARGS, (char *)"GCP_GCPLine_set(GCP self, double GCPLine)"},
-	 { (char *)"GCP_GCPLine_get", _wrap_GCP_GCPLine_get, METH_VARARGS, (char *)"GCP_GCPLine_get(GCP self) -> double"},
-	 { (char *)"GCP_Info_set", _wrap_GCP_Info_set, METH_VARARGS, (char *)"GCP_Info_set(GCP self, char * Info)"},
-	 { (char *)"GCP_Info_get", _wrap_GCP_Info_get, METH_VARARGS, (char *)"GCP_Info_get(GCP self) -> char *"},
-	 { (char *)"GCP_Id_set", _wrap_GCP_Id_set, METH_VARARGS, (char *)"GCP_Id_set(GCP self, char * Id)"},
-	 { (char *)"GCP_Id_get", _wrap_GCP_Id_get, METH_VARARGS, (char *)"GCP_Id_get(GCP self) -> char *"},
-	 { (char *)"new_GCP", _wrap_new_GCP, METH_VARARGS, (char *)"new_GCP(double x=0.0, double y=0.0, double z=0.0, double pixel=0.0, double line=0.0, char const * info, char const * id) -> GCP"},
-	 { (char *)"delete_GCP", _wrap_delete_GCP, METH_VARARGS, (char *)"delete_GCP(GCP self)"},
-	 { (char *)"GCP_swigregister", GCP_swigregister, METH_VARARGS, NULL},
-	 { (char *)"GDAL_GCP_GCPX_get", _wrap_GDAL_GCP_GCPX_get, METH_VARARGS, (char *)"GDAL_GCP_GCPX_get(GCP gcp) -> double"},
-	 { (char *)"GDAL_GCP_GCPX_set", _wrap_GDAL_GCP_GCPX_set, METH_VARARGS, (char *)"GDAL_GCP_GCPX_set(GCP gcp, double dfGCPX)"},
-	 { (char *)"GDAL_GCP_GCPY_get", _wrap_GDAL_GCP_GCPY_get, METH_VARARGS, (char *)"GDAL_GCP_GCPY_get(GCP gcp) -> double"},
-	 { (char *)"GDAL_GCP_GCPY_set", _wrap_GDAL_GCP_GCPY_set, METH_VARARGS, (char *)"GDAL_GCP_GCPY_set(GCP gcp, double dfGCPY)"},
-	 { (char *)"GDAL_GCP_GCPZ_get", _wrap_GDAL_GCP_GCPZ_get, METH_VARARGS, (char *)"GDAL_GCP_GCPZ_get(GCP gcp) -> double"},
-	 { (char *)"GDAL_GCP_GCPZ_set", _wrap_GDAL_GCP_GCPZ_set, METH_VARARGS, (char *)"GDAL_GCP_GCPZ_set(GCP gcp, double dfGCPZ)"},
-	 { (char *)"GDAL_GCP_GCPPixel_get", _wrap_GDAL_GCP_GCPPixel_get, METH_VARARGS, (char *)"GDAL_GCP_GCPPixel_get(GCP gcp) -> double"},
-	 { (char *)"GDAL_GCP_GCPPixel_set", _wrap_GDAL_GCP_GCPPixel_set, METH_VARARGS, (char *)"GDAL_GCP_GCPPixel_set(GCP gcp, double dfGCPPixel)"},
-	 { (char *)"GDAL_GCP_GCPLine_get", _wrap_GDAL_GCP_GCPLine_get, METH_VARARGS, (char *)"GDAL_GCP_GCPLine_get(GCP gcp) -> double"},
-	 { (char *)"GDAL_GCP_GCPLine_set", _wrap_GDAL_GCP_GCPLine_set, METH_VARARGS, (char *)"GDAL_GCP_GCPLine_set(GCP gcp, double dfGCPLine)"},
-	 { (char *)"GDAL_GCP_Info_get", _wrap_GDAL_GCP_Info_get, METH_VARARGS, (char *)"GDAL_GCP_Info_get(GCP gcp) -> char const *"},
-	 { (char *)"GDAL_GCP_Info_set", _wrap_GDAL_GCP_Info_set, METH_VARARGS, (char *)"GDAL_GCP_Info_set(GCP gcp, char const * pszInfo)"},
-	 { (char *)"GDAL_GCP_Id_get", _wrap_GDAL_GCP_Id_get, METH_VARARGS, (char *)"GDAL_GCP_Id_get(GCP gcp) -> char const *"},
-	 { (char *)"GDAL_GCP_Id_set", _wrap_GDAL_GCP_Id_set, METH_VARARGS, (char *)"GDAL_GCP_Id_set(GCP gcp, char const * pszId)"},
-	 { (char *)"GCPsToGeoTransform", _wrap_GCPsToGeoTransform, METH_VARARGS, (char *)"GCPsToGeoTransform(int nGCPs, int bApproxOK=1) -> RETURN_NONE"},
-	 { (char *)"delete_VirtualMem", _wrap_delete_VirtualMem, METH_VARARGS, (char *)"delete_VirtualMem(VirtualMem self)"},
-	 { (char *)"VirtualMem_GetAddr", _wrap_VirtualMem_GetAddr, METH_VARARGS, (char *)"VirtualMem_GetAddr(VirtualMem self)"},
-	 { (char *)"VirtualMem_Pin", _wrap_VirtualMem_Pin, METH_VARARGS, (char *)"VirtualMem_Pin(VirtualMem self, size_t start_offset=0, size_t nsize=0, int bWriteOp=0)"},
-	 { (char *)"VirtualMem_swigregister", VirtualMem_swigregister, METH_VARARGS, NULL},
-	 { (char *)"delete_AsyncReader", _wrap_delete_AsyncReader, METH_VARARGS, (char *)"delete_AsyncReader(AsyncReader self)"},
-	 { (char *)"AsyncReader_GetNextUpdatedRegion", _wrap_AsyncReader_GetNextUpdatedRegion, METH_VARARGS, (char *)"AsyncReader_GetNextUpdatedRegion(AsyncReader self, double timeout) -> GDALAsyncStatusType"},
-	 { (char *)"AsyncReader_GetBuffer", _wrap_AsyncReader_GetBuffer, METH_VARARGS, (char *)"AsyncReader_GetBuffer(AsyncReader self)"},
-	 { (char *)"AsyncReader_LockBuffer", _wrap_AsyncReader_LockBuffer, METH_VARARGS, (char *)"AsyncReader_LockBuffer(AsyncReader self, double timeout) -> int"},
-	 { (char *)"AsyncReader_UnlockBuffer", _wrap_AsyncReader_UnlockBuffer, METH_VARARGS, (char *)"AsyncReader_UnlockBuffer(AsyncReader self)"},
-	 { (char *)"AsyncReader_swigregister", AsyncReader_swigregister, METH_VARARGS, NULL},
-	 { (char *)"Dataset_RasterXSize_get", _wrap_Dataset_RasterXSize_get, METH_VARARGS, (char *)"Dataset_RasterXSize_get(Dataset self) -> int"},
-	 { (char *)"Dataset_RasterYSize_get", _wrap_Dataset_RasterYSize_get, METH_VARARGS, (char *)"Dataset_RasterYSize_get(Dataset self) -> int"},
-	 { (char *)"Dataset_RasterCount_get", _wrap_Dataset_RasterCount_get, METH_VARARGS, (char *)"Dataset_RasterCount_get(Dataset self) -> int"},
-	 { (char *)"delete_Dataset", _wrap_delete_Dataset, METH_VARARGS, (char *)"delete_Dataset(Dataset self)"},
-	 { (char *)"Dataset_GetDriver", _wrap_Dataset_GetDriver, METH_VARARGS, (char *)"Dataset_GetDriver(Dataset self) -> Driver"},
-	 { (char *)"Dataset_GetRasterBand", _wrap_Dataset_GetRasterBand, METH_VARARGS, (char *)"Dataset_GetRasterBand(Dataset self, int nBand) -> Band"},
-	 { (char *)"Dataset_GetRootGroup", _wrap_Dataset_GetRootGroup, METH_VARARGS, (char *)"Dataset_GetRootGroup(Dataset self) -> Group"},
-	 { (char *)"Dataset_GetProjection", _wrap_Dataset_GetProjection, METH_VARARGS, (char *)"Dataset_GetProjection(Dataset self) -> char const *"},
-	 { (char *)"Dataset_GetProjectionRef", _wrap_Dataset_GetProjectionRef, METH_VARARGS, (char *)"Dataset_GetProjectionRef(Dataset self) -> char const *"},
-	 { (char *)"Dataset_GetSpatialRef", _wrap_Dataset_GetSpatialRef, METH_VARARGS, (char *)"Dataset_GetSpatialRef(Dataset self) -> SpatialReference"},
-	 { (char *)"Dataset_SetProjection", _wrap_Dataset_SetProjection, METH_VARARGS, (char *)"Dataset_SetProjection(Dataset self, char const * prj) -> CPLErr"},
-	 { (char *)"Dataset_SetSpatialRef", _wrap_Dataset_SetSpatialRef, METH_VARARGS, (char *)"Dataset_SetSpatialRef(Dataset self, SpatialReference srs) -> CPLErr"},
-	 { (char *)"Dataset_GetGeoTransform", (PyCFunction) _wrap_Dataset_GetGeoTransform, METH_VARARGS | METH_KEYWORDS, (char *)"Dataset_GetGeoTransform(Dataset self, int * can_return_null=None)"},
-	 { (char *)"Dataset_SetGeoTransform", _wrap_Dataset_SetGeoTransform, METH_VARARGS, (char *)"Dataset_SetGeoTransform(Dataset self, double [6] argin) -> CPLErr"},
-	 { (char *)"Dataset_BuildOverviews", (PyCFunction) _wrap_Dataset_BuildOverviews, METH_VARARGS | METH_KEYWORDS, (char *)"Dataset_BuildOverviews(Dataset self, char const * resampling, int overviewlist=0, GDALProgressFunc callback=0, void * callback_data=None) -> int"},
-	 { (char *)"Dataset_GetGCPCount", _wrap_Dataset_GetGCPCount, METH_VARARGS, (char *)"Dataset_GetGCPCount(Dataset self) -> int"},
-	 { (char *)"Dataset_GetGCPProjection", _wrap_Dataset_GetGCPProjection, METH_VARARGS, (char *)"Dataset_GetGCPProjection(Dataset self) -> char const *"},
-	 { (char *)"Dataset_GetGCPSpatialRef", _wrap_Dataset_GetGCPSpatialRef, METH_VARARGS, (char *)"Dataset_GetGCPSpatialRef(Dataset self) -> SpatialReference"},
-	 { (char *)"Dataset_GetGCPs", _wrap_Dataset_GetGCPs, METH_VARARGS, (char *)"Dataset_GetGCPs(Dataset self)"},
-	 { (char *)"Dataset__SetGCPs", _wrap_Dataset__SetGCPs, METH_VARARGS, (char *)"Dataset__SetGCPs(Dataset self, int nGCPs, char const * pszGCPProjection) -> CPLErr"},
-	 { (char *)"Dataset__SetGCPs2", _wrap_Dataset__SetGCPs2, METH_VARARGS, (char *)"Dataset__SetGCPs2(Dataset self, int nGCPs, SpatialReference hSRS) -> CPLErr"},
-	 { (char *)"Dataset_FlushCache", _wrap_Dataset_FlushCache, METH_VARARGS, (char *)"Dataset_FlushCache(Dataset self)"},
-	 { (char *)"Dataset_AddBand", (PyCFunction) _wrap_Dataset_AddBand, METH_VARARGS | METH_KEYWORDS, (char *)"Dataset_AddBand(Dataset self, GDALDataType datatype, char ** options=None) -> CPLErr"},
-	 { (char *)"Dataset_CreateMaskBand", _wrap_Dataset_CreateMaskBand, METH_VARARGS, (char *)"Dataset_CreateMaskBand(Dataset self, int nFlags) -> CPLErr"},
-	 { (char *)"Dataset_GetFileList", _wrap_Dataset_GetFileList, METH_VARARGS, (char *)"Dataset_GetFileList(Dataset self) -> char **"},
-	 { (char *)"Dataset_WriteRaster", (PyCFunction) _wrap_Dataset_WriteRaster, METH_VARARGS | METH_KEYWORDS, (char *)"Dataset_WriteRaster(Dataset self, int xoff, int yoff, int xsize, int ysize, GIntBig buf_len, int * buf_xsize=None, int * buf_ysize=None, GDALDataType * buf_type=None, int band_list=0, GIntBig * buf_pixel_space=None, GIntBig * buf_line_space=None, GIntBig * buf_band_space=None) -> CPLErr"},
-	 { (char *)"Dataset_AdviseRead", _wrap_Dataset_AdviseRead, METH_VARARGS, (char *)"Dataset_AdviseRead(Dataset self, int xoff, int yoff, int xsize, int ysize, int * buf_xsize=None, int * buf_ysize=None, GDALDataType * buf_type=None, int band_list=0, char ** options=None) -> CPLErr"},
-	 { (char *)"Dataset_BeginAsyncReader", (PyCFunction) _wrap_Dataset_BeginAsyncReader, METH_VARARGS | METH_KEYWORDS, (char *)"Dataset_BeginAsyncReader(Dataset self, int xOff, int yOff, int xSize, int ySize, int buf_len, int buf_xsize, int buf_ysize, GDALDataType bufType, int band_list=0, int nPixelSpace=0, int nLineSpace=0, int nBandSpace=0, char ** options=None) -> AsyncReader"},
-	 { (char *)"Dataset_EndAsyncReader", _wrap_Dataset_EndAsyncReader, METH_VARARGS, (char *)"Dataset_EndAsyncReader(Dataset self, AsyncReader ario)"},
-	 { (char *)"Dataset_GetVirtualMem", (PyCFunction) _wrap_Dataset_GetVirtualMem, METH_VARARGS | METH_KEYWORDS, (char *)"Dataset_GetVirtualMem(Dataset self, GDALRWFlag eRWFlag, int nXOff, int nYOff, int nXSize, int nYSize, int nBufXSize, int nBufYSize, GDALDataType eBufType, int band_list, int bIsBandSequential, size_t nCacheSize, size_t nPageSizeHint, char ** options=None) -> VirtualMem"},
-	 { (char *)"Dataset_GetTiledVirtualMem", (PyCFunction) _wrap_Dataset_GetTiledVirtualMem, METH_VARARGS | METH_KEYWORDS, (char *)"Dataset_GetTiledVirtualMem(Dataset self, GDALRWFlag eRWFlag, int nXOff, int nYOff, int nXSize, int nYSize, int nTileXSize, int nTileYSize, GDALDataType eBufType, int band_list, GDALTileOrganization eTileOrganization, size_t nCacheSize, char ** options=None) -> VirtualMem"},
-	 { (char *)"Dataset_CreateLayer", (PyCFunction) _wrap_Dataset_CreateLayer, METH_VARARGS | METH_KEYWORDS, (char *)"Dataset_CreateLayer(Dataset self, char const * name, SpatialReference srs=None, OGRwkbGeometryType geom_type, char ** options=None) -> Layer"},
-	 { (char *)"Dataset_CopyLayer", (PyCFunction) _wrap_Dataset_CopyLayer, METH_VARARGS | METH_KEYWORDS, (char *)"Dataset_CopyLayer(Dataset self, Layer src_layer, char const * new_name, char ** options=None) -> Layer"},
-	 { (char *)"Dataset_DeleteLayer", _wrap_Dataset_DeleteLayer, METH_VARARGS, (char *)"Dataset_DeleteLayer(Dataset self, int index) -> OGRErr"},
-	 { (char *)"Dataset_GetLayerCount", _wrap_Dataset_GetLayerCount, METH_VARARGS, (char *)"Dataset_GetLayerCount(Dataset self) -> int"},
-	 { (char *)"Dataset_GetLayerByIndex", _wrap_Dataset_GetLayerByIndex, METH_VARARGS, (char *)"Dataset_GetLayerByIndex(Dataset self, int index=0) -> Layer"},
-	 { (char *)"Dataset_GetLayerByName", _wrap_Dataset_GetLayerByName, METH_VARARGS, (char *)"Dataset_GetLayerByName(Dataset self, char const * layer_name) -> Layer"},
-	 { (char *)"Dataset_ResetReading", _wrap_Dataset_ResetReading, METH_VARARGS, (char *)"Dataset_ResetReading(Dataset self)"},
-	 { (char *)"Dataset_GetNextFeature", (PyCFunction) _wrap_Dataset_GetNextFeature, METH_VARARGS | METH_KEYWORDS, (char *)"Dataset_GetNextFeature(Dataset self, bool include_layer=True, bool include_pct=False, GDALProgressFunc callback=0, void * callback_data=None) -> Feature"},
-	 { (char *)"Dataset_TestCapability", _wrap_Dataset_TestCapability, METH_VARARGS, (char *)"Dataset_TestCapability(Dataset self, char const * cap) -> bool"},
-	 { (char *)"Dataset_ExecuteSQL", (PyCFunction) _wrap_Dataset_ExecuteSQL, METH_VARARGS | METH_KEYWORDS, (char *)"Dataset_ExecuteSQL(Dataset self, char const * statement, Geometry spatialFilter=None, char const * dialect) -> Layer"},
-	 { (char *)"Dataset_ReleaseResultSet", _wrap_Dataset_ReleaseResultSet, METH_VARARGS, (char *)"Dataset_ReleaseResultSet(Dataset self, Layer layer)"},
-	 { (char *)"Dataset_GetStyleTable", _wrap_Dataset_GetStyleTable, METH_VARARGS, (char *)"Dataset_GetStyleTable(Dataset self) -> StyleTable"},
-	 { (char *)"Dataset_SetStyleTable", _wrap_Dataset_SetStyleTable, METH_VARARGS, (char *)"Dataset_SetStyleTable(Dataset self, StyleTable table)"},
-	 { (char *)"Dataset_AbortSQL", _wrap_Dataset_AbortSQL, METH_VARARGS, (char *)"Dataset_AbortSQL(Dataset self) -> OGRErr"},
-	 { (char *)"Dataset_StartTransaction", (PyCFunction) _wrap_Dataset_StartTransaction, METH_VARARGS | METH_KEYWORDS, (char *)"Dataset_StartTransaction(Dataset self, int force=False) -> OGRErr"},
-	 { (char *)"Dataset_CommitTransaction", _wrap_Dataset_CommitTransaction, METH_VARARGS, (char *)"Dataset_CommitTransaction(Dataset self) -> OGRErr"},
-	 { (char *)"Dataset_RollbackTransaction", _wrap_Dataset_RollbackTransaction, METH_VARARGS, (char *)"Dataset_RollbackTransaction(Dataset self) -> OGRErr"},
-	 { (char *)"Dataset_ClearStatistics", _wrap_Dataset_ClearStatistics, METH_VARARGS, (char *)"Dataset_ClearStatistics(Dataset self)"},
-	 { (char *)"Dataset_GetFieldDomain", _wrap_Dataset_GetFieldDomain, METH_VARARGS, (char *)"Dataset_GetFieldDomain(Dataset self, char const * name) -> FieldDomain"},
-	 { (char *)"Dataset_AddFieldDomain", _wrap_Dataset_AddFieldDomain, METH_VARARGS, (char *)"Dataset_AddFieldDomain(Dataset self, FieldDomain fieldDomain) -> bool"},
-	 { (char *)"Dataset_ReadRaster1", (PyCFunction) _wrap_Dataset_ReadRaster1, METH_VARARGS | METH_KEYWORDS, (char *)"Dataset_ReadRaster1(Dataset self, double xoff, double yoff, double xsize, double ysize, int * buf_xsize=None, int * buf_ysize=None, GDALDataType * buf_type=None, int band_list=0, GIntBig * buf_pixel_space=None, GIntBig * buf_line_space=None, GIntBig * buf_band_space=None, GDALRIOResampleAlg resample_alg, GDALProgressFunc callback=0, void * callback_data=None, void * inputOutputBuf=None) -> CPLErr"},
-	 { (char *)"Dataset_swigregister", Dataset_swigregister, METH_VARARGS, NULL},
-	 { (char *)"delete_Group", _wrap_delete_Group, METH_VARARGS, (char *)"delete_Group(Group self)"},
-	 { (char *)"Group_GetName", _wrap_Group_GetName, METH_VARARGS, (char *)"Group_GetName(Group self) -> char const *"},
-	 { (char *)"Group_GetFullName", _wrap_Group_GetFullName, METH_VARARGS, (char *)"Group_GetFullName(Group self) -> char const *"},
-	 { (char *)"Group_GetMDArrayNames", _wrap_Group_GetMDArrayNames, METH_VARARGS, (char *)"Group_GetMDArrayNames(Group self, char ** options=None) -> char **"},
-	 { (char *)"Group_OpenMDArray", _wrap_Group_OpenMDArray, METH_VARARGS, (char *)"Group_OpenMDArray(Group self, char const * name, char ** options=None) -> MDArray"},
-	 { (char *)"Group_OpenMDArrayFromFullname", _wrap_Group_OpenMDArrayFromFullname, METH_VARARGS, (char *)"Group_OpenMDArrayFromFullname(Group self, char const * name, char ** options=None) -> MDArray"},
-	 { (char *)"Group_ResolveMDArray", _wrap_Group_ResolveMDArray, METH_VARARGS, (char *)"Group_ResolveMDArray(Group self, char const * name, char const * starting_point, char ** options=None) -> MDArray"},
-	 { (char *)"Group_GetGroupNames", _wrap_Group_GetGroupNames, METH_VARARGS, (char *)"Group_GetGroupNames(Group self, char ** options=None) -> char **"},
-	 { (char *)"Group_OpenGroup", _wrap_Group_OpenGroup, METH_VARARGS, (char *)"Group_OpenGroup(Group self, char const * name, char ** options=None) -> Group"},
-	 { (char *)"Group_OpenGroupFromFullname", _wrap_Group_OpenGroupFromFullname, METH_VARARGS, (char *)"Group_OpenGroupFromFullname(Group self, char const * name, char ** options=None) -> Group"},
-	 { (char *)"Group_GetVectorLayerNames", _wrap_Group_GetVectorLayerNames, METH_VARARGS, (char *)"Group_GetVectorLayerNames(Group self, char ** options=None) -> char **"},
-	 { (char *)"Group_OpenVectorLayer", _wrap_Group_OpenVectorLayer, METH_VARARGS, (char *)"Group_OpenVectorLayer(Group self, char const * name, char ** options=None) -> Layer"},
-	 { (char *)"Group_GetDimensions", _wrap_Group_GetDimensions, METH_VARARGS, (char *)"Group_GetDimensions(Group self, char ** options=None)"},
-	 { (char *)"Group_GetAttribute", _wrap_Group_GetAttribute, METH_VARARGS, (char *)"Group_GetAttribute(Group self, char const * name) -> Attribute"},
-	 { (char *)"Group_GetAttributes", _wrap_Group_GetAttributes, METH_VARARGS, (char *)"Group_GetAttributes(Group self, char ** options=None)"},
-	 { (char *)"Group_GetStructuralInfo", _wrap_Group_GetStructuralInfo, METH_VARARGS, (char *)"Group_GetStructuralInfo(Group self) -> char **"},
-	 { (char *)"Group_CreateGroup", _wrap_Group_CreateGroup, METH_VARARGS, (char *)"Group_CreateGroup(Group self, char const * name, char ** options=None) -> Group"},
-	 { (char *)"Group_CreateDimension", _wrap_Group_CreateDimension, METH_VARARGS, (char *)"Group_CreateDimension(Group self, char const * name, char const * type, char const * direction, unsigned long long size, char ** options=None) -> Dimension"},
-	 { (char *)"Group_CreateMDArray", _wrap_Group_CreateMDArray, METH_VARARGS, (char *)"Group_CreateMDArray(Group self, char const * name, int nDimensions, ExtendedDataType data_type, char ** options=None) -> MDArray"},
-	 { (char *)"Group_CreateAttribute", _wrap_Group_CreateAttribute, METH_VARARGS, (char *)"Group_CreateAttribute(Group self, char const * name, int nDimensions, ExtendedDataType data_type, char ** options=None) -> Attribute"},
-	 { (char *)"Group_swigregister", Group_swigregister, METH_VARARGS, NULL},
-	 { (char *)"Statistics_min_get", _wrap_Statistics_min_get, METH_VARARGS, (char *)"Statistics_min_get(Statistics self) -> double"},
-	 { (char *)"Statistics_max_get", _wrap_Statistics_max_get, METH_VARARGS, (char *)"Statistics_max_get(Statistics self) -> double"},
-	 { (char *)"Statistics_mean_get", _wrap_Statistics_mean_get, METH_VARARGS, (char *)"Statistics_mean_get(Statistics self) -> double"},
-	 { (char *)"Statistics_std_dev_get", _wrap_Statistics_std_dev_get, METH_VARARGS, (char *)"Statistics_std_dev_get(Statistics self) -> double"},
-	 { (char *)"Statistics_valid_count_get", _wrap_Statistics_valid_count_get, METH_VARARGS, (char *)"Statistics_valid_count_get(Statistics self) -> GIntBig"},
-	 { (char *)"delete_Statistics", _wrap_delete_Statistics, METH_VARARGS, (char *)"delete_Statistics(Statistics self)"},
-	 { (char *)"new_Statistics", _wrap_new_Statistics, METH_VARARGS, (char *)"new_Statistics() -> Statistics"},
-	 { (char *)"Statistics_swigregister", Statistics_swigregister, METH_VARARGS, NULL},
-	 { (char *)"delete_MDArray", _wrap_delete_MDArray, METH_VARARGS, (char *)"delete_MDArray(MDArray self)"},
-	 { (char *)"MDArray_GetName", _wrap_MDArray_GetName, METH_VARARGS, (char *)"MDArray_GetName(MDArray self) -> char const *"},
-	 { (char *)"MDArray_GetFullName", _wrap_MDArray_GetFullName, METH_VARARGS, (char *)"MDArray_GetFullName(MDArray self) -> char const *"},
-	 { (char *)"MDArray_GetTotalElementsCount", _wrap_MDArray_GetTotalElementsCount, METH_VARARGS, (char *)"MDArray_GetTotalElementsCount(MDArray self) -> unsigned long long"},
-	 { (char *)"MDArray_GetDimensionCount", _wrap_MDArray_GetDimensionCount, METH_VARARGS, (char *)"MDArray_GetDimensionCount(MDArray self) -> size_t"},
-	 { (char *)"MDArray_GetDimensions", _wrap_MDArray_GetDimensions, METH_VARARGS, (char *)"MDArray_GetDimensions(MDArray self)"},
-	 { (char *)"MDArray_GetCoordinateVariables", _wrap_MDArray_GetCoordinateVariables, METH_VARARGS, (char *)"MDArray_GetCoordinateVariables(MDArray self)"},
-	 { (char *)"MDArray_GetBlockSize", _wrap_MDArray_GetBlockSize, METH_VARARGS, (char *)"MDArray_GetBlockSize(MDArray self)"},
-	 { (char *)"MDArray_GetProcessingChunkSize", _wrap_MDArray_GetProcessingChunkSize, METH_VARARGS, (char *)"MDArray_GetProcessingChunkSize(MDArray self, size_t nMaxChunkMemory)"},
-	 { (char *)"MDArray_GetDataType", _wrap_MDArray_GetDataType, METH_VARARGS, (char *)"MDArray_GetDataType(MDArray self) -> ExtendedDataType"},
-	 { (char *)"MDArray_GetStructuralInfo", _wrap_MDArray_GetStructuralInfo, METH_VARARGS, (char *)"MDArray_GetStructuralInfo(MDArray self) -> char **"},
-	 { (char *)"MDArray_Read", _wrap_MDArray_Read, METH_VARARGS, (char *)"MDArray_Read(MDArray self, int nDims1, int nDims2, int nDims3, int nDims4, ExtendedDataType buffer_datatype) -> CPLErr"},
-	 { (char *)"MDArray_WriteStringArray", _wrap_MDArray_WriteStringArray, METH_VARARGS, (char *)"MDArray_WriteStringArray(MDArray self, int nDims1, int nDims2, int nDims3, ExtendedDataType buffer_datatype, char ** options) -> CPLErr"},
-	 { (char *)"MDArray_Write", _wrap_MDArray_Write, METH_VARARGS, (char *)"MDArray_Write(MDArray self, int nDims1, int nDims2, int nDims3, int nDims4, ExtendedDataType buffer_datatype, GIntBig buf_len) -> CPLErr"},
-	 { (char *)"MDArray_AdviseRead", _wrap_MDArray_AdviseRead, METH_VARARGS, (char *)"MDArray_AdviseRead(MDArray self, int nDims1, int nDims2) -> CPLErr"},
-	 { (char *)"MDArray_GetAttribute", _wrap_MDArray_GetAttribute, METH_VARARGS, (char *)"MDArray_GetAttribute(MDArray self, char const * name) -> Attribute"},
-	 { (char *)"MDArray_GetAttributes", _wrap_MDArray_GetAttributes, METH_VARARGS, (char *)"MDArray_GetAttributes(MDArray self, char ** options=None)"},
-	 { (char *)"MDArray_CreateAttribute", _wrap_MDArray_CreateAttribute, METH_VARARGS, (char *)"MDArray_CreateAttribute(MDArray self, char const * name, int nDimensions, ExtendedDataType data_type, char ** options=None) -> Attribute"},
-	 { (char *)"MDArray_GetNoDataValueAsRaw", _wrap_MDArray_GetNoDataValueAsRaw, METH_VARARGS, (char *)"MDArray_GetNoDataValueAsRaw(MDArray self) -> CPLErr"},
-	 { (char *)"MDArray_GetNoDataValueAsDouble", _wrap_MDArray_GetNoDataValueAsDouble, METH_VARARGS, (char *)"MDArray_GetNoDataValueAsDouble(MDArray self)"},
-<<<<<<< HEAD
-<<<<<<< HEAD
-	 { (char *)"MDArray_GetNoDataValueAsString", _wrap_MDArray_GetNoDataValueAsString, METH_VARARGS, (char *)"MDArray_GetNoDataValueAsString(MDArray self) -> retStringAndCPLFree *"},
-	 { (char *)"MDArray_SetNoDataValueDouble", _wrap_MDArray_SetNoDataValueDouble, METH_VARARGS, (char *)"MDArray_SetNoDataValueDouble(MDArray self, double d) -> CPLErr"},
-	 { (char *)"MDArray_SetNoDataValueString", _wrap_MDArray_SetNoDataValueString, METH_VARARGS, (char *)"MDArray_SetNoDataValueString(MDArray self, char const * nodata) -> CPLErr"},
-=======
-	 { (char *)"MDArray_SetNoDataValueDouble", _wrap_MDArray_SetNoDataValueDouble, METH_VARARGS, (char *)"MDArray_SetNoDataValueDouble(MDArray self, double d) -> CPLErr"},
-<<<<<<< HEAD
->>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
-=======
-	 { (char *)"MDArray_SetNoDataValueDouble", _wrap_MDArray_SetNoDataValueDouble, METH_VARARGS, (char *)"MDArray_SetNoDataValueDouble(MDArray self, double d) -> CPLErr"},
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
-=======
->>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
->>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
-=======
-	 { (char *)"MDArray_SetNoDataValueDouble", _wrap_MDArray_SetNoDataValueDouble, METH_VARARGS, (char *)"MDArray_SetNoDataValueDouble(MDArray self, double d) -> CPLErr"},
->>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
->>>>>>> gdal-raster-parallelisation
-	 { (char *)"MDArray_SetNoDataValueRaw", _wrap_MDArray_SetNoDataValueRaw, METH_VARARGS, (char *)"MDArray_SetNoDataValueRaw(MDArray self, GIntBig nLen) -> CPLErr"},
-	 { (char *)"MDArray_DeleteNoDataValue", _wrap_MDArray_DeleteNoDataValue, METH_VARARGS, (char *)"MDArray_DeleteNoDataValue(MDArray self) -> CPLErr"},
-	 { (char *)"MDArray_GetOffset", _wrap_MDArray_GetOffset, METH_VARARGS, (char *)"MDArray_GetOffset(MDArray self)"},
-	 { (char *)"MDArray_GetOffsetStorageType", _wrap_MDArray_GetOffsetStorageType, METH_VARARGS, (char *)"MDArray_GetOffsetStorageType(MDArray self) -> GDALDataType"},
-	 { (char *)"MDArray_GetScale", _wrap_MDArray_GetScale, METH_VARARGS, (char *)"MDArray_GetScale(MDArray self)"},
-	 { (char *)"MDArray_GetScaleStorageType", _wrap_MDArray_GetScaleStorageType, METH_VARARGS, (char *)"MDArray_GetScaleStorageType(MDArray self) -> GDALDataType"},
-	 { (char *)"MDArray_SetOffset", (PyCFunction) _wrap_MDArray_SetOffset, METH_VARARGS | METH_KEYWORDS, (char *)"MDArray_SetOffset(MDArray self, double val, GDALDataType storageType) -> CPLErr"},
-	 { (char *)"MDArray_SetScale", (PyCFunction) _wrap_MDArray_SetScale, METH_VARARGS | METH_KEYWORDS, (char *)"MDArray_SetScale(MDArray self, double val, GDALDataType storageType) -> CPLErr"},
-	 { (char *)"MDArray_SetUnit", _wrap_MDArray_SetUnit, METH_VARARGS, (char *)"MDArray_SetUnit(MDArray self, char const * unit) -> CPLErr"},
-	 { (char *)"MDArray_GetUnit", _wrap_MDArray_GetUnit, METH_VARARGS, (char *)"MDArray_GetUnit(MDArray self) -> char const *"},
-	 { (char *)"MDArray_SetSpatialRef", _wrap_MDArray_SetSpatialRef, METH_VARARGS, (char *)"MDArray_SetSpatialRef(MDArray self, SpatialReference srs) -> OGRErr"},
-	 { (char *)"MDArray_GetSpatialRef", _wrap_MDArray_GetSpatialRef, METH_VARARGS, (char *)"MDArray_GetSpatialRef(MDArray self) -> SpatialReference"},
-	 { (char *)"MDArray_GetView", _wrap_MDArray_GetView, METH_VARARGS, (char *)"MDArray_GetView(MDArray self, char const * viewExpr) -> MDArray"},
-	 { (char *)"MDArray_Transpose", _wrap_MDArray_Transpose, METH_VARARGS, (char *)"MDArray_Transpose(MDArray self, int nList) -> MDArray"},
-	 { (char *)"MDArray_GetUnscaled", _wrap_MDArray_GetUnscaled, METH_VARARGS, (char *)"MDArray_GetUnscaled(MDArray self) -> MDArray"},
-	 { (char *)"MDArray_GetMask", _wrap_MDArray_GetMask, METH_VARARGS, (char *)"MDArray_GetMask(MDArray self, char ** options=None) -> MDArray"},
-	 { (char *)"MDArray_AsClassicDataset", _wrap_MDArray_AsClassicDataset, METH_VARARGS, (char *)"MDArray_AsClassicDataset(MDArray self, size_t iXDim, size_t iYDim) -> Dataset"},
-	 { (char *)"MDArray_GetStatistics", (PyCFunction) _wrap_MDArray_GetStatistics, METH_VARARGS | METH_KEYWORDS, (char *)"MDArray_GetStatistics(MDArray self, Dataset ds=None, bool approx_ok=False, bool force=True, GDALProgressFunc callback=0, void * callback_data=None) -> Statistics"},
-	 { (char *)"MDArray_ComputeStatistics", (PyCFunction) _wrap_MDArray_ComputeStatistics, METH_VARARGS | METH_KEYWORDS, (char *)"MDArray_ComputeStatistics(MDArray self, Dataset ds=None, bool approx_ok=False, GDALProgressFunc callback=0, void * callback_data=None) -> Statistics"},
-	 { (char *)"MDArray_GetResampled", _wrap_MDArray_GetResampled, METH_VARARGS, (char *)"MDArray_GetResampled(MDArray self, int nDimensions, GDALRIOResampleAlg resample_alg, OSRSpatialReferenceShadow ** srs, char ** options=None) -> MDArray"},
-	 { (char *)"MDArray_Cache", _wrap_MDArray_Cache, METH_VARARGS, (char *)"MDArray_Cache(MDArray self, char ** options=None) -> bool"},
-	 { (char *)"MDArray_swigregister", MDArray_swigregister, METH_VARARGS, NULL},
-	 { (char *)"delete_Attribute", _wrap_delete_Attribute, METH_VARARGS, (char *)"delete_Attribute(Attribute self)"},
-	 { (char *)"Attribute_GetName", _wrap_Attribute_GetName, METH_VARARGS, (char *)"Attribute_GetName(Attribute self) -> char const *"},
-	 { (char *)"Attribute_GetFullName", _wrap_Attribute_GetFullName, METH_VARARGS, (char *)"Attribute_GetFullName(Attribute self) -> char const *"},
-	 { (char *)"Attribute_GetTotalElementsCount", _wrap_Attribute_GetTotalElementsCount, METH_VARARGS, (char *)"Attribute_GetTotalElementsCount(Attribute self) -> unsigned long long"},
-	 { (char *)"Attribute_GetDimensionCount", _wrap_Attribute_GetDimensionCount, METH_VARARGS, (char *)"Attribute_GetDimensionCount(Attribute self) -> size_t"},
-	 { (char *)"Attribute_GetDimensionsSize", _wrap_Attribute_GetDimensionsSize, METH_VARARGS, (char *)"Attribute_GetDimensionsSize(Attribute self)"},
-	 { (char *)"Attribute_GetDataType", _wrap_Attribute_GetDataType, METH_VARARGS, (char *)"Attribute_GetDataType(Attribute self) -> ExtendedDataType"},
-	 { (char *)"Attribute_ReadAsRaw", _wrap_Attribute_ReadAsRaw, METH_VARARGS, (char *)"Attribute_ReadAsRaw(Attribute self) -> CPLErr"},
-	 { (char *)"Attribute_ReadAsString", _wrap_Attribute_ReadAsString, METH_VARARGS, (char *)"Attribute_ReadAsString(Attribute self) -> char const *"},
-	 { (char *)"Attribute_ReadAsInt", _wrap_Attribute_ReadAsInt, METH_VARARGS, (char *)"Attribute_ReadAsInt(Attribute self) -> int"},
-	 { (char *)"Attribute_ReadAsDouble", _wrap_Attribute_ReadAsDouble, METH_VARARGS, (char *)"Attribute_ReadAsDouble(Attribute self) -> double"},
-	 { (char *)"Attribute_ReadAsStringArray", _wrap_Attribute_ReadAsStringArray, METH_VARARGS, (char *)"Attribute_ReadAsStringArray(Attribute self) -> char **"},
-	 { (char *)"Attribute_ReadAsIntArray", _wrap_Attribute_ReadAsIntArray, METH_VARARGS, (char *)"Attribute_ReadAsIntArray(Attribute self)"},
-	 { (char *)"Attribute_ReadAsDoubleArray", _wrap_Attribute_ReadAsDoubleArray, METH_VARARGS, (char *)"Attribute_ReadAsDoubleArray(Attribute self)"},
-	 { (char *)"Attribute_WriteRaw", _wrap_Attribute_WriteRaw, METH_VARARGS, (char *)"Attribute_WriteRaw(Attribute self, GIntBig nLen) -> CPLErr"},
-	 { (char *)"Attribute_WriteString", _wrap_Attribute_WriteString, METH_VARARGS, (char *)"Attribute_WriteString(Attribute self, char const * val) -> CPLErr"},
-	 { (char *)"Attribute_WriteStringArray", _wrap_Attribute_WriteStringArray, METH_VARARGS, (char *)"Attribute_WriteStringArray(Attribute self, char ** vals) -> CPLErr"},
-	 { (char *)"Attribute_WriteInt", _wrap_Attribute_WriteInt, METH_VARARGS, (char *)"Attribute_WriteInt(Attribute self, int val) -> CPLErr"},
-	 { (char *)"Attribute_WriteDouble", _wrap_Attribute_WriteDouble, METH_VARARGS, (char *)"Attribute_WriteDouble(Attribute self, double val) -> CPLErr"},
-	 { (char *)"Attribute_WriteDoubleArray", _wrap_Attribute_WriteDoubleArray, METH_VARARGS, (char *)"Attribute_WriteDoubleArray(Attribute self, int nList) -> CPLErr"},
-	 { (char *)"Attribute_swigregister", Attribute_swigregister, METH_VARARGS, NULL},
-	 { (char *)"delete_Dimension", _wrap_delete_Dimension, METH_VARARGS, (char *)"delete_Dimension(Dimension self)"},
-	 { (char *)"Dimension_GetName", _wrap_Dimension_GetName, METH_VARARGS, (char *)"Dimension_GetName(Dimension self) -> char const *"},
-	 { (char *)"Dimension_GetFullName", _wrap_Dimension_GetFullName, METH_VARARGS, (char *)"Dimension_GetFullName(Dimension self) -> char const *"},
-	 { (char *)"Dimension_GetType", _wrap_Dimension_GetType, METH_VARARGS, (char *)"Dimension_GetType(Dimension self) -> char const *"},
-	 { (char *)"Dimension_GetDirection", _wrap_Dimension_GetDirection, METH_VARARGS, (char *)"Dimension_GetDirection(Dimension self) -> char const *"},
-	 { (char *)"Dimension_GetSize", _wrap_Dimension_GetSize, METH_VARARGS, (char *)"Dimension_GetSize(Dimension self) -> unsigned long long"},
-	 { (char *)"Dimension_GetIndexingVariable", _wrap_Dimension_GetIndexingVariable, METH_VARARGS, (char *)"Dimension_GetIndexingVariable(Dimension self) -> MDArray"},
-	 { (char *)"Dimension_SetIndexingVariable", _wrap_Dimension_SetIndexingVariable, METH_VARARGS, (char *)"Dimension_SetIndexingVariable(Dimension self, MDArray array) -> bool"},
-	 { (char *)"Dimension_swigregister", Dimension_swigregister, METH_VARARGS, NULL},
-	 { (char *)"delete_ExtendedDataType", _wrap_delete_ExtendedDataType, METH_VARARGS, (char *)"delete_ExtendedDataType(ExtendedDataType self)"},
-	 { (char *)"ExtendedDataType_Create", _wrap_ExtendedDataType_Create, METH_VARARGS, (char *)"ExtendedDataType_Create(GDALDataType dt) -> ExtendedDataType"},
-	 { (char *)"ExtendedDataType_CreateString", _wrap_ExtendedDataType_CreateString, METH_VARARGS, (char *)"ExtendedDataType_CreateString(size_t nMaxStringLength=0) -> ExtendedDataType"},
-	 { (char *)"ExtendedDataType_CreateCompound", _wrap_ExtendedDataType_CreateCompound, METH_VARARGS, (char *)"ExtendedDataType_CreateCompound(char const * name, size_t nTotalSize, int nComps) -> ExtendedDataType"},
-	 { (char *)"ExtendedDataType_GetName", _wrap_ExtendedDataType_GetName, METH_VARARGS, (char *)"ExtendedDataType_GetName(ExtendedDataType self) -> char const *"},
-	 { (char *)"ExtendedDataType_GetClass", _wrap_ExtendedDataType_GetClass, METH_VARARGS, (char *)"ExtendedDataType_GetClass(ExtendedDataType self) -> GDALExtendedDataTypeClass"},
-	 { (char *)"ExtendedDataType_GetNumericDataType", _wrap_ExtendedDataType_GetNumericDataType, METH_VARARGS, (char *)"ExtendedDataType_GetNumericDataType(ExtendedDataType self) -> GDALDataType"},
-	 { (char *)"ExtendedDataType_GetSize", _wrap_ExtendedDataType_GetSize, METH_VARARGS, (char *)"ExtendedDataType_GetSize(ExtendedDataType self) -> size_t"},
-	 { (char *)"ExtendedDataType_GetMaxStringLength", _wrap_ExtendedDataType_GetMaxStringLength, METH_VARARGS, (char *)"ExtendedDataType_GetMaxStringLength(ExtendedDataType self) -> size_t"},
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
-=======
->>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
-=======
-	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
->>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
-=======
->>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
->>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
-=======
->>>>>>> gdal-raster-parallelisation
-	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
-=======
->>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
-=======
-	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
->>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
-	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
->>>>>>> OSGeo-master
-=======
->>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
-=======
-	 { (char *)"ExtendedDataType_GetSubType", _wrap_ExtendedDataType_GetSubType, METH_VARARGS, (char *)"ExtendedDataType_GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"},
->>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-	 { (char *)"ExtendedDataType_GetComponents", _wrap_ExtendedDataType_GetComponents, METH_VARARGS, (char *)"ExtendedDataType_GetComponents(ExtendedDataType self)"},
-	 { (char *)"ExtendedDataType_CanConvertTo", _wrap_ExtendedDataType_CanConvertTo, METH_VARARGS, (char *)"ExtendedDataType_CanConvertTo(ExtendedDataType self, ExtendedDataType other) -> bool"},
-	 { (char *)"ExtendedDataType_Equals", _wrap_ExtendedDataType_Equals, METH_VARARGS, (char *)"ExtendedDataType_Equals(ExtendedDataType self, ExtendedDataType other) -> bool"},
-	 { (char *)"ExtendedDataType_swigregister", ExtendedDataType_swigregister, METH_VARARGS, NULL},
-	 { (char *)"delete_EDTComponent", _wrap_delete_EDTComponent, METH_VARARGS, (char *)"delete_EDTComponent(EDTComponent self)"},
-	 { (char *)"EDTComponent_Create", _wrap_EDTComponent_Create, METH_VARARGS, (char *)"EDTComponent_Create(char const * name, size_t offset, ExtendedDataType type) -> EDTComponent"},
-	 { (char *)"EDTComponent_GetName", _wrap_EDTComponent_GetName, METH_VARARGS, (char *)"EDTComponent_GetName(EDTComponent self) -> char const *"},
-	 { (char *)"EDTComponent_GetOffset", _wrap_EDTComponent_GetOffset, METH_VARARGS, (char *)"EDTComponent_GetOffset(EDTComponent self) -> size_t"},
-	 { (char *)"EDTComponent_GetType", _wrap_EDTComponent_GetType, METH_VARARGS, (char *)"EDTComponent_GetType(EDTComponent self) -> ExtendedDataType"},
-	 { (char *)"EDTComponent_swigregister", EDTComponent_swigregister, METH_VARARGS, NULL},
-	 { (char *)"Band_XSize_get", _wrap_Band_XSize_get, METH_VARARGS, (char *)"Band_XSize_get(Band self) -> int"},
-	 { (char *)"Band_YSize_get", _wrap_Band_YSize_get, METH_VARARGS, (char *)"Band_YSize_get(Band self) -> int"},
-	 { (char *)"Band_DataType_get", _wrap_Band_DataType_get, METH_VARARGS, (char *)"Band_DataType_get(Band self) -> GDALDataType"},
-	 { (char *)"Band_GetDataset", _wrap_Band_GetDataset, METH_VARARGS, (char *)"Band_GetDataset(Band self) -> Dataset"},
-	 { (char *)"Band_GetBand", _wrap_Band_GetBand, METH_VARARGS, (char *)"Band_GetBand(Band self) -> int"},
-	 { (char *)"Band_GetBlockSize", _wrap_Band_GetBlockSize, METH_VARARGS, (char *)"Band_GetBlockSize(Band self)"},
-	 { (char *)"Band_GetActualBlockSize", _wrap_Band_GetActualBlockSize, METH_VARARGS, (char *)"Band_GetActualBlockSize(Band self, int nXBlockOff, int nYBlockOff)"},
-	 { (char *)"Band_GetColorInterpretation", _wrap_Band_GetColorInterpretation, METH_VARARGS, (char *)"Band_GetColorInterpretation(Band self) -> GDALColorInterp"},
-	 { (char *)"Band_GetRasterColorInterpretation", _wrap_Band_GetRasterColorInterpretation, METH_VARARGS, (char *)"Band_GetRasterColorInterpretation(Band self) -> GDALColorInterp"},
-	 { (char *)"Band_SetColorInterpretation", _wrap_Band_SetColorInterpretation, METH_VARARGS, (char *)"Band_SetColorInterpretation(Band self, GDALColorInterp val) -> CPLErr"},
-	 { (char *)"Band_SetRasterColorInterpretation", _wrap_Band_SetRasterColorInterpretation, METH_VARARGS, (char *)"Band_SetRasterColorInterpretation(Band self, GDALColorInterp val) -> CPLErr"},
-	 { (char *)"Band_GetNoDataValue", _wrap_Band_GetNoDataValue, METH_VARARGS, (char *)"Band_GetNoDataValue(Band self)"},
-	 { (char *)"Band_SetNoDataValue", _wrap_Band_SetNoDataValue, METH_VARARGS, (char *)"Band_SetNoDataValue(Band self, double d) -> CPLErr"},
-	 { (char *)"Band_DeleteNoDataValue", _wrap_Band_DeleteNoDataValue, METH_VARARGS, (char *)"Band_DeleteNoDataValue(Band self) -> CPLErr"},
-	 { (char *)"Band_GetUnitType", _wrap_Band_GetUnitType, METH_VARARGS, (char *)"Band_GetUnitType(Band self) -> char const *"},
-	 { (char *)"Band_SetUnitType", _wrap_Band_SetUnitType, METH_VARARGS, (char *)"Band_SetUnitType(Band self, char const * val) -> CPLErr"},
-	 { (char *)"Band_GetRasterCategoryNames", _wrap_Band_GetRasterCategoryNames, METH_VARARGS, (char *)"Band_GetRasterCategoryNames(Band self) -> char **"},
-	 { (char *)"Band_SetRasterCategoryNames", _wrap_Band_SetRasterCategoryNames, METH_VARARGS, (char *)"Band_SetRasterCategoryNames(Band self, char ** names) -> CPLErr"},
-	 { (char *)"Band_GetMinimum", _wrap_Band_GetMinimum, METH_VARARGS, (char *)"Band_GetMinimum(Band self)"},
-	 { (char *)"Band_GetMaximum", _wrap_Band_GetMaximum, METH_VARARGS, (char *)"Band_GetMaximum(Band self)"},
-	 { (char *)"Band_GetOffset", _wrap_Band_GetOffset, METH_VARARGS, (char *)"Band_GetOffset(Band self)"},
-	 { (char *)"Band_GetScale", _wrap_Band_GetScale, METH_VARARGS, (char *)"Band_GetScale(Band self)"},
-	 { (char *)"Band_SetOffset", _wrap_Band_SetOffset, METH_VARARGS, (char *)"Band_SetOffset(Band self, double val) -> CPLErr"},
-	 { (char *)"Band_SetScale", _wrap_Band_SetScale, METH_VARARGS, (char *)"Band_SetScale(Band self, double val) -> CPLErr"},
-	 { (char *)"Band_GetStatistics", _wrap_Band_GetStatistics, METH_VARARGS, (char *)"Band_GetStatistics(Band self, int approx_ok, int force) -> CPLErr"},
-	 { (char *)"Band_ComputeStatistics", _wrap_Band_ComputeStatistics, METH_VARARGS, (char *)"Band_ComputeStatistics(Band self, bool approx_ok, GDALProgressFunc callback=0, void * callback_data=None) -> CPLErr"},
-	 { (char *)"Band_SetStatistics", _wrap_Band_SetStatistics, METH_VARARGS, (char *)"Band_SetStatistics(Band self, double min, double max, double mean, double stddev) -> CPLErr"},
-	 { (char *)"Band_GetOverviewCount", _wrap_Band_GetOverviewCount, METH_VARARGS, (char *)"Band_GetOverviewCount(Band self) -> int"},
-	 { (char *)"Band_GetOverview", _wrap_Band_GetOverview, METH_VARARGS, (char *)"Band_GetOverview(Band self, int i) -> Band"},
-	 { (char *)"Band_Checksum", (PyCFunction) _wrap_Band_Checksum, METH_VARARGS | METH_KEYWORDS, (char *)"Band_Checksum(Band self, int xoff=0, int yoff=0, int * xsize=None, int * ysize=None) -> int"},
-	 { (char *)"Band_ComputeRasterMinMax", _wrap_Band_ComputeRasterMinMax, METH_VARARGS, (char *)"Band_ComputeRasterMinMax(Band self, int approx_ok=0)"},
-	 { (char *)"Band_ComputeBandStats", _wrap_Band_ComputeBandStats, METH_VARARGS, (char *)"Band_ComputeBandStats(Band self, int samplestep=1)"},
-	 { (char *)"Band_Fill", _wrap_Band_Fill, METH_VARARGS, (char *)"Band_Fill(Band self, double real_fill, double imag_fill=0.0) -> CPLErr"},
-	 { (char *)"Band_WriteRaster", (PyCFunction) _wrap_Band_WriteRaster, METH_VARARGS | METH_KEYWORDS, (char *)"Band_WriteRaster(Band self, int xoff, int yoff, int xsize, int ysize, GIntBig buf_len, int * buf_xsize=None, int * buf_ysize=None, GDALDataType * buf_type=None, GIntBig * buf_pixel_space=None, GIntBig * buf_line_space=None) -> CPLErr"},
-	 { (char *)"Band_FlushCache", _wrap_Band_FlushCache, METH_VARARGS, (char *)"Band_FlushCache(Band self)"},
-	 { (char *)"Band_GetRasterColorTable", _wrap_Band_GetRasterColorTable, METH_VARARGS, (char *)"Band_GetRasterColorTable(Band self) -> ColorTable"},
-	 { (char *)"Band_GetColorTable", _wrap_Band_GetColorTable, METH_VARARGS, (char *)"Band_GetColorTable(Band self) -> ColorTable"},
-	 { (char *)"Band_SetRasterColorTable", _wrap_Band_SetRasterColorTable, METH_VARARGS, (char *)"Band_SetRasterColorTable(Band self, ColorTable arg) -> int"},
-	 { (char *)"Band_SetColorTable", _wrap_Band_SetColorTable, METH_VARARGS, (char *)"Band_SetColorTable(Band self, ColorTable arg) -> int"},
-	 { (char *)"Band_GetDefaultRAT", _wrap_Band_GetDefaultRAT, METH_VARARGS, (char *)"Band_GetDefaultRAT(Band self) -> RasterAttributeTable"},
-	 { (char *)"Band_SetDefaultRAT", _wrap_Band_SetDefaultRAT, METH_VARARGS, (char *)"Band_SetDefaultRAT(Band self, RasterAttributeTable table) -> int"},
-	 { (char *)"Band_GetMaskBand", _wrap_Band_GetMaskBand, METH_VARARGS, (char *)"Band_GetMaskBand(Band self) -> Band"},
-	 { (char *)"Band_GetMaskFlags", _wrap_Band_GetMaskFlags, METH_VARARGS, (char *)"Band_GetMaskFlags(Band self) -> int"},
-	 { (char *)"Band_CreateMaskBand", _wrap_Band_CreateMaskBand, METH_VARARGS, (char *)"Band_CreateMaskBand(Band self, int nFlags) -> CPLErr"},
-	 { (char *)"Band_GetHistogram", (PyCFunction) _wrap_Band_GetHistogram, METH_VARARGS | METH_KEYWORDS, (char *)"Band_GetHistogram(Band self, double min=-0.5, double max=255.5, int buckets=256, int include_out_of_range=0, int approx_ok=1, GDALProgressFunc callback=0, void * callback_data=None) -> CPLErr"},
-	 { (char *)"Band_GetDefaultHistogram", (PyCFunction) _wrap_Band_GetDefaultHistogram, METH_VARARGS | METH_KEYWORDS, (char *)"Band_GetDefaultHistogram(Band self, double * min_ret=None, double * max_ret=None, int * buckets_ret=None, GUIntBig ** ppanHistogram=None, int force=1, GDALProgressFunc callback=0, void * callback_data=None) -> CPLErr"},
-	 { (char *)"Band_SetDefaultHistogram", _wrap_Band_SetDefaultHistogram, METH_VARARGS, (char *)"Band_SetDefaultHistogram(Band self, double min, double max, int buckets_in) -> CPLErr"},
-	 { (char *)"Band_HasArbitraryOverviews", _wrap_Band_HasArbitraryOverviews, METH_VARARGS, (char *)"Band_HasArbitraryOverviews(Band self) -> bool"},
-	 { (char *)"Band_GetCategoryNames", _wrap_Band_GetCategoryNames, METH_VARARGS, (char *)"Band_GetCategoryNames(Band self) -> char **"},
-	 { (char *)"Band_SetCategoryNames", _wrap_Band_SetCategoryNames, METH_VARARGS, (char *)"Band_SetCategoryNames(Band self, char ** papszCategoryNames) -> CPLErr"},
-	 { (char *)"Band_GetVirtualMem", (PyCFunction) _wrap_Band_GetVirtualMem, METH_VARARGS | METH_KEYWORDS, (char *)"Band_GetVirtualMem(Band self, GDALRWFlag eRWFlag, int nXOff, int nYOff, int nXSize, int nYSize, int nBufXSize, int nBufYSize, GDALDataType eBufType, size_t nCacheSize, size_t nPageSizeHint, char ** options=None) -> VirtualMem"},
-	 { (char *)"Band_GetVirtualMemAuto", (PyCFunction) _wrap_Band_GetVirtualMemAuto, METH_VARARGS | METH_KEYWORDS, (char *)"Band_GetVirtualMemAuto(Band self, GDALRWFlag eRWFlag, char ** options=None) -> VirtualMem"},
-	 { (char *)"Band_GetTiledVirtualMem", (PyCFunction) _wrap_Band_GetTiledVirtualMem, METH_VARARGS | METH_KEYWORDS, (char *)"Band_GetTiledVirtualMem(Band self, GDALRWFlag eRWFlag, int nXOff, int nYOff, int nXSize, int nYSize, int nTileXSize, int nTileYSize, GDALDataType eBufType, size_t nCacheSize, char ** options=None) -> VirtualMem"},
-	 { (char *)"Band_GetDataCoverageStatus", _wrap_Band_GetDataCoverageStatus, METH_VARARGS, (char *)"Band_GetDataCoverageStatus(Band self, int nXOff, int nYOff, int nXSize, int nYSize, int nMaskFlagStop=0) -> int"},
-	 { (char *)"Band_AdviseRead", _wrap_Band_AdviseRead, METH_VARARGS, (char *)"Band_AdviseRead(Band self, int xoff, int yoff, int xsize, int ysize, int * buf_xsize=None, int * buf_ysize=None, GDALDataType * buf_type=None, char ** options=None) -> CPLErr"},
-	 { (char *)"Band_AsMDArray", _wrap_Band_AsMDArray, METH_VARARGS, (char *)"Band_AsMDArray(Band self) -> MDArray"},
-	 { (char *)"Band_ReadRaster1", (PyCFunction) _wrap_Band_ReadRaster1, METH_VARARGS | METH_KEYWORDS, (char *)"Band_ReadRaster1(Band self, double xoff, double yoff, double xsize, double ysize, int * buf_xsize=None, int * buf_ysize=None, GDALDataType * buf_type=None, GIntBig * buf_pixel_space=None, GIntBig * buf_line_space=None, GDALRIOResampleAlg resample_alg, GDALProgressFunc callback=0, void * callback_data=None, void * inputOutputBuf=None) -> CPLErr"},
-	 { (char *)"Band_ReadBlock", (PyCFunction) _wrap_Band_ReadBlock, METH_VARARGS | METH_KEYWORDS, (char *)"Band_ReadBlock(Band self, int xoff, int yoff, void * buf_obj=None) -> CPLErr"},
-	 { (char *)"Band_swigregister", Band_swigregister, METH_VARARGS, NULL},
-	 { (char *)"new_ColorTable", (PyCFunction) _wrap_new_ColorTable, METH_VARARGS | METH_KEYWORDS, (char *)"new_ColorTable(GDALPaletteInterp palette) -> ColorTable"},
-	 { (char *)"delete_ColorTable", _wrap_delete_ColorTable, METH_VARARGS, (char *)"delete_ColorTable(ColorTable self)"},
-	 { (char *)"ColorTable_Clone", _wrap_ColorTable_Clone, METH_VARARGS, (char *)"ColorTable_Clone(ColorTable self) -> ColorTable"},
-	 { (char *)"ColorTable_GetPaletteInterpretation", _wrap_ColorTable_GetPaletteInterpretation, METH_VARARGS, (char *)"ColorTable_GetPaletteInterpretation(ColorTable self) -> GDALPaletteInterp"},
-	 { (char *)"ColorTable_GetCount", _wrap_ColorTable_GetCount, METH_VARARGS, (char *)"ColorTable_GetCount(ColorTable self) -> int"},
-	 { (char *)"ColorTable_GetColorEntry", _wrap_ColorTable_GetColorEntry, METH_VARARGS, (char *)"ColorTable_GetColorEntry(ColorTable self, int entry) -> ColorEntry"},
-	 { (char *)"ColorTable_GetColorEntryAsRGB", _wrap_ColorTable_GetColorEntryAsRGB, METH_VARARGS, (char *)"ColorTable_GetColorEntryAsRGB(ColorTable self, int entry, ColorEntry centry) -> int"},
-	 { (char *)"ColorTable_SetColorEntry", _wrap_ColorTable_SetColorEntry, METH_VARARGS, (char *)"ColorTable_SetColorEntry(ColorTable self, int entry, ColorEntry centry)"},
-	 { (char *)"ColorTable_CreateColorRamp", _wrap_ColorTable_CreateColorRamp, METH_VARARGS, (char *)"ColorTable_CreateColorRamp(ColorTable self, int nStartIndex, ColorEntry startcolor, int nEndIndex, ColorEntry endcolor)"},
-	 { (char *)"ColorTable_swigregister", ColorTable_swigregister, METH_VARARGS, NULL},
-	 { (char *)"new_RasterAttributeTable", _wrap_new_RasterAttributeTable, METH_VARARGS, (char *)"new_RasterAttributeTable() -> RasterAttributeTable"},
-	 { (char *)"delete_RasterAttributeTable", _wrap_delete_RasterAttributeTable, METH_VARARGS, (char *)"delete_RasterAttributeTable(RasterAttributeTable self)"},
-	 { (char *)"RasterAttributeTable_Clone", _wrap_RasterAttributeTable_Clone, METH_VARARGS, (char *)"RasterAttributeTable_Clone(RasterAttributeTable self) -> RasterAttributeTable"},
-	 { (char *)"RasterAttributeTable_GetColumnCount", _wrap_RasterAttributeTable_GetColumnCount, METH_VARARGS, (char *)"RasterAttributeTable_GetColumnCount(RasterAttributeTable self) -> int"},
-	 { (char *)"RasterAttributeTable_GetNameOfCol", _wrap_RasterAttributeTable_GetNameOfCol, METH_VARARGS, (char *)"RasterAttributeTable_GetNameOfCol(RasterAttributeTable self, int iCol) -> char const *"},
-	 { (char *)"RasterAttributeTable_GetUsageOfCol", _wrap_RasterAttributeTable_GetUsageOfCol, METH_VARARGS, (char *)"RasterAttributeTable_GetUsageOfCol(RasterAttributeTable self, int iCol) -> GDALRATFieldUsage"},
-	 { (char *)"RasterAttributeTable_GetTypeOfCol", _wrap_RasterAttributeTable_GetTypeOfCol, METH_VARARGS, (char *)"RasterAttributeTable_GetTypeOfCol(RasterAttributeTable self, int iCol) -> GDALRATFieldType"},
-	 { (char *)"RasterAttributeTable_GetColOfUsage", _wrap_RasterAttributeTable_GetColOfUsage, METH_VARARGS, (char *)"RasterAttributeTable_GetColOfUsage(RasterAttributeTable self, GDALRATFieldUsage eUsage) -> int"},
-	 { (char *)"RasterAttributeTable_GetRowCount", _wrap_RasterAttributeTable_GetRowCount, METH_VARARGS, (char *)"RasterAttributeTable_GetRowCount(RasterAttributeTable self) -> int"},
-	 { (char *)"RasterAttributeTable_GetValueAsString", _wrap_RasterAttributeTable_GetValueAsString, METH_VARARGS, (char *)"RasterAttributeTable_GetValueAsString(RasterAttributeTable self, int iRow, int iCol) -> char const *"},
-	 { (char *)"RasterAttributeTable_GetValueAsInt", _wrap_RasterAttributeTable_GetValueAsInt, METH_VARARGS, (char *)"RasterAttributeTable_GetValueAsInt(RasterAttributeTable self, int iRow, int iCol) -> int"},
-	 { (char *)"RasterAttributeTable_GetValueAsDouble", _wrap_RasterAttributeTable_GetValueAsDouble, METH_VARARGS, (char *)"RasterAttributeTable_GetValueAsDouble(RasterAttributeTable self, int iRow, int iCol) -> double"},
-	 { (char *)"RasterAttributeTable_SetValueAsString", _wrap_RasterAttributeTable_SetValueAsString, METH_VARARGS, (char *)"RasterAttributeTable_SetValueAsString(RasterAttributeTable self, int iRow, int iCol, char const * pszValue)"},
-	 { (char *)"RasterAttributeTable_SetValueAsInt", _wrap_RasterAttributeTable_SetValueAsInt, METH_VARARGS, (char *)"RasterAttributeTable_SetValueAsInt(RasterAttributeTable self, int iRow, int iCol, int nValue)"},
-	 { (char *)"RasterAttributeTable_SetValueAsDouble", _wrap_RasterAttributeTable_SetValueAsDouble, METH_VARARGS, (char *)"RasterAttributeTable_SetValueAsDouble(RasterAttributeTable self, int iRow, int iCol, double dfValue)"},
-	 { (char *)"RasterAttributeTable_SetRowCount", _wrap_RasterAttributeTable_SetRowCount, METH_VARARGS, (char *)"RasterAttributeTable_SetRowCount(RasterAttributeTable self, int nCount)"},
-	 { (char *)"RasterAttributeTable_CreateColumn", _wrap_RasterAttributeTable_CreateColumn, METH_VARARGS, (char *)"RasterAttributeTable_CreateColumn(RasterAttributeTable self, char const * pszName, GDALRATFieldType eType, GDALRATFieldUsage eUsage) -> int"},
-	 { (char *)"RasterAttributeTable_GetLinearBinning", _wrap_RasterAttributeTable_GetLinearBinning, METH_VARARGS, (char *)"RasterAttributeTable_GetLinearBinning(RasterAttributeTable self) -> bool"},
-	 { (char *)"RasterAttributeTable_SetLinearBinning", _wrap_RasterAttributeTable_SetLinearBinning, METH_VARARGS, (char *)"RasterAttributeTable_SetLinearBinning(RasterAttributeTable self, double dfRow0Min, double dfBinSize) -> int"},
-	 { (char *)"RasterAttributeTable_GetRowOfValue", _wrap_RasterAttributeTable_GetRowOfValue, METH_VARARGS, (char *)"RasterAttributeTable_GetRowOfValue(RasterAttributeTable self, double dfValue) -> int"},
-	 { (char *)"RasterAttributeTable_ChangesAreWrittenToFile", _wrap_RasterAttributeTable_ChangesAreWrittenToFile, METH_VARARGS, (char *)"RasterAttributeTable_ChangesAreWrittenToFile(RasterAttributeTable self) -> int"},
-	 { (char *)"RasterAttributeTable_DumpReadable", _wrap_RasterAttributeTable_DumpReadable, METH_VARARGS, (char *)"RasterAttributeTable_DumpReadable(RasterAttributeTable self)"},
-	 { (char *)"RasterAttributeTable_SetTableType", _wrap_RasterAttributeTable_SetTableType, METH_VARARGS, (char *)"RasterAttributeTable_SetTableType(RasterAttributeTable self, GDALRATTableType eTableType)"},
-	 { (char *)"RasterAttributeTable_GetTableType", _wrap_RasterAttributeTable_GetTableType, METH_VARARGS, (char *)"RasterAttributeTable_GetTableType(RasterAttributeTable self) -> GDALRATTableType"},
-	 { (char *)"RasterAttributeTable_swigregister", RasterAttributeTable_swigregister, METH_VARARGS, NULL},
-	 { (char *)"TermProgress_nocb", (PyCFunction) _wrap_TermProgress_nocb, METH_VARARGS | METH_KEYWORDS, (char *)"TermProgress_nocb(double dfProgress, char const * pszMessage=None, void * pData=None) -> int"},
-	 { (char *)"ComputeMedianCutPCT", (PyCFunction) _wrap_ComputeMedianCutPCT, METH_VARARGS | METH_KEYWORDS, (char *)"ComputeMedianCutPCT(Band red, Band green, Band blue, int num_colors, ColorTable colors, GDALProgressFunc callback=0, void * callback_data=None) -> int"},
-	 { (char *)"DitherRGB2PCT", (PyCFunction) _wrap_DitherRGB2PCT, METH_VARARGS | METH_KEYWORDS, (char *)"DitherRGB2PCT(Band red, Band green, Band blue, Band target, ColorTable colors, GDALProgressFunc callback=0, void * callback_data=None) -> int"},
-	 { (char *)"ReprojectImage", (PyCFunction) _wrap_ReprojectImage, METH_VARARGS | METH_KEYWORDS, (char *)"ReprojectImage(Dataset src_ds, Dataset dst_ds, char const * src_wkt=None, char const * dst_wkt=None, GDALResampleAlg eResampleAlg, double WarpMemoryLimit=0.0, double maxerror=0.0, GDALProgressFunc callback=0, void * callback_data=None, char ** options=None) -> CPLErr"},
-	 { (char *)"ComputeProximity", (PyCFunction) _wrap_ComputeProximity, METH_VARARGS | METH_KEYWORDS, (char *)"ComputeProximity(Band srcBand, Band proximityBand, char ** options=None, GDALProgressFunc callback=0, void * callback_data=None) -> int"},
-	 { (char *)"RasterizeLayer", (PyCFunction) _wrap_RasterizeLayer, METH_VARARGS | METH_KEYWORDS, (char *)"RasterizeLayer(Dataset dataset, int bands, Layer layer, void * pfnTransformer=None, void * pTransformArg=None, int burn_values=0, char ** options=None, GDALProgressFunc callback=0, void * callback_data=None) -> int"},
-	 { (char *)"Polygonize", (PyCFunction) _wrap_Polygonize, METH_VARARGS | METH_KEYWORDS, (char *)"Polygonize(Band srcBand, Band maskBand, Layer outLayer, int iPixValField, char ** options=None, GDALProgressFunc callback=0, void * callback_data=None) -> int"},
-	 { (char *)"FPolygonize", (PyCFunction) _wrap_FPolygonize, METH_VARARGS | METH_KEYWORDS, (char *)"FPolygonize(Band srcBand, Band maskBand, Layer outLayer, int iPixValField, char ** options=None, GDALProgressFunc callback=0, void * callback_data=None) -> int"},
-	 { (char *)"FillNodata", (PyCFunction) _wrap_FillNodata, METH_VARARGS | METH_KEYWORDS, (char *)"FillNodata(Band targetBand, Band maskBand, double maxSearchDist, int smoothingIterations, char ** options=None, GDALProgressFunc callback=0, void * callback_data=None) -> int"},
-	 { (char *)"SieveFilter", (PyCFunction) _wrap_SieveFilter, METH_VARARGS | METH_KEYWORDS, (char *)"SieveFilter(Band srcBand, Band maskBand, Band dstBand, int threshold, int connectedness=4, char ** options=None, GDALProgressFunc callback=0, void * callback_data=None) -> int"},
-	 { (char *)"RegenerateOverviews", (PyCFunction) _wrap_RegenerateOverviews, METH_VARARGS | METH_KEYWORDS, (char *)"RegenerateOverviews(Band srcBand, int overviewBandCount, char const * resampling, GDALProgressFunc callback=0, void * callback_data=None) -> int"},
-	 { (char *)"RegenerateOverview", (PyCFunction) _wrap_RegenerateOverview, METH_VARARGS | METH_KEYWORDS, (char *)"RegenerateOverview(Band srcBand, Band overviewBand, char const * resampling, GDALProgressFunc callback=0, void * callback_data=None) -> int"},
-	 { (char *)"ContourGenerate", (PyCFunction) _wrap_ContourGenerate, METH_VARARGS | METH_KEYWORDS, (char *)"ContourGenerate(Band srcBand, double contourInterval, double contourBase, int fixedLevelCount, int useNoData, double noDataValue, Layer dstLayer, int idField, int elevField, GDALProgressFunc callback=0, void * callback_data=None) -> int"},
-	 { (char *)"ContourGenerateEx", (PyCFunction) _wrap_ContourGenerateEx, METH_VARARGS | METH_KEYWORDS, (char *)"ContourGenerateEx(Band srcBand, Layer dstLayer, char ** options=None, GDALProgressFunc callback=0, void * callback_data=None) -> int"},
-	 { (char *)"ViewshedGenerate", (PyCFunction) _wrap_ViewshedGenerate, METH_VARARGS | METH_KEYWORDS, (char *)"ViewshedGenerate(Band srcBand, char const * driverName, char const * targetRasterName, char ** creationOptions, double observerX, double observerY, double observerHeight, double targetHeight, double visibleVal, double invisibleVal, double outOfRangeVal, double noDataVal, double dfCurvCoeff, GDALViewshedMode mode, double maxDistance, GDALProgressFunc callback=0, void * callback_data=None, GDALViewshedOutputType heightMode=GVOT_NORMAL, char ** papszOptions=None) -> Dataset"},
-	 { (char *)"AutoCreateWarpedVRT", _wrap_AutoCreateWarpedVRT, METH_VARARGS, (char *)"AutoCreateWarpedVRT(Dataset src_ds, char const * src_wkt=None, char const * dst_wkt=None, GDALResampleAlg eResampleAlg, double maxerror=0.0) -> Dataset"},
-	 { (char *)"CreatePansharpenedVRT", _wrap_CreatePansharpenedVRT, METH_VARARGS, (char *)"CreatePansharpenedVRT(char const * pszXML, Band panchroBand, int nInputSpectralBands) -> Dataset"},
-	 { (char *)"delete_GDALTransformerInfoShadow", _wrap_delete_GDALTransformerInfoShadow, METH_VARARGS, (char *)"delete_GDALTransformerInfoShadow(GDALTransformerInfoShadow self)"},
-	 { (char *)"GDALTransformerInfoShadow_TransformPoint", _wrap_GDALTransformerInfoShadow_TransformPoint, METH_VARARGS, (char *)"\n"
-		"TransformPoint(int bDstToSrc, double [3] inout) -> int\n"
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/swig/python/extensions/gdal_wrap.cpp
 		"GDALTransformerInfoShadow_TransformPoint(GDALTransformerInfoShadow self, int bDstToSrc, double x, double y, double z=0.0) -> int\n"
 		""},
 	 { "GDALTransformerInfoShadow_TransformPoints", _wrap_GDALTransformerInfoShadow_TransformPoints, METH_VARARGS, "GDALTransformerInfoShadow_TransformPoints(GDALTransformerInfoShadow self, int bDstToSrc, int nCount) -> int"},

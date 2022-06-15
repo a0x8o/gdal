@@ -151,26 +151,7 @@ struct curl_slist* GetGSHeaders( const std::string& osPathForOption,
         return nullptr;
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/port/cpl_google_cloud.cpp
-=======
-<<<<<<< HEAD:port/cpl_google_cloud.cpp
     CPLString osDate = VSIGetCredential(osPathForOption.c_str(), "CPL_GS_TIMESTAMP", "");
-=======
->>>>>>> OSGeo-master:port/cpl_google_cloud.cpp
-=======
-<<<<<<< HEAD:port/cpl_google_cloud.cpp
-    CPLString osDate = VSIGetCredential(osPathForOption.c_str(), "CPL_GS_TIMESTAMP", "");
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD:port/cpl_google_cloud.cpp
-    CPLString osDate = VSIGetCredential(osPathForOption.c_str(), "CPL_GS_TIMESTAMP", "");
-=======
->>>>>>> gdal-raster-parallelisation
-    CPLString osDate = CPLGetConfigOption("CPL_GS_TIMESTAMP", "");
->>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_google_cloud.cpp
     if( osDate.empty() )
     {
         osDate = IVSIS3LikeHandleHelper::GetRFC822DateTime();
@@ -358,28 +339,8 @@ bool VSIGSHandleHelper::GetConfiguration(const std::string& osPathForOption,
     osAccessKeyId.clear();
     osHeaderFile.clear();
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/port/cpl_google_cloud.cpp
-    if( CPLTestBool(CPLGetConfigOption("GS_NO_SIGN_REQUEST", "NO")) )
-=======
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:port/cpl_google_cloud.cpp
     if( CPLTestBool(VSIGetCredential(
             osPathForOption.c_str(), "GS_NO_SIGN_REQUEST", "NO")) )
-=======
-    if( CPLTestBool(CPLGetConfigOption("GS_NO_SIGN_REQUEST", "NO")) )
->>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_google_cloud.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:port/cpl_google_cloud.cpp
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
     {
         return true;
     }
@@ -791,28 +752,8 @@ VSIGSHandleHelper* VSIGSHandleHelper::BuildFromURI( const char* pszURI,
     // https://cloud.google.com/storage/docs/xml-api/reference-headers#xgooguserproject
     // The Project ID for an existing Google Cloud project to bill for access
     // charges associated with the request.
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/port/cpl_google_cloud.cpp
-    const std::string osUserProject = CPLGetConfigOption("GS_USER_PROJECT", "");
-=======
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:port/cpl_google_cloud.cpp
     const std::string osUserProject = VSIGetCredential(
         osPathForOption.c_str(), "GS_USER_PROJECT", "");
-=======
-    const std::string osUserProject = CPLGetConfigOption("GS_USER_PROJECT", "");
->>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/port/cpl_google_cloud.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:port/cpl_google_cloud.cpp
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
 
     return new VSIGSHandleHelper( osEndpoint,
                                   osBucketObject,

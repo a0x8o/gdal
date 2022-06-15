@@ -5336,91 +5336,6 @@ def test_ogr_gpkg_fixup_wrong_mr_column_name_update_trigger():
 
     gdal.Unlink(filename)
     assert 'column_nameIS' not in sql
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 145dd38d72 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> gdal-raster-parallelisation
-=======
-=======
->>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 913c3ef6c1 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> gdal-raster-parallelisation
-=======
-=======
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 39cde30c78 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> a57f04675f (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> gdal-raster-parallelisation
-=======
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> OSGeo-master
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
 
 ###############################################################################
 # Test support for CRS coordinate_epoch
@@ -5505,32 +5420,6 @@ def test_ogr_gpkg_crs_coordinate_epoch():
     ds = None
 
     gdal.Unlink(filename)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
 
 
 ###############################################################################
@@ -5558,10 +5447,6 @@ def test_ogr_gpkg_CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE():
     assert gdal.VSIStatL(filename) is not None
     assert gdal.ReadDir('/vsimem/temporary_location') is None
     gdal.Unlink(filename)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
 
 ###############################################################################
 # Test (currently minimum) support for related tables extension
@@ -5722,76 +5607,3 @@ def test_ogr_gpkg_alter_geom_field_defn():
     ds = None
 
     gdal.Unlink(filename)
->>>>>>> gdal-raster-parallelisation
-=======
->>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
-=======
->>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> d6169a4179 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 145dd38d72 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> gdal-raster-parallelisation
->>>>>>> OSGeo-master
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 913c3ef6c1 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> c92eb67b49 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> gdal-raster-parallelisation
-=======
-=======
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 39cde30c78 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> a57f04675f (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> gdal-raster-parallelisation
-=======
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> OSGeo-master
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> cee97e22ca (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 0b77adf83b (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation

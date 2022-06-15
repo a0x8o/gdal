@@ -522,69 +522,7 @@ def test_pam_esri_GeodataXform_gcp():
 
 def test_pam_metadata_coordinate_epoch():
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-    tmpfilename = '/vsimem/tmp.pnm'
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
     tmpfilename = '/vsimem/tmp.pgm'
-=======
-    tmpfilename = '/vsimem/tmp.pnm'
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
     ds = gdal.GetDriverByName('PNM').Create(tmpfilename, 1, 1)
     srs = osr.SpatialReference()
     srs.ImportFromEPSG(4326)
@@ -600,32 +538,6 @@ def test_pam_metadata_coordinate_epoch():
     gdal.GetDriverByName('PNM').Delete(tmpfilename)
 
 ###############################################################################
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
 # Check that PAM handles correctly equality of NaN nodata values (#4847)
 
 def test_pam_nodata_nan():
@@ -637,89 +549,5 @@ def test_pam_nodata_nan():
     # Check that no PAM file is generated
     assert gdal.VSIStatL(outfilename + '.aux.xml') is None
     gdal.GetDriverByName('GTiff').Delete(outfilename)
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-# Cleanup.
-
-def test_pam_cleanup():
-    gdaltest.clean_tmp()
-    if gdaltest.pam_setting != 'NULL':
-        gdal.SetConfigOption('GDAL_PAM_ENABLED', gdaltest.pam_setting)
-    else:
-        gdal.SetConfigOption('GDAL_PAM_ENABLED', None)
-
-    try:
-        os.chmod('tmpdirreadonly', stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
-        shutil.rmtree('tmpdirreadonly')
-    except OSError:
-        pass
-    try:
-        shutil.rmtree('tmppamproxydir')
-    except OSError:
-        pass
-
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> OSGeo-master
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
 
 

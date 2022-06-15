@@ -321,61 +321,7 @@ OGRSpatialReference* GDALGeoPackageDataset::GetSpatialRef(int iSrsId,
 
     CPLString oSQL;
     oSQL.Printf( "SELECT definition, organization, organization_coordsys_id%s%s "
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
-<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                  "FROM gpkg_spatial_ref_sys WHERE "
-=======
-=======
-<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-                 "FROM gpkg_spatial_ref_sys WHERE "
-=======
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
-<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-                 "FROM gpkg_spatial_ref_sys WHERE "
-=======
->>>>>>> gdal-raster-parallelisation
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
-<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-                 "FROM gpkg_spatial_ref_sys WHERE "
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> gdal-raster-parallelisation
-=======
-<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-                 "FROM gpkg_spatial_ref_sys WHERE "
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-=======
-<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-                 "FROM gpkg_spatial_ref_sys WHERE "
-=======
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-                 "FROM gpkg_spatial_ref_sys WHERE definition IS NOT NULL AND "
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                  "srs_id = %d LIMIT 2",
                  m_bHasDefinition12_063 ? ", definition_12_063" : "",
                  m_bHasEpochColumn ? ", epoch" : "",
@@ -409,68 +355,8 @@ OGRSpatialReference* GDALGeoPackageDataset::GetSpatialRef(int iSrsId,
     }
 
     const char *pszWkt = oResult->GetValue(0, 0);
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
     if( pszWkt == nullptr )
         return nullptr;
-=======
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
     const char* pszOrganization = oResult->GetValue(1, 0);
     const char* pszOrganizationCoordsysID = oResult->GetValue(2, 0);
     const char *pszWkt2 = m_bHasDefinition12_063 ? oResult->GetValue(3, 0) : nullptr;
@@ -876,36 +762,6 @@ int GDALGeoPackageDataset::GetSrsId(const OGRSpatialReference& oSRS)
     // Add epoch column if needed
     if( oSRS.GetCoordinateEpoch() > 0 && !m_bHasEpochColumn )
     {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
         if( SoftStartTransaction() != OGRERR_NONE )
             return DEFAULT_SRID;
 
@@ -930,86 +786,6 @@ int GDALGeoPackageDataset::GetSrsId(const OGRSpatialReference& oSRS)
         if( SoftCommitTransaction() != OGRERR_NONE )
             return DEFAULT_SRID;
 
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-        if( !m_bHasDefinition12_063 )
-        {
-            if( !ConvertGpkgSpatialRefSysToExtensionWkt2() )
-            {
-                return DEFAULT_SRID;
-            }
-        }
-
-        if( SQLCommand(hDB,
-                "ALTER TABLE gpkg_spatial_ref_sys "
-                "ADD COLUMN epoch DOUBLE") != OGRERR_NONE )
-        {
-            return DEFAULT_SRID;
-        }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
         m_bHasEpochColumn = true;
     }
 
@@ -1380,36 +1156,6 @@ const std::map< CPLString, std::vector<GPKGExtensionDesc> > &
             const char* pszExtensionName = oResult->GetValue(1, i);
             const char* pszDefinition = oResult->GetValue(2, i);
             const char* pszScope = oResult->GetValue(3, i);
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
             if( pszTableName && pszExtensionName && pszDefinition && pszScope )
             {
                 GPKGExtensionDesc oDesc;
@@ -1418,41 +1164,6 @@ const std::map< CPLString, std::vector<GPKGExtensionDesc> > &
                 oDesc.osScope = pszScope;
                 m_oMapTableToExtensions[ CPLString(pszTableName).toupper() ].push_back(oDesc);
             }
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-            GPKGExtensionDesc oDesc;
-            oDesc.osExtensionName = pszExtensionName;
-            oDesc.osDefinition = pszDefinition;
-            oDesc.osScope = pszScope;
-            m_oMapTableToExtensions[ CPLString(pszTableName).toupper() ].push_back(oDesc);
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
         }
     }
 
@@ -1486,68 +1197,8 @@ const std::map< CPLString, GPKGContentsDesc > &
         for( int i = 0; i < oResult->RowCount(); i++ )
         {
             const char* pszTableName = oResult->GetValue(0, i);
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
             if( pszTableName == nullptr )
                 continue;
-=======
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
             const char* pszDataType = oResult->GetValue(1, i);
             const char* pszIdentifier = oResult->GetValue(2, i);
             const char* pszDescription = oResult->GetValue(3, i);
@@ -1921,68 +1572,8 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
             for ( int i = 0; i < oResult->RowCount(); i++ )
             {
                 const char *pszTableName = oResult->GetValue(0, i);
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                 if( pszTableName == nullptr )
                     continue;
-=======
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
                 if( oSetTables.find(pszTableName) != oSetTables.end() )
                 {
                     // This should normally not happen if all constraints are properly set
@@ -1999,36 +1590,6 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
                 const char* pszZ = oResult->GetValue(5, i);
                 const char* pszM = oResult->GetValue(6, i);
                 bool bIsInGpkgContents = CPL_TO_BOOL(oResult->GetValueAsInteger(11, i));
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                 const char* pszObjectType = oResult->GetValue(12, i);
                 if( pszObjectType == nullptr ||
                     !(EQUAL(pszObjectType, "table") || EQUAL(pszObjectType, "view")) )
@@ -2039,36 +1600,6 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
                              pszTableName);
                     continue;
                 }
-=======
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
                 OGRGeoPackageTableLayer *poLayer = new OGRGeoPackageTableLayer(this, pszTableName);
                 bool bHasZ = pszZ && atoi(pszZ) > 0;
                 bool bHasM = pszM && atoi(pszM) > 0;
@@ -2150,36 +1681,6 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
             const char* pszTMSMaxX = oResult->GetValue(10, 0);
             const char* pszTMSMaxY = oResult->GetValue(11, 0);
             const char* pszDataType = oResult->GetValue(12, 0);
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
             if( pszTableName && pszTMSMinX && pszTMSMinY && pszTMSMaxX &&
                 pszTMSMaxY )
             {
@@ -2191,44 +1692,6 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
                                     EQUAL(pszDataType, "tiles"),
                                     poOpenInfo->papszOpenOptions );
             }
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-
-            bRet = OpenRaster( pszTableName, pszIdentifier, pszDescription,
-                                pszSRSId ? atoi(pszSRSId) : 0,
-                                CPLAtof(pszTMSMinX), CPLAtof(pszTMSMinY),
-                                CPLAtof(pszTMSMaxX), CPLAtof(pszTMSMaxY),
-                                pszMinX, pszMinY, pszMaxX, pszMaxY,
-                                EQUAL(pszDataType, "tiles"),
-                                poOpenInfo->papszOpenOptions );
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
         }
         else if( oResult->RowCount() >= 1 )
         {
@@ -2249,69 +1712,8 @@ int GDALGeoPackageDataset::Open( GDALOpenInfo* poOpenInfo )
             {
                 const char *pszTableName = oResult->GetValue(0, i);
                 const char *pszIdentifier = oResult->GetValue(1, i);
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                 if( pszTableName == nullptr )
                     continue;
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                 m_aosSubDatasets.AddNameValue(
                     CPLSPrintf("SUBDATASET_%d_NAME", nSDSCount+1),
                     CPLSPrintf("GPKG:%s:%s", m_pszFilename, pszTableName));
@@ -2393,68 +1795,8 @@ void GDALGeoPackageDataset::FixupWrongRTreeTrigger()
     auto oResult = SQLQuery(hDB,
         "SELECT name, sql FROM sqlite_master WHERE type = 'trigger' AND "
         "NAME LIKE 'rtree_%_update3' AND sql LIKE '% AFTER UPDATE OF % ON %'");
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
     if( oResult == nullptr )
         return;
-=======
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
     if( oResult->RowCount() > 0 )
     {
         CPLDebug("GPKG", "Fixing incorrect trigger(s) related to RTree");
@@ -2502,36 +1844,6 @@ void GDALGeoPackageDataset::FixupWrongRTreeTrigger()
             }
         }
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
 }
 
 /************************************************************************/
@@ -2552,160 +1864,6 @@ void GDALGeoPackageDataset::FixupWrongMedataReferenceColumnNameUpdate()
     {
         CPLDebug("GPKG", "Fixing incorrect trigger gpkg_metadata_reference_column_name_update");
         const char *pszSQL = oResult->GetValue(0, 0);
-        std::string osNewSQL(
-            CPLString(pszSQL).replaceAll("column_nameIS", "column_name IS"));
-
-        SQLCommand(hDB,
-            "DROP TRIGGER gpkg_metadata_reference_column_name_update");
-        SQLCommand(hDB, osNewSQL.c_str());
-    }
-=======
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-}
-
-/************************************************************************/
-/*             FixupWrongMedataReferenceColumnNameUpdate()              */
-/************************************************************************/
-
-void GDALGeoPackageDataset::FixupWrongMedataReferenceColumnNameUpdate()
-{
-    // Fix wrong trigger that was generated by GDAL < 2.4.0
-    // See https://github.com/qgis/QGIS/issues/42768
-    auto oResult = SQLQuery(hDB,
-        "SELECT sql FROM sqlite_master WHERE type = 'trigger' AND "
-        "NAME ='gpkg_metadata_reference_column_name_update' AND "
-        "sql LIKE '%column_nameIS%'");
-    if( oResult->RowCount() == 1 )
-    {
-        CPLDebug("GPKG", "Fixing incorrect trigger gpkg_metadata_reference_column_name_update");
-        const char *pszSQL = oResult->GetValue(0, 0);
-        std::string osNewSQL(
-            CPLString(pszSQL).replaceAll("column_nameIS", "column_name IS"));
-
-        SQLCommand(hDB,
-            "DROP TRIGGER gpkg_metadata_reference_column_name_update");
-        SQLCommand(hDB, osNewSQL.c_str());
-    }
-=======
->>>>>>> 8d6f7a8fd1 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> d9da6eb2a3 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> b93670d45a (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-}
-
-/************************************************************************/
-/*             FixupWrongMedataReferenceColumnNameUpdate()              */
-/************************************************************************/
-
-void GDALGeoPackageDataset::FixupWrongMedataReferenceColumnNameUpdate()
-{
-    // Fix wrong trigger that was generated by GDAL < 2.4.0
-    // See https://github.com/qgis/QGIS/issues/42768
-    auto oResult = SQLQuery(hDB,
-        "SELECT sql FROM sqlite_master WHERE type = 'trigger' AND "
-        "NAME ='gpkg_metadata_reference_column_name_update' AND "
-        "sql LIKE '%column_nameIS%'");
-    if( oResult->RowCount() == 1 )
-    {
-        CPLDebug("GPKG", "Fixing incorrect trigger gpkg_metadata_reference_column_name_update");
-        const char *pszSQL = oResult->GetValue(0, 0);
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> gdal-raster-parallelisation
-        std::string osNewSQL(
-            CPLString(pszSQL).replaceAll("column_nameIS", "column_name IS"));
-
-        SQLCommand(hDB,
-            "DROP TRIGGER gpkg_metadata_reference_column_name_update");
-        SQLCommand(hDB, osNewSQL.c_str());
-    }
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-}
-
-/************************************************************************/
-/*             FixupWrongMedataReferenceColumnNameUpdate()              */
-/************************************************************************/
-
-void GDALGeoPackageDataset::FixupWrongMedataReferenceColumnNameUpdate()
-{
-    // Fix wrong trigger that was generated by GDAL < 2.4.0
-    // See https://github.com/qgis/QGIS/issues/42768
-    auto oResult = SQLQuery(hDB,
-        "SELECT sql FROM sqlite_master WHERE type = 'trigger' AND "
-        "NAME ='gpkg_metadata_reference_column_name_update' AND "
-        "sql LIKE '%column_nameIS%'");
-    if( oResult->RowCount() == 1 )
-    {
-        CPLDebug("GPKG", "Fixing incorrect trigger gpkg_metadata_reference_column_name_update");
-        const char *pszSQL = oResult->GetValue(0, 0);
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
-        std::string osNewSQL(
-            CPLString(pszSQL).replaceAll("column_nameIS", "column_name IS"));
-
-        SQLCommand(hDB,
-            "DROP TRIGGER gpkg_metadata_reference_column_name_update");
-        SQLCommand(hDB, osNewSQL.c_str());
-    }
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-}
-
-/************************************************************************/
-/*             FixupWrongMedataReferenceColumnNameUpdate()              */
-/************************************************************************/
-
-void GDALGeoPackageDataset::FixupWrongMedataReferenceColumnNameUpdate()
-{
-    // Fix wrong trigger that was generated by GDAL < 2.4.0
-    // See https://github.com/qgis/QGIS/issues/42768
-    auto oResult = SQLQuery(hDB,
-        "SELECT sql FROM sqlite_master WHERE type = 'trigger' AND "
-        "NAME ='gpkg_metadata_reference_column_name_update' AND "
-        "sql LIKE '%column_nameIS%'");
-    if( oResult->RowCount() == 1 )
-    {
-        CPLDebug("GPKG", "Fixing incorrect trigger gpkg_metadata_reference_column_name_update");
-        const char *pszSQL = oResult->GetValue(0, 0);
->>>>>>> gdal-raster-parallelisation
         std::string osNewSQL(
             CPLString(pszSQL).replaceAll("column_nameIS", "column_name IS"));
 
@@ -4288,71 +3446,9 @@ char **GDALGeoPackageDataset::GetMetadata( const char *pszDomain )
         const char* pszMDStandardURI = oResult->GetValue(1, i);
         const char* pszMimeType = oResult->GetValue(2, i);
         const char* pszReferenceScope = oResult->GetValue(3, i);
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
         if( pszMetadata && pszMDStandardURI && pszMimeType &&
             pszReferenceScope &&
             EQUAL(pszMDStandardURI, "http://gdal.org") &&
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-        int bIsGPKGScope = EQUAL(pszReferenceScope, "geopackage");
-        if( EQUAL(pszMDStandardURI, "http://gdal.org") &&
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
             EQUAL(pszMimeType, "text/xml") )
         {
             CPLXMLNode* psXMLNode = CPLParseXMLString(pszMetadata);
@@ -7325,71 +6421,11 @@ void GDALGeoPackageDataset::CheckUnknownExtensions(bool bCheckRasterTable)
             const char* pszExtName = oResultTable->GetValue(0, i);
             const char* pszDefinition = oResultTable->GetValue(1, i);
             const char* pszScope = oResultTable->GetValue(2, i);
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
             if( pszExtName == nullptr || pszDefinition == nullptr ||
                 pszScope == nullptr )
             {
                 continue;
             }
-=======
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
 
             if( EQUAL(pszExtName, "gpkg_webp") )
             {
@@ -8489,68 +7525,8 @@ const OGRFieldDomain* GDALGeoPackageDataset::GetFieldDomain(const std::string& n
             {
                 const char* pszTableName = oResultTable2->GetValue (0, iRecord);
                 const char* pszColumnName = oResultTable2->GetValue (1, iRecord);
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
                 if( pszTableName == nullptr || pszColumnName == nullptr )
                     continue;
-=======
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
                 OGRLayer* poLayer = const_cast<GDALGeoPackageDataset*>(this)->
                                                     GetLayerByName(pszTableName);
                 if( poLayer )
@@ -8599,68 +7575,8 @@ const OGRFieldDomain* GDALGeoPackageDataset::GetFieldDomain(const std::string& n
     for ( int iRecord = 0; iRecord < oResultTable->RowCount(); iRecord++ )
     {
         const char* pszConstraintType = oResultTable->GetValue (0, iRecord);
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
         if( pszConstraintType == nullptr )
             continue;
-=======
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/gpkg/ogrgeopackagedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
         const char* pszValue = oResultTable->GetValue (1, iRecord);
         const char* pszMin = oResultTable->GetValue (2, iRecord);
         const bool bIsMinIncluded = oResultTable->GetValueAsInteger(3, iRecord) == 1;

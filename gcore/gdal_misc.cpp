@@ -3302,36 +3302,6 @@ GDALGeneralCmdLineProcessor( int nArgc, char ***ppapszArgv, int nOptions )
                 printf( "  Supports: Feature styles.\n" );/*ok*/
             if( CPLFetchBool( papszMD, GDAL_DCAP_COORDINATE_EPOCH, false ) )
                 printf( "  Supports: Coordinate epoch.\n" );/*ok*/
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/gcore/gdal_misc.cpp
-=======
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gcore/gdal_misc.cpp
             if( CPLFetchBool( papszMD, GDAL_DCAP_MULTIPLE_VECTOR_LAYERS, false ) )
                 printf( "  Supports: Multiple vector layers.\n" );/*ok*/
             if( CPLFetchBool( papszMD, GDAL_DCAP_FIELD_DOMAINS, false ) )
@@ -3339,36 +3309,6 @@ GDALGeneralCmdLineProcessor( int nArgc, char ***ppapszArgv, int nOptions )
             if( CSLFetchNameValue( papszMD, GDAL_DMD_CREATION_FIELD_DOMAIN_TYPES ) )
               printf( "  Creation field domain types: %s\n",/*ok*/
                       CSLFetchNameValue( papszMD, GDAL_DMD_CREATION_FIELD_DOMAIN_TYPES ) );
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/gcore/gdal_misc.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:gcore/gdal_misc.cpp
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master:gcore/gdal_misc.cpp
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
 
             for( const char* key: { GDAL_DMD_CREATIONOPTIONLIST,
                                     GDAL_DMD_MULTIDIM_DATASET_CREATIONOPTIONLIST,

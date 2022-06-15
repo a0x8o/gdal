@@ -311,49 +311,7 @@ static void SerializeJSON(const CPLJSONObject& obj,
 
         case CPLJSONObject::Type::Long:
         {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/apps/gdalmdiminfo_lib.cpp
-            serializer.Add( obj.ToLong() );
-=======
-=======
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:apps/gdalmdiminfo_lib.cpp
             serializer.Add( static_cast<int64_t>(obj.ToLong()) );
-=======
-            serializer.Add( obj.ToLong() );
->>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/apps/gdalmdiminfo_lib.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:apps/gdalmdiminfo_lib.cpp
-=======
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-<<<<<<< HEAD
->>>>>>> OSGeo-master:apps/gdalmdiminfo_lib.cpp
-=======
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
             break;
         }
 

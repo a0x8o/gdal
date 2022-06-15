@@ -11,29 +11,68 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
  * Copyright (c) 2021, CLS
 =======
 >>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
  * Copyright (c) 2021, CLS
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
  * Copyright (c) 2021, CLS
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> feature/gdaltiles
  * Copyright (c) 2021, CLS
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
  * Copyright (c) 2021, CLS
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
  * Copyright (c) 2021, CLS
@@ -46,6 +85,39 @@
  * Copyright (c) 2021, CLS
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> gdal-raster-parallelisation
+=======
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+ * Copyright (c) 2021, CLS
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+ * Copyright (c) 2021, CLS
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+ * Copyright (c) 2021, CLS
+=======
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -72,6 +144,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -81,16 +154,66 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
+=======
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 #include "gdal_alg_priv.h"
 
 #include <climits>
@@ -99,21 +222,54 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 
 #include <climits>
 #include <cmath>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
@@ -122,6 +278,47 @@
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+
+#include <climits>
+#include <cmath>
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+
+#include <climits>
+#include <cmath>
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> feature/gdaltiles
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> feature/gdaltiles
+=======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
 =======
 
@@ -135,6 +332,15 @@
 >>>>>>> OSGeo-master
 =======
 >>>>>>> gdal-raster-parallelisation
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 #include <cstdlib>
 #include <cstring>
 
@@ -152,29 +358,68 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 #include "memdataset.h"
 =======
 >>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 #include "memdataset.h"
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
 #include "memdataset.h"
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> feature/gdaltiles
 #include "memdataset.h"
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 #include "memdataset.h"
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 #include "memdataset.h"
@@ -187,6 +432,39 @@
 #include "memdataset.h"
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> gdal-raster-parallelisation
+=======
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+#include "memdataset.h"
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+#include "memdataset.h"
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+#include "memdataset.h"
+=======
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 
 CPL_CVSID("$Id$")
 
@@ -211,19 +489,62 @@ const double OVERSAMPLE_FACTOR=1.3;
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 typedef struct {
     GDALTransformerInfo sTI;
 
@@ -264,6 +585,7 @@ typedef struct {
 } GDALGeoLocTransformInfo;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -276,6 +598,19 @@ typedef struct {
 =======
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> feature/gdaltiles
+=======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -285,9 +620,47 @@ typedef struct {
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 /************************************************************************/
 /*                         GeoLocLoadFullData()                         */
 /************************************************************************/
@@ -403,6 +776,7 @@ static bool GeoLocLoadFullData( GDALGeoLocTransformInfo *psTransform )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -412,16 +786,66 @@ static bool GeoLocLoadFullData( GDALGeoLocTransformInfo *psTransform )
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
+=======
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 /* -------------------------------------------------------------------- */
 /*      Scan forward map for lat/long extents.                          */
 /* -------------------------------------------------------------------- */
@@ -463,25 +887,66 @@ static bool GeoLocLoadFullData( GDALGeoLocTransformInfo *psTransform )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 =======
+<<<<<<< HEAD
 >>>>>>> OSGeo-master
 =======
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -490,6 +955,27 @@ static bool GeoLocLoadFullData( GDALGeoLocTransformInfo *psTransform )
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> gdal-raster-parallelisation
+=======
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
     return true;
 }
 
@@ -506,19 +992,62 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
     const size_t nXYCount = nXSize * nYSize;
     const int nMaxIter = 3;
 
@@ -554,6 +1083,7 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
         }
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -566,6 +1096,19 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 =======
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> feature/gdaltiles
+=======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
@@ -575,9 +1118,47 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 
 /* -------------------------------------------------------------------- */
 /*      Decide on resolution for backmap.  We aim for slightly          */
@@ -590,15 +1171,48 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
     const double dfPixelSize = sqrt(
         (psTransform->dfMaxX - psTransform->dfMinX) *
         (psTransform->dfMaxY - psTransform->dfMinY) / dfTargetPixels);
@@ -606,14 +1220,26 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
     const double dfPixelSize = sqrt((dfMaxX - dfMinX) * (dfMaxY - dfMinY)
                               / dfTargetPixels);
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 >>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
     const double dfPixelSize = sqrt(
         (psTransform->dfMaxX - psTransform->dfMinX) *
         (psTransform->dfMaxY - psTransform->dfMinY) / dfTargetPixels);
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
@@ -628,8 +1254,16 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 =======
     const double dfPixelSize = sqrt((dfMaxX - dfMinX) * (dfMaxY - dfMinY)
                               / dfTargetPixels);
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
     const double dfPixelSize = sqrt(
         (psTransform->dfMaxX - psTransform->dfMinX) *
@@ -637,12 +1271,48 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 =======
+<<<<<<< HEAD
     const double dfPixelSize = sqrt(
         (psTransform->dfMaxX - psTransform->dfMinX) *
         (psTransform->dfMaxY - psTransform->dfMinY) / dfTargetPixels);
 >>>>>>> OSGeo-master
 =======
 >>>>>>> gdal-raster-parallelisation
+=======
+    const double dfPixelSize = sqrt((dfMaxX - dfMinX) * (dfMaxY - dfMinY)
+                              / dfTargetPixels);
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+    const double dfPixelSize = sqrt(
+        (psTransform->dfMaxX - psTransform->dfMinX) *
+        (psTransform->dfMaxY - psTransform->dfMinY) / dfTargetPixels);
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+    const double dfPixelSize = sqrt(
+        (psTransform->dfMaxX - psTransform->dfMinX) *
+        (psTransform->dfMaxY - psTransform->dfMinY) / dfTargetPixels);
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
     if( dfPixelSize == 0.0 )
     {
         CPLError(CE_Failure, CPLE_AppDefined, "Invalid pixel size for backmap");
@@ -653,28 +1323,73 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
     const double dfBMXSize = (psTransform->dfMaxX - psTransform->dfMinX) / dfPixelSize + 1;
     const double dfBMYSize = (psTransform->dfMaxY - psTransform->dfMinY) / dfPixelSize + 1;
 =======
     const double dfBMXSize = (dfMaxX - dfMinX) / dfPixelSize + 1;
     const double dfBMYSize = (dfMaxY - dfMinY) / dfPixelSize + 1;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 >>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
     const double dfBMXSize = (psTransform->dfMaxX - psTransform->dfMinX) / dfPixelSize + 1;
     const double dfBMYSize = (psTransform->dfMaxY - psTransform->dfMinY) / dfPixelSize + 1;
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
@@ -688,19 +1403,61 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 =======
     const double dfBMXSize = (dfMaxX - dfMinX) / dfPixelSize + 1;
     const double dfBMYSize = (dfMaxY - dfMinY) / dfPixelSize + 1;
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
     const double dfBMXSize = (psTransform->dfMaxX - psTransform->dfMinX) / dfPixelSize + 1;
     const double dfBMYSize = (psTransform->dfMaxY - psTransform->dfMinY) / dfPixelSize + 1;
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 =======
+<<<<<<< HEAD
     const double dfBMXSize = (psTransform->dfMaxX - psTransform->dfMinX) / dfPixelSize + 1;
     const double dfBMYSize = (psTransform->dfMaxY - psTransform->dfMinY) / dfPixelSize + 1;
 >>>>>>> OSGeo-master
 =======
 >>>>>>> gdal-raster-parallelisation
+=======
+    const double dfBMXSize = (dfMaxX - dfMinX) / dfPixelSize + 1;
+    const double dfBMYSize = (dfMaxY - dfMinY) / dfPixelSize + 1;
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+    const double dfBMXSize = (psTransform->dfMaxX - psTransform->dfMinX) / dfPixelSize + 1;
+    const double dfBMYSize = (psTransform->dfMaxY - psTransform->dfMinY) / dfPixelSize + 1;
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+    const double dfBMXSize = (psTransform->dfMaxX - psTransform->dfMinX) / dfPixelSize + 1;
+    const double dfBMYSize = (psTransform->dfMaxY - psTransform->dfMinY) / dfPixelSize + 1;
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 
     if( !(dfBMXSize > 0 && dfBMXSize < INT_MAX) ||
         !(dfBMYSize > 0 && dfBMYSize < INT_MAX) )
@@ -727,15 +1484,48 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
     const double dfMinX = psTransform->dfMinX - dfPixelSize / 2.0;
     const double dfMaxY = psTransform->dfMaxY + dfPixelSize / 2.0;
 =======
@@ -743,13 +1533,25 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
     dfMaxY += dfPixelSize / 2.0;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 >>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
     const double dfMinX = psTransform->dfMinX - dfPixelSize / 2.0;
     const double dfMaxY = psTransform->dfMaxY + dfPixelSize / 2.0;
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
@@ -764,19 +1566,62 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
     dfMinX -= dfPixelSize / 2.0;
     dfMaxY += dfPixelSize / 2.0;
 
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
     const double dfMinX = psTransform->dfMinX - dfPixelSize / 2.0;
     const double dfMaxY = psTransform->dfMaxY + dfPixelSize / 2.0;
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 =======
+<<<<<<< HEAD
     const double dfMinX = psTransform->dfMinX - dfPixelSize / 2.0;
     const double dfMaxY = psTransform->dfMaxY + dfPixelSize / 2.0;
 >>>>>>> OSGeo-master
 =======
 >>>>>>> gdal-raster-parallelisation
+=======
+    dfMinX -= dfPixelSize / 2.0;
+    dfMaxY += dfPixelSize / 2.0;
+
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+    const double dfMinX = psTransform->dfMinX - dfPixelSize / 2.0;
+    const double dfMaxY = psTransform->dfMaxY + dfPixelSize / 2.0;
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+    const double dfMinX = psTransform->dfMinX - dfPixelSize / 2.0;
+    const double dfMaxY = psTransform->dfMaxY + dfPixelSize / 2.0;
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 
     psTransform->adfBackMapGeoTransform[0] = dfMinX;
     psTransform->adfBackMapGeoTransform[1] = dfPixelSize;
@@ -792,22 +1637,60 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
     GByte *pabyValidFlag = static_cast<GByte *>(
         VSI_CALLOC_VERBOSE(nBMXSize, nBMYSize));
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
@@ -816,6 +1699,47 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+    GByte *pabyValidFlag = static_cast<GByte *>(
+        VSI_CALLOC_VERBOSE(nBMXSize, nBMYSize));
+
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+    GByte *pabyValidFlag = static_cast<GByte *>(
+        VSI_CALLOC_VERBOSE(nBMXSize, nBMYSize));
+
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> feature/gdaltiles
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> feature/gdaltiles
+=======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
 =======
     GByte *pabyValidFlag = static_cast<GByte *>(
@@ -829,6 +1753,15 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 >>>>>>> OSGeo-master
 =======
 >>>>>>> gdal-raster-parallelisation
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
     psTransform->pafBackMapX = static_cast<float *>(
         VSI_MALLOC3_VERBOSE(nBMXSize, nBMYSize, sizeof(float)));
     psTransform->pafBackMapY = static_cast<float *>(
@@ -841,6 +1774,7 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
 =======
@@ -848,14 +1782,47 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
+=======
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
     if( psTransform->pafBackMapX == nullptr ||
         psTransform->pafBackMapY == nullptr ||
         wgtsBackMap == nullptr)
     {
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -864,6 +1831,21 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> gdal-raster-parallelisation
+=======
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
     if( pabyValidFlag == nullptr ||
         psTransform->pafBackMapX == nullptr ||
         psTransform->pafBackMapY == nullptr ||
@@ -871,9 +1853,21 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
     {
         CPLFree( pabyValidFlag );
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 >>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
     if( psTransform->pafBackMapX == nullptr ||
@@ -881,6 +1875,11 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
         wgtsBackMap == nullptr)
     {
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
@@ -894,8 +1893,16 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
     if( psTransform->pafBackMapX == nullptr ||
         psTransform->pafBackMapY == nullptr ||
@@ -904,9 +1911,45 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 =======
+<<<<<<< HEAD
 >>>>>>> OSGeo-master
 =======
 >>>>>>> gdal-raster-parallelisation
+=======
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+    if( psTransform->pafBackMapX == nullptr ||
+        psTransform->pafBackMapY == nullptr ||
+        wgtsBackMap == nullptr)
+    {
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+    if( psTransform->pafBackMapX == nullptr ||
+        psTransform->pafBackMapY == nullptr ||
+        wgtsBackMap == nullptr)
+    {
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
         CPLFree( wgtsBackMap );
         return false;
     }
@@ -918,38 +1961,102 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
         psTransform->pafBackMapX[i] = 0;
         psTransform->pafBackMapY[i] = 0;
         wgtsBackMap[i] = 0.0;
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
         psTransform->pafBackMapX[i] = 0.0;
         psTransform->pafBackMapY[i] = 0.0;
         wgtsBackMap[i] = 0.0;
         pabyValidFlag[i] = 0;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 >>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
         psTransform->pafBackMapX[i] = 0;
         psTransform->pafBackMapY[i] = 0;
         wgtsBackMap[i] = 0.0;
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
@@ -962,8 +2069,16 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
         psTransform->pafBackMapX[i] = 0;
         psTransform->pafBackMapY[i] = 0;
@@ -971,12 +2086,46 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 =======
+<<<<<<< HEAD
         psTransform->pafBackMapX[i] = 0;
         psTransform->pafBackMapY[i] = 0;
         wgtsBackMap[i] = 0.0;
 >>>>>>> OSGeo-master
 =======
 >>>>>>> gdal-raster-parallelisation
+=======
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+        psTransform->pafBackMapX[i] = 0;
+        psTransform->pafBackMapY[i] = 0;
+        wgtsBackMap[i] = 0.0;
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+        psTransform->pafBackMapX[i] = 0;
+        psTransform->pafBackMapY[i] = 0;
+        wgtsBackMap[i] = 0.0;
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
     }
 
 /* -------------------------------------------------------------------- */
@@ -986,6 +2135,7 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
 =======
@@ -993,10 +2143,42 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
+=======
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 /* -------------------------------------------------------------------- */
 
     const auto UpdateBackmap = [&](std::ptrdiff_t iBMX, std::ptrdiff_t iBMY,
@@ -1045,29 +2227,76 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 =======
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> gdal-raster-parallelisation
+=======
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 /*      Initialize to the nMaxIter+1 value so we can spot genuinely     */
 /*      valid pixels in the hole-filling loop.                          */
 /* -------------------------------------------------------------------- */
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 >>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 /* -------------------------------------------------------------------- */
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
 /* -------------------------------------------------------------------- */
 
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+/* -------------------------------------------------------------------- */
+
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
     const auto UpdateBackmap = [&](std::ptrdiff_t iBMX, std::ptrdiff_t iBMY,
                                    size_t iX, size_t iY,
                                    double tempwt)
@@ -1113,13 +2342,24 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
     };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
+=======
+>>>>>>> feature/gdaltiles
 =======
 /* -------------------------------------------------------------------- */
 
@@ -1169,6 +2409,7 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
 =======
@@ -1178,6 +2419,91 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> gdal-raster-parallelisation
+=======
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+/* -------------------------------------------------------------------- */
+
+    const auto UpdateBackmap = [&](std::ptrdiff_t iBMX, std::ptrdiff_t iBMY,
+                                   size_t iX, size_t iY,
+                                   double tempwt)
+    {
+        const float fUpdatedBMX = psTransform->pafBackMapX[iBMX + iBMY * nBMXSize] +
+            static_cast<float>( tempwt * (
+                (iX + FSHIFT) * psTransform->dfPIXEL_STEP +
+                psTransform->dfPIXEL_OFFSET));
+        const float fUpdatedBMY = psTransform->pafBackMapY[iBMX + iBMY * nBMXSize] +
+            static_cast<float>( tempwt * (
+                (iY + FSHIFT) * psTransform->dfLINE_STEP +
+                psTransform->dfLINE_OFFSET));
+        const float fUpdatedWeight = wgtsBackMap[iBMX + iBMY * nBMXSize] +
+                               static_cast<float>(tempwt);
+
+        // Only update the backmap if the updated averaged value results in a
+        // geoloc position that isn't too different from the original one.
+        // (there's no guarantee that if padfGeoLocX[i] ~= padfGeoLoc[j],
+        //  padfGeoLoc[alpha * i + (1 - alpha) * j] ~= padfGeoLoc[i] )
+        if( fUpdatedWeight > 0 )
+        {
+            const float fX = fUpdatedBMX / fUpdatedWeight;
+            const float fY = fUpdatedBMY / fUpdatedWeight;
+            const double dfGeoLocPixel = (fX - psTransform->dfPIXEL_OFFSET) / psTransform->dfPIXEL_STEP;
+            const double dfGeoLocLine = (fY - psTransform->dfLINE_OFFSET) / psTransform->dfLINE_STEP;
+            size_t iXAvg = static_cast<size_t>(std::max(0.0, dfGeoLocPixel));
+            iXAvg = std::min(iXAvg, psTransform->nGeoLocXSize-1);
+            size_t iYAvg = static_cast<size_t>(std::max(0.0, dfGeoLocLine));
+            iYAvg = std::min(iYAvg, psTransform->nGeoLocYSize-1);
+            const double dfGLX = psTransform->padfGeoLocX[iXAvg + iYAvg * nXSize];
+            const double dfGLY = psTransform->padfGeoLocY[iXAvg + iYAvg * nXSize];
+
+            if( !(psTransform->bHasNoData &&
+                  dfGLX == psTransform->dfNoDataX ) &&
+                fabs(dfGLX - psTransform->padfGeoLocX[iX + iY * nXSize]) <= 2 * dfPixelSize &&
+                fabs(dfGLY - psTransform->padfGeoLocY[iX + iY * nXSize]) <= 2 * dfPixelSize )
+            {
+                psTransform->pafBackMapX[iBMX + iBMY * nBMXSize] = fUpdatedBMX;
+                psTransform->pafBackMapY[iBMX + iBMY * nBMXSize] = fUpdatedBMY;
+                wgtsBackMap[iBMX + iBMY * nBMXSize] = fUpdatedWeight;
+            }
+        }
+    };
+
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
     for( size_t iY = 0; iY < nYSize; iY++ )
     {
         for( size_t iX = 0; iX < nXSize; iX++ )
@@ -1201,28 +2527,73 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
             const std::ptrdiff_t iBMX = static_cast<std::ptrdiff_t>(dBMX);
             const std::ptrdiff_t iBMY = static_cast<std::ptrdiff_t>(dBMY);
 =======
             const int iBMX = static_cast<int>(dBMX);
             const int iBMY = static_cast<int>(dBMY);
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 >>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
             const std::ptrdiff_t iBMX = static_cast<std::ptrdiff_t>(dBMX);
             const std::ptrdiff_t iBMY = static_cast<std::ptrdiff_t>(dBMY);
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
@@ -1236,19 +2607,61 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 =======
             const int iBMX = static_cast<int>(dBMX);
             const int iBMY = static_cast<int>(dBMY);
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
             const std::ptrdiff_t iBMX = static_cast<std::ptrdiff_t>(dBMX);
             const std::ptrdiff_t iBMY = static_cast<std::ptrdiff_t>(dBMY);
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 =======
+<<<<<<< HEAD
             const std::ptrdiff_t iBMX = static_cast<std::ptrdiff_t>(dBMX);
             const std::ptrdiff_t iBMY = static_cast<std::ptrdiff_t>(dBMY);
 >>>>>>> OSGeo-master
 =======
 >>>>>>> gdal-raster-parallelisation
+=======
+            const int iBMX = static_cast<int>(dBMX);
+            const int iBMY = static_cast<int>(dBMY);
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+            const std::ptrdiff_t iBMX = static_cast<std::ptrdiff_t>(dBMX);
+            const std::ptrdiff_t iBMY = static_cast<std::ptrdiff_t>(dBMY);
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+            const std::ptrdiff_t iBMX = static_cast<std::ptrdiff_t>(dBMX);
+            const std::ptrdiff_t iBMY = static_cast<std::ptrdiff_t>(dBMY);
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
             const double fracBMX = dBMX - iBMX;
             const double fracBMY = dBMY - iBMY;
 
@@ -1268,21 +2681,64 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 UpdateBackmap(iBMX, iBMY, iX, iY, tempwt);
 =======
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
                 UpdateBackmap(iBMX, iBMY, iX, iY, tempwt);
 =======
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+                UpdateBackmap(iBMX, iBMY, iX, iY, tempwt);
+=======
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
                 psTransform->pafBackMapX[iBMX + iBMY * nBMXSize] +=
                     static_cast<float>( tempwt * (
                         (iX + FSHIFT) * psTransform->dfPIXEL_STEP +
@@ -1297,13 +2753,30 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
                 //For backward compatibility
                 pabyValidFlag[iBMX + iBMY * nBMXSize] = static_cast<GByte>(nMaxIter+1);
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 >>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
                 UpdateBackmap(iBMX, iBMY, iX, iY, tempwt);
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
@@ -1314,6 +2787,7 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -1325,6 +2799,45 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 >>>>>>> OSGeo-master
 =======
 >>>>>>> gdal-raster-parallelisation
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+                UpdateBackmap(iBMX, iBMY, iX, iY, tempwt);
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+                UpdateBackmap(iBMX, iBMY, iX, iY, tempwt);
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+                UpdateBackmap(iBMX, iBMY, iX, iY, tempwt);
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+                UpdateBackmap(iBMX, iBMY, iX, iY, tempwt);
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
             }
 
             //Check logic for top right pixel
@@ -1337,21 +2850,64 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 UpdateBackmap(iBMX + 1, iBMY, iX, iY, tempwt);
 =======
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
                 UpdateBackmap(iBMX + 1, iBMY, iX, iY, tempwt);
 =======
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+                UpdateBackmap(iBMX + 1, iBMY, iX, iY, tempwt);
+=======
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 
                 psTransform->pafBackMapX[iBMX + 1 + iBMY * nBMXSize] +=
                     static_cast<float>( tempwt * (
@@ -1367,13 +2923,30 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
                 //For backward compatibility
                 pabyValidFlag[iBMX + 1 + iBMY * nBMXSize] = static_cast<GByte>(nMaxIter+1);
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 >>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
                 UpdateBackmap(iBMX + 1, iBMY, iX, iY, tempwt);
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
@@ -1384,6 +2957,7 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -1395,6 +2969,45 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 >>>>>>> OSGeo-master
 =======
 >>>>>>> gdal-raster-parallelisation
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+                UpdateBackmap(iBMX + 1, iBMY, iX, iY, tempwt);
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+                UpdateBackmap(iBMX + 1, iBMY, iX, iY, tempwt);
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+                UpdateBackmap(iBMX + 1, iBMY, iX, iY, tempwt);
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+                UpdateBackmap(iBMX + 1, iBMY, iX, iY, tempwt);
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
             }
 
             //Check logic for bottom right pixel
@@ -1406,21 +3019,64 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 UpdateBackmap(iBMX + 1, iBMY + 1, iX, iY, tempwt);
 =======
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
                 UpdateBackmap(iBMX + 1, iBMY + 1, iX, iY, tempwt);
 =======
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+                UpdateBackmap(iBMX + 1, iBMY + 1, iX, iY, tempwt);
+=======
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
                 psTransform->pafBackMapX[iBMX + 1 + (iBMY+1) * nBMXSize] +=
                     static_cast<float>( tempwt * (
                         (iX + FSHIFT) * psTransform->dfPIXEL_STEP +
@@ -1435,13 +3091,30 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
                 //For backward compatibility
                 pabyValidFlag[iBMX + 1 + (iBMY+1) * nBMXSize] = static_cast<GByte>(nMaxIter+1);
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 >>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
                 UpdateBackmap(iBMX + 1, iBMY + 1, iX, iY, tempwt);
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
@@ -1452,6 +3125,7 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -1463,6 +3137,45 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 >>>>>>> OSGeo-master
 =======
 >>>>>>> gdal-raster-parallelisation
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+                UpdateBackmap(iBMX + 1, iBMY + 1, iX, iY, tempwt);
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+                UpdateBackmap(iBMX + 1, iBMY + 1, iX, iY, tempwt);
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+                UpdateBackmap(iBMX + 1, iBMY + 1, iX, iY, tempwt);
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+                UpdateBackmap(iBMX + 1, iBMY + 1, iX, iY, tempwt);
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
             }
 
             //Check logic for bottom left pixel
@@ -1475,21 +3188,64 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 UpdateBackmap(iBMX, iBMY + 1, iX, iY, tempwt);
 =======
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
                 UpdateBackmap(iBMX, iBMY + 1, iX, iY, tempwt);
 =======
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+                UpdateBackmap(iBMX, iBMY + 1, iX, iY, tempwt);
+=======
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
                 psTransform->pafBackMapX[iBMX + (iBMY+1) * nBMXSize] +=
                     static_cast<float>( tempwt * (
                         (iX + FSHIFT) * psTransform->dfPIXEL_STEP +
@@ -1504,13 +3260,30 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
                 //For backward compatibility
                 pabyValidFlag[iBMX + (iBMY+1) * nBMXSize] = static_cast<GByte>(nMaxIter+1);
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 >>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
                 UpdateBackmap(iBMX, iBMY + 1, iX, iY, tempwt);
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
@@ -1521,6 +3294,7 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -1532,6 +3306,45 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 >>>>>>> OSGeo-master
 =======
 >>>>>>> gdal-raster-parallelisation
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+                UpdateBackmap(iBMX, iBMY + 1, iX, iY, tempwt);
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+                UpdateBackmap(iBMX, iBMY + 1, iX, iY, tempwt);
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+                UpdateBackmap(iBMX, iBMY + 1, iX, iY, tempwt);
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+                UpdateBackmap(iBMX, iBMY + 1, iX, iY, tempwt);
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
             }
 
         }
@@ -1546,6 +3359,7 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
@@ -1555,16 +3369,66 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
+=======
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
         //Check if pixel was only touch during neighbor scan
         //But no real weight was added as source point matched
         //backmap grid node
@@ -1572,9 +3436,18 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
 =======
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
         {
             psTransform->pafBackMapX[i] /= wgtsBackMap[i];
             psTransform->pafBackMapY[i] /= wgtsBackMap[i];
@@ -1688,9 +3561,22 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
         if (pabyValidFlag[i] == 0)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
         {
             psTransform->pafBackMapX[i] /= wgtsBackMap[i];
             psTransform->pafBackMapY[i] /= wgtsBackMap[i];
@@ -1801,16 +3687,30 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
     CPLFree( wgtsBackMap );
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> feature/gdaltiles
     CPLFree( pabyValidFlag );
 >>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> feature/gdaltiles
         {
             psTransform->pafBackMapX[i] /= wgtsBackMap[i];
             psTransform->pafBackMapY[i] /= wgtsBackMap[i];
@@ -1928,10 +3828,18 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
 =======
         //Setting these to -1 for backward compatibility
         if (pabyValidFlag[i] == 0)
+=======
+=======
+        //Setting these to -1 for backward compatibility
+        if (pabyValidFlag[i] == 0)
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
         {
@@ -2048,10 +3956,499 @@ static bool GeoLocGenerateBackMap( GDALGeoLocTransformInfo *psTransform )
 =======
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> OSGeo-master
 =======
 >>>>>>> gdal-raster-parallelisation
+=======
+=======
+        //Setting these to -1 for backward compatibility
+        if (pabyValidFlag[i] == 0)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+        {
+            psTransform->pafBackMapX[i] /= wgtsBackMap[i];
+            psTransform->pafBackMapY[i] /= wgtsBackMap[i];
+        }
+        else
+        {
+            psTransform->pafBackMapX[i] = -1.0f;
+            psTransform->pafBackMapY[i] = -1.0f;
+        }
+    }
+
+    // Fill holes in backmap
+    auto poMEMDS = std::unique_ptr<GDALDataset>(
+          MEMDataset::Create( "",
+                              static_cast<int>(nBMXSize),
+                              static_cast<int>(nBMYSize),
+                              0, GDT_Float32, nullptr ));
+
+    for( int i = 1; i <= 2; i++ )
+    {
+        char szBuffer[32] = { '\0' };
+        char szBuffer0[64] = { '\0' };
+        char* apszOptions[] = { szBuffer0, nullptr };
+
+        void* ptr = (i == 1) ? psTransform->pafBackMapX : psTransform->pafBackMapY;
+        szBuffer[CPLPrintPointer(szBuffer, ptr, sizeof(szBuffer))] = '\0';
+        snprintf(szBuffer0, sizeof(szBuffer0), "DATAPOINTER=%s", szBuffer);
+        poMEMDS->AddBand(GDT_Float32, apszOptions);
+        poMEMDS->GetRasterBand(i)->SetNoDataValue(-1);
+    }
+
+#ifdef DEBUG_GEOLOC
+    if( CPLTestBool(CPLGetConfigOption("GEOLOC_DUMP", "NO")) )
+    {
+        GDALClose(GDALCreateCopy(GDALGetDriverByName("GTiff"),
+                              "/tmp/geoloc_before_fill.tif",
+                              poMEMDS.get(),
+                              false, nullptr, nullptr, nullptr));
+    }
+#endif
+
+    constexpr double dfMaxSearchDist = 3.0;
+    constexpr int nSmoothingIterations = 1;
+    for( int i = 1; i <= 2; i++ )
+    {
+        GDALFillNodata( GDALRasterBand::ToHandle(poMEMDS->GetRasterBand(i)),
+                        nullptr,
+                        dfMaxSearchDist,
+                        0, // unused parameter
+                        nSmoothingIterations,
+                        nullptr,
+                        nullptr,
+                        nullptr );
+    }
+
+#ifdef DEBUG_GEOLOC
+    if( CPLTestBool(CPLGetConfigOption("GEOLOC_DUMP", "NO")) )
+    {
+        GDALClose(GDALCreateCopy(GDALGetDriverByName("GTiff"),
+                              "/tmp/geoloc_after_fill.tif",
+                              poMEMDS.get(),
+                              false, nullptr, nullptr, nullptr));
+    }
+#endif
+
+    // A final hole filling logic, proceeding line by line, and feeling
+    // holes when the backmap values surrounding the hole are close enough.
+    for( size_t iBMY = 0; iBMY < nBMYSize; iBMY++ )
+    {
+        size_t iLastValidIX = static_cast<size_t>(-1);
+        for( size_t iBMX = 0; iBMX < nBMXSize; iBMX++ )
+        {
+            const size_t iBM = iBMX + iBMY * nBMXSize;
+            if( psTransform->pafBackMapX[iBM] < 0 )
+                continue;
+            if( iBMX > iLastValidIX + 1 &&
+                iLastValidIX != static_cast<size_t>(-1) &&
+                fabs( psTransform->pafBackMapX[iBM] -
+                    psTransform->pafBackMapX[iLastValidIX + iBMY * nBMXSize]) <= 2 &&
+                fabs( psTransform->pafBackMapY[iBM] -
+                    psTransform->pafBackMapY[iLastValidIX + iBMY * nBMXSize]) <= 2 )
+            {
+                for( size_t iBMXInner = iLastValidIX + 1; iBMXInner < iBMX; ++iBMXInner )
+                {
+                    const float alpha = static_cast<float>(iBMXInner - iLastValidIX) / (iBMX - iLastValidIX);
+                    psTransform->pafBackMapX[iBMXInner + iBMY * nBMXSize] =
+                        (1.0f - alpha) * psTransform->pafBackMapX[iLastValidIX + iBMY * nBMXSize] +
+                        alpha * psTransform->pafBackMapX[iBM];
+                    psTransform->pafBackMapY[iBMXInner + iBMY * nBMXSize] =
+                        (1.0f - alpha) * psTransform->pafBackMapY[iLastValidIX + iBMY * nBMXSize] +
+                        alpha * psTransform->pafBackMapY[iBM];
+                }
+            }
+            iLastValidIX = iBMX;
+        }
+    }
+
+#ifdef DEBUG_GEOLOC
+    if( CPLTestBool(CPLGetConfigOption("GEOLOC_DUMP", "NO")) )
+    {
+        GDALClose(GDALCreateCopy(GDALGetDriverByName("GTiff"),
+                              "/tmp/geoloc_after_line_fill.tif",
+                              poMEMDS.get(),
+                              false, nullptr, nullptr, nullptr));
+    }
+#endif
+
+    CPLFree( wgtsBackMap );
+<<<<<<< HEAD
+    CPLFree( pabyValidFlag );
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+>>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+        {
+            psTransform->pafBackMapX[i] /= wgtsBackMap[i];
+            psTransform->pafBackMapY[i] /= wgtsBackMap[i];
+        }
+        else
+        {
+            psTransform->pafBackMapX[i] = -1.0f;
+            psTransform->pafBackMapY[i] = -1.0f;
+        }
+    }
+
+    // Fill holes in backmap
+    auto poMEMDS = std::unique_ptr<GDALDataset>(
+          MEMDataset::Create( "",
+                              static_cast<int>(nBMXSize),
+                              static_cast<int>(nBMYSize),
+                              0, GDT_Float32, nullptr ));
+
+    for( int i = 1; i <= 2; i++ )
+    {
+        char szBuffer[32] = { '\0' };
+        char szBuffer0[64] = { '\0' };
+        char* apszOptions[] = { szBuffer0, nullptr };
+
+        void* ptr = (i == 1) ? psTransform->pafBackMapX : psTransform->pafBackMapY;
+        szBuffer[CPLPrintPointer(szBuffer, ptr, sizeof(szBuffer))] = '\0';
+        snprintf(szBuffer0, sizeof(szBuffer0), "DATAPOINTER=%s", szBuffer);
+        poMEMDS->AddBand(GDT_Float32, apszOptions);
+        poMEMDS->GetRasterBand(i)->SetNoDataValue(-1);
+    }
+
+#ifdef DEBUG_GEOLOC
+    if( CPLTestBool(CPLGetConfigOption("GEOLOC_DUMP", "NO")) )
+    {
+        GDALClose(GDALCreateCopy(GDALGetDriverByName("GTiff"),
+                              "/tmp/geoloc_before_fill.tif",
+                              poMEMDS.get(),
+                              false, nullptr, nullptr, nullptr));
+    }
+#endif
+
+    constexpr double dfMaxSearchDist = 3.0;
+    constexpr int nSmoothingIterations = 1;
+    for( int i = 1; i <= 2; i++ )
+    {
+        GDALFillNodata( GDALRasterBand::ToHandle(poMEMDS->GetRasterBand(i)),
+                        nullptr,
+                        dfMaxSearchDist,
+                        0, // unused parameter
+                        nSmoothingIterations,
+                        nullptr,
+                        nullptr,
+                        nullptr );
+    }
+
+#ifdef DEBUG_GEOLOC
+    if( CPLTestBool(CPLGetConfigOption("GEOLOC_DUMP", "NO")) )
+    {
+        GDALClose(GDALCreateCopy(GDALGetDriverByName("GTiff"),
+                              "/tmp/geoloc_after_fill.tif",
+                              poMEMDS.get(),
+                              false, nullptr, nullptr, nullptr));
+    }
+#endif
+
+    // A final hole filling logic, proceeding line by line, and feeling
+    // holes when the backmap values surrounding the hole are close enough.
+    for( size_t iBMY = 0; iBMY < nBMYSize; iBMY++ )
+    {
+        size_t iLastValidIX = static_cast<size_t>(-1);
+        for( size_t iBMX = 0; iBMX < nBMXSize; iBMX++ )
+        {
+            const size_t iBM = iBMX + iBMY * nBMXSize;
+            if( psTransform->pafBackMapX[iBM] < 0 )
+                continue;
+            if( iBMX > iLastValidIX + 1 &&
+                iLastValidIX != static_cast<size_t>(-1) &&
+                fabs( psTransform->pafBackMapX[iBM] -
+                    psTransform->pafBackMapX[iLastValidIX + iBMY * nBMXSize]) <= 2 &&
+                fabs( psTransform->pafBackMapY[iBM] -
+                    psTransform->pafBackMapY[iLastValidIX + iBMY * nBMXSize]) <= 2 )
+            {
+                for( size_t iBMXInner = iLastValidIX + 1; iBMXInner < iBMX; ++iBMXInner )
+                {
+                    const float alpha = static_cast<float>(iBMXInner - iLastValidIX) / (iBMX - iLastValidIX);
+                    psTransform->pafBackMapX[iBMXInner + iBMY * nBMXSize] =
+                        (1.0f - alpha) * psTransform->pafBackMapX[iLastValidIX + iBMY * nBMXSize] +
+                        alpha * psTransform->pafBackMapX[iBM];
+                    psTransform->pafBackMapY[iBMXInner + iBMY * nBMXSize] =
+                        (1.0f - alpha) * psTransform->pafBackMapY[iLastValidIX + iBMY * nBMXSize] +
+                        alpha * psTransform->pafBackMapY[iBM];
+                }
+            }
+            iLastValidIX = iBMX;
+        }
+    }
+
+#ifdef DEBUG_GEOLOC
+    if( CPLTestBool(CPLGetConfigOption("GEOLOC_DUMP", "NO")) )
+    {
+        GDALClose(GDALCreateCopy(GDALGetDriverByName("GTiff"),
+                              "/tmp/geoloc_after_line_fill.tif",
+                              poMEMDS.get(),
+                              false, nullptr, nullptr, nullptr));
+    }
+#endif
+
+    CPLFree( wgtsBackMap );
+<<<<<<< HEAD
+    CPLFree( pabyValidFlag );
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+        {
+            psTransform->pafBackMapX[i] /= wgtsBackMap[i];
+            psTransform->pafBackMapY[i] /= wgtsBackMap[i];
+        }
+        else
+        {
+            psTransform->pafBackMapX[i] = -1.0f;
+            psTransform->pafBackMapY[i] = -1.0f;
+        }
+    }
+
+    // Fill holes in backmap
+    auto poMEMDS = std::unique_ptr<GDALDataset>(
+          MEMDataset::Create( "",
+                              static_cast<int>(nBMXSize),
+                              static_cast<int>(nBMYSize),
+                              0, GDT_Float32, nullptr ));
+
+    for( int i = 1; i <= 2; i++ )
+    {
+        char szBuffer[32] = { '\0' };
+        char szBuffer0[64] = { '\0' };
+        char* apszOptions[] = { szBuffer0, nullptr };
+
+        void* ptr = (i == 1) ? psTransform->pafBackMapX : psTransform->pafBackMapY;
+        szBuffer[CPLPrintPointer(szBuffer, ptr, sizeof(szBuffer))] = '\0';
+        snprintf(szBuffer0, sizeof(szBuffer0), "DATAPOINTER=%s", szBuffer);
+        poMEMDS->AddBand(GDT_Float32, apszOptions);
+        poMEMDS->GetRasterBand(i)->SetNoDataValue(-1);
+    }
+
+#ifdef DEBUG_GEOLOC
+    if( CPLTestBool(CPLGetConfigOption("GEOLOC_DUMP", "NO")) )
+    {
+        GDALClose(GDALCreateCopy(GDALGetDriverByName("GTiff"),
+                              "/tmp/geoloc_before_fill.tif",
+                              poMEMDS.get(),
+                              false, nullptr, nullptr, nullptr));
+    }
+#endif
+
+    constexpr double dfMaxSearchDist = 3.0;
+    constexpr int nSmoothingIterations = 1;
+    for( int i = 1; i <= 2; i++ )
+    {
+        GDALFillNodata( GDALRasterBand::ToHandle(poMEMDS->GetRasterBand(i)),
+                        nullptr,
+                        dfMaxSearchDist,
+                        0, // unused parameter
+                        nSmoothingIterations,
+                        nullptr,
+                        nullptr,
+                        nullptr );
+    }
+
+#ifdef DEBUG_GEOLOC
+    if( CPLTestBool(CPLGetConfigOption("GEOLOC_DUMP", "NO")) )
+    {
+        GDALClose(GDALCreateCopy(GDALGetDriverByName("GTiff"),
+                              "/tmp/geoloc_after_fill.tif",
+                              poMEMDS.get(),
+                              false, nullptr, nullptr, nullptr));
+    }
+#endif
+
+    // A final hole filling logic, proceeding line by line, and feeling
+    // holes when the backmap values surrounding the hole are close enough.
+    for( size_t iBMY = 0; iBMY < nBMYSize; iBMY++ )
+    {
+        size_t iLastValidIX = static_cast<size_t>(-1);
+        for( size_t iBMX = 0; iBMX < nBMXSize; iBMX++ )
+        {
+            const size_t iBM = iBMX + iBMY * nBMXSize;
+            if( psTransform->pafBackMapX[iBM] < 0 )
+                continue;
+            if( iBMX > iLastValidIX + 1 &&
+                iLastValidIX != static_cast<size_t>(-1) &&
+                fabs( psTransform->pafBackMapX[iBM] -
+                    psTransform->pafBackMapX[iLastValidIX + iBMY * nBMXSize]) <= 2 &&
+                fabs( psTransform->pafBackMapY[iBM] -
+                    psTransform->pafBackMapY[iLastValidIX + iBMY * nBMXSize]) <= 2 )
+            {
+                for( size_t iBMXInner = iLastValidIX + 1; iBMXInner < iBMX; ++iBMXInner )
+                {
+                    const float alpha = static_cast<float>(iBMXInner - iLastValidIX) / (iBMX - iLastValidIX);
+                    psTransform->pafBackMapX[iBMXInner + iBMY * nBMXSize] =
+                        (1.0f - alpha) * psTransform->pafBackMapX[iLastValidIX + iBMY * nBMXSize] +
+                        alpha * psTransform->pafBackMapX[iBM];
+                    psTransform->pafBackMapY[iBMXInner + iBMY * nBMXSize] =
+                        (1.0f - alpha) * psTransform->pafBackMapY[iLastValidIX + iBMY * nBMXSize] +
+                        alpha * psTransform->pafBackMapY[iBM];
+                }
+            }
+            iLastValidIX = iBMX;
+        }
+    }
+
+#ifdef DEBUG_GEOLOC
+    if( CPLTestBool(CPLGetConfigOption("GEOLOC_DUMP", "NO")) )
+    {
+        GDALClose(GDALCreateCopy(GDALGetDriverByName("GTiff"),
+                              "/tmp/geoloc_after_line_fill.tif",
+                              poMEMDS.get(),
+                              false, nullptr, nullptr, nullptr));
+    }
+#endif
+
+    CPLFree( wgtsBackMap );
+<<<<<<< HEAD
+    CPLFree( pabyValidFlag );
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+        {
+            psTransform->pafBackMapX[i] /= wgtsBackMap[i];
+            psTransform->pafBackMapY[i] /= wgtsBackMap[i];
+        }
+        else
+        {
+            psTransform->pafBackMapX[i] = -1.0f;
+            psTransform->pafBackMapY[i] = -1.0f;
+        }
+    }
+
+    // Fill holes in backmap
+    auto poMEMDS = std::unique_ptr<GDALDataset>(
+          MEMDataset::Create( "",
+                              static_cast<int>(nBMXSize),
+                              static_cast<int>(nBMYSize),
+                              0, GDT_Float32, nullptr ));
+
+    for( int i = 1; i <= 2; i++ )
+    {
+        char szBuffer[32] = { '\0' };
+        char szBuffer0[64] = { '\0' };
+        char* apszOptions[] = { szBuffer0, nullptr };
+
+        void* ptr = (i == 1) ? psTransform->pafBackMapX : psTransform->pafBackMapY;
+        szBuffer[CPLPrintPointer(szBuffer, ptr, sizeof(szBuffer))] = '\0';
+        snprintf(szBuffer0, sizeof(szBuffer0), "DATAPOINTER=%s", szBuffer);
+        poMEMDS->AddBand(GDT_Float32, apszOptions);
+        poMEMDS->GetRasterBand(i)->SetNoDataValue(-1);
+    }
+
+#ifdef DEBUG_GEOLOC
+    if( CPLTestBool(CPLGetConfigOption("GEOLOC_DUMP", "NO")) )
+    {
+        GDALClose(GDALCreateCopy(GDALGetDriverByName("GTiff"),
+                              "/tmp/geoloc_before_fill.tif",
+                              poMEMDS.get(),
+                              false, nullptr, nullptr, nullptr));
+    }
+#endif
+
+    constexpr double dfMaxSearchDist = 3.0;
+    constexpr int nSmoothingIterations = 1;
+    for( int i = 1; i <= 2; i++ )
+    {
+        GDALFillNodata( GDALRasterBand::ToHandle(poMEMDS->GetRasterBand(i)),
+                        nullptr,
+                        dfMaxSearchDist,
+                        0, // unused parameter
+                        nSmoothingIterations,
+                        nullptr,
+                        nullptr,
+                        nullptr );
+    }
+
+#ifdef DEBUG_GEOLOC
+    if( CPLTestBool(CPLGetConfigOption("GEOLOC_DUMP", "NO")) )
+    {
+        GDALClose(GDALCreateCopy(GDALGetDriverByName("GTiff"),
+                              "/tmp/geoloc_after_fill.tif",
+                              poMEMDS.get(),
+                              false, nullptr, nullptr, nullptr));
+    }
+#endif
+
+    // A final hole filling logic, proceeding line by line, and feeling
+    // holes when the backmap values surrounding the hole are close enough.
+    for( size_t iBMY = 0; iBMY < nBMYSize; iBMY++ )
+    {
+        size_t iLastValidIX = static_cast<size_t>(-1);
+        for( size_t iBMX = 0; iBMX < nBMXSize; iBMX++ )
+        {
+            const size_t iBM = iBMX + iBMY * nBMXSize;
+            if( psTransform->pafBackMapX[iBM] < 0 )
+                continue;
+            if( iBMX > iLastValidIX + 1 &&
+                iLastValidIX != static_cast<size_t>(-1) &&
+                fabs( psTransform->pafBackMapX[iBM] -
+                    psTransform->pafBackMapX[iLastValidIX + iBMY * nBMXSize]) <= 2 &&
+                fabs( psTransform->pafBackMapY[iBM] -
+                    psTransform->pafBackMapY[iLastValidIX + iBMY * nBMXSize]) <= 2 )
+            {
+                for( size_t iBMXInner = iLastValidIX + 1; iBMXInner < iBMX; ++iBMXInner )
+                {
+                    const float alpha = static_cast<float>(iBMXInner - iLastValidIX) / (iBMX - iLastValidIX);
+                    psTransform->pafBackMapX[iBMXInner + iBMY * nBMXSize] =
+                        (1.0f - alpha) * psTransform->pafBackMapX[iLastValidIX + iBMY * nBMXSize] +
+                        alpha * psTransform->pafBackMapX[iBM];
+                    psTransform->pafBackMapY[iBMXInner + iBMY * nBMXSize] =
+                        (1.0f - alpha) * psTransform->pafBackMapY[iLastValidIX + iBMY * nBMXSize] +
+                        alpha * psTransform->pafBackMapY[iBM];
+                }
+            }
+            iLastValidIX = iBMX;
+        }
+    }
+
+#ifdef DEBUG_GEOLOC
+    if( CPLTestBool(CPLGetConfigOption("GEOLOC_DUMP", "NO")) )
+    {
+        GDALClose(GDALCreateCopy(GDALGetDriverByName("GTiff"),
+                              "/tmp/geoloc_after_line_fill.tif",
+                              poMEMDS.get(),
+                              false, nullptr, nullptr, nullptr));
+    }
+#endif
+
+    CPLFree( wgtsBackMap );
+<<<<<<< HEAD
+    CPLFree( pabyValidFlag );
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 
     return true;
 }
@@ -2469,28 +4866,73 @@ int GDALGeoLocTransform( void *pTransformArg,
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
 >>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
             const std::ptrdiff_t iBMX = static_cast<std::ptrdiff_t>(dfBMX);
             const std::ptrdiff_t iBMY = static_cast<std::ptrdiff_t>(dfBMY);
 =======
             const int iBMX = static_cast<int>(dfBMX);
             const int iBMY = static_cast<int>(dfBMY);
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 >>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
 =======
             const std::ptrdiff_t iBMX = static_cast<std::ptrdiff_t>(dfBMX);
             const std::ptrdiff_t iBMY = static_cast<std::ptrdiff_t>(dfBMY);
 >>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> feature/gdaltiles
 =======
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
@@ -2504,19 +4946,61 @@ int GDALGeoLocTransform( void *pTransformArg,
 =======
             const int iBMX = static_cast<int>(dfBMX);
             const int iBMY = static_cast<int>(dfBMY);
+<<<<<<< HEAD
 >>>>>>> gdal-raster-parallelisation
 >>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 =======
             const std::ptrdiff_t iBMX = static_cast<std::ptrdiff_t>(dfBMX);
             const std::ptrdiff_t iBMY = static_cast<std::ptrdiff_t>(dfBMY);
 >>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
 <<<<<<< HEAD
 =======
+<<<<<<< HEAD
             const std::ptrdiff_t iBMX = static_cast<std::ptrdiff_t>(dfBMX);
             const std::ptrdiff_t iBMY = static_cast<std::ptrdiff_t>(dfBMY);
 >>>>>>> OSGeo-master
 =======
 >>>>>>> gdal-raster-parallelisation
+=======
+            const int iBMX = static_cast<int>(dfBMX);
+            const int iBMY = static_cast<int>(dfBMY);
+>>>>>>> 06d6b0b4d0 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+            const std::ptrdiff_t iBMX = static_cast<std::ptrdiff_t>(dfBMX);
+            const std::ptrdiff_t iBMY = static_cast<std::ptrdiff_t>(dfBMY);
+>>>>>>> ba1e26a07d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> e0ad3e40c3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 8fad898483 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 6bdd8a35a5 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+>>>>>>> 261b7a668c (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> 010051a724 (Merge branch 'master' of github.com:OSGeo/gdal)
+<<<<<<< HEAD
+>>>>>>> dd24feb831 (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+=======
+=======
+            const std::ptrdiff_t iBMX = static_cast<std::ptrdiff_t>(dfBMX);
+            const std::ptrdiff_t iBMY = static_cast<std::ptrdiff_t>(dfBMY);
+>>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> 61413fe48c (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> cda917754d (Merge branch 'master' of github.com:OSGeo/gdal)
+=======
+>>>>>>> 69ca760823 (Merge branch 'master' of github.com:OSGeo/gdal)
+>>>>>>> feature/gdaltiles
 
             const size_t iBM = iBMX + iBMY * psTransform->nBackMapWidth;
             if( psTransform->pafBackMapX[iBM] < 0 )

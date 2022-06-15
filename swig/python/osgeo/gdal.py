@@ -1714,27 +1714,7 @@ def Sync(*args, **kwargs):
     return _gdal.Sync(*args, **kwargs)
 
 def AbortPendingUploads(*args):
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/swig/python/osgeo/gdal.py
-    """AbortPendingUploads(char const * utf8_path) -> bool"""
-=======
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:swig/python/osgeo/gdal.py
     r"""AbortPendingUploads(char const * utf8_path) -> bool"""
-=======
-    """AbortPendingUploads(char const * utf8_path) -> bool"""
->>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/osgeo/gdal.py
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:swig/python/osgeo/gdal.py
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
     return _gdal.AbortPendingUploads(*args)
 
 def GetActualURL(*args):
@@ -2595,52 +2575,8 @@ class Dataset(MajorObject):
             return self._SetGCPs2(gcps, wkt_or_spatial_ref)
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/swig/python/osgeo/gdal.py
-=======
-=======
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:swig/python/osgeo/gdal.py
 # Register Dataset in _gdal:
 _gdal.Dataset_swigregister(Dataset)
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:swig/python/osgeo/gdal.py
-=======
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-<<<<<<< HEAD
->>>>>>> OSGeo-master:swig/python/osgeo/gdal.py
-=======
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-GEDTST_NONE = _gdal.GEDTST_NONE
-GEDTST_JSON = _gdal.GEDTST_JSON
-class Group(_object):
-    """Proxy of C++ GDALGroupHS class."""
->>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/osgeo/gdal.py
 
 GEDTST_NONE = _gdal.GEDTST_NONE
 
@@ -2852,11 +2788,6 @@ class MDArray(object):
         r"""GetNoDataValueAsString(MDArray self) -> retStringAndCPLFree *"""
         return _gdal.MDArray_GetNoDataValueAsString(self, *args)
 
-    def GetNoDataValueAsString(self, *args):
-        """GetNoDataValueAsString(MDArray self) -> retStringAndCPLFree *"""
-        return _gdal.MDArray_GetNoDataValueAsString(self, *args)
-
-
     def SetNoDataValueDouble(self, *args):
         r"""SetNoDataValueDouble(MDArray self, double d) -> CPLErr"""
         return _gdal.MDArray_SetNoDataValueDouble(self, *args)
@@ -2872,11 +2803,6 @@ class MDArray(object):
     def SetNoDataValueString(self, *args):
         r"""SetNoDataValueString(MDArray self, char const * nodata) -> CPLErr"""
         return _gdal.MDArray_SetNoDataValueString(self, *args)
-
-    def SetNoDataValueString(self, *args):
-        """SetNoDataValueString(MDArray self, char const * nodata) -> CPLErr"""
-        return _gdal.MDArray_SetNoDataValueString(self, *args)
-
 
     def SetNoDataValueRaw(self, *args):
         r"""SetNoDataValueRaw(MDArray self, GIntBig nLen) -> CPLErr"""
@@ -2962,22 +2888,6 @@ class MDArray(object):
         r"""Cache(MDArray self, char ** options=None) -> bool"""
         return _gdal.MDArray_Cache(self, *args)
 
-    def Cache(self, *args):
-        """Cache(MDArray self, char ** options=None) -> bool"""
-        return _gdal.MDArray_Cache(self, *args)
-
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-    def Cache(self, *args):
-        """Cache(MDArray self, char ** options=None) -> bool"""
-        return _gdal.MDArray_Cache(self, *args)
-
-
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
     def Read(self,
              array_start_idx = None,
              count = None,
@@ -3439,33 +3349,6 @@ class ExtendedDataType(object):
         r"""GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"""
         return _gdal.ExtendedDataType_GetSubType(self, *args)
 
-    def GetSubType(self, *args):
-        """GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"""
-        return _gdal.ExtendedDataType_GetSubType(self, *args)
-
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-    def GetSubType(self, *args):
-        """GetSubType(ExtendedDataType self) -> GDALExtendedDataTypeSubType"""
-        return _gdal.ExtendedDataType_GetSubType(self, *args)
-
-
-=======
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
     def GetComponents(self, *args):
         r"""GetComponents(ExtendedDataType self)"""
         return _gdal.ExtendedDataType_GetComponents(self, *args)

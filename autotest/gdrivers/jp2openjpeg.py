@@ -2992,27 +2992,7 @@ def test_jp2openjpeg_tilesize_16():
 
 def test_jp2openjpeg_generate_PLT():
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    # Only try the rest with openjpeg >= 2.4.0 that supports it
-=======
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
     # Only try the test with openjpeg >= 2.4.0 that supports it
-=======
-    # Only try the rest with openjpeg >= 2.4.0 that supports it
->>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
     if gdaltest.jp2openjpeg_drv.GetMetadataItem('DMD_CREATIONOPTIONLIST').find('PLT') < 0:
         pytest.skip()
 
@@ -3039,27 +3019,7 @@ def test_jp2openjpeg_generate_PLT():
 
 def test_jp2openjpeg_generate_TLM():
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    # Only try the rest with openjpeg >= 2.5.0 that supports it
-=======
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
     # Only try the test with openjpeg >= 2.5.0 that supports it
-=======
-    # Only try the rest with openjpeg >= 2.5.0 that supports it
->>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
     if gdaltest.jp2openjpeg_drv.GetMetadataItem('DMD_CREATIONOPTIONLIST').find('TLM') < 0:
         pytest.skip()
 
@@ -3079,15 +3039,6 @@ def test_jp2openjpeg_generate_TLM():
 
     gdaltest.jp2openjpeg_drv.Delete(filename)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
 
 
 ###############################################################################
@@ -3111,12 +3062,3 @@ def test_jp2openjpeg_STRICT_NO():
     with gdaltest.error_handler():
         assert ds.GetRasterBand(1).Checksum() == 5058
     ds = None
-=======
->>>>>>> 33d99249ed (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation

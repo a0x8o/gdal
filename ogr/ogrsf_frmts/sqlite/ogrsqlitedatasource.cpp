@@ -623,69 +623,7 @@ void OGRSQLiteDataSource::SaveStatistics()
                   "SELECT event_id, table_name, geometry_column, event "
                   "FROM spatialite_history ORDER BY event_id DESC LIMIT 1" );
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
-        if( oResult->RowCount() == 1 )
-=======
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
         if( oResult && oResult->RowCount() == 1 )
-=======
-        if( oResult->RowCount() == 1 )
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
         {
             const char* pszEventId = oResult->GetValue(0, 0);
             const char* pszTableName = oResult->GetValue(1, 0);
@@ -2347,47 +2285,7 @@ bool OGRSQLiteDataSource::OpenVirtualTable(const char* pszName, const char* pszS
 /*                             OpenTable()                              */
 /************************************************************************/
 
-<<<<<<< HEAD:ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
 bool OGRSQLiteDataSource::OpenTable( const char *pszTableName,
-=======
-int OGRSQLiteDataSource::OpenTable( const char *pszTableName,
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/sqlite/ogrsqlitedatasource.cpp
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
                                     bool bIsTable,
                                     bool bIsVirtualShape )
 
@@ -2739,20 +2637,6 @@ OGRLayer * OGRSQLiteDataSource::ExecuteSQL( const char *pszSQLCommand,
 
         DeleteLayer( pszLayerName );
         return nullptr;
-    }
-
-/* -------------------------------------------------------------------- */
-/*      Special case GetVSILFILE() command (used by GDAL MBTiles driver)*/
-/* -------------------------------------------------------------------- */
-    if (strcmp(pszSQLCommand, "GetVSILFILE()") == 0)
-    {
-        if (fpMainFile == nullptr)
-            return nullptr;
-
-        char szVal[64];
-        int nRet = CPLPrintPointer( szVal, fpMainFile, sizeof(szVal)-1 );
-        szVal[nRet] = '\0';
-        return new OGRSQLiteSingleFeatureLayer( "VSILFILE", szVal );
     }
 
 /* -------------------------------------------------------------------- */

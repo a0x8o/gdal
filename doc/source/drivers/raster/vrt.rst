@@ -947,52 +947,10 @@ GDAL drivers are registered. ``pszMetadata`` is optional and can be ``nullptr``.
 It can be used to declare the function signature to the user and to request additional
 parameters aside from the ones from the Dataset.
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/doc/source/drivers/raster/vrt.rst
-A :cpp:type:`GDALDerivedPixelFunc` is defined with a signature similar to :cpp:func:`GDALRasterBand::IRasterIO`:
-
-
-.. cpp:function:: CPL_Err TestFunction(void** papoSources, int nSources, void* pData, int nBufXSize, int nBufYSize, GDALDataType eSrcType, GDALDataType eBufType, int nPixelSpace, int nLineSpace)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:doc/source/drivers/raster/vrt.rst
 A :cpp:type:`GDALDerivedPixelFuncWithArgs` is defined with a signature similar to :cpp:func:`GDALRasterBand::IRasterIO`:
 
 
 .. cpp:function:: CPLErr TestFunction(void** papoSources, int nSources, void* pData, int nBufXSize, int nBufYSize, GDALDataType eSrcType, GDALDataType eBufType, int nPixelSpace, int nLineSpace, CSLConstList papszArgs)
-=======
-A :cpp:type:`GDALDerivedPixelFunc` is defined with a signature similar to :cpp:func:`GDALRasterBand::IRasterIO`:
-
-
-.. cpp:function:: CPL_Err TestFunction(void** papoSources, int nSources, void* pData, int nBufXSize, int nBufYSize, GDALDataType eSrcType, GDALDataType eBufType, int nPixelSpace, int nLineSpace)
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/raster/vrt.rst
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
 
    :param papoSources: A pointer to packed rasters; one per source.  The
     datatype of all will be the same, specified in the ``eSrcType`` parameter.
@@ -1023,101 +981,11 @@ A :cpp:type:`GDALDerivedPixelFunc` is defined with a signature similar to :cpp:f
 
    :param nLineSpace: The byte offset from the start of one scanline in
     pData to the start of the next.
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:doc/source/drivers/raster/vrt.rst
-A :cpp:type:`GDALDerivedPixelFuncWithArgs` is defined with a signature similar to :cpp:func:`GDALRasterBand::IRasterIO`:
-
-
-.. cpp:function:: CPLErr TestFunction(void** papoSources, int nSources, void* pData, int nBufXSize, int nBufYSize, GDALDataType eSrcType, GDALDataType eBufType, int nPixelSpace, int nLineSpace, CSLConstList papszArgs)
-=======
-A :cpp:type:`GDALDerivedPixelFunc` is defined with a signature similar to :cpp:func:`GDALRasterBand::IRasterIO`:
-
-
-.. cpp:function:: CPL_Err TestFunction(void** papoSources, int nSources, void* pData, int nBufXSize, int nBufYSize, GDALDataType eSrcType, GDALDataType eBufType, int nPixelSpace, int nLineSpace)
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/raster/vrt.rst
-
-   :param papoSources: A pointer to packed rasters; one per source.  The
-    datatype of all will be the same, specified in the ``eSrcType`` parameter.
-
-   :param nSources: The number of source rasters.
-
-   :param pData: The buffer into which the data should be read, or from which
-    it should be written.  This buffer must contain at least ``nBufXSize *
-    nBufYSize`` words of type eBufType.  It is organized in left to right, top
-    to bottom pixel order.  Spacing is controlled by the ``nPixelSpace`` and
-    ``nLineSpace`` parameters.
-
-   :param nBufXSize: The width of the buffer image into which the desired
-    region is to be read, or from which it is to be written.
-
-   :param nBufYSize: The height of the buffer image into which the desired
-    region is to be read, or from which it is to be written.
-
-   :param eSrcType: The type of the pixel values in the ``papoSources`` raster
-    array.
-
-   :param eBufType: The type of the pixel values that the pixel function must
-    generate in the ``pData`` data buffer.
-
-   :param nPixelSpace: The byte offset from the start of one pixel value in
-    ``pData`` to the start of the next pixel value within a scanline.  If
-    defaulted (0) the size of the datatype eBufType is used.
-
-   :param nLineSpace: The byte offset from the start of one scanline in
-    pData to the start of the next.
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:doc/source/drivers/raster/vrt.rst
 
    :param papszArgs: An optional string list of named function arguments (e.g. ``y=4``)
 
 
 It is also possible to register a :cpp:type:`GDALDerivedPixelFunc` (which omits the final :cpp:type:`CSLConstList` argument) using :cpp:func:`GDALAddDerivedBandPixelFunc`.
-=======
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/drivers/raster/vrt.rst
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:doc/source/drivers/raster/vrt.rst
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master:doc/source/drivers/raster/vrt.rst
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
 
 The following is an implementation of the pixel function:
 

@@ -2887,94 +2887,6 @@ def test_vsis3_write_multipart_retry(aws_test_config, webserver_port):
                 gdal.VSIFCloseL(f)
 
 
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-###############################################################################
-# Test abort pending multipart uploads
-
-
-def test_vsis3_abort_pending_uploads():
-
-    if gdaltest.webserver_port == 0:
-        pytest.skip()
-
-    handler = webserver.SequentialHandler()
-    handler.add('GET', '/my_bucket/?max-uploads=1&uploads', 200, {},
-                """<?xml version="1.0"?>
-                <ListMultipartUploadsResult>
-                    <NextKeyMarker>next_key_marker</NextKeyMarker>
-                    <NextUploadIdMarker>next_upload_id_marker</NextUploadIdMarker>
-                    <IsTruncated>true</IsTruncated>
-                    <Upload>
-                        <Key>my_key</Key>
-                        <UploadId>my_upload_id</UploadId>
-                    </Upload>
-                </ListMultipartUploadsResult>
-                """)
-    handler.add('GET', '/my_bucket/?key-marker=next_key_marker&max-uploads=1&upload-id-marker=next_upload_id_marker&uploads', 200, {},
-                """<?xml version="1.0"?>
-                <ListMultipartUploadsResult>
-                    <IsTruncated>false</IsTruncated>
-                    <Upload>
-                        <Key>my_key2</Key>
-                        <UploadId>my_upload_id2</UploadId>
-                    </Upload>
-                </ListMultipartUploadsResult>
-                """)
-    handler.add('DELETE', "/my_bucket/my_key?uploadId=my_upload_id", 204)
-    handler.add('DELETE', "/my_bucket/my_key2?uploadId=my_upload_id2", 204)
-    with webserver.install_http_handler(handler):
-        with gdaltest.config_option('CPL_VSIS3_LIST_UPLOADS_MAX', '1'):
-            assert gdal.AbortPendingUploads('/vsis3/my_bucket')
-
-
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-###############################################################################
-# Test abort pending multipart uploads
-
-
-def test_vsis3_abort_pending_uploads():
-
-    if gdaltest.webserver_port == 0:
-        pytest.skip()
-
-    handler = webserver.SequentialHandler()
-    handler.add('GET', '/my_bucket/?max-uploads=1&uploads', 200, {},
-                """<?xml version="1.0"?>
-                <ListMultipartUploadsResult>
-                    <NextKeyMarker>next_key_marker</NextKeyMarker>
-                    <NextUploadIdMarker>next_upload_id_marker</NextUploadIdMarker>
-                    <IsTruncated>true</IsTruncated>
-                    <Upload>
-                        <Key>my_key</Key>
-                        <UploadId>my_upload_id</UploadId>
-                    </Upload>
-                </ListMultipartUploadsResult>
-                """)
-    handler.add('GET', '/my_bucket/?key-marker=next_key_marker&max-uploads=1&upload-id-marker=next_upload_id_marker&uploads', 200, {},
-                """<?xml version="1.0"?>
-                <ListMultipartUploadsResult>
-                    <IsTruncated>false</IsTruncated>
-                    <Upload>
-                        <Key>my_key2</Key>
-                        <UploadId>my_upload_id2</UploadId>
-                    </Upload>
-                </ListMultipartUploadsResult>
-                """)
-    handler.add('DELETE', "/my_bucket/my_key?uploadId=my_upload_id", 204)
-    handler.add('DELETE', "/my_bucket/my_key2?uploadId=my_upload_id2", 204)
-    with webserver.install_http_handler(handler):
-        with gdaltest.config_option('CPL_VSIS3_LIST_UPLOADS_MAX', '1'):
-            assert gdal.AbortPendingUploads('/vsis3/my_bucket')
-
-
 ###############################################################################
 # Test abort pending multipart uploads
 
@@ -3245,23 +3157,6 @@ def test_vsis3_7(aws_test_config, webserver_port):
         ) is not None
 
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
->>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> OSGeo-master
-=======
-
->>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> OSGeo-master
-=======
-
->>>>>>> 5f28a56f54 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
 ###############################################################################
 # Test handling of file and directory with same name
 
@@ -4137,7 +4032,6 @@ def test_vsis3_fake_sync_multithreaded_upload_chunk_size_failure(
     gdal.FileFromMemBuffer('/vsimem/test/foo', 'foo\n')
 
     handler = webserver.SequentialHandler()
-<<<<<<< HEAD
     handler.add(
         'GET',
         '/test_bucket/?prefix=test%2F',
@@ -4190,20 +4084,6 @@ def test_vsis3_fake_sync_multithreaded_upload_chunk_size_failure(
         '/test_bucket/test/foo?uploadId=my_id',
         204
     )
-=======
-    handler.add('GET', '/test_bucket/?prefix=test%2F', 200)
-    handler.add('GET', '/test_bucket/test', 404)
-    handler.add('GET', '/test_bucket/?delimiter=%2F&max-keys=100&prefix=test%2F', 200)
-    handler.add('GET', '/test_bucket/', 200)
-    handler.add('GET', '/test_bucket/test/', 404)
-    handler.add('PUT', '/test_bucket/test/', 200)
-    handler.add('POST', '/test_bucket/test/foo?uploads', 200, {'Content-type': 'application:/xml'},
-                b'<?xml version="1.0" encoding="UTF-8"?><InitiateMultipartUploadResult><UploadId>my_id</UploadId></InitiateMultipartUploadResult>')
-    handler.add('PUT', '/test_bucket/test/foo?partNumber=1&uploadId=my_id', 200,
-                {'ETag':  '"first_etag"'},
-                expected_headers = {'Content-Length': '3'})
-    handler.add('DELETE', '/test_bucket/test/foo?uploadId=my_id', 204)
->>>>>>> 8d1efd1c06 (Merge branch 'master' of github.com:OSGeo/gdal)
 
     with gdaltest.config_options({'VSIS3_SIMULATE_THREADING': 'YES',
                                   'VSIS3_SYNC_MULTITHREADING': 'NO'}):
@@ -4257,15 +4137,6 @@ def test_vsis3_metadata(aws_test_config, webserver_port):
 
     # Write HEADERS domain
     handler = webserver.SequentialHandler()
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
     handler.add(
         'PUT',
         '/test_metadata/foo.txt',
@@ -4277,30 +4148,6 @@ def test_vsis3_metadata(aws_test_config, webserver_port):
             'x-amz-copy-source': '/test_metadata/foo.txt'
         }
     )
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-    handler.add('PUT', '/test_metadata/foo.txt', 200, {},
-                expected_headers = {'foo': 'bar',
-                                    'x-amz-metadata-directive': 'REPLACE',
-                                    'x-amz-copy-source': '/test_metadata/foo.txt'})
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 8d1efd1c06 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> OSGeo-master
-=======
->>>>>>> 8d1efd1c06 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> OSGeo-master
-=======
->>>>>>> 8d1efd1c06 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
     with webserver.install_http_handler(handler):
         assert gdal.SetFileMetadata(
             '/vsis3/test_metadata/foo.txt',
@@ -4310,33 +4157,11 @@ def test_vsis3_metadata(aws_test_config, webserver_port):
 
     # Write TAGS domain
     handler = webserver.SequentialHandler()
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    handler.add('PUT', '/test_metadata/foo.txt?tagging', 200,
-                expected_body = b"""<?xml version="1.0" encoding="UTF-8"?>
-=======
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
     handler.add(
         'PUT',
         '/test_metadata/foo.txt?tagging',
         200,
         expected_body=b"""<?xml version="1.0" encoding="UTF-8"?>
-=======
-    handler.add('PUT', '/test_metadata/foo.txt?tagging', 200,
-                expected_body = b"""<?xml version="1.0" encoding="UTF-8"?>
->>>>>>> 8d1efd1c06 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
 <Tagging xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
   <TagSet>
     <Tag>

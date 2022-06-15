@@ -194,53 +194,12 @@ DCAP_NOTNULL_FIELDS = _gdalconst.DCAP_NOTNULL_FIELDS
 DCAP_UNIQUE_FIELDS = _gdalconst.DCAP_UNIQUE_FIELDS
 DCAP_DEFAULT_FIELDS = _gdalconst.DCAP_DEFAULT_FIELDS
 DCAP_NOTNULL_GEOMFIELDS = _gdalconst.DCAP_NOTNULL_GEOMFIELDS
-<<<<<<< HEAD:swig/python/osgeo/gdalconst.py
 DCAP_NONSPATIAL = _gdalconst.DCAP_NONSPATIAL
 DCAP_FEATURE_STYLES = _gdalconst.DCAP_FEATURE_STYLES
 DCAP_COORDINATE_EPOCH = _gdalconst.DCAP_COORDINATE_EPOCH
 DCAP_MULTIPLE_VECTOR_LAYERS = _gdalconst.DCAP_MULTIPLE_VECTOR_LAYERS
 DCAP_FIELD_DOMAINS = _gdalconst.DCAP_FIELD_DOMAINS
 DCAP_RENAME_LAYERS = _gdalconst.DCAP_RENAME_LAYERS
-=======
-DCAP_UNIQUE_FIELDS = _gdalconst.DCAP_UNIQUE_FIELDS
-DCAP_COORDINATE_EPOCH = _gdalconst.DCAP_COORDINATE_EPOCH
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/osgeo/gdalconst.py
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/swig/python/osgeo/gdalconst.py
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/osgeo/gdalconst.py
->>>>>>> OSGeo-master:swig/python/osgeo/gdalconst.py
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/osgeo/gdalconst.py
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/osgeo/gdalconst.py
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/osgeo/gdalconst.py
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/osgeo/gdalconst.py
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/swig/python/osgeo/gdalconst.py
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
 DIM_TYPE_HORIZONTAL_X = _gdalconst.DIM_TYPE_HORIZONTAL_X
 DIM_TYPE_HORIZONTAL_Y = _gdalconst.DIM_TYPE_HORIZONTAL_Y
 DIM_TYPE_VERTICAL = _gdalconst.DIM_TYPE_VERTICAL

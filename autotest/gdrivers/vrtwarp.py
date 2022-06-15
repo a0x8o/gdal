@@ -342,49 +342,7 @@ def test_vrtwarp_9():
     vrtwarp_ds = gdal.Warp('tmp/vrtwarp_9.vrt', 'tmp/sstgeo.vrt', options='-overwrite -of VRT -geoloc')
     assert vrtwarp_ds.GetRasterBand(1).GetOverviewCount() == 1
     assert vrtwarp_ds.GetRasterBand(1).Checksum() == expected_cs_main
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-    assert vrtwarp_ds.GetRasterBand(1).GetOverview(0).Checksum() == 63696, \
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
     assert vrtwarp_ds.GetRasterBand(1).GetOverview(0).Checksum() == 62489, \
-=======
-    assert vrtwarp_ds.GetRasterBand(1).GetOverview(0).Checksum() == 63696, \
->>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
         (vrtwarp_ds.GetRasterBand(1).GetOverview(0).XSize, vrtwarp_ds.GetRasterBand(1).GetOverview(0).YSize)
     vrtwarp_ds = None
 

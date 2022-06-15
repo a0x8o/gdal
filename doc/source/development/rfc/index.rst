@@ -88,80 +88,8 @@ RFC list
     rfc78_gdal_utils_package
     rfc79_listing_service_providers
     rfc80_numfocus_relationship
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/doc/source/development/rfc/index.rst
-    rfc81_coordinate_epoch
-    rfc83_use_of_project_sponsorship
-=======
-<<<<<<< HEAD:doc/source/development/rfc/index.rst
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD:doc/source/development/rfc/index.rst
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 8fc61d7286 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> d9b2222466 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:doc/source/development/rfc/index.rst
-=======
->>>>>>> b1792c641a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/development/rfc/index.rst
-=======
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 19c9e5d30a (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-<<<<<<< HEAD:doc/source/development/rfc/index.rst
-=======
->>>>>>> b1792c641a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/development/rfc/index.rst
->>>>>>> 0ca587e694 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> b7187c72cc (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 8fc61d7286 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
-<<<<<<< HEAD:doc/source/development/rfc/index.rst
-=======
->>>>>>> b1792c641a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/development/rfc/index.rst
->>>>>>> 4a3a424d06 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> d9b2222466 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> gdal-raster-parallelisation
->>>>>>> b7187c72cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-<<<<<<< HEAD:doc/source/development/rfc/index.rst
-=======
->>>>>>> b1792c641a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/development/rfc/index.rst
->>>>>>> 4a3a424d06 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD:doc/source/development/rfc/index.rst
-<<<<<<< HEAD:doc/source/development/rfc/index.rst
-=======
->>>>>>> b1792c641a (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/development/rfc/index.rst
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
     rfc81_coordinate_epoch
     rfc83_use_of_project_sponsorship
     rfc84_cmake
     rfc85_policy_code_additions
-=======
-    rfc83_use_of_project_sponsorship
->>>>>>> 3d5cfd648d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/doc/source/development/rfc/index.rst
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:doc/source/development/rfc/index.rst
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
+    rfc86_column_oriented_api

@@ -65,7 +65,7 @@ GDALRasterBandH MEMCreateRasterBand( GDALDataset *poDS, int nBand,
                                      int bAssumeOwnership )
 
 {
-    return reinterpret_cast<GDALRasterBandH>(
+    return GDALRasterBand::ToHandle(
         new MEMRasterBand( poDS, nBand, pabyData, eType, nPixelOffset,
                            nLineOffset, bAssumeOwnership ) );
 }
@@ -81,7 +81,7 @@ GDALRasterBandH MEMCreateRasterBandEx( GDALDataset *poDS, int nBand,
                                        int bAssumeOwnership )
 
 {
-    return reinterpret_cast<GDALRasterBandH>(
+    return GDALRasterBand::ToHandle(
         new MEMRasterBand( poDS, nBand, pabyData, eType, nPixelOffset,
                            nLineOffset, bAssumeOwnership ) );
 }
@@ -183,7 +183,7 @@ CPLErr MEMRasterBand::IReadBlock( CPL_UNUSED int nBlockXOff,
 
         for( int iPixel = 0; iPixel < nBlockXSize; iPixel++ )
         {
-            memcpy( reinterpret_cast<GByte *>(pImage) + iPixel*nWordSize,
+            memcpy( static_cast<GByte *>(pImage) + iPixel*nWordSize,
                     pabyCur + iPixel*nPixelOffset,
                     nWordSize );
         }
@@ -217,7 +217,7 @@ CPLErr MEMRasterBand::IWriteBlock( CPL_UNUSED int nBlockXOff,
         for( int iPixel = 0; iPixel < nBlockXSize; iPixel++ )
         {
             memcpy( pabyCur + iPixel*nPixelOffset,
-                    reinterpret_cast<GByte *>( pImage ) + iPixel*nWordSize,
+                    static_cast<GByte *>( pImage ) + iPixel*nWordSize,
                     nWordSize );
         }
     }
@@ -259,8 +259,8 @@ CPLErr MEMRasterBand::IRasterIO( GDALRWFlag eRWFlag,
                 nXOff*nPixelOffset,
                 eDataType,
                 static_cast<int>(nPixelOffset),
-                reinterpret_cast<GByte*>( pData ) +
-                nLineSpaceBuf * static_cast<GPtrDiff_t>(iLine),
+                static_cast<GByte*>( pData ) +
+                    nLineSpaceBuf * static_cast<GPtrDiff_t>(iLine),
                 eBufType,
                 static_cast<int>(nPixelSpaceBuf),
                 nXSize );
@@ -271,8 +271,8 @@ CPLErr MEMRasterBand::IRasterIO( GDALRWFlag eRWFlag,
         for( int iLine = 0; iLine < nYSize; iLine++ )
         {
             GDALCopyWords(
-                reinterpret_cast<GByte *>( pData ) +
-                nLineSpaceBuf*static_cast<GPtrDiff_t>(iLine),
+                static_cast<GByte *>( pData ) +
+                    nLineSpaceBuf*static_cast<GPtrDiff_t>(iLine),
                 eBufType,
                 static_cast<int>(nPixelSpaceBuf),
                 pabyData + nLineOffset*static_cast<GPtrDiff_t>(iLine + nYOff) +
@@ -319,7 +319,7 @@ CPLErr MEMDataset::IRasterIO( GDALRWFlag eRWFlag,
             if( panBandMap[iBandIndex] != iBandIndex + 1 )
                 break;
 
-            MEMRasterBand *poBand = reinterpret_cast<MEMRasterBand *>(
+            MEMRasterBand *poBand = cpl::down_cast<MEMRasterBand *>(
                 GetRasterBand(iBandIndex + 1) );
             if( iBandIndex == 0 )
             {
@@ -352,8 +352,8 @@ CPLErr MEMDataset::IRasterIO( GDALRWFlag eRWFlag,
                         nXOff*nPixelOffset,
                         eDT,
                         eDTSize,
-                        reinterpret_cast<GByte *>( pData ) +
-                        nLineSpaceBuf * static_cast<size_t>(iLine),
+                        static_cast<GByte *>( pData ) +
+                            nLineSpaceBuf * static_cast<size_t>(iLine),
                         eBufType,
                         eBufTypeSize,
                         nXSize * nBands );
@@ -364,8 +364,8 @@ CPLErr MEMDataset::IRasterIO( GDALRWFlag eRWFlag,
                 for(int iLine=0;iLine<nYSize;iLine++)
                 {
                     GDALCopyWords(
-                        reinterpret_cast<GByte *>( pData ) +
-                        nLineSpaceBuf*(size_t)iLine,
+                        static_cast<GByte *>( pData ) +
+                            nLineSpaceBuf*(size_t)iLine,
                         eBufType,
                         eBufTypeSize,
                         pabyData +
@@ -433,7 +433,7 @@ CPLErr MEMRasterBand::CreateMaskBand( int nFlagsIn )
     if( (nFlagsIn & GMF_PER_DATASET) != 0 && nBand != 1 && poMemDS != nullptr )
     {
         MEMRasterBand* poFirstBand =
-            reinterpret_cast<MEMRasterBand*>(poMemDS->GetRasterBand(1));
+            dynamic_cast<MEMRasterBand*>(poMemDS->GetRasterBand(1));
         if( poFirstBand != nullptr)
             return poFirstBand->CreateMaskBand( nFlagsIn );
     }
@@ -454,7 +454,7 @@ CPLErr MEMRasterBand::CreateMaskBand( int nFlagsIn )
         for( int i = 2; i <= poMemDS->GetRasterCount(); ++i )
         {
             MEMRasterBand* poOtherBand =
-                reinterpret_cast<MEMRasterBand*>(poMemDS->GetRasterBand(i));
+                cpl::down_cast<MEMRasterBand*>(poMemDS->GetRasterBand(i));
             poOtherBand->InvalidateMaskBand();
             poOtherBand->nMaskFlags = nFlagsIn;
             poOtherBand->bOwnMask = false;
@@ -508,50 +508,10 @@ MEMDataset::MEMDataset() :
 MEMDataset::~MEMDataset()
 
 {
-<<<<<<< HEAD:frmts/mem/memdataset.cpp
     const bool bSuppressOnCloseBackup = bSuppressOnClose;
     bSuppressOnClose = true;
     FlushCache(true);
     bSuppressOnClose = bSuppressOnCloseBackup;
-=======
-    FlushCache();
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/mem/memdataset.cpp
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/frmts/mem/memdataset.cpp
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/mem/memdataset.cpp
->>>>>>> OSGeo-master:frmts/mem/memdataset.cpp
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/mem/memdataset.cpp
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/mem/memdataset.cpp
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/mem/memdataset.cpp
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/mem/memdataset.cpp
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/mem/memdataset.cpp
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
 
     GDALDeinitGCPs( m_nGCPCount, m_pasGCPs );
     CPLFree( m_pasGCPs );
@@ -645,7 +605,7 @@ void *MEMDataset::GetInternalHandle( const char * pszRequest )
         if(int BandNumber = static_cast<int>(CPLScanLong(&pszRequest[6], 10)))
         {
             MEMRasterBand *RequestedRasterBand =
-                reinterpret_cast<MEMRasterBand *>( GetRasterBand(BandNumber) );
+                cpl::down_cast<MEMRasterBand *>( GetRasterBand(BandNumber) );
 
             // we're within a MEMDataset so the only thing a RasterBand
             // could be is a MEMRasterBand
@@ -737,7 +697,7 @@ CPLErr MEMDataset::AddBand( GDALDataType eType, char **papszOptions )
 #if SIZEOF_VOIDP == 4
             ( nTmp > INT_MAX ) ? nullptr :
 #endif
-            reinterpret_cast<GByte *>(
+            static_cast<GByte *>(
                 VSI_CALLOC_VERBOSE((size_t)nTmp, GetRasterYSize() ) );
 
         if( pData == nullptr )
@@ -756,7 +716,7 @@ CPLErr MEMDataset::AddBand( GDALDataType eType, char **papszOptions )
 /*      Get layout of memory and other flags.                           */
 /* -------------------------------------------------------------------- */
     const char *pszDataPointer = CSLFetchNameValue(papszOptions, "DATAPOINTER");
-    GByte *pData = reinterpret_cast<GByte *>(
+    GByte *pData = static_cast<GByte *>(
         CPLScanPointer( pszDataPointer,
                         static_cast<int>(strlen(pszDataPointer)) ) );
 
@@ -779,6 +739,17 @@ CPLErr MEMDataset::AddBand( GDALDataType eType, char **papszOptions )
                                 nPixelOffset, nLineOffset, FALSE ) );
 
     return CE_None;
+}
+
+/************************************************************************/
+/*                           AddMEMBand()                               */
+/************************************************************************/
+
+void MEMDataset::AddMEMBand(GDALRasterBandH hMEMBand)
+{
+    auto poBand = GDALRasterBand::FromHandle(hMEMBand);
+    CPLAssert( dynamic_cast<MEMRasterBand*>(poBand) != nullptr );
+    SetBand( 1 + nBands, poBand);
 }
 
 /************************************************************************/
@@ -971,19 +942,20 @@ CPLErr MEMDataset::IBuildOverviews( const char *pszResampling,
 
         // If the band has an explicit mask, we need to create overviews
         // for it
-        MEMRasterBand* poMEMBand = reinterpret_cast<MEMRasterBand*>(poBand);
+        MEMRasterBand* poMEMBand = cpl::down_cast<MEMRasterBand*>(poBand);
         const bool bMustGenerateMaskOvr =
-                ( (poMEMBand->bOwnMask && poMEMBand->poMask != nullptr) ||
+            ( (poMEMBand->bOwnMask && poMEMBand->poMask != nullptr) ||
         // Or if it is a per-dataset mask, in which case just do it for the
         // first band
-                  ((poMEMBand->nMaskFlags & GMF_PER_DATASET) != 0 && iBand == 0) );
+                  ((poMEMBand->nMaskFlags & GMF_PER_DATASET) != 0 && iBand == 0) ) &&
+            dynamic_cast<MEMRasterBand*>(poBand->GetMaskBand()) != nullptr;
 
         if( nNewOverviews > 0 && bMustGenerateMaskOvr )
         {
             for( int i = 0; i < nNewOverviews; i++ )
             {
                 MEMRasterBand* poMEMOvrBand =
-                    reinterpret_cast<MEMRasterBand*>(papoOverviewBands[i]);
+                    cpl::down_cast<MEMRasterBand*>(papoOverviewBands[i]);
                 if( !(poMEMOvrBand->bOwnMask && poMEMOvrBand->poMask != nullptr) &&
                     (poMEMOvrBand->nMaskFlags & GMF_PER_DATASET) == 0 )
                 {
@@ -997,7 +969,7 @@ CPLErr MEMDataset::IBuildOverviews( const char *pszResampling,
                     1.0 * (iBand+0.5) / nBands,
                     pfnProgress, pProgressData );
 
-            MEMRasterBand* poMaskBand = reinterpret_cast<MEMRasterBand*>(
+            MEMRasterBand* poMaskBand = cpl::down_cast<MEMRasterBand*>(
                                                         poBand->GetMaskBand());
             // Make the mask band to be its own mask, similarly to what is
             // done for alpha bands in GDALRegenerateOverviews() (#5640)
@@ -1171,7 +1143,7 @@ GDALDataset *MEMDataset::Open( GDALOpenInfo * poOpenInfo )
                                      static_cast<int>(strlen(pszOption)));
 
     const char *pszDataPointer = CSLFetchNameValue(papszOptions,"DATAPOINTER");
-    GByte *pabyData = reinterpret_cast<GByte *>(
+    GByte *pabyData = static_cast<GByte *>(
         CPLScanPointer( pszDataPointer,
                         static_cast<int>(strlen(pszDataPointer)) ) );
 
@@ -1216,7 +1188,7 @@ GDALDataset *MEMDataset::Open( GDALOpenInfo * poOpenInfo )
 /*                               Create()                               */
 /************************************************************************/
 
-GDALDataset *MEMDataset::Create( const char * /* pszFilename */,
+MEMDataset *MEMDataset::Create( const char * /* pszFilename */,
                                  int nXSize,
                                  int nYSize,
                                  int nBandsIn,
@@ -1266,7 +1238,7 @@ GDALDataset *MEMDataset::Create( const char * /* pszFilename */,
     if( bPixelInterleaved )
     {
         apbyBandData.push_back(
-            reinterpret_cast<GByte *>( VSI_CALLOC_VERBOSE( 1, nGlobalSize ) ) );
+            static_cast<GByte *>( VSI_CALLOC_VERBOSE( 1, nGlobalSize ) ) );
 
         if( apbyBandData[0] == nullptr )
             bAllocOK = FALSE;
@@ -1281,7 +1253,7 @@ GDALDataset *MEMDataset::Create( const char * /* pszFilename */,
         for( int iBand = 0; iBand < nBandsIn; iBand++ )
         {
             apbyBandData.push_back(
-                reinterpret_cast<GByte *>(
+                static_cast<GByte *>(
                     VSI_CALLOC_VERBOSE(
                         1,
                         static_cast<size_t>(nWordSize) * nXSize * nYSize ) ) );
@@ -1345,357 +1317,18 @@ GDALDataset *MEMDataset::Create( const char * /* pszFilename */,
     return poDS;
 }
 
-/************************************************************************/
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/frmts/mem/memdataset.cpp
-=======
-<<<<<<< HEAD:frmts/mem/memdataset.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:frmts/mem/memdataset.cpp
-=======
->>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
->>>>>>> gdal-raster-parallelisation
-=======
-<<<<<<< HEAD:frmts/mem/memdataset.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:frmts/mem/memdataset.cpp
-=======
->>>>>>> a153e8e338 (Docker: alpine-normal: add lzma support [ci skip])
-=======
-=======
->>>>>>> 9b650fdeac (Docker: alpine-normal: add lzma support [ci skip])
-<<<<<<< HEAD
-<<<<<<< HEAD:frmts/mem/memdataset.cpp
->>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
->>>>>>> gdal-raster-parallelisation
-=======
->>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
-=======
-<<<<<<< HEAD:frmts/mem/memdataset.cpp
->>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
-=======
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD:frmts/mem/memdataset.cpp
-<<<<<<< HEAD:frmts/mem/memdataset.cpp
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
-=======
-<<<<<<< HEAD:frmts/mem/memdataset.cpp
->>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
-=======
->>>>>>> gdal-raster-parallelisation
-/*                               MEMGroup                               */
-/************************************************************************/
-
-class MEMGroup final: public GDALGroup
+GDALDataset *MEMDataset::CreateBase( const char * pszFilename,
+                                 int nXSize,
+                                 int nYSize,
+                                 int nBandsIn,
+                                 GDALDataType eType,
+                                 char **papszOptions )
 {
-    std::map<CPLString, std::shared_ptr<GDALGroup>> m_oMapGroups{};
-    std::map<CPLString, std::shared_ptr<GDALMDArray>> m_oMapMDArrays{};
-    std::map<CPLString, std::shared_ptr<GDALAttribute>> m_oMapAttributes{};
-    std::map<CPLString, std::shared_ptr<GDALDimension>> m_oMapDimensions{};
-
-public:
-    MEMGroup(const std::string& osParentName, const char* pszName): GDALGroup(osParentName, pszName ? pszName : "") {}
-
-    std::vector<std::string> GetMDArrayNames(CSLConstList papszOptions) const override;
-    std::shared_ptr<GDALMDArray> OpenMDArray(const std::string& osName,
-                                             CSLConstList papszOptions) const override;
-
-    std::vector<std::string> GetGroupNames(CSLConstList papszOptions) const override;
-    std::shared_ptr<GDALGroup> OpenGroup(const std::string& osName,
-                                         CSLConstList papszOptions) const override;
-
-    std::shared_ptr<GDALGroup> CreateGroup(const std::string& osName,
-                                           CSLConstList papszOptions) override;
-
-    std::shared_ptr<GDALDimension> CreateDimension(const std::string&,
-                                                   const std::string&,
-                                                   const std::string&,
-                                                   GUInt64,
-                                                   CSLConstList papszOptions) override;
-
-    std::shared_ptr<GDALMDArray> CreateMDArray(const std::string& osName,
-                                                       const std::vector<std::shared_ptr<GDALDimension>>& aoDimensions,
-                                                       const GDALExtendedDataType& oDataType,
-                                                       CSLConstList papszOptions) override;
-
-    std::shared_ptr<GDALAttribute> GetAttribute(const std::string& osName) const override;
-
-    std::vector<std::shared_ptr<GDALAttribute>> GetAttributes(CSLConstList papszOptions) const override;
-
-    std::vector<std::shared_ptr<GDALDimension>> GetDimensions(CSLConstList papszOptions) const override;
-
-    std::shared_ptr<GDALAttribute> CreateAttribute(
-        const std::string& osName,
-        const std::vector<GUInt64>& anDimensions,
-        const GDALExtendedDataType& oDataType,
-        CSLConstList papszOptions) override;
-};
+    return Create(pszFilename, nXSize, nYSize, nBandsIn,
+                  eType, papszOptions);
+}
 
 /************************************************************************/
-/*                            MEMAbstractMDArray                        */
-/************************************************************************/
-
-class MEMAbstractMDArray: virtual public GDALAbstractMDArray
-{
-    std::vector<std::shared_ptr<GDALDimension>> m_aoDims;
-    size_t m_nTotalSize = 0;
-    GByte* m_pabyArray{};
-    bool m_bOwnArray = false;
-    std::vector<GPtrDiff_t> m_anStrides{};
-
-    struct StackReadWrite
-    {
-        size_t       nIters = 0;
-        const GByte* src_ptr = nullptr;
-        GByte*       dst_ptr = nullptr;
-        GPtrDiff_t   src_inc_offset = 0;
-        GPtrDiff_t   dst_inc_offset = 0;
-    };
-
-    void ReadWrite(bool bIsWrite,
-                   const size_t* count,
-                    std::vector<StackReadWrite>& stack,
-                    const GDALExtendedDataType& srcType,
-                    const GDALExtendedDataType& dstType) const;
-
-protected:
-    GDALExtendedDataType m_oType;
-
-    bool IRead(const GUInt64* arrayStartIdx,     // array of size GetDimensionCount()
-                      const size_t* count,                 // array of size GetDimensionCount()
-                      const GInt64* arrayStep,        // step in elements
-                      const GPtrDiff_t* bufferStride, // stride in elements
-                      const GDALExtendedDataType& bufferDataType,
-                      void* pDstBuffer) const override;
-
-    bool IWrite(const GUInt64* arrayStartIdx,     // array of size GetDimensionCount()
-                      const size_t* count,                 // array of size GetDimensionCount()
-                      const GInt64* arrayStep,        // step in elements
-                      const GPtrDiff_t* bufferStride, // stride in elements
-                      const GDALExtendedDataType& bufferDataType,
-                      const void* pSrcBuffer) override;
-
-public:
-    MEMAbstractMDArray(const std::string& osParentName,
-                       const std::string& osName,
-                       const std::vector<std::shared_ptr<GDALDimension>>& aoDimensions,
-                       const GDALExtendedDataType& oType);
-    ~MEMAbstractMDArray();
-
-    const std::vector<std::shared_ptr<GDALDimension>>& GetDimensions() const override { return m_aoDims; }
-
-    const GDALExtendedDataType& GetDataType() const override { return m_oType; }
-
-    bool Init(GByte* pData = nullptr,
-              const std::vector<GPtrDiff_t>& anStrides = std::vector<GPtrDiff_t>());
-};
-
-/************************************************************************/
-/*                                MEMMDArray                            */
-/************************************************************************/
-
-#ifdef _MSC_VER
-#pragma warning (push)
-#pragma warning (disable:4250) // warning C4250: 'MEMMDArray': inherits 'MEMAbstractMDArray::MEMAbstractMDArray::IRead' via dominance
-#endif //_MSC_VER
-
-class MEMMDArray final: public MEMAbstractMDArray, public GDALMDArray
-{
-    std::map<CPLString, std::shared_ptr<GDALAttribute>> m_oMapAttributes{};
-    std::string m_osUnit{};
-    std::shared_ptr<OGRSpatialReference> m_poSRS{};
-    GByte* m_pabyNoData = nullptr;
-    double m_dfScale = 1.0;
-    double m_dfOffset = 0.0;
-    bool m_bHasScale = false;
-    bool m_bHasOffset = false;
-    GDALDataType m_eOffsetStorageType = GDT_Unknown;
-    GDALDataType m_eScaleStorageType = GDT_Unknown;
-    std::string m_osFilename{};
-
-protected:
-    MEMMDArray(const std::string& osParentName,
-               const std::string& osName,
-               const std::vector<std::shared_ptr<GDALDimension>>& aoDimensions,
-               const GDALExtendedDataType& oType);
-
-public:
-    static std::shared_ptr<MEMMDArray> Create(const std::string& osParentName,
-               const std::string& osName,
-               const std::vector<std::shared_ptr<GDALDimension>>& aoDimensions,
-               const GDALExtendedDataType& oType)
-    {
-        auto array(std::shared_ptr<MEMMDArray>(
-            new MEMMDArray(osParentName, osName, aoDimensions, oType)));
-        array->SetSelf(array);
-        return array;
-    }
-    ~MEMMDArray();
-
-    bool IsWritable() const override { return true; }
-
-    const std::string& GetFilename() const override { return m_osFilename; }
-
-    std::shared_ptr<GDALAttribute> GetAttribute(const std::string& osName) const override;
-
-    std::vector<std::shared_ptr<GDALAttribute>> GetAttributes(CSLConstList papszOptions) const override;
-
-    std::shared_ptr<GDALAttribute> CreateAttribute(
-        const std::string& osName,
-        const std::vector<GUInt64>& anDimensions,
-        const GDALExtendedDataType& oDataType,
-        CSLConstList papszOptions) override;
-
-    const std::string& GetUnit() const override { return m_osUnit; }
-
-    bool SetUnit(const std::string& osUnit) override {
-        m_osUnit = osUnit; return true; }
-
-    bool SetSpatialRef(const OGRSpatialReference* poSRS) override {
-        m_poSRS.reset(poSRS ? poSRS->Clone() : nullptr); return true; }
-
-    std::shared_ptr<OGRSpatialReference> GetSpatialRef() const override { return m_poSRS; }
-
-    const void* GetRawNoDataValue() const override;
-
-    bool SetRawNoDataValue(const void*) override;
-
-    double GetOffset(bool* pbHasOffset, GDALDataType* peStorageType) const override
-    {
-        if( pbHasOffset) *pbHasOffset = m_bHasOffset;
-        if( peStorageType ) *peStorageType = m_eOffsetStorageType;
-        return m_dfOffset;
-    }
-
-    double GetScale(bool* pbHasScale, GDALDataType* peStorageType) const override
-    {
-        if( pbHasScale) *pbHasScale = m_bHasScale;
-        if( peStorageType ) *peStorageType = m_eScaleStorageType;
-        return m_dfScale;
-    }
-
-    bool SetOffset(double dfOffset, GDALDataType eStorageType) override
-    { m_bHasOffset = true; m_dfOffset = dfOffset; m_eOffsetStorageType = eStorageType; return true; }
-
-    bool SetScale(double dfScale, GDALDataType eStorageType) override
-    { m_bHasScale = true; m_dfScale = dfScale; m_eScaleStorageType = eStorageType; return true; }
-};
-
-/************************************************************************/
-/*                               MEMAttribute                           */
-/************************************************************************/
-
-class MEMAttribute final: public MEMAbstractMDArray, public GDALAttribute
-{
-protected:
-    MEMAttribute(const std::string& osParentName,
-                 const std::string& osName,
-                 const std::vector<GUInt64>& anDimensions,
-                 const GDALExtendedDataType& oType);
-public:
-    static std::shared_ptr<MEMAttribute> Create(const std::string& osParentName,
-                                                const std::string& osName,
-                                                const std::vector<GUInt64>& anDimensions,
-                                                const GDALExtendedDataType& oType)
-    {
-        auto attr(std::shared_ptr<MEMAttribute>(
-            new MEMAttribute(osParentName, osName, anDimensions, oType)));
-        attr->SetSelf(attr);
-        return attr;
-    }
-};
-
-#ifdef _MSC_VER
-#pragma warning (pop)
-#endif //_MSC_VER
-
-/************************************************************************/
-/*                               MEMDimension                           */
-/************************************************************************/
-
-class MEMDimension final: public GDALDimension
-{
-    std::weak_ptr<GDALMDArray> m_poIndexingVariable{};
-
-public:
-    MEMDimension(const std::string& osParentName,
-                 const std::string& osName,
-                 const std::string& osType,
-                 const std::string& osDirection,
-                 GUInt64 nSize);
-
-    std::shared_ptr<GDALMDArray> GetIndexingVariable() const override { return m_poIndexingVariable.lock(); }
-
-    bool SetIndexingVariable(std::shared_ptr<GDALMDArray> poIndexingVariable) override;
-};
-
-/************************************************************************/
->>>>>>> dc9531d526 (Merge pull request #3822 from rouault/gml_srs):gdal/frmts/mem/memdataset.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memdataset.cpp
-=======
->>>>>>> c266ec5649 (Merge pull request #3822 from rouault/gml_srs)
-=======
-=======
->>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memdataset.cpp
->>>>>>> a153e8e338 (Docker: alpine-normal: add lzma support [ci skip])
-=======
-=======
->>>>>>> 9b650fdeac (Docker: alpine-normal: add lzma support [ci skip])
->>>>>>> gdal-raster-parallelisation
-=======
->>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memdataset.cpp
-<<<<<<< HEAD
->>>>>>> OSGeo-master:frmts/mem/memdataset.cpp
-=======
-=======
->>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
-<<<<<<< HEAD
->>>>>>> df05d90486 (Merge pull request #3822 from rouault/gml_srs)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> db86ad06c3 (Merge pull request #3822 from rouault/gml_srs)
-=======
->>>>>>> gdal-raster-parallelisation
-=======
-=======
-=======
->>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memdataset.cpp
->>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
->>>>>>> d263d6ecd7 (Docker: alpine-normal: add lzma support [ci skip])
-<<<<<<< HEAD
-=======
-=======
->>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memdataset.cpp
->>>>>>> OSGeo-master
-=======
->>>>>>> 9b650fdeac (Docker: alpine-normal: add lzma support [ci skip])
-=======
->>>>>>> 3bf486f286 (Merge pull request #3822 from rouault/gml_srs)
-=======
-=======
->>>>>>> e24604829c (Docker: alpine-normal: add lzma support [ci skip]):gdal/frmts/mem/memdataset.cpp
->>>>>>> ad39429cce (Docker: alpine-normal: add lzma support [ci skip])
->>>>>>> gdal-raster-parallelisation
 /*                           GetMDArrayNames()                          */
 /************************************************************************/
 
@@ -1776,6 +1409,7 @@ std::shared_ptr<GDALGroup> MEMGroup::CreateGroup(const std::string& osName,
 std::shared_ptr<GDALMDArray> MEMGroup::CreateMDArray(const std::string& osName,
                                                      const std::vector<std::shared_ptr<GDALDimension>>& aoDimensions,
                                                      const GDALExtendedDataType& oType,
+                                                     void* pData,
                                                      CSLConstList papszOptions)
 {
     if( osName.empty() )
@@ -1792,15 +1426,11 @@ std::shared_ptr<GDALMDArray> MEMGroup::CreateMDArray(const std::string& osName,
     }
     auto newArray(MEMMDArray::Create(GetFullName(), osName, aoDimensions, oType));
 
-    // Used by NUMPYMultiDimensionalDataset
-    const char *pszDataPointer = CSLFetchNameValue(papszOptions, "DATAPOINTER");
-    GByte* pData = nullptr;
+    GByte* pabyData = nullptr;
     std::vector<GPtrDiff_t> anStrides;
-    if( pszDataPointer )
+    if( pData )
     {
-        pData = reinterpret_cast<GByte *>(
-            CPLScanPointer( pszDataPointer,
-                            static_cast<int>(strlen(pszDataPointer)) ) );
+        pabyData = static_cast<GByte *>(pData);
         const char* pszStrides = CSLFetchNameValue(papszOptions, "STRIDES");
         if( pszStrides )
         {
@@ -1818,10 +1448,43 @@ std::shared_ptr<GDALMDArray> MEMGroup::CreateMDArray(const std::string& osName,
             }
         }
     }
-    if( !newArray->Init(pData, anStrides) )
+    if( !newArray->Init(pabyData, anStrides) )
         return nullptr;
     m_oMapMDArrays[osName] = newArray;
     return newArray;
+}
+
+std::shared_ptr<GDALMDArray> MEMGroup::CreateMDArray(const std::string& osName,
+                                                     const std::vector<std::shared_ptr<GDALDimension>>& aoDimensions,
+                                                     const GDALExtendedDataType& oType,
+                                                     CSLConstList papszOptions)
+{
+    void* pData = nullptr;
+    const char *pszDataPointer = CSLFetchNameValue(papszOptions, "DATAPOINTER");
+    if( pszDataPointer )
+    {
+        // Will not work on architectures with "capability pointers"
+        pData =
+            CPLScanPointer( pszDataPointer,
+                            static_cast<int>(strlen(pszDataPointer)) );
+    }
+    return CreateMDArray(osName, aoDimensions, oType, pData, papszOptions);
+}
+
+/************************************************************************/
+/*                      MEMGroupCreateMDArray()                         */
+/************************************************************************/
+
+// Used by NUMPYMultiDimensionalDataset
+std::shared_ptr<GDALMDArray> MEMGroupCreateMDArray(GDALGroup* poGroup,
+                                                   const std::string& osName,
+                                                   const std::vector<std::shared_ptr<GDALDimension>>& aoDimensions,
+                                                   const GDALExtendedDataType& oDataType,
+                                                   void* pData,
+                                                   CSLConstList papszOptions)
+{
+    return dynamic_cast<MEMGroup*>(poGroup)->CreateMDArray(
+        osName, aoDimensions, oDataType, pData, papszOptions);
 }
 
 /************************************************************************/
@@ -2109,7 +1772,7 @@ void MEMAbstractMDArray::ReadWrite(bool bIsWrite,
                 CPLAssert(false);
             }
             else if ( bBothAreNumericDT
-#if SIZEOF_VOIDP == 8
+#if SIZEOF_VOIDP >= 8
                       && src_inc_offset <= std::numeric_limits<int>::max()
                       && dst_inc_offset <= std::numeric_limits<int>::max()
 #endif
@@ -2598,7 +2261,7 @@ void GDALRegister_MEM()
     poDriver->pfnOpen = MEMDataset::Open;
     poDriver->pfnIdentify = MEMDatasetIdentify;
 #endif
-    poDriver->pfnCreate = MEMDataset::Create;
+    poDriver->pfnCreate = MEMDataset::CreateBase;
     poDriver->pfnCreateMultiDimensional = MEMDataset::CreateMultiDimensional;
     poDriver->pfnDelete = MEMDatasetDelete;
 

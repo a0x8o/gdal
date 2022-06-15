@@ -393,73 +393,8 @@ LZWDecode(TIFF* tif, uint8_t* op0, tmsize_t occ0, uint16_t s)
 	static const char module[] = "LZWDecode";
 	LZWCodecState *sp = DecoderState(tif);
 	uint8_t *op = (uint8_t*) op0;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/frmts/gtiff/libtiff/tif_lzw.c
-=======
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:frmts/gtiff/libtiff/tif_lzw.c
 	tmsize_t occ = occ0;
 	uint8_t *bp;
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:frmts/gtiff/libtiff/tif_lzw.c
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master:frmts/gtiff/libtiff/tif_lzw.c
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-	long occ = (long) occ0;
-	uint8_t *tp;
-	uint8_t *bp;
-	hcode_t code;
-	int len;
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/gtiff/libtiff/tif_lzw.c
 	long nbits, nextbits, nbitsmask;
 	WordType nextdata;
 	code_t *free_entp, *maxcodep, *oldcodep;
@@ -514,51 +449,6 @@ LZWDecode(TIFF* tif, uint8_t* op0, tmsize_t occ0, uint16_t s)
 	}
 
 	bp = (uint8_t*)tif->tif_rawcp;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD:frmts/gtiff/libtiff/tif_lzw.c
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/frmts/gtiff/libtiff/tif_lzw.c
-=======
-<<<<<<< HEAD:frmts/gtiff/libtiff/tif_lzw.c
-=======
->>>>>>> OSGeo-master:frmts/gtiff/libtiff/tif_lzw.c
-=======
-<<<<<<< HEAD:frmts/gtiff/libtiff/tif_lzw.c
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> gdal-raster-parallelisation
-=======
-<<<<<<< HEAD:frmts/gtiff/libtiff/tif_lzw.c
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD:frmts/gtiff/libtiff/tif_lzw.c
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-<<<<<<< HEAD:frmts/gtiff/libtiff/tif_lzw.c
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-#ifdef LZW_CHECKEOS
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/gtiff/libtiff/tif_lzw.c
 	sp->dec_bitsleft += (((uint64_t)tif->tif_rawcc - sp->old_tif_rawcc) << 3);
 	uint64_t dec_bitsleft = sp->dec_bitsleft;
 	nbits = sp->lzw_nbits;
@@ -571,40 +461,9 @@ LZWDecode(TIFF* tif, uint8_t* op0, tmsize_t occ0, uint16_t s)
 	code_t* const dec_codetab = sp->dec_codetab;
 	code_t* codep;
 
-<<<<<<< HEAD:frmts/gtiff/libtiff/tif_lzw.c
     if (occ == 0) {
         goto after_loop;
     }
-=======
-	while (occ > 0) {
-		NextCode(tif, sp, bp, code, GetNextCode);
-		if (code == CODE_EOI)
-			break;
-		if (code == CODE_CLEAR) {
-			do {
-				free_entp = sp->dec_codetab + CODE_FIRST;
-				_TIFFmemset(free_entp, 0,
-					    (CSIZE - CODE_FIRST) * sizeof (code_t));
-				nbits = BITS_MIN;
-				nbitsmask = MAXCODE(BITS_MIN);
-				maxcodep = sp->dec_codetab + nbitsmask-1;
-				NextCode(tif, sp, bp, code, GetNextCode);
-			} while (code == CODE_CLEAR);	/* consecutive CODE_CLEAR codes */
-			if (code == CODE_EOI)
-				break;
-			if (code > CODE_CLEAR) {
-				TIFFErrorExt(tif->tif_clientdata, tif->tif_name,
-				"LZWDecode: Corrupted LZW table at scanline %"PRIu32,
-					     tif->tif_row);
-				return (0);
-			}
-			*op++ = (uint8_t)code;
-			occ--;
-			oldcodep = sp->dec_codetab + code;
-			continue;
-		}
-		codep = sp->dec_codetab + code;
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/gtiff/libtiff/tif_lzw.c
 
 begin:
     {
@@ -619,7 +478,6 @@ begin:
             goto after_loop;
         goto code_clear;
 
-<<<<<<< HEAD:frmts/gtiff/libtiff/tif_lzw.c
 code_below_256:
         {
             if (codep > free_entp)
@@ -650,80 +508,6 @@ code_below_256:
                 goto after_loop;
             goto begin;
         }
-=======
-		free_entp->next = oldcodep;
-		if (free_entp->next < &sp->dec_codetab[0] ||
-		    free_entp->next >= &sp->dec_codetab[CSIZE]) {
-			TIFFErrorExt(tif->tif_clientdata, module,
-			    "Corrupted LZW table at scanline %"PRIu32,
-			    tif->tif_row);
-			return (0);
-		}
-		free_entp->firstchar = free_entp->next->firstchar;
-		free_entp->length = free_entp->next->length+1;
-		free_entp->value = (codep < free_entp) ?
-		    codep->firstchar : free_entp->firstchar;
-		if (++free_entp > maxcodep) {
-			if (++nbits > BITS_MAX)		/* should not happen */
-				nbits = BITS_MAX;
-			nbitsmask = MAXCODE(nbits);
-			maxcodep = sp->dec_codetab + nbitsmask-1;
-		}
-		oldcodep = codep;
-		if (code >= 256) {
-			/*
-			 * Code maps to a string, copy string
-			 * value to output (written in reverse).
-			 */
-			if(codep->length == 0) {
-				TIFFErrorExt(tif->tif_clientdata, module,
-				    "Wrong length of decoded string: "
-				    "data probably corrupted at scanline %"PRIu32,
-				    tif->tif_row);
-				return (0);
-			}
-			if (codep->length > occ) {
-				/*
-				 * String is too long for decode buffer,
-				 * locate portion that will fit, copy to
-				 * the decode buffer, and setup restart
-				 * logic for the next decoding call.
-				 */
-				sp->dec_codep = codep;
-				do {
-					codep = codep->next;
-				} while (codep && codep->length > occ);
-				if (codep) {
-					sp->dec_restart = (long)occ;
-					tp = op + occ;
-					do  {
-						*--tp = codep->value;
-						codep = codep->next;
-					}  while (--occ && codep);
-					if (codep)
-						codeLoop(tif, module);
-				}
-				break;
-			}
-			len = codep->length;
-			tp = op + len;
-			do {
-				*--tp = codep->value;
-				codep = codep->next;
-			} while (codep && tp > op);
-			if (codep) {
-			    codeLoop(tif, module);
-			    break;
-			}
-			assert(occ >= len);
-			op += len;
-			occ -= len;
-		} else {
-			*op++ = (uint8_t)code;
-			occ--;
-		}
-	}
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/gtiff/libtiff/tif_lzw.c
 
 code_above_or_equal_to_258:
         {
@@ -970,69 +754,7 @@ LZWDecodeCompat(TIFF* tif, uint8_t* op0, tmsize_t occ0, uint16_t s)
 	static const char module[] = "LZWDecodeCompat";
 	LZWCodecState *sp = DecoderState(tif);
 	uint8_t *op = (uint8_t*) op0;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/frmts/gtiff/libtiff/tif_lzw.c
-	long occ = (long) occ0;
-=======
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:frmts/gtiff/libtiff/tif_lzw.c
 	tmsize_t occ = occ0;
-=======
-	long occ = (long) occ0;
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/gtiff/libtiff/tif_lzw.c
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:frmts/gtiff/libtiff/tif_lzw.c
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master:frmts/gtiff/libtiff/tif_lzw.c
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
 	uint8_t *tp;
 	uint8_t *bp;
 	int code, nbits;
@@ -1084,61 +806,7 @@ LZWDecodeCompat(TIFF* tif, uint8_t* op0, tmsize_t occ0, uint16_t s)
 	}
 
 	bp = (uint8_t*)tif->tif_rawcp;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/frmts/gtiff/libtiff/tif_lzw.c
-=======
-<<<<<<< HEAD:frmts/gtiff/libtiff/tif_lzw.c
 
-=======
-=======
-<<<<<<< HEAD:frmts/gtiff/libtiff/tif_lzw.c
-
-=======
-=======
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/frmts/gtiff/libtiff/tif_lzw.c
-=======
-<<<<<<< HEAD:frmts/gtiff/libtiff/tif_lzw.c
-
-=======
->>>>>>> gdal-raster-parallelisation
->>>>>>> OSGeo-master:frmts/gtiff/libtiff/tif_lzw.c
-=======
-<<<<<<< HEAD:frmts/gtiff/libtiff/tif_lzw.c
-
-=======
->>>>>>> 45f3acfa27 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 15dfe094cc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> gdal-raster-parallelisation
-=======
-<<<<<<< HEAD:frmts/gtiff/libtiff/tif_lzw.c
-
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> a4a704227c (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-=======
-<<<<<<< HEAD:frmts/gtiff/libtiff/tif_lzw.c
-
-=======
-<<<<<<< HEAD
->>>>>>> OSGeo-master
-=======
->>>>>>> ce77a78b9e (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-#ifdef LZW_CHECKEOS
->>>>>>> 576ad336cf (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/gtiff/libtiff/tif_lzw.c
 	sp->dec_bitsleft += (((uint64_t)tif->tif_rawcc - sp->old_tif_rawcc) << 3);
 	uint64_t dec_bitsleft = sp->dec_bitsleft;
 

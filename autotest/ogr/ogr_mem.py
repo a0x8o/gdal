@@ -632,7 +632,6 @@ def test_ogr_mem_coordinate_epoch():
     assert srs.GetAuthorityCode(None) == '4326'
     assert srs.GetCoordinateEpoch() == 2021.3
     assert srs.GetDataAxisToSRSAxisMapping() == [2, 1]
-<<<<<<< HEAD
 
 
 ###############################################################################
@@ -673,5 +672,3 @@ def test_ogr_mem_alter_geom_field_defn():
     new_geom_field_defn.SetSpatialRef(None)
     assert lyr.AlterGeomFieldDefn(0, new_geom_field_defn, ogr.ALTER_GEOM_FIELD_DEFN_ALL_FLAG) == ogr.OGRERR_NONE
     assert lyr.GetSpatialRef() is None
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal)

@@ -3787,7 +3787,8 @@ OGRErr OGRSpatialReference::SetFromUserInput( const char * pszDefinition,
             // PROJ < 9.0.1 doesn't like a datum_ensemble whose member have
             // a unknown id.
             CPLJSONDocument oCRSDoc;
-            oCRSDoc.LoadMemory(pszDefinition);
+            if( !oCRSDoc.LoadMemory(pszDefinition) )
+                return OGRERR_CORRUPT_DATA;
             CPLJSONObject oCRSRoot = oCRSDoc.GetRoot();
             RemoveIDFromMemberOfEnsembles(oCRSRoot);
             pj = proj_create(d->getPROJContext(), oCRSRoot.ToString().c_str());
@@ -9001,36 +9002,6 @@ bool OGRSpatialReference::IsDynamic() const
     {
         horiz = proj_clone(ctxt, d->m_pj_crs);
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/ogr/ogrspatialreference.cpp
-=======
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrspatialreference.cpp
     if( horiz && proj_get_type(horiz) == PJ_TYPE_BOUND_CRS )
     {
         auto baseCRS = proj_get_source_crs(ctxt, horiz);
@@ -9040,36 +9011,6 @@ bool OGRSpatialReference::IsDynamic() const
             horiz = baseCRS;
         }
     }
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrspatialreference.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrspatialreference.cpp
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrspatialreference.cpp
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
     auto datum = horiz ? proj_crs_get_datum(ctxt, horiz) : nullptr;
     if( datum )
     {

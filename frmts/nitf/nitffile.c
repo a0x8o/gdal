@@ -544,15 +544,6 @@ int NITFCreate( const char *pszFilename,
 
 {
     return NITFCreateEx(pszFilename, nPixels, nLines, nBands, nBitsPerSample,
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/frmts/nitf/nitffile.c
-=======
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:frmts/nitf/nitffile.c
                         pszPVType, papszOptions, NULL, NULL, NULL, NULL);
 }
 
@@ -564,33 +555,6 @@ int NITFCreateEx( const char *pszFilename,
                   int* pnImageCount,
                   vsi_l_offset* pnImageOffset,
                   vsi_l_offset* pnICOffset )
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:frmts/nitf/nitffile.c
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-                        pszPVType, papszOptions, NULL);
-}
-
-int NITFCreateEx( const char *pszFilename,
-                      int nPixels, int nLines, int nBands,
-                      int nBitsPerSample, const char *pszPVType,
-                      char **papszOptions,  int* pnICOffset )
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/frmts/nitf/nitffile.c
-=======
->>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitffile.c
->>>>>>> OSGeo-master:frmts/nitf/nitffile.c
-=======
->>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitffile.c
->>>>>>> OSGeo-master
-=======
->>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitffile.c
->>>>>>> gdal-raster-parallelisation
 
 {
     VSILFILE	*fp;
@@ -1128,33 +1092,11 @@ int NITFCreateEx( const char *pszFilename,
         }
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/frmts/nitf/nitffile.c
-    if( pnICOffset && iIM == 0 )
-        *pnICOffset = (int)(nCur+nOffset+1);
-=======
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:frmts/nitf/nitffile.c
     if( pnICOffset )
     {
         if( iIM == 0 || bAppendSubdataset )
             *pnICOffset = nCur+nOffset+1;
     }
-=======
-    if( pnICOffset && iIM == 0 )
-        *pnICOffset = (int)(nCur+nOffset+1);
->>>>>>> 5742ec588f (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/nitf/nitffile.c
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:frmts/nitf/nitffile.c
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
     OVR( 2,nCur+nOffset+1, IC     , "NC"                           );
 
     if( pszIC[0] != 'N' )

@@ -6,34 +6,7 @@ Install all required development packages: GNU make, g++, ...
 Build:
 
 ```
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-cd gdal
-=======
 ./autogen.sh
-=======
-./autogen.sh
-=======
-cd gdal
->>>>>>> 0d8751a21a (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-<<<<<<< HEAD
-cd gdal
-=======
-./autogen.sh
->>>>>>> gdal-raster-parallelisation
->>>>>>> OSGeo-master
-=======
-./autogen.sh
-=======
-cd gdal
->>>>>>> 0d8751a21a (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> d152855ae2 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> 29a6c2eec2 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
 ./configure --with-python [other options]
 make -j8 -s
 cd apps; make -s test_ogrsf; cd ..

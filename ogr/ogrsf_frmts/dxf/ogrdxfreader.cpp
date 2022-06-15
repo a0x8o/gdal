@@ -177,25 +177,7 @@ int OGRDXFReader::ReadValueRaw( char *pszValueBuf, int nValueBufSize )
            && achSrcBuffer[iEOL] != '\0' )
         iEOL++;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
-=======
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
     bool bLongLine = false;
-=======
->>>>>>> 137c8e8f4e (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
     while( achSrcBuffer[iEOL] == '\0' )
     {
         // The line is longer than the buffer. Let's copy what we have so
@@ -217,146 +199,17 @@ int OGRDXFReader::ReadValueRaw( char *pszValueBuf, int nValueBufSize )
         iSrcBufferOffset = iEOL;
         LoadDiskChunk();
         iEOL = iSrcBufferOffset;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
-=======
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
         bLongLine = true;
 
         // Have we prematurely reached the end of the file?
         if( achSrcBuffer[iEOL] == '\0' )
             return -1;
-=======
->>>>>>> 137c8e8f4e (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> gdal-raster-parallelisation
 
         // Proceed to newline again
         while( achSrcBuffer[iEOL] != '\n'
                && achSrcBuffer[iEOL] != '\r'
                && achSrcBuffer[iEOL] != '\0' )
             iEOL++;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
-
-        // If nothing was read, we have prematurely reached the end of the file
-        if( iEOL == iSrcBufferOffset )
-            return -1;
-=======
-=======
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
-=======
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD:ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
-=======
-
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 02a6804ddc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 8535d12504 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-        // If nothing was read, we have prematurely reached the end of the file
-        if( iEOL == iSrcBufferOffset )
-<<<<<<< HEAD:ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
-            break;
->>>>>>> 137c8e8f4e (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
-=======
-            return -1;
->>>>>>> 66a76c0d6d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-        // If nothing was read, we have reached the end of the file
-=======
-        // If nothing was read, we have prematurely reached the end of the file
->>>>>>> 9587f59887 (Merge branch 'master' of github.com:OSGeo/gdal)
-        if( iEOL == iSrcBufferOffset )
-<<<<<<< HEAD:ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
-            break;
->>>>>>> 137c8e8f4e (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
-<<<<<<< HEAD
->>>>>>> a806a30646 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
-            return -1;
->>>>>>> 66a76c0d6d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
->>>>>>> 9587f59887 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
-=======
-=======
-        // If nothing was read, we have reached the end of the file
-=======
-        // If nothing was read, we have prematurely reached the end of the file
->>>>>>> 55fbac43a8 (Merge branch 'master' of github.com:OSGeo/gdal)
-        if( iEOL == iSrcBufferOffset )
-<<<<<<< HEAD:ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
-            break;
->>>>>>> 137c8e8f4e (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
-<<<<<<< HEAD
->>>>>>> 59bee8280c (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> fa67961096 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 02a6804ddc (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> gdal-raster-parallelisation
-=======
-=======
-=======
-            return -1;
->>>>>>> 66a76c0d6d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
->>>>>>> 55fbac43a8 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 9200354d05 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> 8535d12504 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-        // If nothing was read, we have reached the end of the file
-=======
-        // If nothing was read, we have prematurely reached the end of the file
->>>>>>> 55fbac43a8 (Merge branch 'master' of github.com:OSGeo/gdal)
-        if( iEOL == iSrcBufferOffset )
-<<<<<<< HEAD:ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
-            break;
->>>>>>> 137c8e8f4e (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
-<<<<<<< HEAD
->>>>>>> 59bee8280c (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
-            return -1;
->>>>>>> 66a76c0d6d (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/dxf/ogrdxfreader.cpp
->>>>>>> 55fbac43a8 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
     }
 
     size_t nValueBufLen = 0;

@@ -1696,55 +1696,12 @@ void myRenderPageImpl(PDFDataset* poDS,
     pContext->m_pAnnots = std::move(pOwnedList);
     bool bPrinting =
         pContext->m_pDevice->GetDeviceType() != DeviceType::kDisplay;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/frmts/pdf/pdfdataset.cpp
-=======
-=======
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
->>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:frmts/pdf/pdfdataset.cpp
 
     // TODO(https://crbug.com/pdfium/993) - maybe pass true here.
     const bool bShowWidget = false;
     pList->DisplayAnnots(pPage, pContext->m_pDevice.get(),
                          pContext->m_pContext.get(), bPrinting, matrix,
                          bShowWidget);
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:frmts/pdf/pdfdataset.cpp
-=======
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-<<<<<<< HEAD
->>>>>>> OSGeo-master:frmts/pdf/pdfdataset.cpp
-=======
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-    pList->DisplayAnnots(pPage, pContext->m_pDevice.get(),
-                         pContext->m_pContext.get(), bPrinting, matrix,
-                         false, nullptr);
->>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/frmts/pdf/pdfdataset.cpp
   }
 
   pContext->m_pRenderer = std::make_unique<CPDF_ProgressiveRenderer>(

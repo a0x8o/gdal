@@ -118,172 +118,13 @@ OGRFlatGeobufLayer::OGRFlatGeobufLayer(
                 wkt = wkt.substr(strlen("COORDINATEMETADATA["));
             }
         }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 145dd38d72 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
-=======
-<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
-=======
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
-=======
->>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
-<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
-=======
-        CPL_IGNORE_RET_VAL(dfCoordEpoch);
->>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
-=======
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-        CPL_IGNORE_RET_VAL(dfCoordEpoch);
->>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
->>>>>>> ad088f3587 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 145dd38d72 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> a57f04675f (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
-=======
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> gdal-raster-parallelisation
-=======
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> gdal-raster-parallelisation
-=======
-=======
->>>>>>> 39cde30c78 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
-        CPL_IGNORE_RET_VAL(dfCoordEpoch);
->>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
->>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 9105b4f6b6 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 2b66f85bb3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> gdal-raster-parallelisation
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 39cde30c78 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> a57f04675f (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> gdal-raster-parallelisation
-=======
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
->>>>>>> OSGeo-master
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
 
         if ((org == nullptr || EQUAL(org->c_str(), "EPSG")) && code != 0) {
             m_poSRS->importFromEPSG(code);
         } else if( org && code != 0 ) {
             CPLString osCode;
             osCode.Printf("%s:%d", org->c_str(), code);
-<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
             if( m_poSRS->SetFromUserInput(osCode.c_str(), OGRSpatialReference::SET_FROM_USER_INPUT_LIMITATIONS_get()) != OGRERR_NONE &&
-=======
-            if( m_poSRS->SetFromUserInput(osCode.c_str()) != OGRERR_NONE &&
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
-=======
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
-=======
->>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
-=======
->>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
->>>>>>> 34342977ef (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
->>>>>>> OSGeo-master
-=======
->>>>>>> a853d8a9a9 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> 2ac37d0503 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
->>>>>>> 1c050736fa (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
                 !wkt.empty() )
             {
                 m_poSRS->importFromWkt(wkt.c_str());
@@ -532,72 +373,12 @@ void OGRFlatGeobufLayer::writeHeader(VSILFILE *poFp, uint64_t featuresCount, std
             pszWKT = CPLStrdup(osWKT.c_str());
         }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
-=======
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
-<<<<<<< HEAD:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
         if( pszWKT && !CPLIsUTF8(pszWKT, -1) )
         {
             char *pszWKTtmp = CPLForceToASCII(pszWKT, -1, '?');
             CPLFree(pszWKT);
             pszWKT = pszWKTtmp;
         }
-=======
->>>>>>> 54aa47ee60 (Merge branch 'master' of github.com:OSGeo/gdal):gdal/ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> OSGeo-master
-=======
-=======
-=======
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> OSGeo-master:ogr/ogrsf_frmts/flatgeobuf/ogrflatgeobuflayer.cpp
-=======
->>>>>>> 30c9b12560 (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
->>>>>>> 7494d4d891 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> 6271648633 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
->>>>>>> adab5a94f3 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
         crs = CreateCrsDirect(fbb, pszAuthorityName, nAuthorityCode, m_poSRS->GetName(), nullptr, pszWKT);
         CPLFree(pszWKT);
     }

@@ -17,45 +17,7 @@ GDAL - Geospatial Data Abstraction Library
 [![Documentation build Status](https://github.com/OSGeo/gdal/workflows/Docs/badge.svg)](https://github.com/osgeo/gdal/actions?query=workflow%3A%22Docs%22+branch%3Amaster)
 [![Fuzzing Status](https://oss-fuzz-build-logs.storage.googleapis.com/badges/gdal.svg)](https://bugs.chromium.org/p/oss-fuzz/issues/list?sort=-opened&can=1&q=proj:gdal)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-[![Powered by NumFOCUS](https://img.shields.io/badge/powered%20by-NumFOCUS-orange.svg?style=flat&colorA=E1523D&colorB=007D8A )](http://numfocus.org)
-
-
-GDAL is an open source X/MIT licensed translator library for raster and vector geospatial data formats.
-=======
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5884351.svg)](https://doi.org/10.5281/zenodo.5884351)
-=======
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5884351.svg)](https://doi.org/10.5281/zenodo.5884351)
-=======
-=======
-<<<<<<< HEAD
->>>>>>> dc29376a53 (Merge branch 'master' of github.com:OSGeo/gdal)
-[![Powered by NumFOCUS](https://img.shields.io/badge/powered%20by-NumFOCUS-orange.svg?style=flat&colorA=E1523D&colorB=007D8A )](http://numfocus.org)
-
-
-GDAL is an open source X/MIT licensed translator library for raster and vector geospatial data formats.
-<<<<<<< HEAD
->>>>>>> a7dc28a119 (Merge branch 'master' of github.com:OSGeo/gdal)
-=======
-=======
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5884351.svg)](https://doi.org/10.5281/zenodo.5884351)
->>>>>>> gdal-raster-parallelisation
->>>>>>> OSGeo-master
-=======
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5884351.svg)](https://doi.org/10.5281/zenodo.5884351)
-=======
-[![Powered by NumFOCUS](https://img.shields.io/badge/powered%20by-NumFOCUS-orange.svg?style=flat&colorA=E1523D&colorB=007D8A )](http://numfocus.org)
-
-
-GDAL is an open source X/MIT licensed translator library for raster and vector geospatial data formats.
->>>>>>> a7dc28a119 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> cfb746468a (Merge branch 'master' of github.com:OSGeo/gdal)
-<<<<<<< HEAD
-=======
->>>>>>> dc29376a53 (Merge branch 'master' of github.com:OSGeo/gdal)
->>>>>>> gdal-raster-parallelisation
 
 [![Powered by NumFOCUS](https://img.shields.io/badge/powered%20by-NumFOCUS-orange.svg?style=flat&colorA=E1523D&colorB=007D8A )](http://numfocus.org)
 
