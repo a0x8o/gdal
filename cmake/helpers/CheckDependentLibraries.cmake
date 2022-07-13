@@ -285,6 +285,30 @@ if (Iconv_FOUND)
   else ()
     set(ICONV_CPP_CONST "const")
   endif ()
+
+  if (NOT CMAKE_CROSSCOMPILING)
+      include(CheckCXXSourceRuns)
+      set(ICONV_HAS_EXTRA_CHARSETS_CODE
+"#include <stdlib.h>
+#include <iconv.h>
+int main(){
+    iconv_t conv = iconv_open(\"UTF-8\", \"CP1251\");
+    if( conv != (iconv_t)-1 )
+    {
+        iconv_close(conv);
+        return 0;
+    }
+    return 1;
+}")
+      check_cxx_source_runs("${ICONV_HAS_EXTRA_CHARSETS_CODE}" ICONV_HAS_EXTRA_CHARSETS)
+      if (NOT ICONV_HAS_EXTRA_CHARSETS)
+          message(WARNING "ICONV is available but some character sets used by "
+                          "some drivers are not available. "
+                          "You may need to install an extra package "
+                          "(e.g. 'glibc-gconv-extra' on Fedora)")
+      endif()
+  endif()
+
   unset(ICONV_CONST_TEST_CODE)
   unset(_ICONV_SECOND_ARGUMENT_IS_NOT_CONST)
   unset(CMAKE_REQUIRED_INCLUDES)
@@ -407,8 +431,10 @@ gdal_internal_library(QHULL)
 set(GDAL_USE_LIBCSF_INTERNAL ON)
 
 # Compression used by GTiff and MRF
-gdal_check_package(LERC "Enable LERC (external)" CAN_DISABLE RECOMMENDED)
-gdal_internal_library(LERC)
+if( NOT WORDS_BIGENDIAN )
+  gdal_check_package(LERC "Enable LERC (external)" CAN_DISABLE RECOMMENDED)
+  gdal_internal_library(LERC)
+endif()
 
 gdal_check_package(BRUNSLI "Enable BRUNSLI for JPEG packing in MRF" CAN_DISABLE RECOMMENDED)
 
@@ -604,6 +630,7 @@ gdal_check_package(JXL_THREADS "JPEG-XL threading" CAN_DISABLE)
 
 # unused for now gdal_check_package(OpenMP "")
 gdal_check_package(Crnlib "enable gdal_DDS driver" CAN_DISABLE)
+gdal_check_package(basisu "Enable BASISU driver" CONFIG CAN_DISABLE)
 gdal_check_package(IDB "enable ogr_IDB driver" CAN_DISABLE)
 # TODO: implement FindRASDAMAN libs: -lrasodmg -lclientcomm -lcompression -lnetwork -lraslib
 gdal_check_package(RASDAMAN "enable rasdaman driver" CAN_DISABLE)

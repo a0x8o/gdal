@@ -198,6 +198,14 @@ detected. The behavior can also be globally controlled with the following variab
      This option should be set before CMakeCache.txt is created.
 
 
+.. note::
+
+    Using together GDAL_USE_EXTERNAL_LIBS=OFF and GDAL_USE_INTERNAL_LIBS=OFF
+    will result in a CMake configuration failure, because the following libraries
+    (either as external dependencies or using the internal copy) are at least
+    required: ZLIB, TIFF, GEOTIFF and JSONC. Enabling them as external or internal
+    libraries is thus required.
+
 Armadillo
 *********
 
@@ -222,6 +230,18 @@ Specify install prefix in the ``CMAKE_PREFIX_PATH`` variable.
 .. option:: GDAL_USE_ARROW=ON/OFF
 
     Control whether to use Arrow. Defaults to ON when Arrow is found.
+
+
+basisu
+******
+
+The `Basis Universal <https://github.com/rouault/basis_universal/tree/cmake>` library
+is required for the :ref:`raster.basisu` and :ref:`raster.ktx2` drivers.
+Specify install prefix in the ``CMAKE_PREFIX_PATH`` variable or ``basisu_ROOT`` variable.
+
+.. option:: GDAL_USE_BASISU=ON/OFF
+
+    Control whether to use basisu. Defaults to ON when basisu is found.
 
 
 Blosc
