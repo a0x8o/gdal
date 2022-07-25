@@ -346,23 +346,20 @@ std::string OGROpenFileGDBLayer::GetLaunderedLayerName(const std::string& osName
 bool OGROpenFileGDBLayer::Create(const OGRSpatialReference* poSRS)
 {
     FileGDBTableGeometryType eTableGeomType = FGTGT_NONE;
-    const auto eFlattenType = wkbFlatten(m_eGeomType);
+    const auto eFlattenType = wkbFlatten(OGR_GT_GetLinear(m_eGeomType));
     if( eFlattenType == wkbNone )
         eTableGeomType = FGTGT_NONE;
     else if( eFlattenType == wkbPoint )
         eTableGeomType = FGTGT_POINT;
     else if( eFlattenType == wkbMultiPoint )
         eTableGeomType = FGTGT_MULTIPOINT;
-    else if( eFlattenType == wkbLineString ||
-             eFlattenType == wkbMultiLineString ||
-             eFlattenType == wkbCircularString ||
-             eFlattenType == wkbCompoundCurve ||
-             eFlattenType == wkbMultiCurve )
+    else if( OGR_GT_IsCurve(eFlattenType) ||
+             OGR_GT_IsSubClassOf(eFlattenType, wkbMultiCurve) )
     {
         eTableGeomType = FGTGT_LINE;
     }
-    else if( eFlattenType == wkbPolygon || eFlattenType == wkbMultiPolygon ||
-             eFlattenType == wkbCompoundCurve || eFlattenType == wkbMultiSurface )
+    else if( OGR_GT_IsSurface(eFlattenType) ||
+             OGR_GT_IsSubClassOf(eFlattenType, wkbMultiSurface) )
     {
         eTableGeomType = FGTGT_POLYGON;
     }

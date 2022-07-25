@@ -35,7 +35,8 @@ if (SWIG_REGENERATE_PYTHON)
     ${CMAKE_CURRENT_BINARY_DIR}/osgeo
     OUTPUT
     ${GDAL_PYTHON_PYSOURCES}
-    ${GDAL_PYTHON_CSOURCES})
+    ${GDAL_PYTHON_CSOURCES}
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/modify_cpp_files.cmake)
 
   # gdal_array_wrap.cpp when NumPy exist
   if (Python_NumPy_FOUND)
@@ -48,7 +49,9 @@ if (SWIG_REGENERATE_PYTHON)
         -I${PROJECT_SOURCE_DIR}/swig/include/python/docs ${PY3ARG} -threads -relativeimport -outdir
         ${CMAKE_CURRENT_BINARY_DIR}/osgeo ${SWIG_DEFINES} -I${PROJECT_SOURCE_DIR}/gdal -c++ -python -o ${ARRAY_OUTPUT}
         ${ARRAY_INPUT}
-      DEPENDS ${ARRAY_INPUT} ${PROJECT_SOURCE_DIR}/swig/include/python/typemaps_python.i
+      DEPENDS ${ARRAY_INPUT}
+              ${PROJECT_SOURCE_DIR}/swig/include/python/typemaps_python.i
+              ${CMAKE_CURRENT_SOURCE_DIR}/modify_cpp_files.cmake
       COMMENT "Generate _gdal_array_wrap.so and gdal_array.py by SWiG command")
     list(APPEND GDAL_PYTHON_CSOURCES "${GDAL_PYTHON_CSOURCE_DIR}/gdal_array_wrap.cpp")
     list(APPEND GDAL_PYTHON_PYSOURCES "${CMAKE_CURRENT_BINARY_DIR}/osgeo/gdal_array.py")
@@ -66,6 +69,52 @@ if (SWIG_REGENERATE_PYTHON)
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/osgeo/__init__.py" "${CMAKE_CURRENT_BINARY_DIR}/osgeo"
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/osgeo/__init__.py")
   list(APPEND GDAL_PYTHON_PYSOURCES "${CMAKE_CURRENT_BINARY_DIR}/osgeo/__init__.py")
+
+  foreach(_file IN ITEMS ${GDAL_PYTHON_CSOURCES})
+      add_custom_command(
+        OUTPUT ${_file}
+        APPEND
+        COMMAND ${CMAKE_COMMAND} ${WERROR_DEV_FLAG} "-DFILE=${_file}" -P ${CMAKE_CURRENT_SOURCE_DIR}/modify_cpp_files.cmake)
+  endforeach()
+
+  if (Python_VERSION_MAJOR EQUAL 3 AND Python_EXECUTABLE)
+    foreach(_file IN ITEMS ${GDAL_PYTHON_PYSOURCES})
+        file(TO_NATIVE_PATH "${_file}" _native_file)
+        add_custom_command(
+          OUTPUT ${_file}
+          APPEND
+          COMMAND
+            ${Python_EXECUTABLE} -m lib2to3 --fix=import --fix=next --fix=renames --fix=unicode --fix=ws_comma --fix=xrange
+            --write --write-unchanged-files --nobackups  ${_native_file})
+    endforeach()
+  endif()
+
+  option(SWIG_COPY_REGENERATED_PYTHON_IN_SOURCE_DIR "Copy SWIG regenerated Python bindings into source directory." ON)
+  if(SWIG_COPY_REGENERATED_PYTHON_IN_SOURCE_DIR)
+      file(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/extensions" GDAL_PYTHON_CSOURCE_SRC_DIR_NATIVE_PATH)
+      foreach(_file IN ITEMS ${GDAL_PYTHON_CSOURCES})
+          file(TO_NATIVE_PATH "${_file}" _native_file)
+          add_custom_command(
+            OUTPUT ${_file}
+            APPEND
+            COMMAND
+              ${CMAKE_COMMAND} -E copy_if_different
+              ${_native_file}
+              ${GDAL_PYTHON_CSOURCE_SRC_DIR_NATIVE_PATH})
+      endforeach()
+
+      file(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/osgeo" GDAL_PYTHON_PYSOURCE_SRC_DIR_NATIVE_PATH)
+      foreach(_file IN ITEMS ${GDAL_PYTHON_PYSOURCES})
+          file(TO_NATIVE_PATH "${_file}" _native_file)
+          add_custom_command(
+            OUTPUT ${_file}
+            APPEND
+            COMMAND
+              ${CMAKE_COMMAND} -E copy_if_different
+              ${_native_file}
+              ${GDAL_PYTHON_PYSOURCE_SRC_DIR_NATIVE_PATH})
+      endforeach()
+  endif()
 
 else ()
   set(GDAL_PYTHON_CSOURCES_SRC

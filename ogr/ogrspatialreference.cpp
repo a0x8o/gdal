@@ -191,9 +191,7 @@ OGRSpatialReference::Private::Private():
 {
     // Get the default value for m_axisMappingStrategy from the
     // OSR_DEFAULT_AXIS_MAPPING_STRATEGY configuration option, if set.
-    static const OSRAxisMappingStrategy defaultAxisMappingStrategy = GetDefaultAxisMappingStrategy();
-
-    m_axisMappingStrategy = defaultAxisMappingStrategy;
+    m_axisMappingStrategy = GetDefaultAxisMappingStrategy();
 }
 
 OGRSpatialReference::Private::~Private()
@@ -3544,7 +3542,10 @@ static void RemoveIDFromMemberOfEnsembles(CPLJSONObject& obj)
     {
         for( auto& subObj: obj.ToArray() )
         {
-            subObj.Delete("id");
+            if( subObj.GetType() == CPLJSONObject::Type::Object )
+            {
+                subObj.Delete("id");
+            }
         }
     }
 }
