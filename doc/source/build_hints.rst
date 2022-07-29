@@ -809,6 +809,12 @@ on how the library is detected.
     Control whether to use internal libjpeg copy. Defaults depends on GDAL_USE_INTERNAL_LIBS. When set
     to ON, has precedence over GDAL_USE_JPEG=ON
 
+.. option:: EXPECTED_JPEG_LIB_VERSION=number
+
+    Used with external libjpeg. number is for example 80, for libjpeg 8 ABI.
+    This can be used to check a build time that the expected JPEG library is
+    the one that is included by GDAL.
+
 
 JPEG12
 ******
@@ -1667,9 +1673,9 @@ It is used for the Python, Java and CSharp bindings.
 
     Path to the SWIG executable.
 
-    Note that setting it explictly might be needed, and that putting the
+    Note that setting it explicitly might be needed, and that putting the
     directory of the installed binary into the PATH might not be sufficient.
-    The reason is that when buildingfrom source, a "swig" binary will be
+    The reason is that when building from source, a "swig" binary will be
     generated, but FindSWIG will prefer a "swig-4.0" binary if found elsewhere
     in the PATH.
 
