@@ -1126,8 +1126,9 @@ class Layer(MajorObject):
     def GetRefCount(self, *args) -> "int":
         r"""
         GetRefCount(Layer self) -> int
-        int OGR_L_GetRefCount(OGRLayerH
-        hLayer) 
+
+        For more details: :cpp:func:`OGR_L_GetRefCount`
+
         """
         return _ogr.Layer_GetRefCount(self, *args)
 
@@ -1135,42 +1136,20 @@ class Layer(MajorObject):
         r"""
         SetSpatialFilter(Layer self, Geometry filter)
         SetSpatialFilter(Layer self, int iGeomField, Geometry filter)
-        void
-        OGR_L_SetSpatialFilter(OGRLayerH hLayer, OGRGeometryH hGeom)
 
         Set a new spatial filter.
 
-        This function set the geometry to be used as a spatial filter when
-        fetching features via the OGR_L_GetNextFeature() function. Only
-        features that geometrically intersect the filter geometry will be
-        returned.
+        For more details:
 
-        Currently this test is may be inaccurately implemented, but it is
-        guaranteed that all features whose envelope (as returned by
-        OGR_G_GetEnvelope()) overlaps the envelope of the spatial filter will
-        be returned. This can result in more shapes being returned that should
-        strictly be the case.
-
-        Starting with GDAL 2.3, features with null or empty geometries will
-        never be considered as matching a spatial filter.
-
-        This function makes an internal copy of the passed geometry. The
-        passed geometry remains the responsibility of the caller, and may be
-        safely destroyed.
-
-        For the time being the passed filter geometry should be in the same
-        SRS as the layer (as returned by OGR_L_GetSpatialRef()). In the future
-        this may be generalized.
-
-        This function is the same as the C++ method
-        OGRLayer::SetSpatialFilter.
+        - :cpp:func:`OGR_L_SetSpatialFilter`
+        - :cpp:func:`OGR_L_SetSpatialFilterEx`
 
         Parameters
         -----------
-        hLayer:
-            handle to the layer on which to set the spatial filter.
-        hGeom:
-            handle to the geometry to use as a filtering region. NULL may
+        iGeomField: int, optional
+            index of the geometry field on which the spatial filter operates.
+        filter: Geometry
+            The geometry to use as a filtering region. None may
             be passed indicating that the current spatial filter should be
             cleared, but no new one instituted.
 
@@ -1181,39 +1160,25 @@ class Layer(MajorObject):
         r"""
         SetSpatialFilterRect(Layer self, double minx, double miny, double maxx, double maxy)
         SetSpatialFilterRect(Layer self, int iGeomField, double minx, double miny, double maxx, double maxy)
-        void
-        OGR_L_SetSpatialFilterRect(OGRLayerH hLayer, double dfMinX, double
-        dfMinY, double dfMaxX, double dfMaxY)
 
         Set a new rectangular spatial filter.
 
-        This method set rectangle to be used as a spatial filter when fetching
-        features via the OGR_L_GetNextFeature() method. Only features that
-        geometrically intersect the given rectangle will be returned.
+        For more details:
 
-        The x/y values should be in the same coordinate system as the layer as
-        a whole (as returned by OGRLayer::GetSpatialRef()). Internally this
-        method is normally implemented as creating a 5 vertex closed
-        rectangular polygon and passing it to OGRLayer::SetSpatialFilter(). It
-        exists as a convenience.
-
-        The only way to clear a spatial filter set with this method is to call
-        OGRLayer::SetSpatialFilter(NULL).
-
-        This method is the same as the C++ method
-        OGRLayer::SetSpatialFilterRect().
+        - :cpp:func:`OGR_L_SetSpatialFilterRect`
+        - :cpp:func:`OGR_L_SetSpatialFilterRectEx`
 
         Parameters
         -----------
-        hLayer:
-            handle to the layer on which to set the spatial filter.
-        dfMinX:
+        iGeomField: int, optional
+            index of the geometry field on which the spatial filter operates.
+        minx: float
             the minimum X coordinate for the rectangular region.
-        dfMinY:
+        miny: float
             the minimum Y coordinate for the rectangular region.
-        dfMaxX:
+        maxx: float
             the maximum X coordinate for the rectangular region.
-        dfMaxY:
+        maxy: float
             the maximum Y coordinate for the rectangular region.
 
         """
@@ -1222,26 +1187,15 @@ class Layer(MajorObject):
     def GetSpatialFilter(self, *args) -> "OGRGeometryShadow *":
         r"""
         GetSpatialFilter(Layer self) -> Geometry
-        OGRGeometryH
-        OGR_L_GetSpatialFilter(OGRLayerH hLayer)
 
         This function returns the current spatial filter for this layer.
 
-        The returned pointer is to an internally owned object, and should not
-        be altered or deleted by the caller.
-
-        This function is the same as the C++ method
-        OGRLayer::GetSpatialFilter().
-
-        Parameters
-        -----------
-        hLayer:
-            handle to the layer to get the spatial filter from.
+        For more details: :cpp:func:`OGR_L_GetSpatialFilter`
 
         Returns
         --------
-        OGRGeometryH:
-            a handle to the spatial filter geometry.
+        Geometry:
+            The spatial filter geometry.
 
         """
         return _ogr.Layer_GetSpatialFilter(self, *args)
@@ -1249,42 +1203,23 @@ class Layer(MajorObject):
     def SetAttributeFilter(self, *args) -> "OGRErr":
         r"""
         SetAttributeFilter(Layer self, char * filter_string) -> OGRErr
-        OGRErr
-        OGR_L_SetAttributeFilter(OGRLayerH hLayer, const char \*pszQuery)
 
         Set a new attribute query.
 
-        This function sets the attribute query string to be used when fetching
-        features via the OGR_L_GetNextFeature() function. Only features for
-        which the query evaluates as true will be returned.
-
-        The query string should be in the format of an SQL WHERE clause. For
-        instance 'population > 1000000 and population < 5000000' where
-        population is an attribute in the layer. The query format is a
-        restricted form of SQL WHERE clause as defined
-        'eq_format=restricted_where' about half way through this document:
-
-        http://ogdi.sourceforge.net/prop/6.2.CapabilitiesMetadata.html
-
-        Note that installing a query string will generally result in resetting
-        the current reading position (ala OGR_L_ResetReading()).
-
-        This function is the same as the C++ method
-        OGRLayer::SetAttributeFilter().
+        For more details: :cpp:func:`OGR_L_SetAttributeFilter`
 
         Parameters
         -----------
-        hLayer:
-            handle to the layer on which attribute query will be executed.
-        pszQuery:
-            query in restricted SQL WHERE format, or NULL to clear the
+        filter_string: str
+            query in restricted SQL WHERE format, or None to clear the
             current query.
 
         Returns
         --------
-        OGRErr:
-            OGRERR_NONE if successfully installed, or an error code if the query
-            expression is in error, or some other failure occurs.
+        int:
+            :py:const:`osgeo.ogr.OGRERR_NONE` if successfully installed,
+            or an error code if the query expression is in error,
+            or some other failure occurs.
 
         """
         return _ogr.Layer_SetAttributeFilter(self, *args)
@@ -1292,19 +1227,10 @@ class Layer(MajorObject):
     def ResetReading(self, *args) -> "void":
         r"""
         ResetReading(Layer self)
-        void
-        OGR_L_ResetReading(OGRLayerH hLayer)
 
         Reset feature reading to start on the first feature.
 
-        This affects GetNextFeature().
-
-        This function is the same as the C++ method OGRLayer::ResetReading().
-
-        Parameters
-        -----------
-        hLayer:
-            handle to the layer on which features are read.
+        For more details: :cpp:func:`OGR_L_ResetReading`
 
         """
         return _ogr.Layer_ResetReading(self, *args)
@@ -1312,29 +1238,15 @@ class Layer(MajorObject):
     def GetName(self, *args) -> "char const *":
         r"""
         GetName(Layer self) -> char const *
-        const char\* OGR_L_GetName(OGRLayerH
-        hLayer)
 
         Return the layer name.
 
-        This returns the same content as
-        OGR_FD_GetName(OGR_L_GetLayerDefn(hLayer)), but for a few drivers,
-        calling OGR_L_GetName() directly can avoid lengthy layer definition
-        initialization.
-
-        This function is the same as the C++ method OGRLayer::GetName().
-
-        .. versionadded:: 1.8.0
-
-        Parameters
-        -----------
-        hLayer:
-            handle to the layer.
+        For more details: :cpp:func:`OGR_L_GetName`
 
         Returns
         --------
         str:
-            the layer name (must not been freed)
+            The layer name
 
         """
         return _ogr.Layer_GetName(self, *args)
@@ -1342,35 +1254,16 @@ class Layer(MajorObject):
     def GetGeomType(self, *args) -> "OGRwkbGeometryType":
         r"""
         GetGeomType(Layer self) -> OGRwkbGeometryType
-        OGRwkbGeometryType
-        OGR_L_GetGeomType(OGRLayerH hLayer)
 
         Return the layer geometry type.
 
-        This returns the same result as
-        OGR_FD_GetGeomType(OGR_L_GetLayerDefn(hLayer)), but for a few drivers,
-        calling OGR_L_GetGeomType() directly can avoid lengthy layer
-        definition initialization.
-
-        For layers with multiple geometry fields, this method only returns the
-        geometry type of the first geometry column. For other columns, use
-        OGR_GFld_GetType(OGR_FD_GetGeomFieldDefn(OGR_L_GetLayerDefn(hLayer),
-        i)). For layers without any geometry field, this method returns
-        wkbNone.
-
-        This function is the same as the C++ method OGRLayer::GetGeomType().
-
-        .. versionadded:: 1.8.0
-
-        Parameters
-        -----------
-        hLayer:
-            handle to the layer.
+        For more details: :cpp:func:`OGR_L_GetGeomType`
 
         Returns
         --------
-        OGRwkbGeometryType:
-            the geometry type
+        int:
+            The geometry type code. The types can be found with
+            'osgeo.ogr.wkb' prefix. For example :py:const:`osgeo.ogr.wkbPolygon`.
 
         """
         return _ogr.Layer_GetGeomType(self, *args)
@@ -1378,24 +1271,11 @@ class Layer(MajorObject):
     def GetGeometryColumn(self, *args) -> "char const *":
         r"""
         GetGeometryColumn(Layer self) -> char const *
-        const char\*
-        OGR_L_GetGeometryColumn(OGRLayerH hLayer)
 
         This method returns the name of the underlying database column being
         used as the geometry column, or '' if not supported.
 
-        For layers with multiple geometry fields, this method only returns the
-        geometry type of the first geometry column. For other columns, use OGR
-        _GFld_GetNameRef(OGR_FD_GetGeomFieldDefn(OGR_L_GetLayerDefn(hLayer),
-        i)).
-
-        This method is the same as the C++ method
-        OGRLayer::GetGeometryColumn()
-
-        Parameters
-        -----------
-        hLayer:
-            handle to the layer
+        For more details: :cpp:func:`OGR_L_GetGeometryColumn`
 
         Returns
         --------
@@ -1408,18 +1288,11 @@ class Layer(MajorObject):
     def GetFIDColumn(self, *args) -> "char const *":
         r"""
         GetFIDColumn(Layer self) -> char const *
-        const char\*
-        OGR_L_GetFIDColumn(OGRLayerH hLayer)
 
         This method returns the name of the underlying database column being
         used as the FID column, or '' if not supported.
 
-        This method is the same as the C++ method OGRLayer::GetFIDColumn()
-
-        Parameters
-        -----------
-        hLayer:
-            handle to the layer
+        For more details: :cpp:func:`OGR_L_GetFIDColumn`
 
         Returns
         --------
@@ -1432,44 +1305,28 @@ class Layer(MajorObject):
     def GetFeature(self, *args) -> "OGRFeatureShadow *":
         r"""
         GetFeature(Layer self, GIntBig fid) -> Feature
-        OGRFeatureH
-        OGR_L_GetFeature(OGRLayerH hLayer, GIntBig nFeatureId)
 
         Fetch a feature by its identifier.
 
-        This function will attempt to read the identified feature. The nFID
-        value cannot be OGRNullFID. Success or failure of this operation is
-        unaffected by the spatial or attribute filters (and specialized
-        implementations in drivers should make sure that they do not take into
-        account spatial or attribute filters).
+        For more details: :cpp:func:`OGR_L_GetFeature`
 
-        If this function returns a non-NULL feature, it is guaranteed that its
-        feature id ( OGR_F_GetFID()) will be the same as nFID.
+        Use :py:func:`TestCapability` with (:py:const:`osgeo.ogr.OLCRandomRead`)
+        to establish if this layer supports efficient random access reading via
+        :py:func:`GetFeature`; However, the call should always work if the feature exists.
 
-        Use OGR_L_TestCapability(OLCRandomRead) to establish if this layer
-        supports efficient random access reading via OGR_L_GetFeature();
-        however, the call should always work if the feature exists as a
-        fallback implementation just scans all the features in the layer
-        looking for the desired feature.
-
-        Sequential reads (with OGR_L_GetNextFeature()) are generally
-        considered interrupted by a OGR_L_GetFeature() call.
-
-        The returned feature should be free with OGR_F_Destroy().
-
-        This function is the same as the C++ method OGRLayer::GetFeature( ).
+        Sequential reads (with :py:func:`GetNextFeature`) are generally
+        considered interrupted by a :py:func:`GetFeature` call.
 
         Parameters
         -----------
-        hLayer:
-            handle to the layer that owned the feature.
-        nFeatureId:
-            the feature id of the feature to read.
+        fid: int
+            The feature id of the feature to read.
 
         Returns
         --------
-        OGRFeatureH:
-            a handle to a feature now owned by the caller, or NULL on failure.
+        Feature:
+            A new feature now owned by the caller, or None on failure.
+            The returned feature should be deleted with :py:func:`Destroy`.
 
         """
         return _ogr.Layer_GetFeature(self, *args)
@@ -1477,45 +1334,15 @@ class Layer(MajorObject):
     def GetNextFeature(self, *args) -> "OGRFeatureShadow *":
         r"""
         GetNextFeature(Layer self) -> Feature
-        OGRFeatureH
-        OGR_L_GetNextFeature(OGRLayerH hLayer)
 
         Fetch the next available feature from this layer.
 
-        The returned feature becomes the responsibility of the caller to
-        delete with OGR_F_Destroy(). It is critical that all features
-        associated with an OGRLayer (more specifically an OGRFeatureDefn) be
-        deleted before that layer/datasource is deleted.
-
-        Only features matching the current spatial filter (set with
-        SetSpatialFilter()) will be returned.
-
-        This function implements sequential access to the features of a layer.
-        The OGR_L_ResetReading() function can be used to start at the
-        beginning again.
-
-        Features returned by OGR_GetNextFeature() may or may not be affected
-        by concurrent modifications depending on drivers. A guaranteed way of
-        seeing modifications in effect is to call OGR_L_ResetReading() on
-        layers where OGR_GetNextFeature() has been called, before reading
-        again. Structural changes in layers (field addition, deletion, ...)
-        when a read is in progress may or may not be possible depending on
-        drivers. If a transaction is committed/aborted, the current sequential
-        reading may or may not be valid after that operation and a call to
-        OGR_L_ResetReading() might be needed.
-
-        This function is the same as the C++ method
-        OGRLayer::GetNextFeature().
-
-        Parameters
-        -----------
-        hLayer:
-            handle to the layer from which feature are read.
+        For more details: :cpp:func:`OGR_L_GetNextFeature`
 
         Returns
         --------
-        OGRFeatureH:
-            a handle to a feature, or NULL if no more features are available.
+        Feature:
+            A feature or None if no more features are available.
 
         """
         return _ogr.Layer_GetNextFeature(self, *args)
@@ -1523,38 +1350,20 @@ class Layer(MajorObject):
     def SetNextByIndex(self, *args) -> "OGRErr":
         r"""
         SetNextByIndex(Layer self, GIntBig new_index) -> OGRErr
-        OGRErr
-        OGR_L_SetNextByIndex(OGRLayerH hLayer, GIntBig nIndex)
 
         Move read cursor to the nIndex'th feature in the current resultset.
 
-        This method allows positioning of a layer such that the
-        GetNextFeature() call will read the requested feature, where nIndex is
-        an absolute index into the current result set. So, setting it to 3
-        would mean the next feature read with GetNextFeature() would have been
-        the 4th feature to have been read if sequential reading took place
-        from the beginning of the layer, including accounting for spatial and
-        attribute filters.
-
-        Only in rare circumstances is SetNextByIndex() efficiently
-        implemented. In all other cases the default implementation which calls
-        ResetReading() and then calls GetNextFeature() nIndex times is used.
-        To determine if fast seeking is available on the current layer use the
-        TestCapability() method with a value of OLCFastSetNextByIndex.
-
-        This method is the same as the C++ method OGRLayer::SetNextByIndex()
+        For more details: :cpp:func:`OGR_L_SetNextByIndex`
 
         Parameters
         -----------
-        hLayer:
-            handle to the layer
-        nIndex:
-            the index indicating how many steps into the result set to seek.
+        new_index: int
+            The index indicating how many steps into the result set to seek.
 
         Returns
         --------
-        OGRErr:
-            OGRERR_NONE on success or an error code.
+        int:
+            :py:const:`osgeo.ogr.OGRERR_NONE` on success or an error code.
 
         """
         return _ogr.Layer_SetNextByIndex(self, *args)
@@ -1562,31 +1371,23 @@ class Layer(MajorObject):
     def SetFeature(self, *args) -> "OGRErr":
         r"""
         SetFeature(Layer self, Feature feature) -> OGRErr
-        OGRErr OGR_L_SetFeature(OGRLayerH
-        hLayer, OGRFeatureH hFeat)
 
         Rewrite an existing feature.
 
-        This function will write a feature to the layer, based on the feature
-        id within the OGRFeature.
-
-        Use OGR_L_TestCapability(OLCRandomWrite) to establish if this layer
-        supports random access writing via OGR_L_SetFeature().
-
-        This function is the same as the C++ method OGRLayer::SetFeature().
+        For more details: :cpp:func:`OGR_L_SetFeature`
 
         Parameters
         -----------
-        hLayer:
-            handle to the layer to write the feature.
-        hFeat:
-            the feature to write.
+        feature: Feature
+            The feature to write.
 
         Returns
         --------
-        OGRErr:
-            OGRERR_NONE if the operation works, otherwise an appropriate error
-            code (e.g OGRERR_NON_EXISTING_FEATURE if the feature does not exist).
+        int:
+            :py:const:`osgeo.ogr.OGRERR_NONE` if the operation works,
+            otherwise an appropriate error code
+            (e.g :py:const:`osgeo.ogr.OGRERR_NON_EXISTING_FEATURE` if the
+            feature does not exist).
 
         """
         return _ogr.Layer_SetFeature(self, *args)
@@ -1594,31 +1395,20 @@ class Layer(MajorObject):
     def CreateFeature(self, *args) -> "OGRErr":
         r"""
         CreateFeature(Layer self, Feature feature) -> OGRErr
-        OGRErr
-        OGR_L_CreateFeature(OGRLayerH hLayer, OGRFeatureH hFeat)
 
         Create and write a new feature within a layer.
 
-        The passed feature is written to the layer as a new feature, rather
-        than overwriting an existing one. If the feature has a feature id
-        other than OGRNullFID, then the native implementation may use that as
-        the feature id of the new feature, but not necessarily. Upon
-        successful return the passed feature will have been updated with the
-        new feature id.
-
-        This function is the same as the C++ method OGRLayer::CreateFeature().
+        For more details: :cpp:func:`OGR_L_CreateFeature`
 
         Parameters
         -----------
-        hLayer:
-            handle to the layer to write the feature to.
-        hFeat:
-            the handle of the feature to write to disk.
+        feature: Feature
+            The feature to write to disk.
 
         Returns
         --------
-        OGRErr:
-            OGRERR_NONE on success.
+        int:
+            :py:const:`osgeo.ogr.OGRERR_NONE` on success.
 
         """
         return _ogr.Layer_CreateFeature(self, *args)
@@ -1626,31 +1416,23 @@ class Layer(MajorObject):
     def DeleteFeature(self, *args) -> "OGRErr":
         r"""
         DeleteFeature(Layer self, GIntBig fid) -> OGRErr
-        OGRErr
-        OGR_L_DeleteFeature(OGRLayerH hLayer, GIntBig nFID)
 
         Delete feature from layer.
 
-        The feature with the indicated feature id is deleted from the layer if
-        supported by the driver. Most drivers do not support feature deletion,
-        and will return OGRERR_UNSUPPORTED_OPERATION. The
-        OGR_L_TestCapability() function may be called with OLCDeleteFeature to
-        check if the driver supports feature deletion.
-
-        This method is the same as the C++ method OGRLayer::DeleteFeature().
+        For more details: :cpp:func:`OGR_L_DeleteFeature`
 
         Parameters
         -----------
-        hLayer:
-            handle to the layer
-        nFID:
-            the feature id to be deleted from the layer
+        fid: int
+            The feature id to be deleted from the layer
 
         Returns
         --------
-        OGRErr:
-            OGRERR_NONE if the operation works, otherwise an appropriate error
-            code (e.g OGRERR_NON_EXISTING_FEATURE if the feature does not exist).
+        int:
+            :py:const:`osgeo.ogr.OGRERR_NONE` if the operation works,
+            otherwise an appropriate error code
+            (e.g :py:const:`osgeo.ogr.OGRERR_NON_EXISTING_FEATURE`)
+            if the feature does not exist.
 
         """
         return _ogr.Layer_DeleteFeature(self, *args)
@@ -1658,35 +1440,16 @@ class Layer(MajorObject):
     def SyncToDisk(self, *args) -> "OGRErr":
         r"""
         SyncToDisk(Layer self) -> OGRErr
-        OGRErr OGR_L_SyncToDisk(OGRLayerH
-        hLayer)
 
         Flush pending changes to disk.
 
-        This call is intended to force the layer to flush any pending writes
-        to disk, and leave the disk file in a consistent state. It would not
-        normally have any effect on read-only datasources.
-
-        Some layers do not implement this method, and will still return
-        OGRERR_NONE. The default implementation just returns OGRERR_NONE. An
-        error is only returned if an error occurs while attempting to flush to
-        disk.
-
-        In any event, you should always close any opened datasource with
-        OGR_DS_Destroy() that will ensure all data is correctly flushed.
-
-        This method is the same as the C++ method OGRLayer::SyncToDisk()
-
-        Parameters
-        -----------
-        hLayer:
-            handle to the layer
+        For more details: :cpp:func:`OGR_L_SyncToDisk`
 
         Returns
         --------
-        OGRErr:
-            OGRERR_NONE if no error occurs (even if nothing is done) or an error
-            code.
+        int:
+            :py:const:`osgeo.ogr.OGRERR_NONE` if no error occurs
+            (even if nothing is done) or an error code.
 
         """
         return _ogr.Layer_SyncToDisk(self, *args)
@@ -1694,26 +1457,15 @@ class Layer(MajorObject):
     def GetLayerDefn(self, *args) -> "OGRFeatureDefnShadow *":
         r"""
         GetLayerDefn(Layer self) -> FeatureDefn
-        OGRFeatureDefnH
-        OGR_L_GetLayerDefn(OGRLayerH hLayer)
 
         Fetch the schema information for this layer.
 
-        The returned handle to the OGRFeatureDefn is owned by the OGRLayer,
-        and should not be modified or freed by the application. It
-        encapsulates the attribute schema of the features of the layer.
-
-        This function is the same as the C++ method OGRLayer::GetLayerDefn().
-
-        Parameters
-        -----------
-        hLayer:
-            handle to the layer to get the schema information.
+        For more details: :cpp:func:`OGR_L_GetLayerDefn`
 
         Returns
         --------
-        OGRFeatureDefnH:
-            a handle to the feature definition.
+        FeatureDefn:
+            The feature definition.
 
         """
         return _ogr.Layer_GetLayerDefn(self, *args)
@@ -1721,39 +1473,21 @@ class Layer(MajorObject):
     def GetFeatureCount(self, *args, **kwargs) -> "GIntBig":
         r"""
         GetFeatureCount(Layer self, int force=1) -> GIntBig
-        GIntBig
-        OGR_L_GetFeatureCount(OGRLayerH hLayer, int bForce)
 
         Fetch the feature count in this layer.
 
-        Returns the number of features in the layer. For dynamic databases the
-        count may not be exact. If bForce is FALSE, and it would be expensive
-        to establish the feature count a value of -1 may be returned
-        indicating that the count isn't know. If bForce is TRUE some
-        implementations will actually scan the entire layer once to count
-        objects.
-
-        The returned count takes the spatial filter into account.
-
-        Note that some implementations of this method may alter the read
-        cursor of the layer.
-
-        This function is the same as the CPP OGRLayer::GetFeatureCount().
-
-        Note: since GDAL 2.0, this method returns a GIntBig (previously a int)
+        For more details: :cpp:func:`OGR_L_GetFeatureCount`
 
         Parameters
         -----------
-        hLayer:
-            handle to the layer that owned the features.
-        bForce:
+        force: int
             Flag indicating whether the count should be computed even if
             it is expensive.
 
         Returns
         --------
         int:
-            feature count, -1 if count not known.
+            Feature count, -1 if count not known.
 
         """
         return _ogr.Layer_GetFeatureCount(self, *args, **kwargs)
@@ -1761,43 +1495,33 @@ class Layer(MajorObject):
     def GetExtent(self, *args, **kwargs) -> "void":
         r"""
         GetExtent(Layer self, int force=1, int can_return_null=0, int geom_field=0)
-        OGRErr OGR_L_GetExtent(OGRLayerH
-        hLayer, OGREnvelope \*psExtent, int bForce)
 
         Fetch the extent of this layer.
 
-        Returns the extent (MBR) of the data in the layer. If bForce is FALSE,
-        and it would be expensive to establish the extent then OGRERR_FAILURE
-        will be returned indicating that the extent isn't know. If bForce is
-        TRUE then some implementations will actually scan the entire layer
-        once to compute the MBR of all the features in the layer.
+        For more details:
 
-        Depending on the drivers, the returned extent may or may not take the
-        spatial filter into account. So it is safer to call OGR_L_GetExtent()
-        without setting a spatial filter.
+        - :cpp:func:`OGR_L_GetExtent`
+        - :cpp:func:`OGR_L_GetExtentEx`
 
-        Layers without any geometry may return OGRERR_FAILURE just indicating
-        that no meaningful extents could be collected.
-
-        Note that some implementations of this method may alter the read
-        cursor of the layer.
-
-        This function is the same as the C++ method OGRLayer::GetExtent().
+        .. warning:: Check the return order of the bounds.
 
         Parameters
         -----------
-        hLayer:
-            handle to the layer from which to get extent.
-        psExtent:
-            the structure in which the extent value will be returned.
-        bForce:
+        force: int, default=False
             Flag indicating whether the extent should be computed even if
             it is expensive.
+        can_return_null: int, default=False
+            Whether None can be returned in the response.
+        geom_field: int, default=0
+            Ithe index of the geometry field on which to compute the extent.
+            Can be iterated over using :py:func:`range` and :py:func:`GetGeomFieldCount`.
 
         Returns
         --------
-        OGRErr:
-            OGRERR_NONE on success, OGRERR_FAILURE if extent not known.
+        minx: float
+        maxx: float
+        miny: float
+        maxy: float
 
         """
         return _ogr.Layer_GetExtent(self, *args, **kwargs)
@@ -1805,99 +1529,23 @@ class Layer(MajorObject):
     def TestCapability(self, *args) -> "bool":
         r"""
         TestCapability(Layer self, char const * cap) -> bool
-        int
-        OGR_L_TestCapability(OGRLayerH hLayer, const char \*pszCap)
 
         Test if this layer supported the named capability.
 
-        The capability codes that can be tested are represented as strings,
-        but #defined constants exists to ensure correct spelling. Specific
-        layer types may implement class specific capabilities, but this can't
-        generally be discovered by the caller.
-
-        OLCRandomRead / 'RandomRead': TRUE if the GetFeature() method is
-        implemented in an optimized way for this layer, as opposed to the
-        default implementation using ResetReading() and GetNextFeature() to
-        find the requested feature id.
-
-        OLCSequentialWrite / 'SequentialWrite': TRUE if the CreateFeature()
-        method works for this layer. Note this means that this particular
-        layer is writable. The same OGRLayer class may returned FALSE for
-        other layer instances that are effectively read-only.
-
-        OLCRandomWrite / 'RandomWrite': TRUE if the SetFeature() method is
-        operational on this layer. Note this means that this particular layer
-        is writable. The same OGRLayer class may returned FALSE for other
-        layer instances that are effectively read-only.
-
-        OLCFastSpatialFilter / 'FastSpatialFilter': TRUE if this layer
-        implements spatial filtering efficiently. Layers that effectively read
-        all features, and test them with the OGRFeature intersection methods
-        should return FALSE. This can be used as a clue by the application
-        whether it should build and maintain its own spatial index for
-        features in this layer.
-
-        OLCFastFeatureCount / 'FastFeatureCount': TRUE if this layer can
-        return a feature count (via OGR_L_GetFeatureCount()) efficiently, i.e.
-        without counting the features. In some cases this will return TRUE
-        until a spatial filter is installed after which it will return FALSE.
-
-        OLCFastGetExtent / 'FastGetExtent': TRUE if this layer can return
-        its data extent (via OGR_L_GetExtent()) efficiently, i.e. without
-        scanning all the features. In some cases this will return TRUE until a
-        spatial filter is installed after which it will return FALSE.
-
-        OLCFastSetNextByIndex / 'FastSetNextByIndex': TRUE if this layer can
-        perform the SetNextByIndex() call efficiently, otherwise FALSE.
-
-        OLCCreateField / 'CreateField': TRUE if this layer can create new
-        fields on the current layer using CreateField(), otherwise FALSE.
-
-        OLCCreateGeomField / 'CreateGeomField': (GDAL >= 1.11) TRUE if this
-        layer can create new geometry fields on the current layer using
-        CreateGeomField(), otherwise FALSE.
-
-        OLCDeleteField / 'DeleteField': TRUE if this layer can delete
-        existing fields on the current layer using DeleteField(), otherwise
-        FALSE.
-
-        OLCReorderFields / 'ReorderFields': TRUE if this layer can reorder
-        existing fields on the current layer using ReorderField() or
-        ReorderFields(), otherwise FALSE.
-
-        OLCAlterFieldDefn / 'AlterFieldDefn': TRUE if this layer can alter
-        the definition of an existing field on the current layer using
-        AlterFieldDefn(), otherwise FALSE.
-
-        OLCDeleteFeature / 'DeleteFeature': TRUE if the DeleteFeature()
-        method is supported on this layer, otherwise FALSE.
-
-        OLCStringsAsUTF8 / 'StringsAsUTF8': TRUE if values of OFTString
-        fields are assured to be in UTF-8 format. If FALSE the encoding of
-        fields is uncertain, though it might still be UTF-8.
-
-        OLCTransactions / 'Transactions': TRUE if the StartTransaction(),
-        CommitTransaction() and RollbackTransaction() methods work in a
-        meaningful way, otherwise FALSE.
-
-        OLCCurveGeometries / 'CurveGeometries': TRUE if this layer supports
-        writing curve geometries or may return such geometries. (GDAL 2.0).
-
-        This function is the same as the C++ method
-        OGRLayer::TestCapability().
+        For more details: :cpp:func:`OGR_L_TestCapability`
 
         Parameters
         -----------
-        hLayer:
-            handle to the layer to get the capability from.
-        pszCap:
-            the name of the capability to test.
+        cap: str
+            The name of the capability to test. These can
+            be found in the `osgeo.ogr` namespace. For example,
+            :py:const:`osgeo.ogr.OLCRandomRead`.
 
         Returns
         --------
         int:
-            TRUE if the layer has the requested capability, or FALSE otherwise.
-            OGRLayers will return FALSE for any unrecognized capabilities.
+            True if the layer has the requested capability, or False otherwise.
+            Will return False for any unrecognized capabilities.
 
         """
         return _ogr.Layer_TestCapability(self, *args)
@@ -1905,47 +1553,23 @@ class Layer(MajorObject):
     def CreateField(self, *args, **kwargs) -> "OGRErr":
         r"""
         CreateField(Layer self, FieldDefn field_def, int approx_ok=1) -> OGRErr
-        OGRErr
-        OGR_L_CreateField(OGRLayerH hLayer, OGRFieldDefnH hField, int
-        bApproxOK)
 
         Create a new field on a layer.
 
-        You must use this to create new fields on a real layer. Internally the
-        OGRFeatureDefn for the layer will be updated to reflect the new field.
-        Applications should never modify the OGRFeatureDefn used by a layer
-        directly.
-
-        This function should not be called while there are feature objects in
-        existence that were obtained or created with the previous layer
-        definition.
-
-        Not all drivers support this function. You can query a layer to check
-        if it supports it with the OLCCreateField capability. Some drivers may
-        only support this method while there are still no features in the
-        layer. When it is supported, the existing features of the backing
-        file/database should be updated accordingly.
-
-        Drivers may or may not support not-null constraints. If they support
-        creating fields with not-null constraints, this is generally before
-        creating any feature to the layer.
-
-        This function is the same as the C++ method OGRLayer::CreateField().
+        For more details: :cpp:func:`OGR_L_CreateField`
 
         Parameters
         -----------
-        hLayer:
-            handle to the layer to write the field definition.
-        hField:
-            handle of the field definition to write to disk.
-        bApproxOK:
-            If TRUE, the field may be created in a slightly different
+        field_def: FieldDefn
+            The field definition to write to disk.
+        approx_ok: bool, default=True
+            If True, the field may be created in a slightly different
             form depending on the limitations of the format driver.
 
         Returns
         --------
-        OGRErr:
-            OGRERR_NONE on success.
+        int:
+            :py:const:`osgeo.ogr.OGRERR_NONE` on success.
 
         """
         return _ogr.Layer_CreateField(self, *args, **kwargs)
@@ -1953,41 +1577,20 @@ class Layer(MajorObject):
     def DeleteField(self, *args) -> "OGRErr":
         r"""
         DeleteField(Layer self, int iField) -> OGRErr
-        OGRErr
-        OGR_L_DeleteField(OGRLayerH hLayer, int iField)
 
         Delete an existing field on a layer.
 
-        You must use this to delete existing fields on a real layer.
-        Internally the OGRFeatureDefn for the layer will be updated to reflect
-        the deleted field. Applications should never modify the OGRFeatureDefn
-        used by a layer directly.
-
-        This function should not be called while there are feature objects in
-        existence that were obtained or created with the previous layer
-        definition.
-
-        Not all drivers support this function. You can query a layer to check
-        if it supports it with the OLCDeleteField capability. Some drivers may
-        only support this method while there are still no features in the
-        layer. When it is supported, the existing features of the backing
-        file/database should be updated accordingly.
-
-        This function is the same as the C++ method OGRLayer::DeleteField().
-
-        .. versionadded:: 1.9.0
+        For more details: :cpp:func:`OGR_L_DeleteField`
 
         Parameters
         -----------
-        hLayer:
-            handle to the layer.
-        iField:
+        iField: int
             index of the field to delete.
 
         Returns
         --------
-        OGRErr:
-            OGRERR_NONE on success.
+        int:
+            :py:const:`osgeo.ogr.OGRERR_NONE` on success.
 
         """
         return _ogr.Layer_DeleteField(self, *args)
@@ -1995,57 +1598,24 @@ class Layer(MajorObject):
     def ReorderField(self, *args) -> "OGRErr":
         r"""
         ReorderField(Layer self, int iOldFieldPos, int iNewFieldPos) -> OGRErr
-        OGRErr
-        OGR_L_ReorderField(OGRLayerH hLayer, int iOldFieldPos, int
-        iNewFieldPos)
 
         Reorder an existing field on a layer.
 
-        This function is a convenience wrapper of OGR_L_ReorderFields()
-        dedicated to move a single field.
-
-        You must use this to reorder existing fields on a real layer.
-        Internally the OGRFeatureDefn for the layer will be updated to reflect
-        the reordering of the fields. Applications should never modify the
-        OGRFeatureDefn used by a layer directly.
-
-        This function should not be called while there are feature objects in
-        existence that were obtained or created with the previous layer
-        definition.
-
-        The field definition that was at initial position iOldFieldPos will be
-        moved at position iNewFieldPos, and elements between will be shuffled
-        accordingly.
-
-        For example, let suppose the fields were '0','1','2','3','4'
-        initially. ReorderField(1, 3) will reorder them as
-        '0','2','3','1','4'.
-
-        Not all drivers support this function. You can query a layer to check
-        if it supports it with the OLCReorderFields capability. Some drivers
-        may only support this method while there are still no features in the
-        layer. When it is supported, the existing features of the backing
-        file/database should be updated accordingly.
-
-        This function is the same as the C++ method OGRLayer::ReorderField().
-
-        .. versionadded:: 1.9.0
+        For more details: :cpp:func:`OGR_L_ReorderField`
 
         Parameters
         -----------
-        hLayer:
-            handle to the layer.
-        iOldFieldPos:
+        iOldFieldPos: int
             previous position of the field to move. Must be in the
             range [0,GetFieldCount()-1].
-        iNewFieldPos:
+        iNewFieldPos: int
             new position of the field to move. Must be in the range
             [0,GetFieldCount()-1].
 
         Returns
         --------
-        OGRErr:
-            OGRERR_NONE on success.
+        int:
+            :py:const:`osgeo.ogr.OGRERR_NONE` on success.
 
         """
         return _ogr.Layer_ReorderField(self, *args)
@@ -2053,50 +1623,22 @@ class Layer(MajorObject):
     def ReorderFields(self, *args) -> "OGRErr":
         r"""
         ReorderFields(Layer self, int nList) -> OGRErr
-        OGRErr
-        OGR_L_ReorderFields(OGRLayerH hLayer, int \*panMap)
 
         Reorder all the fields of a layer.
 
-        You must use this to reorder existing fields on a real layer.
-        Internally the OGRFeatureDefn for the layer will be updated to reflect
-        the reordering of the fields. Applications should never modify the
-        OGRFeatureDefn used by a layer directly.
-
-        This function should not be called while there are feature objects in
-        existence that were obtained or created with the previous layer
-        definition.
-
-        panMap is such that,for each field definition at position i after
-        reordering, its position before reordering was panMap[i].
-
-        For example, let suppose the fields were '0','1','2','3','4'
-        initially. ReorderFields([0,2,3,1,4]) will reorder them as
-        '0','2','3','1','4'.
-
-        Not all drivers support this function. You can query a layer to check
-        if it supports it with the OLCReorderFields capability. Some drivers
-        may only support this method while there are still no features in the
-        layer. When it is supported, the existing features of the backing
-        file/database should be updated accordingly.
-
-        This function is the same as the C++ method OGRLayer::ReorderFields().
-
-        .. versionadded:: 1.9.0
+        For more details: :cpp:func:`OGR_L_ReorderFields`
 
         Parameters
         -----------
-        hLayer:
-            handle to the layer.
-        panMap:
-            an array of GetLayerDefn()-> OGRFeatureDefn::GetFieldCount()
-            elements which is a permutation of [0, GetLayerDefn()->
-            OGRFeatureDefn::GetFieldCount()-1].
+        nList: list[int]
+            A list of GetLayerDefn().GetFieldCount()
+            elements which is a permutation of
+            [0, GetLayerDefn().GetFieldCount()-1].
 
         Returns
         --------
-        OGRErr:
-            OGRERR_NONE on success.
+        int:
+            :py:const:`osgeo.ogr.OGRERR_NONE` on success.
 
         """
         return _ogr.Layer_ReorderFields(self, *args)
@@ -2104,52 +1646,32 @@ class Layer(MajorObject):
     def AlterFieldDefn(self, *args) -> "OGRErr":
         r"""
         AlterFieldDefn(Layer self, int iField, FieldDefn field_def, int nFlags) -> OGRErr
-        OGRErr
-        OGR_L_AlterFieldDefn(OGRLayerH hLayer, int iField, OGRFieldDefnH
-        hNewFieldDefn, int nFlags)
 
         Alter the definition of an existing field on a layer.
 
-        You must use this to alter the definition of an existing field of a
-        real layer. Internally the OGRFeatureDefn for the layer will be
-        updated to reflect the altered field. Applications should never modify
-        the OGRFeatureDefn used by a layer directly.
-
-        This function should not be called while there are feature objects in
-        existence that were obtained or created with the previous layer
-        definition.
-
-        Not all drivers support this function. You can query a layer to check
-        if it supports it with the OLCAlterFieldDefn capability. Some drivers
-        may only support this method while there are still no features in the
-        layer. When it is supported, the existing features of the backing
-        file/database should be updated accordingly. Some drivers might also
-        not support all update flags.
-
-        This function is the same as the C++ method
-        OGRLayer::AlterFieldDefn().
-
-        .. versionadded:: 1.9.0
+        For more details: :cpp:func:`OGR_L_AlterFieldDefn`
 
         Parameters
         -----------
-        hLayer:
-            handle to the layer.
-        iField:
+        iField: int
             index of the field whose definition must be altered.
-        hNewFieldDefn:
+        field_def: FieldDefn
             new field definition
-        nFlags:
-            combination of ALTER_NAME_FLAG, ALTER_TYPE_FLAG,
-            ALTER_WIDTH_PRECISION_FLAG, ALTER_NULLABLE_FLAG and ALTER_DEFAULT_FLAG
+        nFlags: int
+            Combination of
+            :py:const:`osgeo.ogr.ALTER_NAME_FLAG`,
+            :py:const:`osgeo.ogr.ALTER_TYPE_FLAG`,
+            :py:const:`osgeo.ogr.ALTER_WIDTH_PRECISION_FLAG`,
+            :py:const:`osgeo.ogr.ALTER_NULLABLE_FLAG` and
+            :py:const:`osgeo.ogr.ALTER_DEFAULT_FLAG`
             to indicate which of the name and/or type and/or width and precision
             fields and/or nullability from the new field definition must be taken
             into account.
 
         Returns
         --------
-        OGRErr:
-            OGRERR_NONE on success.
+        int:
+            :py:const:`osgeo.ogr.OGRERR_NONE` on success.
 
         """
         return _ogr.Layer_AlterFieldDefn(self, *args)
@@ -2161,49 +1683,23 @@ class Layer(MajorObject):
     def CreateGeomField(self, *args, **kwargs) -> "OGRErr":
         r"""
         CreateGeomField(Layer self, GeomFieldDefn field_def, int approx_ok=1) -> OGRErr
-        OGRErr
-        OGR_L_CreateGeomField(OGRLayerH hLayer, OGRGeomFieldDefnH hField, int
-        bApproxOK)
 
         Create a new geometry field on a layer.
 
-        You must use this to create new geometry fields on a real layer.
-        Internally the OGRFeatureDefn for the layer will be updated to reflect
-        the new field. Applications should never modify the OGRFeatureDefn
-        used by a layer directly.
-
-        This function should not be called while there are feature objects in
-        existence that were obtained or created with the previous layer
-        definition.
-
-        Not all drivers support this function. You can query a layer to check
-        if it supports it with the OLCCreateField capability. Some drivers may
-        only support this method while there are still no features in the
-        layer. When it is supported, the existing features of the backing
-        file/database should be updated accordingly.
-
-        Drivers may or may not support not-null constraints. If they support
-        creating fields with not-null constraints, this is generally before
-        creating any feature to the layer.
-
-        This function is the same as the C++ method OGRLayer::CreateField().
-
-        .. versionadded:: 1.11
+        For more details: :cpp:func:`OGR_L_CreateGeomField`
 
         Parameters
         -----------
-        hLayer:
-            handle to the layer to write the field definition.
-        hField:
-            handle of the geometry field definition to write to disk.
-        bApproxOK:
-            If TRUE, the field may be created in a slightly different
+        field_def: GeomFieldDefn
+            The geometry field definition to write to disk.
+        approx_ok: bool, default=True
+            If True, the field may be created in a slightly different
             form depending on the limitations of the format driver.
 
         Returns
         --------
-        OGRErr:
-            OGRERR_NONE on success.
+        int:
+            :py:const:`osgeo.ogr.OGRERR_NONE` on success.
 
         """
         return _ogr.Layer_CreateGeomField(self, *args, **kwargs)
@@ -2211,34 +1707,15 @@ class Layer(MajorObject):
     def StartTransaction(self, *args) -> "OGRErr":
         r"""
         StartTransaction(Layer self) -> OGRErr
-        OGRErr
-        OGR_L_StartTransaction(OGRLayerH hLayer)
 
-        For datasources which support transactions, StartTransaction creates a
-        transaction.
+        For datasources which support transactions, this creates a transaction.
 
-        If starting the transaction fails, will return OGRERR_FAILURE.
-        Datasources which do not support transactions will always return
-        OGRERR_NONE.
-
-        Note: as of GDAL 2.0, use of this API is discouraged when the dataset
-        offers dataset level transaction with GDALDataset::StartTransaction().
-        The reason is that most drivers can only offer transactions at dataset
-        level, and not layer level. Very few drivers really support
-        transactions at layer scope.
-
-        This function is the same as the C++ method
-        OGRLayer::StartTransaction().
-
-        Parameters
-        -----------
-        hLayer:
-            handle to the layer
+        For more details: :cpp:func:`OGR_L_StartTransaction`
 
         Returns
         --------
-        OGRErr:
-            OGRERR_NONE on success.
+        int:
+            :py:const:`osgeo.ogr.OGRERR_NONE` on success.
 
         """
         return _ogr.Layer_StartTransaction(self, *args)
@@ -2246,28 +1723,15 @@ class Layer(MajorObject):
     def CommitTransaction(self, *args) -> "OGRErr":
         r"""
         CommitTransaction(Layer self) -> OGRErr
-        OGRErr
-        OGR_L_CommitTransaction(OGRLayerH hLayer)
 
-        For datasources which support transactions, CommitTransaction commits
-        a transaction.
+        For datasources which support transactions, this commits a transaction.
 
-        If no transaction is active, or the commit fails, will return
-        OGRERR_FAILURE. Datasources which do not support transactions will
-        always return OGRERR_NONE.
-
-        This function is the same as the C++ method
-        OGRLayer::CommitTransaction().
-
-        Parameters
-        -----------
-        hLayer:
-            handle to the layer
+        For more details: :cpp:func:`OGR_L_CommitTransaction`
 
         Returns
         --------
-        OGRErr:
-            OGRERR_NONE on success.
+        int:
+            :py:const:`osgeo.ogr.OGRERR_NONE` on success.
 
         """
         return _ogr.Layer_CommitTransaction(self, *args)
@@ -2275,29 +1739,15 @@ class Layer(MajorObject):
     def RollbackTransaction(self, *args) -> "OGRErr":
         r"""
         RollbackTransaction(Layer self) -> OGRErr
-        OGRErr
-        OGR_L_RollbackTransaction(OGRLayerH hLayer)
 
-        For datasources which support transactions, RollbackTransaction will
-        roll back a datasource to its state before the start of the current
-        transaction.
+        Roll back a datasource to its state before the start of the current transaction.
 
-        If no transaction is active, or the rollback fails, will return
-        OGRERR_FAILURE. Datasources which do not support transactions will
-        always return OGRERR_NONE.
-
-        This function is the same as the C++ method
-        OGRLayer::RollbackTransaction().
-
-        Parameters
-        -----------
-        hLayer:
-            handle to the layer
+        For more details: :cpp:func:`OGR_L_RollbackTransaction`
 
         Returns
         --------
-        OGRErr:
-            OGRERR_NONE on success.
+        int:
+            :py:const:`osgeo.ogr.OGRERR_NONE` on success.
 
         """
         return _ogr.Layer_RollbackTransaction(self, *args)
@@ -2305,21 +1755,10 @@ class Layer(MajorObject):
     def FindFieldIndex(self, *args) -> "int":
         r"""
         FindFieldIndex(Layer self, char const * pszFieldName, int bExactMatch) -> int
-        int
-        OGR_L_FindFieldIndex(OGRLayerH hLayer, const char \*pszFieldName, int
-        bExactMatch)
 
         Find the index of field in a layer.
 
-        The returned number is the index of the field in the layers, or -1 if
-        the field doesn't exist.
-
-        If bExactMatch is set to FALSE and the field doesn't exists in the
-        given form the driver might apply some changes to make it match, like
-        those it might do if the layer was created (eg. like LAUNDER in the
-        OCI driver).
-
-        This method is the same as the C++ method OGRLayer::FindFieldIndex().
+        For more details: :cpp:func:`OGR_L_FindFieldIndex`
 
         Returns
         --------
@@ -2332,25 +1771,15 @@ class Layer(MajorObject):
     def GetSpatialRef(self, *args) -> "OSRSpatialReferenceShadow *":
         r"""
         GetSpatialRef(Layer self) -> SpatialReference
-        OGRSpatialReferenceH
-        OGR_L_GetSpatialRef(OGRLayerH hLayer)
 
         Fetch the spatial reference system for this layer.
 
-        The returned object is owned by the OGRLayer and should not be
-        modified or freed by the application.
-
-        This function is the same as the C++ method OGRLayer::GetSpatialRef().
-
-        Parameters
-        -----------
-        hLayer:
-            handle to the layer to get the spatial reference from.
+        For more details: :cpp:func:`OGR_L_GetSpatialRef`
 
         Returns
         --------
-        OGRSpatialReferenceH:
-            spatial reference, or NULL if there isn't one.
+        SpatialReference:
+            spatial reference, or None if there isn't one.
 
         """
         return _ogr.Layer_GetSpatialRef(self, *args)
@@ -2358,46 +1787,32 @@ class Layer(MajorObject):
     def GetFeaturesRead(self, *args) -> "GIntBig":
         r"""
         GetFeaturesRead(Layer self) -> GIntBig
-        GIntBig
-        OGR_L_GetFeaturesRead(OGRLayerH hLayer) 
+
+        For more details: :cpp:func:`OGR_L_GetFeaturesRead`
+
         """
         return _ogr.Layer_GetFeaturesRead(self, *args)
 
     def SetIgnoredFields(self, *args) -> "OGRErr":
         r"""
         SetIgnoredFields(Layer self, char const ** options) -> OGRErr
-        OGRErr
-        OGR_L_SetIgnoredFields(OGRLayerH hLayer, const char \*\*papszFields)
 
         Set which fields can be omitted when retrieving features from the
         layer.
 
-        If the driver supports this functionality (testable using
-        OLCIgnoreFields capability), it will not fetch the specified fields in
-        subsequent calls to GetFeature() / GetNextFeature() and thus save some
-        processing time and/or bandwidth.
-
-        Besides field names of the layers, the following special fields can be
-        passed: 'OGR_GEOMETRY' to ignore geometry and 'OGR_STYLE' to
-        ignore layer style.
-
-        By default, no fields are ignored.
-
-        This method is the same as the C++ method OGRLayer::SetIgnoredFields()
+        For more details: :cpp:func:`OGR_L_SetIgnoredFields`
 
         Parameters
         -----------
-        hLayer:
-            handle to the layer
-        papszFields:
-            an array of field names terminated by NULL item.
-            If NULL is passed, the ignored list is cleared.
+        options: list[str]
+            A list of field names.
+            If an empty list is passed, the ignored list is cleared.
 
         Returns
         -------
-        OGRErr:
-            OGRERR_NONE if all field names have been resolved (even if the driver
-            does not support this method)
+        int:
+            :py:const:`osgeo.ogr.OGRERR_NONE` if all field names have been resolved
+            (even if the driver does not support this method)
 
         """
         return _ogr.Layer_SetIgnoredFields(self, *args)
@@ -2405,86 +1820,31 @@ class Layer(MajorObject):
     def Intersection(self, *args, **kwargs) -> "OGRErr":
         r"""
         Intersection(Layer self, Layer method_layer, Layer result_layer, char ** options=None, GDALProgressFunc callback=0, void * callback_data=None) -> OGRErr
-        OGRErr
-        OGR_L_Intersection(OGRLayerH pLayerInput, OGRLayerH pLayerMethod,
-        OGRLayerH pLayerResult, char \*\*papszOptions, GDALProgressFunc
-        pfnProgress, void \*pProgressArg)
 
         Intersection of two layers.
 
-        The result layer contains features whose geometries represent areas
-        that are common between features in the input layer and in the method
-        layer. The features in the result layer have attributes from both
-        input and method layers. The schema of the result layer can be set by
-        the user or, if it is empty, is initialized to contain all fields in
-        the input and method layers.
-
-        If the schema of the result is set by user and contains fields that
-        have the same name as a field in input and in method layer, then the
-        attribute in the result feature will get the value from the feature of
-        the method layer.
-
-        For best performance use the minimum amount of features in the method
-        layer and copy it into a memory layer.
-
-        This method relies on GEOS support. Do not use unless the GEOS support
-        is compiled in.  The recognized list of options is :
-        SKIP_FAILURES=YES/NO. Set it to YES to go on, even when a feature
-        could not be inserted or a GEOS call failed.
-
-        PROMOTE_TO_MULTI=YES/NO. Set it to YES to convert Polygons into
-        MultiPolygons, or LineStrings to MultiLineStrings.
-
-        INPUT_PREFIX=string. Set a prefix for the field names that will be
-        created from the fields of the input layer.
-
-        METHOD_PREFIX=string. Set a prefix for the field names that will be
-        created from the fields of the method layer.
-
-        USE_PREPARED_GEOMETRIES=YES/NO. Set to NO to not use prepared
-        geometries to pretest intersection of features of method layer with
-        features of this layer.
-
-        PRETEST_CONTAINMENT=YES/NO. Set to YES to pretest the containment of
-        features of method layer within the features of this layer. This will
-        speed up the method significantly in some cases. Requires that the
-        prepared geometries are in effect.
-
-        KEEP_LOWER_DIMENSION_GEOMETRIES=YES/NO. Set to NO to skip result
-        features with lower dimension geometry that would otherwise be added
-        to the result layer. The default is to add but only if the result
-        layer has an unknown geometry type.
-
-        This function is the same as the C++ method OGRLayer::Intersection().
-
-        The first geometry field is always used.
-
-        .. versionadded:: 1.10
+        For more details: :cpp:func:`OGR_L_Intersection`
 
         Parameters
         -----------
-        pLayerInput:
-            the input layer. Should not be NULL.
-        pLayerMethod:
-            the method layer. Should not be NULL.
-        pLayerResult:
+        method_layer: Layer
+            the method layer. Should not be None.
+        result_layer: Layer
             the layer where the features resulting from the
-            operation are inserted. Should not be NULL. See above the note about
-            the schema.
-        papszOptions:
-            NULL terminated list of options (may be NULL).
-        pfnProgress:
+            operation are inserted. Should not be None.
+        options: list[str], optional
+            List of options (empty list is allowed). For example ["PROMOTE_TO_MULTI=YES"].
+        callback: Callable, optional
             a GDALProgressFunc() compatible callback function for
-            reporting progress or NULL.
-        pProgressArg:
-            argument to be passed to pfnProgress. May be NULL.
-
+            reporting progress or None.
+        callback_data:
+            Argument to be passed to 'callback'. May be None.
 
         Returns
         -------
-        OGRErr:
-            an error code if there was an error or the execution was interrupted,
-            OGRERR_NONE otherwise.
+        int:
+            An error code if there was an error or the execution was interrupted,
+            :py:const:`osgeo.ogr.OGRERR_NONE` otherwise.
 
         """
         return _ogr.Layer_Intersection(self, *args, **kwargs)
@@ -2492,81 +1852,33 @@ class Layer(MajorObject):
     def Union(self, *args, **kwargs) -> "OGRErr":
         r"""
         Union(Layer self, Layer method_layer, Layer result_layer, char ** options=None, GDALProgressFunc callback=0, void * callback_data=None) -> OGRErr
-        OGRErr OGR_L_Union(OGRLayerH
-        pLayerInput, OGRLayerH pLayerMethod, OGRLayerH pLayerResult, char
-        \*\*papszOptions, GDALProgressFunc pfnProgress, void \*pProgressArg)
 
         Union of two layers.
 
-        The result layer contains features whose geometries represent areas
-        that are in either in the input layer, in the method layer, or in
-        both. The features in the result layer have attributes from both input
-        and method layers. For features which represent areas that are only in
-        the input or in the method layer the respective attributes have
-        undefined values. The schema of the result layer can be set by the
-        user or, if it is empty, is initialized to contain all fields in the
-        input and method layers.
-
-        If the schema of the result is set by user and contains fields that
-        have the same name as a field in input and in method layer, then the
-        attribute in the result feature will get the value from the feature of
-        the method layer (even if it is undefined).
-
-        For best performance use the minimum amount of features in the method
-        layer and copy it into a memory layer.
-
-        This method relies on GEOS support. Do not use unless the GEOS support
-        is compiled in.  The recognized list of options is :
-        SKIP_FAILURES=YES/NO. Set it to YES to go on, even when a feature
-        could not be inserted or a GEOS call failed.
-
-        PROMOTE_TO_MULTI=YES/NO. Set it to YES to convert Polygons into
-        MultiPolygons, or LineStrings to MultiLineStrings.
-
-        INPUT_PREFIX=string. Set a prefix for the field names that will be
-        created from the fields of the input layer.
-
-        METHOD_PREFIX=string. Set a prefix for the field names that will be
-        created from the fields of the method layer.
-
-        USE_PREPARED_GEOMETRIES=YES/NO. Set to NO to not use prepared
-        geometries to pretest intersection of features of method layer with
-        features of this layer.
-
-        KEEP_LOWER_DIMENSION_GEOMETRIES=YES/NO. Set to NO to skip result
-        features with lower dimension geometry that would otherwise be added
-        to the result layer. The default is to add but only if the result
-        layer has an unknown geometry type.
-
-        This function is the same as the C++ method OGRLayer::Union().
+        For more details: :cpp:func:`OGR_L_Union`
 
         The first geometry field is always used.
 
-        .. versionadded:: 1.10
-
         Parameters
         -----------
-        pLayerInput:
-            the input layer. Should not be NULL.
-        pLayerMethod:
-            the method layer. Should not be NULL.
-        pLayerResult:
+        method_layer: Layer
+            the method layer. Should not be None.
+        result_layer: Layer
             the layer where the features resulting from the
-            operation are inserted. Should not be NULL. See above the note about
-            the schema.
-        papszOptions:
-            NULL terminated list of options (may be NULL).
-        pfnProgress:
+            operation are inserted. Should not be None.
+        options: list[str], optional
+            List of options (empty list is allowed). For example ["PROMOTE_TO_MULTI=YES"].
+        callback: Callable, optional
             a GDALProgressFunc() compatible callback function for
-            reporting progress or NULL.
-        pProgressArg:
-            argument to be passed to pfnProgress. May be NULL.
+            reporting progress or None.
+        callback_data:
+            Argument to be passed to 'callback'. May be None.
 
         Returns
         -------
-        OGRErr:
-            an error code if there was an error or the execution was interrupted,
-            OGRERR_NONE otherwise.
+        int:
+            An error code if there was an error or the execution was interrupted,
+            :py:const:`osgeo.ogr.OGRERR_NONE` otherwise.
 
         """
         return _ogr.Layer_Union(self, *args, **kwargs)
@@ -2574,73 +1886,31 @@ class Layer(MajorObject):
     def SymDifference(self, *args, **kwargs) -> "OGRErr":
         r"""
         SymDifference(Layer self, Layer method_layer, Layer result_layer, char ** options=None, GDALProgressFunc callback=0, void * callback_data=None) -> OGRErr
-        OGRErr
-        OGR_L_SymDifference(OGRLayerH pLayerInput, OGRLayerH pLayerMethod,
-        OGRLayerH pLayerResult, char \*\*papszOptions, GDALProgressFunc
-        pfnProgress, void \*pProgressArg)
 
         Symmetrical difference of two layers.
 
-        The result layer contains features whose geometries represent areas
-        that are in either in the input layer or in the method layer but not
-        in both. The features in the result layer have attributes from both
-        input and method layers. For features which represent areas that are
-        only in the input or in the method layer the respective attributes
-        have undefined values. The schema of the result layer can be set by
-        the user or, if it is empty, is initialized to contain all fields in
-        the input and method layers.
-
-        If the schema of the result is set by user and contains fields that
-        have the same name as a field in input and in method layer, then the
-        attribute in the result feature will get the value from the feature of
-        the method layer (even if it is undefined).
-
-        For best performance use the minimum amount of features in the method
-        layer and copy it into a memory layer.
-
-        This method relies on GEOS support. Do not use unless the GEOS support
-        is compiled in.  The recognized list of options is :
-        SKIP_FAILURES=YES/NO. Set it to YES to go on, even when a feature
-        could not be inserted or a GEOS call failed.
-
-        PROMOTE_TO_MULTI=YES/NO. Set it to YES to convert Polygons into
-        MultiPolygons, or LineStrings to MultiLineStrings.
-
-        INPUT_PREFIX=string. Set a prefix for the field names that will be
-        created from the fields of the input layer.
-
-        METHOD_PREFIX=string. Set a prefix for the field names that will be
-        created from the fields of the method layer.
-
-        This function is the same as the C++ method OGRLayer::SymDifference().
-
-        The first geometry field is always used.
-
-        .. versionadded:: 1.10
+        For more details: :cpp:func:`OGR_L_SymDifference`
 
         Parameters
         -----------
-        pLayerInput:
-            the input layer. Should not be NULL.
-        pLayerMethod:
-            the method layer. Should not be NULL.
-        pLayerResult:
+        method_layer: Layer
+            the method layer. Should not be None.
+        result_layer: Layer
             the layer where the features resulting from the
-            operation are inserted. Should not be NULL. See above the note about
-            the schema.
-        papszOptions:
-            NULL terminated list of options (may be NULL).
-        pfnProgress:
+            operation are inserted. Should not be None.
+        options: list[str], optional
+            List of options (empty list is allowed). For example ["PROMOTE_TO_MULTI=YES"].
+        callback: Callable, optional
             a GDALProgressFunc() compatible callback function for
-            reporting progress or NULL.
-        pProgressArg:
-            argument to be passed to pfnProgress. May be NULL.
+            reporting progress or None.
+        callback_data:
+            Argument to be passed to 'callback'. May be None.
 
         Returns
         -------
-        OGRErr:
-            an error code if there was an error or the execution was interrupted,
-            OGRERR_NONE otherwise.
+        int:
+            An error code if there was an error or the execution was interrupted,
+            :py:const:`osgeo.ogr.OGRERR_NONE` otherwise.
 
         """
         return _ogr.Layer_SymDifference(self, *args, **kwargs)
@@ -2648,79 +1918,31 @@ class Layer(MajorObject):
     def Identity(self, *args, **kwargs) -> "OGRErr":
         r"""
         Identity(Layer self, Layer method_layer, Layer result_layer, char ** options=None, GDALProgressFunc callback=0, void * callback_data=None) -> OGRErr
-        OGRErr OGR_L_Identity(OGRLayerH
-        pLayerInput, OGRLayerH pLayerMethod, OGRLayerH pLayerResult, char
-        \*\*papszOptions, GDALProgressFunc pfnProgress, void \*pProgressArg)
 
-        Identify the features of this layer with the ones from the identity
-        layer.
+        Identify the features of this layer with the ones from the identity layer.
 
-        The result layer contains features whose geometries represent areas
-        that are in the input layer. The features in the result layer have
-        attributes from both input and method layers. The schema of the result
-        layer can be set by the user or, if it is empty, is initialized to
-        contain all fields in input and method layers.
-
-        If the schema of the result is set by user and contains fields that
-        have the same name as a field in input and in method layer, then the
-        attribute in the result feature will get the value from the feature of
-        the method layer (even if it is undefined).
-
-        For best performance use the minimum amount of features in the method
-        layer and copy it into a memory layer.
-
-        This method relies on GEOS support. Do not use unless the GEOS support
-        is compiled in.  The recognized list of options is :
-        SKIP_FAILURES=YES/NO. Set it to YES to go on, even when a feature
-        could not be inserted or a GEOS call failed.
-
-        PROMOTE_TO_MULTI=YES/NO. Set it to YES to convert Polygons into
-        MultiPolygons, or LineStrings to MultiLineStrings.
-
-        INPUT_PREFIX=string. Set a prefix for the field names that will be
-        created from the fields of the input layer.
-
-        METHOD_PREFIX=string. Set a prefix for the field names that will be
-        created from the fields of the method layer.
-
-        USE_PREPARED_GEOMETRIES=YES/NO. Set to NO to not use prepared
-        geometries to pretest intersection of features of method layer with
-        features of this layer.
-
-        KEEP_LOWER_DIMENSION_GEOMETRIES=YES/NO. Set to NO to skip result
-        features with lower dimension geometry that would otherwise be added
-        to the result layer. The default is to add but only if the result
-        layer has an unknown geometry type.
-
-        This function is the same as the C++ method OGRLayer::Identity().
-
-        The first geometry field is always used.
-
-        .. versionadded:: 1.10
+        For more details: :cpp:func:`OGR_L_Identity`
 
         Parameters
         -----------
-        pLayerInput:
-            the input layer. Should not be NULL.
-        pLayerMethod:
-            the method layer. Should not be NULL.
-        pLayerResult:
+        method_layer: Layer
+            the method layer. Should not be None.
+        result_layer: Layer
             the layer where the features resulting from the
-            operation are inserted. Should not be NULL. See above the note about
-            the schema.
-        papszOptions:
-            NULL terminated list of options (may be NULL).
-        pfnProgress:
+            operation are inserted. Should not be None.
+        options: list[str], optional
+            List of options (empty list is allowed). For example ["PROMOTE_TO_MULTI=YES"].
+        callback: Callable, optional
             a GDALProgressFunc() compatible callback function for
-            reporting progress or NULL.
-        pProgressArg:
-            argument to be passed to pfnProgress. May be NULL.
+            reporting progress or None.
+        callback_data:
+            Argument to be passed to 'callback'. May be None.
 
         Returns
         -------
-        OGRErr:
-            an error code if there was an error or the execution was interrupted,
-            OGRERR_NONE otherwise.
+        int:
+            An error code if there was an error or the execution was interrupted,
+            :py:const:`osgeo.ogr.OGRERR_NONE` otherwise.
 
         """
         return _ogr.Layer_Identity(self, *args, **kwargs)
@@ -2728,72 +1950,31 @@ class Layer(MajorObject):
     def Update(self, *args, **kwargs) -> "OGRErr":
         r"""
         Update(Layer self, Layer method_layer, Layer result_layer, char ** options=None, GDALProgressFunc callback=0, void * callback_data=None) -> OGRErr
-        OGRErr OGR_L_Update(OGRLayerH
-        pLayerInput, OGRLayerH pLayerMethod, OGRLayerH pLayerResult, char
-        \*\*papszOptions, GDALProgressFunc pfnProgress, void \*pProgressArg)
 
         Update this layer with features from the update layer.
 
-        The result layer contains features whose geometries represent areas
-        that are either in the input layer or in the method layer. The
-        features in the result layer have areas of the features of the method
-        layer or those ares of the features of the input layer that are not
-        covered by the method layer. The features of the result layer get
-        their attributes from the input layer. The schema of the result layer
-        can be set by the user or, if it is empty, is initialized to contain
-        all fields in the input layer.
-
-        If the schema of the result is set by user and contains fields that
-        have the same name as a field in the method layer, then the attribute
-        in the result feature the originates from the method layer will get
-        the value from the feature of the method layer.
-
-        For best performance use the minimum amount of features in the method
-        layer and copy it into a memory layer.
-
-        This method relies on GEOS support. Do not use unless the GEOS support
-        is compiled in.  The recognized list of options is :
-        SKIP_FAILURES=YES/NO. Set it to YES to go on, even when a feature
-        could not be inserted or a GEOS call failed.
-
-        PROMOTE_TO_MULTI=YES/NO. Set it to YES to convert Polygons into
-        MultiPolygons, or LineStrings to MultiLineStrings.
-
-        INPUT_PREFIX=string. Set a prefix for the field names that will be
-        created from the fields of the input layer.
-
-        METHOD_PREFIX=string. Set a prefix for the field names that will be
-        created from the fields of the method layer.
-
-        The first geometry field is always used.
-
-        This function is the same as the C++ method OGRLayer::Update().
-
-        .. versionadded:: 1.10
+        For more details: :cpp:func:`OGR_L_Update`
 
         Parameters
         -----------
-        pLayerInput:
-            the input layer. Should not be NULL.
-        pLayerMethod:
-            the method layer. Should not be NULL.
-        pLayerResult:
+        method_layer: Layer
+            the method layer. Should not be None.
+        result_layer: Layer
             the layer where the features resulting from the
-            operation are inserted. Should not be NULL. See above the note about
-            the schema.
-        papszOptions:
-            NULL terminated list of options (may be NULL).
-        pfnProgress:
+            operation are inserted. Should not be None.
+        options: list[str], optional
+            List of options (empty list is allowed). For example ["PROMOTE_TO_MULTI=YES"].
+        callback: Callable, optional
             a GDALProgressFunc() compatible callback function for
-            reporting progress or NULL.
-        pProgressArg:
-            argument to be passed to pfnProgress. May be NULL.
+            reporting progress or None.
+        callback_data:
+            Argument to be passed to 'callback'. May be None.
 
         Returns
         -------
-        OGRErr:
-            an error code if there was an error or the execution was interrupted,
-            OGRERR_NONE otherwise.
+        int:
+            An error code if there was an error or the execution was interrupted,
+            :py:const:`osgeo.ogr.OGRERR_NONE` otherwise.
 
         """
         return _ogr.Layer_Update(self, *args, **kwargs)
@@ -2801,65 +1982,31 @@ class Layer(MajorObject):
     def Clip(self, *args, **kwargs) -> "OGRErr":
         r"""
         Clip(Layer self, Layer method_layer, Layer result_layer, char ** options=None, GDALProgressFunc callback=0, void * callback_data=None) -> OGRErr
-        OGRErr OGR_L_Clip(OGRLayerH pLayerInput,
-        OGRLayerH pLayerMethod, OGRLayerH pLayerResult, char \*\*papszOptions,
-        GDALProgressFunc pfnProgress, void \*pProgressArg)
 
         Clip off areas that are not covered by the method layer.
 
-        The result layer contains features whose geometries represent areas
-        that are in the input layer and in the method layer. The features in
-        the result layer have the (possibly clipped) areas of features in the
-        input layer and the attributes from the same features. The schema of
-        the result layer can be set by the user or, if it is empty, is
-        initialized to contain all fields in the input layer.
-
-        For best performance use the minimum amount of features in the method
-        layer and copy it into a memory layer.
-
-        This method relies on GEOS support. Do not use unless the GEOS support
-        is compiled in.  The recognized list of options is :
-        SKIP_FAILURES=YES/NO. Set it to YES to go on, even when a feature
-        could not be inserted or a GEOS call failed.
-
-        PROMOTE_TO_MULTI=YES/NO. Set it to YES to convert Polygons into
-        MultiPolygons, or LineStrings to MultiLineStrings.
-
-        INPUT_PREFIX=string. Set a prefix for the field names that will be
-        created from the fields of the input layer.
-
-        METHOD_PREFIX=string. Set a prefix for the field names that will be
-        created from the fields of the method layer.
-
-        This function is the same as the C++ method OGRLayer::Clip().
-
-        The first geometry field is always used.
-
-        .. versionadded:: 1.10
+        For more details: :cpp:func:`OGR_L_Clip`
 
         Parameters
         -----------
-        pLayerInput:
-            the input layer. Should not be NULL.
-        pLayerMethod:
-            the method layer. Should not be NULL.
-        pLayerResult:
+        method_layer: Layer
+            the method layer. Should not be None.
+        result_layer: Layer
             the layer where the features resulting from the
-            operation are inserted. Should not be NULL. See above the note about
-            the schema.
-        papszOptions:
-            NULL terminated list of options (may be NULL).
-        pfnProgress:
+            operation are inserted. Should not be None.
+        options: list[str], optional
+            List of options (empty list is allowed). For example ["PROMOTE_TO_MULTI=YES"].
+        callback: Callable, optional
             a GDALProgressFunc() compatible callback function for
-            reporting progress or NULL.
-        pProgressArg:
-            argument to be passed to pfnProgress. May be NULL.
+            reporting progress or None.
+        callback_data:
+            Argument to be passed to 'callback'. May be None.
 
         Returns
         -------
-        OGRErr:
-            an error code if there was an error or the execution was interrupted,
-            OGRERR_NONE otherwise.
+        int:
+            An error code if there was an error or the execution was interrupted,
+            :py:const:`osgeo.ogr.OGRERR_NONE` otherwise.
 
         """
         return _ogr.Layer_Clip(self, *args, **kwargs)
@@ -2867,64 +2014,31 @@ class Layer(MajorObject):
     def Erase(self, *args, **kwargs) -> "OGRErr":
         r"""
         Erase(Layer self, Layer method_layer, Layer result_layer, char ** options=None, GDALProgressFunc callback=0, void * callback_data=None) -> OGRErr
-        OGRErr OGR_L_Erase(OGRLayerH
-        pLayerInput, OGRLayerH pLayerMethod, OGRLayerH pLayerResult, char
-        \*\*papszOptions, GDALProgressFunc pfnProgress, void \*pProgressArg)
 
         Remove areas that are covered by the method layer.
 
-        The result layer contains features whose geometries represent areas
-        that are in the input layer but not in the method layer. The features
-        in the result layer have attributes from the input layer. The schema
-        of the result layer can be set by the user or, if it is empty, is
-        initialized to contain all fields in the input layer.
-
-        For best performance use the minimum amount of features in the method
-        layer and copy it into a memory layer.
-
-        This method relies on GEOS support. Do not use unless the GEOS support
-        is compiled in.  The recognized list of options is :
-        SKIP_FAILURES=YES/NO. Set it to YES to go on, even when a feature
-        could not be inserted or a GEOS call failed.
-
-        PROMOTE_TO_MULTI=YES/NO. Set it to YES to convert Polygons into
-        MultiPolygons, or LineStrings to MultiLineStrings.
-
-        INPUT_PREFIX=string. Set a prefix for the field names that will be
-        created from the fields of the input layer.
-
-        METHOD_PREFIX=string. Set a prefix for the field names that will be
-        created from the fields of the method layer.
-
-        This function is the same as the C++ method OGRLayer::Erase().
-
-        The first geometry field is always used.
-
-        .. versionadded:: 1.10
+        For more details: :cpp:func:`OGR_L_Erase`
 
         Parameters
         -----------
-        pLayerInput:
-            the input layer. Should not be NULL.
-        pLayerMethod:
-            the method layer. Should not be NULL.
-        pLayerResult:
+        method_layer: Layer
+            the method layer. Should not be None.
+        result_layer: Layer
             the layer where the features resulting from the
-            operation are inserted. Should not be NULL. See above the note about
-            the schema.
-        papszOptions:
-            NULL terminated list of options (may be NULL).
-        pfnProgress:
+            operation are inserted. Should not be None.
+        options: list[str], optional
+            List of options (empty list is allowed). For example ["PROMOTE_TO_MULTI=YES"].
+        callback: Callable, optional
             a GDALProgressFunc() compatible callback function for
-            reporting progress or NULL.
-        pProgressArg:
-            argument to be passed to pfnProgress. May be NULL.
+            reporting progress or None.
+        callback_data:
+            Argument to be passed to 'callback'. May be None.
 
         Returns
         -------
-        OGRErr:
-            an error code if there was an error or the execution was interrupted,
-            OGRERR_NONE otherwise.
+        int:
+            An error code if there was an error or the execution was interrupted,
+            :py:const:`osgeo.ogr.OGRERR_NONE` otherwise.
 
         """
         return _ogr.Layer_Erase(self, *args, **kwargs)
@@ -2932,20 +2046,22 @@ class Layer(MajorObject):
     def GetStyleTable(self, *args) -> "OGRStyleTableShadow *":
         r"""
         GetStyleTable(Layer self) -> StyleTable
-        OGRStyleTableH
-        OGR_L_GetStyleTable(OGRLayerH hLayer)
 
-        Get style table. 
+        Get style table.
+
+        For more details: :cpp:func:`OGR_L_GetStyleTable`
+
         """
         return _ogr.Layer_GetStyleTable(self, *args)
 
     def SetStyleTable(self, *args) -> "void":
         r"""
         SetStyleTable(Layer self, StyleTable table)
-        void
-        OGR_L_SetStyleTable(OGRLayerH hLayer, OGRStyleTableH hStyleTable)
 
-        Set style table. 
+        Set style table.
+
+        For more details: :cpp:func:`OGR_L_SetStyleTable`
+
         """
         return _ogr.Layer_SetStyleTable(self, *args)
 
@@ -6351,33 +5467,13 @@ class Geometry(object):
         r"""
         ExportToWkt(Geometry self) -> OGRErr
 
-        :cpp:func:`OGR_G_ExportToWkt`
-
         Convert a geometry into well known text format.
 
-        This function relates to the SFCOM IWks::ExportToWKT() method.
-
-        For backward compatibility purposes, it exports the Old-style 99-402
-        extended dimension (Z) WKB types for types Point, LineString, Polygon,
-        MultiPoint, MultiLineString, MultiPolygon and GeometryCollection. For
-        other geometry types, it is equivalent to :py:func:`ExportToIsoWkt`.
-
-        This function is the same as the CPP method
-        :cpp:func:`OGRGeometry::exportToWkt`.
-
-        Parameters
-        -----------
-        hGeom:
-            handle on the geometry to convert to a text format from.
-        ppszSrcText:
-            a text buffer is allocated by the program, and assigned
-            to the passed pointer. After use, \*ppszDstText should be freed with
-            :cpp:func:`CPLFree`.
+        For more details: :cpp:func:`OGR_G_ExportToWkt`
 
         Returns
         --------
-        OGRErr:
-            Currently OGRERR_NONE is always returned.
+        str
 
         """
         return _ogr.Geometry_ExportToWkt(self, *args)
@@ -6386,33 +5482,16 @@ class Geometry(object):
         r"""
         ExportToIsoWkt(Geometry self) -> OGRErr
 
-        :cpp:func:`OGR_G_ExportToIsoWkt`
-
         Convert a geometry into SFSQL 1.2 / ISO SQL/MM Part 3 well known text
         format.
 
-        This function relates to the SFCOM IWks::ExportToWKT() method. It
-        exports the SFSQL 1.2 and ISO SQL/MM Part 3 extended dimension (Z&M)
-        WKB types.
-
-        This function is the same as the CPP method
-        :cpp:func:`OGRGeometry::exportToWkt`.
+        For more details: :cpp:func:`OGR_G_ExportToIsoWkt`
 
         .. versionadded:: 2.0
 
-        Parameters
-        -----------
-        hGeom:
-            handle on the geometry to convert to a text format from.
-        ppszSrcText:
-            a text buffer is allocated by the program, and assigned
-            to the passed pointer. After use, \*ppszDstText should be freed with
-            :cpp:func:`CPLFree`.
-
         Returns
         --------
-        OGRErr:
-            Currently OGRERR_NONE is always returned.
+        str
 
         """
         return _ogr.Geometry_ExportToIsoWkt(self, *args)
@@ -6421,34 +5500,18 @@ class Geometry(object):
         r"""
         ExportToWkb(Geometry self, OGRwkbByteOrder byte_order=wkbNDR) -> OGRErr
 
-        :cpp:func:`OGR_G_ExportToWkb`
-
         Convert a geometry well known binary format.
 
-        This function relates to the SFCOM IWks::ExportToWKB() method.
-
-        For backward compatibility purposes, it exports the Old-style 99-402
-        extended dimension (Z) WKB types for types Point, LineString, Polygon,
-        MultiPoint, MultiLineString, MultiPolygon and GeometryCollection. For
-        other geometry types, it is equivalent to :py:func:`ExportToIsoWkb`.
-
-        This function is the same as the CPP method
-        :cpp:func:`OGRGeometry::exportToWkb` with eWkbVariant = wkbVariantOldOgc.
+        For more details: :cpp:func:`OGR_G_ExportToWkb`
 
         Parameters
         -----------
-        hGeom:
-            handle on the geometry to convert to a well know binary data from.
-        eOrder:
+        byte_order: osgeo.ogr.wkbXDR | osgeo.ogr.wkbNDR, default=osgeo.ogr.wkbNDR
             One of wkbXDR or wkbNDR indicating MSB or LSB byte order respectively.
-        pabyDstBuffer:
-            a buffer into which the binary representation is
-            written. This buffer must be at least :cpp:func:`OGR_G_WkbSize` byte in size.
 
         Returns
         --------
-        OGRErr:
-            Currently OGRERR_NONE is always returned.
+        bytes
 
         """
         return _ogr.Geometry_ExportToWkb(self, *args, **kwargs)
@@ -6457,34 +5520,21 @@ class Geometry(object):
         r"""
         ExportToIsoWkb(Geometry self, OGRwkbByteOrder byte_order=wkbNDR) -> OGRErr
 
-        :cpp:func:`OGR_G_ExportToIsoWkb`
-
         Convert a geometry into SFSQL 1.2 / ISO SQL/MM Part 3 well known
         binary format.
 
-        This function relates to the SFCOM IWks::ExportToWKB() method. It
-        exports the SFSQL 1.2 and ISO SQL/MM Part 3 extended dimension (Z&M)
-        WKB types.
-
-        This function is the same as the CPP method
-        :cpp:func:`OGRGeometry::exportToWkb` with eWkbVariant = wkbVariantIso.
+        For more details: :cpp:func:`OGR_G_ExportToIsoWkb`
 
         .. versionadded:: 2.0
 
         Parameters
         -----------
-        hGeom:
-            handle on the geometry to convert to a well know binary data from.
-        eOrder:
+        byte_order: osgeo.ogr.wkbXDR | osgeo.ogr.wkbNDR, default=osgeo.ogr.wkbNDR
             One of wkbXDR or wkbNDR indicating MSB or LSB byte order respectively.
-        pabyDstBuffer:
-            a buffer into which the binary representation is written.
-            This buffer must be at least :cpp:func:`OGR_G_WkbSize` byte in size.
 
         Returns
         --------
-        OGRErr:
-            Currently OGRERR_NONE is always returned.
+        bytes
 
         """
         return _ogr.Geometry_ExportToIsoWkb(self, *args, **kwargs)
@@ -6533,23 +5583,14 @@ class Geometry(object):
         r"""
         Clone(Geometry self) -> Geometry
 
-        :cpp:func:`OGR_G_Clone`
-
         Make a copy of this object.
 
-        This function relates to the SFCOM IGeometry::clone() method.
-
-        This function is the same as the CPP method :cpp:func:`OGRGeometry::clone`.
-
-        Parameters
-        -----------
-        hGeom:
-            handle on the geometry to clone from.
+        For more details: :cpp:func:`OGR_G_Clone`
 
         Returns
         --------
-        OGRGeometryH:
-            a handle on the copy of the geometry with the spatial reference system
+        Geometry:
+            The copy of the geometry with the same spatial reference system
             as the original.
 
         """
@@ -6559,26 +5600,15 @@ class Geometry(object):
         r"""
         GetGeometryType(Geometry self) -> OGRwkbGeometryType
 
-        :cpp:func:`OGR_G_GetGeometryType`
-
         Fetch geometry type.
 
-        Note that the geometry type may include the 2.5D flag. To get a 2D
-        flattened version of the geometry type apply the wkbFlatten() macro to
-        the return result.
-
-        This function is the same as the CPP method
-        :cpp:func:`OGRGeometry::getGeometryType`.
-
-        Parameters
-        -----------
-        hGeom:
-            handle on the geometry to get type from.
+        For more details: :cpp:func:`OGR_G_GetGeometryType`
 
         Returns
         --------
-        OGRwkbGeometryType:
-            the geometry type code.
+        int:
+            The geometry type code. The types can be found with
+            'osgeo.ogr.wkb' prefix. For example :py:const:`osgeo.ogr.wkbPolygon`.
 
         """
         return _ogr.Geometry_GetGeometryType(self, *args)
@@ -6587,24 +5617,15 @@ class Geometry(object):
         r"""
         GetGeometryName(Geometry self) -> char const *
 
-        :cpp:func:`OGR_G_GetGeometryName`
-
         Fetch WKT name for geometry type.
 
-        There is no SFCOM analog to this function.
+        For more details: :cpp:func:`OGR_G_GetGeometryName`
 
-        This function is the same as the CPP method
-        :cpp:func:`OGRGeometry::getGeometryName`.
-
-        Parameters
-        -----------
-        hGeom:
-            handle on the geometry to get name from.
+        geometry to get name from.
 
         Returns
         --------
-        str:
-            name used for this geometry type in well known text format.
+        str
 
         """
         return _ogr.Geometry_GetGeometryName(self, *args)
@@ -6681,16 +5702,12 @@ class Geometry(object):
         r"""
         SwapXY(Geometry self)
 
-        :cpp:func:`OGR_G_SwapXY`
-
         Swap x and y coordinates.
+
+        For more details: :cpp:func:`OGR_G_SwapXY`
 
         .. versionadded:: 2.3.0
 
-        Parameters
-        -----------
-        hGeom:
-            geometry.
 
         """
         return _ogr.Geometry_SwapXY(self, *args)
@@ -6703,30 +5720,19 @@ class Geometry(object):
         r"""
         Simplify(Geometry self, double tolerance) -> Geometry
 
-        :cpp:func:`OGR_G_Simplify`
-
         Compute a simplified geometry.
 
-        This function is the same as the C++ method :cpp:func:`OGRGeometry::Simplify`.
-
-        This function is built on the GEOS library, check it for the
-        definition of the geometry operation. If OGR is built without the GEOS
-        library, this function will always fail, issuing a CPLE_NotSupported
-        error.
-
-        .. versionadded:: 1.8.0
+        For more details: :cpp:func:`OGR_G_Simplify`
 
         Parameters
         -----------
-        hThis:
-            the geometry.
-        dTolerance:
-            the distance tolerance for the simplification.
+        tolerance: float
+            The distance tolerance for the simplification.
 
         Returns
         --------
-        OGRGeometryH:
-            the simplified geometry or NULL if an error occurs.
+        Geometry:
+            The simplified geometry or None if an error occurs.
 
         """
         return _ogr.Geometry_Simplify(self, *args)
@@ -6735,31 +5741,19 @@ class Geometry(object):
         r"""
         SimplifyPreserveTopology(Geometry self, double tolerance) -> Geometry
 
-        :cpp:func:`OGR_G_SimplifyPreserveTopology`
-
         Simplify the geometry while preserving topology.
 
-        This function is the same as the C++ method
-        :cpp:func:`OGRGeometry::SimplifyPreserveTopology`.
-
-        This function is built on the GEOS library, check it for the
-        definition of the geometry operation. If OGR is built without the GEOS
-        library, this function will always fail, issuing a CPLE_NotSupported
-        error.
-
-        .. versionadded:: 1.9.0
+        For more details: :cpp:func:`OGR_G_SimplifyPreserveTopology`
 
         Parameters
         -----------
-        hThis:
-            the geometry.
-        dTolerance:
-            the distance tolerance for the simplification.
+        tolerance: float
+            The distance tolerance for the simplification.
 
         Returns
         --------
-        OGRGeometryH:
-            the simplified geometry or NULL if an error occurs.
+        Geometry:
+            The simplified geometry or None if an error occurs.
 
         """
         return _ogr.Geometry_SimplifyPreserveTopology(self, *args)
@@ -6768,33 +5762,24 @@ class Geometry(object):
         r"""
         DelaunayTriangulation(Geometry self, double dfTolerance=0.0, int bOnlyEdges=FALSE) -> Geometry
 
-        :cpp:func:`OGR_G_DelaunayTriangulation`
-
         Return a Delaunay triangulation of the vertices of the geometry.
 
-        This function is the same as the C++ method
-        :cpp:func:`OGRGeometry::DelaunayTriangulation`.
-
-        This function is built on the GEOS library, v3.4 or above. If OGR is
-        built without the GEOS library, this function will always fail,
-        issuing a CPLE_NotSupported error.
+        For more details: :cpp:func:`OGR_G_DelaunayTriangulation`
 
         .. versionadded:: 2.1
 
         Parameters
         -----------
-        hThis:
-            the geometry.
-        dfTolerance:
+        dfTolerance: float
             optional snapping tolerance to use for improved robustness
-        bOnlyEdges:
-            if TRUE, will return a MULTILINESTRING, otherwise it will
+        bOnlyEdges: bool
+            If True, will return a MULTILINESTRING, otherwise it will
             return a GEOMETRYCOLLECTION containing triangular POLYGONs.
 
         Returns
         --------
-        OGRGeometryH:
-            the geometry resulting from the Delaunay triangulation or NULL if an
+        Geometry:
+            The geometry resulting from the Delaunay triangulation or None if an
             error occurs.
 
         """
@@ -6804,34 +5789,14 @@ class Geometry(object):
         r"""
         Polygonize(Geometry self) -> Geometry
 
-        :cpp:func:`OGR_G_Polygonize`
-
         Polygonizes a set of sparse edges.
 
-        A new geometry object is created and returned containing a collection
-        of reassembled Polygons: NULL will be returned if the input collection
-        doesn't corresponds to a MultiLinestring, or when reassembling Edges
-        into Polygons is impossible due to topological inconsistencies.
-
-        This function is the same as the C++ method :cpp:func:`OGRGeometry::Polygonize`.
-
-        This function is built on the GEOS library, check it for the
-        definition of the geometry operation. If OGR is built without the GEOS
-        library, this function will always fail, issuing a CPLE_NotSupported
-        error.
-
-        .. versionadded:: 1.9.0
-
-        Parameters
-        -----------
-        hTarget:
-            The Geometry to be polygonized.
+        For more details: :cpp:func:`OGR_G_Polygonize`
 
         Returns
         --------
-        OGRGeometryH:
-            a handle to a newly allocated geometry now owned by the caller, or
-            NULL on failure.
+        Geometry:
+            A new geometry or None on failure.
 
         """
         return _ogr.Geometry_Polygonize(self, *args)
@@ -6840,32 +5805,14 @@ class Geometry(object):
         r"""
         Boundary(Geometry self) -> Geometry
 
-        :cpp:func:`OGR_G_Boundary`
-
         Compute boundary.
 
-        A new geometry object is created and returned containing the boundary
-        of the geometry on which the method is invoked.
-
-        This function is the same as the C++ method :cpp:func:`OGR_G_Boundary`.
-
-        This function is built on the GEOS library, check it for the
-        definition of the geometry operation. If OGR is built without the GEOS
-        library, this function will always fail, issuing a CPLE_NotSupported
-        error.
-
-        .. versionadded:: 1.8.0
-
-        Parameters
-        -----------
-        hTarget:
-            The Geometry to calculate the boundary of.
+        For more details: :cpp:func:`OGR_G_Boundary`
 
         Returns
         --------
-        OGRGeometryH:
-            a handle to a newly allocated geometry now owned by the caller, or
-            NULL on failure.
+        Geometry:
+            A new geometry or None on failure.
 
         """
         return _ogr.Geometry_Boundary(self, *args)
@@ -6874,11 +5821,11 @@ class Geometry(object):
         r"""
         GetBoundary(Geometry self) -> Geometry
 
-        :cpp:func:`OGR_G_GetBoundary`
-
         Compute boundary (deprecated)
 
-        Deprecated
+        For more details: :cpp:func:`OGR_G_GetBoundary`
+
+        ..warning:: Deprecated
 
         See: :cpp:func:`OGR_G_Boundary`
 
@@ -6889,30 +5836,15 @@ class Geometry(object):
         r"""
         ConvexHull(Geometry self) -> Geometry
 
-        :cpp:func:`OGR_G_ConvexHull`
-
         Compute convex hull.
 
-        A new geometry object is created and returned containing the convex
-        hull of the geometry on which the method is invoked.
-
-        This function is the same as the C++ method :cpp:func:`OGRGeometry::ConvexHull`.
-
-        This function is built on the GEOS library, check it for the
-        definition of the geometry operation. If OGR is built without the GEOS
-        library, this function will always fail, issuing a CPLE_NotSupported
-        error.
-
-        Parameters
-        -----------
-        hTarget:
-            The Geometry to calculate the convex hull of.
+        For more details: :cpp:func:`OGR_G_ConvexHull`
 
         Returns
         --------
-        OGRGeometryH:
-            a handle to a newly allocated geometry now owned by the caller, or
-            NULL on failure.
+        Geometry:
+            a handle to A newly allocated geometry now owned by the caller, or
+            None on failure.
 
         """
         return _ogr.Geometry_ConvexHull(self, *args)
@@ -6925,30 +5857,22 @@ class Geometry(object):
         r"""
         MakeValid(Geometry self, char ** options=None) -> Geometry
 
-        :cpp:func:`OGR_G_MakeValid`
-
         Attempts to make an invalid geometry valid without losing vertices.
 
-        Already-valid geometries are cloned without further intervention.
-
-        This function is the same as the C++ method :cpp:func:`OGRGeometry::MakeValid`.
-
-        This function is built on the GEOS >= 3.8 library, check it for the
-        definition of the geometry operation. If OGR is built without the GEOS
-        >= 3.8 library, this function will return a clone of the input
-        geometry if it is valid, or NULL if it is invalid
+        For more details: :cpp:func:`OGR_G_MakeValidEx`
 
         .. versionadded:: 3.0
+        .. versionadded:: 3.4 options
 
         Parameters
         -----------
-        hGeom:
-            The Geometry to make valid.
+        options: list[str], optional
+            papszOptions to be passed in. For example: ["METHOD=STRUCTURE"].
 
         Returns
         --------
-        OGRGeometryH:
-            a newly allocated geometry now owned by the caller, or NULL on
+        Geometry:
+            A newly allocated geometry now owned by the caller, or None on
             failure.
 
         """
@@ -6958,28 +5882,16 @@ class Geometry(object):
         r"""
         Normalize(Geometry self) -> Geometry
 
-        :cpp:func:`OGR_G_Normalize`
-
         Attempts to bring geometry into normalized/canonical form.
 
-        This function is the same as the C++ method :cpp:func:`OGRGeometry::Normalize`.
-
-        This function is built on the GEOS library; check it for the
-        definition of the geometry operation. If OGR is built without the GEOS
-        library, this function will always fail, issuing a CPLE_NotSupported
-        error.
+        For more details: :cpp:func:`OGR_G_Normalize`
 
         .. versionadded:: 3.3
 
-        Parameters
-        -----------
-        hGeom:
-            The Geometry to normalize.
-
         Returns
         --------
-        OGRGeometryH:
-            a newly allocated geometry now owned by the caller, or NULL on
+        Geometry:
+            A newly allocated geometry now owned by the caller, or None on
             failure.
 
         """
@@ -6993,43 +5905,23 @@ class Geometry(object):
         r"""
         Buffer(Geometry self, double distance, int quadsecs=30) -> Geometry
 
-        :cpp:func:`OGR_G_Buffer`
-
         Compute buffer of geometry.
 
-        Builds a new geometry containing the buffer region around the geometry
-        on which it is invoked. The buffer is a polygon containing the region
-        within the buffer distance of the original geometry.
-
-        Some buffer sections are properly described as curves, but are
-        converted to approximate polygons. The nQuadSegs parameter can be used
-        to control how many segments should be used to define a 90 degree
-        curve - a quadrant of a circle. A value of 30 is a reasonable default.
-        Large values result in large numbers of vertices in the resulting
-        buffer geometry while small numbers reduce the accuracy of the result.
-
-        This function is the same as the C++ method :cpp:func:`OGRGeometry::Buffer`.
-
-        This function is built on the GEOS library, check it for the
-        definition of the geometry operation. If OGR is built without the GEOS
-        library, this function will always fail, issuing a CPLE_NotSupported
-        error.
+        For more details: :cpp:func:`OGR_G_Buffer`
 
         Parameters
         -----------
-        hTarget:
-            the geometry.
-        dfDist:
-            the buffer distance to be applied. Should be expressed into
+        distance: float
+            The buffer distance to be applied. Should be expressed into
             the same unit as the coordinates of the geometry.
-        nQuadSegs:
-            the number of segments used to approximate a 90 degree
+        quadsecs: int, default=30
+            The number of segments used to approximate a 90 degree
             (quadrant) of curvature.
 
         Returns
         --------
-        OGRGeometryH:
-            the newly created geometry, or NULL if an error occurs.
+        Geometry:
+            The newly created geometry or None if an error occurs.
 
         """
         return _ogr.Geometry_Buffer(self, *args, **kwargs)
@@ -7038,37 +5930,19 @@ class Geometry(object):
         r"""
         Intersection(Geometry self, Geometry other) -> Geometry
 
-        :cpp:func:`OGR_G_Intersection`
-
         Compute intersection.
 
-        Generates a new geometry which is the region of intersection of the
-        two geometries operated on. The :py:func:`Intersects` function can be
-        used to test if two geometries intersect.
-
-        Geometry validity is not checked. In case you are unsure of the
-        validity of the input geometries, call :py:func:`IsValid` before, otherwise the
-        result might be wrong.
-
-        This function is the same as the C++ method
-        :cpp:func:`OGRGeometry::Intersection`.
-
-        This function is built on the GEOS library, check it for the
-        definition of the geometry operation. If OGR is built without the GEOS
-        library, this function will always fail, issuing a CPLE_NotSupported
-        error.
+        For more details: :cpp:func:`OGR_G_Intersection`
 
         Parameters
         -----------
-        hThis:
-            the geometry.
-        hOther:
-            the other geometry.
+        other: Geometry
+            The other geometry.
 
         Returns
         --------
-        OGRGeometryH:
-            a new geometry representing the intersection or NULL if there is no
+        Geometry:
+            A new geometry representing the intersection or None if there is no
             intersection or an error occurs.
 
         """
@@ -7078,35 +5952,19 @@ class Geometry(object):
         r"""
         Union(Geometry self, Geometry other) -> Geometry
 
-        :cpp:func:`OGR_G_Union`
-
         Compute union.
 
-        Generates a new geometry which is the region of union of the two
-        geometries operated on.
-
-        Geometry validity is not checked. In case you are unsure of the
-        validity of the input geometries, call :py:func:`IsValid` before, otherwise the
-        result might be wrong.
-
-        This function is the same as the C++ method :cpp:func:`OGRGeometry::Union`.
-
-        This function is built on the GEOS library, check it for the
-        definition of the geometry operation. If OGR is built without the GEOS
-        library, this function will always fail, issuing a CPLE_NotSupported
-        error.
+        For more details: :cpp:func:`OGR_G_Union`
 
         Parameters
         -----------
-        hThis:
-            the geometry.
-        hOther:
-            the other geometry.
+        other: Geometry
+            The other geometry.
 
         Returns
         --------
-        OGRGeometryH:
-            a new geometry representing the union or NULL if an error occurs.
+        Geometry:
+            A new geometry representing the union or None if an error occurs.
 
         """
         return _ogr.Geometry_Union(self, *args)
@@ -7115,31 +5973,14 @@ class Geometry(object):
         r"""
         UnionCascaded(Geometry self) -> Geometry
 
-        :cpp:func:`OGR_G_UnionCascaded`
-
         Compute union using cascading.
 
-        Geometry validity is not checked. In case you are unsure of the
-        validity of the input geometries, call :py:func:`IsValid` before, otherwise the
-        result might be wrong.
-
-        This function is the same as the C++ method
-        :cpp:func:`OGRGeometry::UnionCascaded`.
-
-        This function is built on the GEOS library, check it for the
-        definition of the geometry operation. If OGR is built without the GEOS
-        library, this function will always fail, issuing a CPLE_NotSupported
-        error.
-
-        Parameters
-        -----------
-        hThis:
-            the geometry.
+        For more deails: :cpp:func:`OGR_G_UnionCascaded`
 
         Returns
         --------
-        OGRGeometryH:
-            a new geometry representing the union or NULL if an error occurs.
+        Geometry:
+            A new geometry representing the union or None if an error occurs.
 
         """
         return _ogr.Geometry_UnionCascaded(self, *args)
@@ -7148,35 +5989,19 @@ class Geometry(object):
         r"""
         Difference(Geometry self, Geometry other) -> Geometry
 
-        :cpp:func:`OGR_G_Difference`
-
         Compute difference.
 
-        Generates a new geometry which is the region of this geometry with the
-        region of the other geometry removed.
-
-        Geometry validity is not checked. In case you are unsure of the
-        validity of the input geometries, call :py:func:`IsValid` before, otherwise the
-        result might be wrong.
-
-        This function is the same as the C++ method :cpp:func:`OGRGeometry::Difference`.
-
-        This function is built on the GEOS library, check it for the
-        definition of the geometry operation. If OGR is built without the GEOS
-        library, this function will always fail, issuing a CPLE_NotSupported
-        error.
+        For more details: :cpp:func:`OGR_G_Difference`
 
         Parameters
         -----------
-        hThis:
-            the geometry.
-        hOther:
-            the other geometry.
+        other: Geometry
+            The other geometry.
 
         Returns
         --------
-        OGRGeometryH:
-            a new geometry representing the difference or NULL if the difference
+        Geometry:
+            A new geometry representing the difference or None if the difference
             is empty or an error occurs.
 
         """
@@ -7186,38 +6011,19 @@ class Geometry(object):
         r"""
         SymDifference(Geometry self, Geometry other) -> Geometry
 
-        :cpp:func:`OGR_G_SymDifference`
-
         Compute symmetric difference.
 
-        Generates a new geometry which is the symmetric difference of this
-        geometry and the other geometry.
-
-        Geometry validity is not checked. In case you are unsure of the
-        validity of the input geometries, call :py:func:`IsValid` before, otherwise the
-        result might be wrong.
-
-        This function is the same as the C++ method
-        :cpp:func:`OGRGeometry::SymmetricDifference`.
-
-        This function is built on the GEOS library, check it for the
-        definition of the geometry operation. If OGR is built without the GEOS
-        library, this function will always fail, issuing a CPLE_NotSupported
-        error.
-
-        .. versionadded:: 1.8.0
+        For more details: :cpp:func:`OGR_G_SymDifference`
 
         Parameters
         -----------
-        hThis:
-            the geometry.
-        hOther:
+        other:
             the other geometry.
 
         Returns
         --------
-        OGRGeometryH:
-            a new geometry representing the symmetric difference or NULL if the
+        Geometry:
+            A new geometry representing the symmetric difference or None if the
             difference is empty or an error occurs.
 
         """
@@ -7227,13 +6033,12 @@ class Geometry(object):
         r"""
         SymmetricDifference(Geometry self, Geometry other) -> Geometry
 
-        :cpp:func:`OGR_G_SymmetricDifference`
-
         Compute symmetric difference (deprecated)
 
-        Deprecated
+        For more details: :cpp:func:`OGR_G_SymmetricDifference`
 
-        See: :cpp:func:`OGR_G_SymmetricDifference`
+        .. warning:: Deprecated
+
 
         """
         return _ogr.Geometry_SymmetricDifference(self, *args)
@@ -7242,31 +6047,19 @@ class Geometry(object):
         r"""
         Distance(Geometry self, Geometry other) -> double
 
-        :cpp:func:`OGR_G_Distance`
-
         Compute distance between two geometries.
 
-        Returns the shortest distance between the two geometries. The distance
-        is expressed into the same unit as the coordinates of the geometries.
-
-        This function is the same as the C++ method :cpp:func:`OGRGeometry::Distance`.
-
-        This function is built on the GEOS library, check it for the
-        definition of the geometry operation. If OGR is built without the GEOS
-        library, this function will always fail, issuing a CPLE_NotSupported
-        error.
+        For more details: :cpp:func:`OGR_G_Distance`
 
         Parameters
         -----------
-        hFirst:
-            the first geometry to compare against.
-        hOther:
-            the other geometry to compare against.
+        other: Geometry
+            The other geometry to compare against.
 
         Returns
         --------
         float:
-            the distance between the geometries or -1 if an error occurs.
+            The distance between the geometries or -1 if an error occurs.
 
         """
         return _ogr.Geometry_Distance(self, *args)
@@ -7275,32 +6068,21 @@ class Geometry(object):
         r"""
         Distance3D(Geometry self, Geometry other) -> double
 
-        :cpp:func:`OGR_G_Distance3D`
-
         Returns the 3D distance between two geometries.
 
-        The distance is expressed into the same unit as the coordinates of the
-        geometries.
-
-        This method is built on the SFCGAL library, check it for the
-        definition of the geometry operation. If OGR is built without the
-        SFCGAL library, this method will always return -1.0
-
-        This function is the same as the C++ method :cpp:func:`OGRGeometry::Distance3D`.
+        For more details: :cpp:func:`OGR_G_Distance3D`
 
         .. versionadded:: 2.2
 
         Parameters
         -----------
-        hFirst:
-            the first geometry to compare against.
-        hOther:
-            the other geometry to compare against.
+        other: Geometry
+            The other geometry to compare against.
 
         Returns
         --------
         float:
-            the distance between the geometries or -1 if an error occurs.
+            The distance between the geometries or -1 if an error occurs.
 
         """
         return _ogr.Geometry_Distance3D(self, *args)
@@ -7309,21 +6091,9 @@ class Geometry(object):
         r"""
         Empty(Geometry self)
 
-        :cpp:func:`OGR_G_Empty`
-
         Clear geometry information.
 
-        This restores the geometry to its initial state after construction,
-        and before assignment of actual geometry.
-
-        This function relates to the SFCOM IGeometry::Empty() method.
-
-        This function is the same as the CPP method :cpp:func:`OGRGeometry::empty`.
-
-        Parameters
-        -----------
-        hGeom:
-            handle on the geometry to empty.
+        For more details: :cpp:func:`OGR_G_Empty`
 
         """
         return _ogr.Geometry_Empty(self, *args)
@@ -7332,21 +6102,14 @@ class Geometry(object):
         r"""
         IsEmpty(Geometry self) -> bool
 
-        :cpp:func:`OGR_G_IsEmpty`
-
         Test if the geometry is empty.
 
-        This method is the same as the CPP method :cpp:func:`OGRGeometry::IsEmpty`.
-
-        Parameters
-        -----------
-        hGeom:
-            The Geometry to test.
+        For more details: :cpp:func:`OGR_G_IsEmpty`
 
         Returns
         --------
         int:
-            TRUE if the geometry has no points, otherwise FALSE.
+            True if the geometry has no points, otherwise False.
 
         """
         return _ogr.Geometry_IsEmpty(self, *args)
@@ -7355,25 +6118,14 @@ class Geometry(object):
         r"""
         IsValid(Geometry self) -> bool
 
-        :cpp:func:`OGR_G_IsValid`
-
         Test if the geometry is valid.
 
-        This function is the same as the C++ method :cpp:func:`OGRGeometry::IsValid`.
-
-        This function is built on the GEOS library, check it for the
-        definition of the geometry operation. If OGR is built without the GEOS
-        library, this function will always return FALSE.
-
-        Parameters
-        -----------
-        hGeom:
-            The Geometry to test.
+        For more details: :cpp:func:`OGR_G_IsValid`
 
         Returns
         --------
         int:
-            TRUE if the geometry has no points, otherwise FALSE.
+            True if the geometry has no points, otherwise False.
 
         """
         return _ogr.Geometry_IsValid(self, *args)
@@ -7382,29 +6134,14 @@ class Geometry(object):
         r"""
         IsSimple(Geometry self) -> bool
 
-        :cpp:func:`OGR_G_IsSimple`
+        Returns True if the geometry is simple.
 
-        Returns TRUE if the geometry is simple.
-
-        Returns TRUE if the geometry has no anomalous geometric points, such
-        as self intersection or self tangency. The description of each
-        instantiable geometric class will include the specific conditions that
-        cause an instance of that class to be classified as not simple.
-
-        This function is the same as the C++ method :cpp:func:`OGRGeometry::IsSimple`.
-
-        If OGR is built without the GEOS library, this function will always
-        return FALSE.
-
-        Parameters
-        -----------
-        hGeom:
-            The Geometry to test.
+        For more details: :cpp:func:`OGR_G_IsSimple`
 
         Returns
         --------
         int:
-            TRUE if object is simple, otherwise FALSE.
+            True if object is simple, otherwise False.
 
         """
         return _ogr.Geometry_IsSimple(self, *args)
@@ -7413,25 +6150,14 @@ class Geometry(object):
         r"""
         IsRing(Geometry self) -> bool
 
-        :cpp:func:`OGR_G_IsRing`
-
         Test if the geometry is a ring.
 
-        This function is the same as the C++ method :cpp:func:`OGRGeometry::IsRing`.
-
-        This function is built on the GEOS library, check it for the
-        definition of the geometry operation. If OGR is built without the GEOS
-        library, this function will always return FALSE.
-
-        Parameters
-        -----------
-        hGeom:
-            The Geometry to test.
+        For more details: :cpp:func:`OGR_G_IsRing`
 
         Returns
         --------
         int:
-            TRUE if the geometry has no points, otherwise FALSE.
+            True if the geometry has no points, otherwise False.
 
         """
         return _ogr.Geometry_IsRing(self, *args)
@@ -7440,27 +6166,19 @@ class Geometry(object):
         r"""
         Intersects(Geometry self, Geometry other) -> bool
 
-        :cpp:func:`OGR_G_Intersects`
+        Determines whether two geometries intersect.
 
-        Do these features intersect?
-
-        Determines whether two geometries intersect. If GEOS is enabled, then
-        this is done in rigorous fashion otherwise TRUE is returned if the
-        envelopes (bounding boxes) of the two geometries overlap.
-
-        This function is the same as the CPP method :cpp:func:`OGRGeometry::Intersects`.
+        For more details: :cpp:func:`OGR_G_Intersects`
 
         Parameters
         -----------
-        hGeom:
-            handle on the first geometry.
-        hOtherGeom:
-            handle on the other geometry to test against.
+        other: Geometry
+            The other geometry to test against.
 
         Returns
         --------
         int:
-            TRUE if the geometries intersect, otherwise FALSE.
+            True if the geometries intersect, otherwise False.
 
         """
         return _ogr.Geometry_Intersects(self, *args)
@@ -7473,32 +6191,19 @@ class Geometry(object):
         r"""
         Equals(Geometry self, Geometry other) -> bool
 
-        :cpp:func:`OGR_G_Equals`
+        Returns True if two geometries are equivalent.
 
-        Returns TRUE if two geometries are equivalent.
-
-        This operation implements the SQL/MM ST_OrderingEquals() operation.
-
-        The comparison is done in a structural way, that is to say that the
-        geometry types must be identical, as well as the number and ordering
-        of sub-geometries and vertices. Or equivalently, two geometries are
-        considered equal by this method if their WKT/WKB representation is
-        equal. Note: this must be distinguished for equality in a spatial way
-        (which is the purpose of the ST_Equals() operation).
-
-        This function is the same as the CPP method :cpp:func:`OGRGeometry::Equals`.
+        For more details: :cpp:func:`OGR_G_Equals`
 
         Parameters
         -----------
-        hGeom:
-            handle on the first geometry.
-        hOther:
-            handle on the other geometry to test against.
+        other: Geometry
+            The other geometry to test against.
 
         Returns
         --------
         int:
-            TRUE if equivalent or FALSE otherwise.
+            True if equivalent or False otherwise.
 
         """
         return _ogr.Geometry_Equals(self, *args)
@@ -7511,34 +6216,19 @@ class Geometry(object):
         r"""
         Disjoint(Geometry self, Geometry other) -> bool
 
-        :cpp:func:`OGR_G_Disjoint`
-
         Test for disjointness.
 
-        Tests if this geometry and the other geometry are disjoint.
-
-        Geometry validity is not checked. In case you are unsure of the
-        validity of the input geometries, call :py:func:`IsValid` before, otherwise the
-        result might be wrong.
-
-        This function is the same as the C++ method :cpp:func:`OGRGeometry::Disjoint`.
-
-        This function is built on the GEOS library, check it for the
-        definition of the geometry operation. If OGR is built without the GEOS
-        library, this function will always fail, issuing a CPLE_NotSupported
-        error.
+        For more details: :cpp:func:`OGR_G_Disjoint`
 
         Parameters
         -----------
-        hThis:
-            the geometry to compare.
-        hOther:
-            the other geometry to compare.
+        other: Geometry
+            The other geometry to compare.
 
         Returns
         --------
         int:
-            TRUE if they are disjoint, otherwise FALSE.
+            True if they are disjoint, otherwise False.
 
         """
         return _ogr.Geometry_Disjoint(self, *args)
@@ -7547,34 +6237,19 @@ class Geometry(object):
         r"""
         Touches(Geometry self, Geometry other) -> bool
 
-        :cpp:func:`OGR_G_Touches`
-
         Test for touching.
 
-        Tests if this geometry and the other geometry are touching.
-
-        Geometry validity is not checked. In case you are unsure of the
-        validity of the input geometries, call :py:func:`IsValid` before, otherwise the
-        result might be wrong.
-
-        This function is the same as the C++ method :cpp:func:`OGRGeometry::Touches`.
-
-        This function is built on the GEOS library, check it for the
-        definition of the geometry operation. If OGR is built without the GEOS
-        library, this function will always fail, issuing a CPLE_NotSupported
-        error.
+        For more details: :cpp:func:`OGR_G_Touches`
 
         Parameters
         -----------
-        hThis:
-            the geometry to compare.
-        hOther:
+        other:
             the other geometry to compare.
 
         Returns
         --------
         int:
-            TRUE if they are touching, otherwise FALSE.
+            True if they are touching, otherwise False.
 
         """
         return _ogr.Geometry_Touches(self, *args)
@@ -7583,34 +6258,19 @@ class Geometry(object):
         r"""
         Crosses(Geometry self, Geometry other) -> bool
 
-        :cpp:func:`OGR_G_Crosses`
-
         Test for crossing.
 
-        Tests if this geometry and the other geometry are crossing.
-
-        Geometry validity is not checked. In case you are unsure of the
-        validity of the input geometries, call :py:func:`IsValid` before, otherwise the
-        result might be wrong.
-
-        This function is the same as the C++ method :cpp:func:`OGRGeometry::Crosses`.
-
-        This function is built on the GEOS library, check it for the
-        definition of the geometry operation. If OGR is built without the GEOS
-        library, this function will always fail, issuing a CPLE_NotSupported
-        error.
+        For more details: :cpp:func:`OGR_G_Crosses`
 
         Parameters
         -----------
-        hThis:
-            the geometry to compare.
-        hOther:
+        other: Geometry
             the other geometry to compare.
 
         Returns
         --------
         int:
-            TRUE if they are crossing, otherwise FALSE.
+            True if they are crossing, otherwise False.
 
         """
         return _ogr.Geometry_Crosses(self, *args)
@@ -7619,34 +6279,19 @@ class Geometry(object):
         r"""
         Within(Geometry self, Geometry other) -> bool
 
-        :cpp:func:`OGR_G_Within`
-
         Test for containment.
 
-        Tests if this geometry is within the other geometry.
-
-        Geometry validity is not checked. In case you are unsure of the
-        validity of the input geometries, call :py:func:`IsValid` before, otherwise the
-        result might be wrong.
-
-        This function is the same as the C++ method :cpp:func:`OGRGeometry::Within`.
-
-        This function is built on the GEOS library, check it for the
-        definition of the geometry operation. If OGR is built without the GEOS
-        library, this function will always fail, issuing a CPLE_NotSupported
-        error.
+        For more details: :cpp:func:`OGR_G_Within`
 
         Parameters
         -----------
-        hThis:
-            the geometry to compare.
-        hOther:
+        other: Geometry
             the other geometry to compare.
 
         Returns
         --------
         int:
-            TRUE if hThis is within hOther, otherwise FALSE.
+            True if this is within other, otherwise False.
 
         """
         return _ogr.Geometry_Within(self, *args)
@@ -7655,34 +6300,19 @@ class Geometry(object):
         r"""
         Contains(Geometry self, Geometry other) -> bool
 
-        :cpp:func:`OGR_G_Contains`
-
         Test for containment.
 
-        Tests if this geometry contains the other geometry.
-
-        Geometry validity is not checked. In case you are unsure of the
-        validity of the input geometries, call :py:func:`IsValid` before, otherwise the
-        result might be wrong.
-
-        This function is the same as the C++ method :cpp:func:`OGRGeometry::Contains`.
-
-        This function is built on the GEOS library, check it for the
-        definition of the geometry operation. If OGR is built without the GEOS
-        library, this function will always fail, issuing a CPLE_NotSupported
-        error.
+        For more details: :cpp:func:`OGR_G_Contains`
 
         Parameters
         -----------
-        hThis:
-            the geometry to compare.
-        hOther:
+        other: Geometry
             the other geometry to compare.
 
         Returns
         --------
         int:
-            TRUE if hThis contains hOther geometry, otherwise FALSE.
+            True if this contains the other geometry, otherwise False.
 
         """
         return _ogr.Geometry_Contains(self, *args)
@@ -7691,35 +6321,19 @@ class Geometry(object):
         r"""
         Overlaps(Geometry self, Geometry other) -> bool
 
-        :cpp:func:`OGR_G_Overlaps`
-
         Test for overlap.
 
-        Tests if this geometry and the other geometry overlap, that is their
-        intersection has a non-zero area.
-
-        Geometry validity is not checked. In case you are unsure of the
-        validity of the input geometries, call :py:func:`IsValid` before, otherwise the
-        result might be wrong.
-
-        This function is the same as the C++ method :cpp:func:`OGRGeometry::Overlaps`.
-
-        This function is built on the GEOS library, check it for the
-        definition of the geometry operation. If OGR is built without the GEOS
-        library, this function will always fail, issuing a CPLE_NotSupported
-        error.
+        For more details: :cpp:func:`OGR_G_Overlaps`
 
         Parameters
         -----------
-        hThis:
-            the geometry to compare.
-        hOther:
+        other: Geometry
             the other geometry to compare.
 
         Returns
         --------
         int:
-            TRUE if they are overlapping, otherwise FALSE.
+            True if they are overlapping, otherwise False.
 
         """
         return _ogr.Geometry_Overlaps(self, *args)
@@ -7728,39 +6342,19 @@ class Geometry(object):
         r"""
         TransformTo(Geometry self, SpatialReference reference) -> OGRErr
 
-        :cpp:func:`OGR_G_TransformTo`
-
         Transform geometry to new spatial reference system.
 
-        This function will transform the coordinates of a geometry from their
-        current spatial reference system to a new target spatial reference
-        system. Normally this means reprojecting the vectors, but it could
-        include datum shifts, and changes of units.
-
-        This function will only work if the geometry already has an assigned
-        spatial reference system, and if it is transformable to the target
-        coordinate system.
-
-        Because this function requires internal creation and initialization of
-        an OGRCoordinateTransformation object it is significantly more
-        expensive to use this function to transform many geometries than it is
-        to create the OGRCoordinateTransformation in advance, and call
-        transform() with that transformation. This function exists primarily
-        for convenience when only transforming a single geometry.
-
-        This function is the same as the CPP method :cpp:func:`OGRGeometry::transformTo`.
+        For more details: :cpp:func:`OGR_G_TransformTo`
 
         Parameters
         -----------
-        hGeom:
-            handle on the geometry to apply the transform to.
-        hSRS:
-            handle on the spatial reference system to apply.
+        reference: SpatialReference
+           The spatial reference system to apply.
 
         Returns
         --------
-        OGRErr:
-            OGRERR_NONE on success, or an error code.
+        int:
+            :py:const:`osgeo.ogr.OGRERR_NONE` on success, or an error code.
 
         """
         return _ogr.Geometry_TransformTo(self, *args)
@@ -7769,25 +6363,13 @@ class Geometry(object):
         r"""
         GetSpatialReference(Geometry self) -> SpatialReference
 
-        :cpp:func:`OGR_G_GetSpatialReference`
+        For more details: :cpp:func:`OGR_G_GetSpatialReference`
 
         Returns spatial reference system for geometry.
 
-        This function relates to the SFCOM IGeometry::get_SpatialReference()
-        method.
-
-        This function is the same as the CPP method
-        :cpp:func:`OGRGeometry::getSpatialReference`.
-
-        Parameters
-        -----------
-        hGeom:
-            handle on the geometry to get spatial reference from.
-
         Returns
         --------
-        OGRSpatialReferenceH:
-            a reference to the spatial reference geometry.
+        SpatialReference
 
         """
         return _ogr.Geometry_GetSpatialReference(self, *args)
@@ -7796,32 +6378,14 @@ class Geometry(object):
         r"""
         AssignSpatialReference(Geometry self, SpatialReference reference)
 
-        :cpp:func:`OGR_G_AssignSpatialReference`
-
         Assign spatial reference to this object.
 
-        Any existing spatial reference is replaced, but under no circumstances
-        does this result in the object being reprojected. It is just changing
-        the interpretation of the existing geometry. Note that assigning a
-        spatial reference increments the reference count on the
-        OGRSpatialReference, but does not copy it.
-
-        Starting with GDAL 2.3, this will also assign the spatial reference to
-        potential sub-geometries of the geometry ( OGRGeometryCollection,
-        OGRCurvePolygon/OGRPolygon, OGRCompoundCurve, OGRPolyhedralSurface and
-        their derived classes).
-
-        This is similar to the SFCOM IGeometry::put_SpatialReference() method.
-
-        This function is the same as the CPP method
-        :cpp:func:`OGRGeometry::assignSpatialReference`.
+        For more details: :cpp:func:`OGR_G_AssignSpatialReference`
 
         Parameters
         -----------
-        hGeom:
-            handle on the geometry to apply the new spatial reference system.
-        hSRS:
-            handle on the new spatial reference system to apply.
+        reference: SpatialReference
+            The new spatial reference system to apply.
 
         """
         return _ogr.Geometry_AssignSpatialReference(self, *args)
@@ -7830,18 +6394,9 @@ class Geometry(object):
         r"""
         CloseRings(Geometry self)
 
-        :cpp:func:`OGR_G_CloseRings`
-
         Force rings to be closed.
 
-        If this geometry, or any contained geometries has polygon rings that
-        are not closed, they will be closed by adding the starting point at
-        the end.
-
-        Parameters
-        -----------
-        hGeom:
-            handle to the geometry.
+        For more details: :cpp:func:`OGR_G_CloseRings`
 
         """
         return _ogr.Geometry_CloseRings(self, *args)
@@ -7850,19 +6405,9 @@ class Geometry(object):
         r"""
         FlattenTo2D(Geometry self)
 
-        :cpp:func:`OGR_G_FlattenTo2D`
-
         Convert geometry to strictly 2D.
 
-        In a sense this converts all Z coordinates to 0.0.
-
-        This function is the same as the CPP method
-        :cpp:func:`OGRGeometry::flattenTo2D`.
-
-        Parameters
-        -----------
-        hGeom:
-            handle on the geometry to convert.
+        For more details: :cpp:func:`OGR_G_FlattenTo2D`
 
         """
         return _ogr.Geometry_FlattenTo2D(self, *args)
@@ -7871,21 +6416,14 @@ class Geometry(object):
         r"""
         Segmentize(Geometry self, double dfMaxLength)
 
-        :cpp:func:`OGR_G_Segmentize`
-
         Modify the geometry such it has no segment longer then the given
         distance.
 
-        Interpolated points will have Z and M values (if needed) set to 0.
-        Distance computation is performed in 2d only.
-
-        This function is the same as the CPP method :cpp:func:`OGRGeometry::segmentize`.
+        For more details: :cpp:func:`OGR_G_Segmentize`
 
         Parameters
         -----------
-        hGeom:
-            handle on the geometry to segmentize
-        dfMaxLength:
+        dfMaxLength: float
             the maximum distance between 2 points after segmentization
 
         """
@@ -7895,20 +6433,19 @@ class Geometry(object):
         r"""
         GetEnvelope(Geometry self)
 
-        :cpp:func:`OGR_G_GetEnvelope`
-
         Computes and returns the bounding envelope for this geometry in the
         passed psEnvelope structure.
 
-        This function is the same as the CPP method
-        :cpp:func:`OGRGeometry::getEnvelope`.
+        For more details: :cpp:func:`OGR_G_GetEnvelope`
 
-        Parameters
-        -----------
-        hGeom:
-            handle of the geometry to get envelope from.
-        psEnvelope:
-            the structure in which to place the results.
+        .. warning:: Check the return order of the bounds.
+
+        Returns
+        --------
+        minx: float
+        maxx: float
+        miny: float
+        maxy: float
 
         """
         return _ogr.Geometry_GetEnvelope(self, *args)
@@ -7917,22 +6454,21 @@ class Geometry(object):
         r"""
         GetEnvelope3D(Geometry self)
 
-        :cpp:func:`OGR_G_GetEnvelope3D`
-
         Computes and returns the bounding envelope (3D) for this geometry in
         the passed psEnvelope structure.
 
-        This function is the same as the CPP method
-        :cpp:func:`OGRGeometry::getEnvelope`.
+        For more details: :cpp:func:`OGR_G_GetEnvelope3D`
 
-        .. versionadded:: 1.9.0
+        .. warning:: Check the return order of the bounds.
 
-        Parameters
-        -----------
-        hGeom:
-            handle of the geometry to get envelope from.
-        psEnvelope:
-            the structure in which to place the results.
+        Returns
+        --------
+        minx: float
+        maxx: float
+        miny: float
+        maxy: float
+        minz: float
+        maxz: float
 
         """
         return _ogr.Geometry_GetEnvelope3D(self, *args)
@@ -7941,31 +6477,13 @@ class Geometry(object):
         r"""
         Centroid(Geometry self) -> Geometry
 
-        :cpp:func:`OGR_G_Centroid`
-
         Compute the geometry centroid.
 
-        The centroid location is applied to the passed in OGRPoint object. The
-        centroid is not necessarily within the geometry.
-
-        This method relates to the SFCOM ISurface::get_Centroid() method
-        however the current implementation based on GEOS can operate on other
-        geometry types such as multipoint, linestring, geometrycollection such
-        as multipolygons. OGC SF SQL 1.1 defines the operation for surfaces
-        (polygons). SQL/MM-Part 3 defines the operation for surfaces and
-        multisurfaces (multipolygons).
-
-        This function is the same as the C++ method :cpp:func:`OGRGeometry::Centroid`.
-
-        This function is built on the GEOS library, check it for the
-        definition of the geometry operation. If OGR is built without the GEOS
-        library, this function will always fail, issuing a CPLE_NotSupported
-        error.
+        For more details: :cpp:func:`OGR_G_Centroid`
 
         Returns
         --------
-        int:
-            OGRERR_NONE on success or OGRERR_FAILURE on error.
+        Geometry
 
         """
         return _ogr.Geometry_Centroid(self, *args)
@@ -7974,30 +6492,14 @@ class Geometry(object):
         r"""
         PointOnSurface(Geometry self) -> Geometry
 
-        :cpp:func:`OGR_G_PointOnSurface`
-
         Returns a point guaranteed to lie on the surface.
 
-        This method relates to the SFCOM ISurface::get_PointOnSurface() method
-        however the current implementation based on GEOS can operate on other
-        geometry types than the types that are supported by SQL/MM-Part 3 :
-        surfaces (polygons) and multisurfaces (multipolygons).
-
-        This method is built on the GEOS library, check it for the definition
-        of the geometry operation. If OGR is built without the GEOS library,
-        this method will always fail, issuing a CPLE_NotSupported error.
-
-        .. versionadded:: 1.10
-
-        Parameters
-        -----------
-        hGeom:
-            the geometry to operate on.
+        For more details: :cpp:func:`OGR_G_PointOnSurface`
 
         Returns
         --------
-        OGRGeometryH:
-            a point guaranteed to lie on the surface or NULL if an error occurred.
+        Geometry:
+            A point guaranteed to lie on the surface or None if an error occurred.
 
         """
         return _ogr.Geometry_PointOnSurface(self, *args)
@@ -8006,29 +6508,13 @@ class Geometry(object):
         r"""
         WkbSize(Geometry self) -> size_t
 
-        :cpp:func:`OGR_G_WkbSize`
-
         Returns size of related binary representation.
 
-        This function returns the exact number of bytes required to hold the
-        well known binary representation of this geometry object. Its
-        computation may be slightly expensive for complex geometries.
-
-        This function relates to the SFCOM IWks::WkbSize() method.
-
-        This function is the same as the CPP method :cpp:func:`OGRGeometry::WkbSize`.
-
-        Use :py:func:`WkbSizeEx` if called on huge geometries (> 2 GB serialized)
-
-        Parameters
-        -----------
-        hGeom:
-            handle on the geometry to get the binary size from.
+        For more details: :cpp:func:`OGR_G_WkbSize`
 
         Returns
         --------
-        int:
-            size of binary representation in bytes.
+        int
 
         """
         return _ogr.Geometry_WkbSize(self, *args)
@@ -8037,25 +6523,17 @@ class Geometry(object):
         r"""
         GetCoordinateDimension(Geometry self) -> int
 
-        :cpp:func:`OGR_G_GetCoordinateDimension`
-
         Get the dimension of the coordinates in this geometry.
 
-        This function is the same as the CPP method
-        :cpp:func:`OGRGeometry::getCoordinateDimension`.
+        For more details: :cpp:func:`OGR_G_GetCoordinateDimension`
 
-        Deprecated use :py:func:`CoordinateDimension`, :py:func:`Is3D`, or
-        :py:func:`IsMeasured`.
-
-        Parameters
-        -----------
-        hGeom:
-            handle on the geometry to get the dimension of the coordinates from.
+        .. warning:: Deprecated. Use :py:func:`CoordinateDimension`,
+            :py:func:`Is3D`, or :py:func:`IsMeasured`.
 
         Returns
         --------
         int:
-            this will return 2 or 3.
+            This will return 2 or 3.
 
         """
         return _ogr.Geometry_GetCoordinateDimension(self, *args)
@@ -8064,24 +6542,16 @@ class Geometry(object):
         r"""
         CoordinateDimension(Geometry self) -> int
 
-        :cpp:func:`OGR_G_CoordinateDimension`
-
         Get the dimension of the coordinates in this geometry.
 
-        This function is the same as the CPP method
-        :cpp:func:`OGRGeometry::CoordinateDimension`.
+        For more details: :cpp:func:`OGR_G_CoordinateDimension`
 
         .. versionadded:: 2.1
-
-        Parameters
-        -----------
-        hGeom:
-            handle on the geometry to get the dimension of the coordinates from.
 
         Returns
         --------
         int:
-            this will return 2 for XY, 3 for XYZ and XYM, and 4 for XYZM data.
+            This will return 2 for XY, 3 for XYZ and XYM, and 4 for XYZM data.
 
         """
         return _ogr.Geometry_CoordinateDimension(self, *args)
@@ -8090,23 +6560,16 @@ class Geometry(object):
         r"""
         Is3D(Geometry self) -> int
 
-        :cpp:func:`OGR_G_Is3D`
-
         See whether this geometry has Z coordinates.
 
-        This function is the same as the CPP method :cpp:func:`OGRGeometry::Is3D`.
+        For more details: :cpp:func:`OGR_G_Is3D`
 
         .. versionadded:: 2.1
-
-        Parameters
-        -----------
-        hGeom:
-            handle on the geometry to check whether it has Z coordinates.
 
         Returns
         --------
         int:
-            TRUE if the geometry has Z coordinates.
+            True if the geometry has Z coordinates.
 
         """
         return _ogr.Geometry_Is3D(self, *args)
@@ -8115,23 +6578,16 @@ class Geometry(object):
         r"""
         IsMeasured(Geometry self) -> int
 
-        :cpp:func:`OGR_G_IsMeasured`
-
         See whether this geometry is measured.
 
-        This function is the same as the CPP method :cpp:func:`OGRGeometry::IsMeasured`.
+        For more details: :cpp:func:`OGR_G_IsMeasured`
 
         .. versionadded:: 2.1
-
-        Parameters
-        -----------
-        hGeom:
-            handle on the geometry to check whether it is measured.
 
         Returns
         --------
         int:
-            TRUE if the geometry has M coordinates.
+            True if the geometry has M coordinates.
 
         """
         return _ogr.Geometry_IsMeasured(self, *args)
@@ -8140,23 +6596,15 @@ class Geometry(object):
         r"""
         SetCoordinateDimension(Geometry self, int dimension)
 
-        :cpp:func:`OGR_G_SetCoordinateDimension`
-
         Set the coordinate dimension.
 
-        This method sets the explicit coordinate dimension. Setting the
-        coordinate dimension of a geometry to 2 should zero out any existing Z
-        values. Setting the dimension of a geometry collection, a compound
-        curve, a polygon, etc. will affect the children geometries. This will
-        also remove the M dimension if present before this call.
+        For more details: :cpp:func:`OGR_G_SetCoordinateDimension`
 
-        Deprecated use :py:func:`Set3D` or :py:func:`SetMeasured`.
+        .. warning:: Deprecated. Use :py:func:`Set3D` or :py:func:`SetMeasured`.
 
         Parameters
         -----------
-        hGeom:
-            handle on the geometry to set the dimension of the coordinates.
-        nNewDimension:
+        dimension: int
             New coordinate dimension value, either 2 or 3.
 
         """
@@ -8166,23 +6614,16 @@ class Geometry(object):
         r"""
         Set3D(Geometry self, int b3D)
 
-        :cpp:func:`OGR_G_Set3D`
-
         Add or remove the Z coordinate dimension.
 
-        This method adds or removes the explicit Z coordinate dimension.
-        Removing the Z coordinate dimension of a geometry will remove any
-        existing Z values. Adding the Z dimension to a geometry collection, a
-        compound curve, a polygon, etc. will affect the children geometries.
+        For more details: :cpp:func:`OGR_G_Set3D`
 
         .. versionadded:: 2.1
 
         Parameters
         -----------
-        hGeom:
-            handle on the geometry to set or unset the Z dimension.
-        bIs3D:
-            Should the geometry have a Z dimension, either TRUE or FALSE.
+        bIs3D: bool
+            Should the geometry have a Z dimension, either True or False.
 
         """
         return _ogr.Geometry_Set3D(self, *args)
@@ -8191,23 +6632,16 @@ class Geometry(object):
         r"""
         SetMeasured(Geometry self, int bMeasured)
 
-        :cpp:func:`OGR_G_SetMeasured`
-
         Add or remove the M coordinate dimension.
 
-        This method adds or removes the explicit M coordinate dimension.
-        Removing the M coordinate dimension of a geometry will remove any
-        existing M values. Adding the M dimension to a geometry collection, a
-        compound curve, a polygon, etc. will affect the children geometries.
+        For more details: :cpp:func:`OGR_G_SetMeasured`
 
         .. versionadded:: 2.1
 
         Parameters
         -----------
-        hGeom:
-            handle on the geometry to set or unset the M dimension.
-        bIsMeasured:
-            Should the geometry have a M dimension, either TRUE or FALSE.
+        bIsMeasured: bool
+            Should the geometry have a M dimension, either True or False.
 
         """
         return _ogr.Geometry_SetMeasured(self, *args)
@@ -8216,27 +6650,14 @@ class Geometry(object):
         r"""
         GetDimension(Geometry self) -> int
 
-        :cpp:func:`OGR_G_GetDimension`
-
         Get the dimension of this geometry.
 
-        This function corresponds to the SFCOM IGeometry::GetDimension()
-        method. It indicates the dimension of the geometry, but does not
-        indicate the dimension of the underlying space (as indicated by
-        :cpp:func:`OGR_G_GetCoordinateDimension` function).
-
-        This function is the same as the CPP method
-        :cpp:func:`OGRGeometry::getDimension`.
-
-        Parameters
-        -----------
-        hGeom:
-            handle on the geometry to get the dimension from.
+        For more details: :cpp:func:`OGR_G_GetDimension`
 
         Returns
         --------
         int:
-            0 for points, 1 for lines and 2 for surfaces.
+            0 for points, 1 for lines, and 2 for surfaces.
 
         """
         return _ogr.Geometry_GetDimension(self, *args)
@@ -8262,36 +6683,19 @@ class Geometry(object):
         Transform(Geometry self, CoordinateTransformation trans) -> OGRErr
         Transform(Geometry self, GeomTransformer transformer) -> Geometry
 
-        :cpp:func:`OGR_G_Transform`
-
         Apply arbitrary coordinate transformation to geometry.
 
-        This function will transform the coordinates of a geometry from their
-        current spatial reference system to a new target spatial reference
-        system. Normally this means reprojecting the vectors, but it could
-        include datum shifts, and changes of units.
-
-        Note that this function does not require that the geometry already
-        have a spatial reference system. It will be assumed that they can be
-        treated as having the source spatial reference system of the
-        OGRCoordinateTransformation object, and the actual SRS of the geometry
-        will be ignored. On successful completion the output
-        OGRSpatialReference of the OGRCoordinateTransformation will be
-        assigned to the geometry.
-
-        This function is the same as the CPP method :cpp:func:`OGRGeometry::transform`.
+        For more details: :cpp:func:`OGR_G_Transform`
 
         Parameters
         -----------
-        hGeom:
-            handle on the geometry to apply the transform to.
-        hTransform:
-            handle on the transformation to apply.
+        trans: CoordinateTransform
+            The transformation to apply.
 
         Returns
         --------
-        OGRErr:
-            OGRERR_NONE on success or an error code.
+        Geometry:
+            The transformed geometry.
 
         """
         return _ogr.Geometry_Transform(self, *args)

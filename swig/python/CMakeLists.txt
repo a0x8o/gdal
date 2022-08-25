@@ -18,6 +18,10 @@ set(GDAL_PYTHON_CSOURCES
 
 if (SWIG_REGENERATE_PYTHON)
 
+  if ("${CMAKE_BINARY_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
+      message(WARNING "Builds from root directory with SWIG_REGENERATE_PYTHON=ON mostly work, but 'make clean' will remove the swig/python/extensions/* and swig/python/osgeo* generated files")
+  endif()
+
   list(APPEND GDAL_SWIG_COMMON_INTERFACE_FILES
        ${PROJECT_SOURCE_DIR}/swig/include/python/callback.i
        ${PROJECT_SOURCE_DIR}/swig/include/python/gdal_python.i
@@ -37,20 +41,15 @@ if (SWIG_REGENERATE_PYTHON)
 
   set(GDAL_PYTHON_PYSOURCES
       ${CMAKE_CURRENT_BINARY_DIR}/osgeo/gdal.py ${CMAKE_CURRENT_BINARY_DIR}/osgeo/gdalconst.py
-      ${CMAKE_CURRENT_BINARY_DIR}/osgeo/gdalnumeric.py ${CMAKE_CURRENT_BINARY_DIR}/osgeo/gnm.py
+      ${CMAKE_CURRENT_BINARY_DIR}/osgeo/gnm.py
       ${CMAKE_CURRENT_BINARY_DIR}/osgeo/ogr.py ${CMAKE_CURRENT_BINARY_DIR}/osgeo/osr.py)
   include(GdalSwigBindings)
-  if (Python_VERSION_MAJOR EQUAL 3)
-    set(PY3ARG "-py3")
-  else ()
-    unset(PY3ARG)
-  endif ()
   gdal_swig_bindings(
     BINDING
     python
     ARGS
     -I${PROJECT_SOURCE_DIR}/swig/include/python/docs
-    ${PY3ARG}
+    -py3
     -threads
     -relativeimport
     -outdir
@@ -68,7 +67,7 @@ if (SWIG_REGENERATE_PYTHON)
       OUTPUT ${ARRAY_OUTPUT} "${CMAKE_CURRENT_BINARY_DIR}/osgeo/gdal_array.py"
       COMMAND
         ${SWIG_EXECUTABLE} -Wall -I${PROJECT_SOURCE_DIR}/swig/include -I${PROJECT_SOURCE_DIR}/swig/include/python
-        -I${PROJECT_SOURCE_DIR}/swig/include/python/docs ${PY3ARG} -threads -relativeimport -outdir
+        -I${PROJECT_SOURCE_DIR}/swig/include/python/docs -py3 -threads -relativeimport -outdir
         ${CMAKE_CURRENT_BINARY_DIR}/osgeo ${SWIG_DEFINES} -I${PROJECT_SOURCE_DIR}/gdal -c++ -python -o ${ARRAY_OUTPUT}
         ${ARRAY_INPUT}
       DEPENDS ${ARRAY_INPUT}
@@ -79,18 +78,22 @@ if (SWIG_REGENERATE_PYTHON)
     list(APPEND GDAL_PYTHON_PYSOURCES "${CMAKE_CURRENT_BINARY_DIR}/osgeo/gdal_array.py")
   endif ()
 
-  add_custom_command(
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/osgeo/gdalnumeric.py"
-    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/osgeo/gdalnumeric.py"
-            "${CMAKE_CURRENT_BINARY_DIR}/osgeo"
-    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/osgeo/gdalnumeric.py")
-  list(APPEND GDAL_PYTHON_PYSOURCES "${CMAKE_CURRENT_BINARY_DIR}/osgeo/gdalnumeric.py")
+  if (NOT "${CMAKE_BINARY_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
+      add_custom_command(
+        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/osgeo/gdalnumeric.py"
+        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/osgeo/gdalnumeric.py"
+                "${CMAKE_CURRENT_BINARY_DIR}/osgeo"
+        DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/osgeo/gdalnumeric.py")
+      list(APPEND GDAL_PYTHON_PYSOURCES "${CMAKE_CURRENT_BINARY_DIR}/osgeo/gdalnumeric.py")
+  endif()
 
-  add_custom_command(
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/osgeo/__init__.py"
-    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/osgeo/__init__.py" "${CMAKE_CURRENT_BINARY_DIR}/osgeo"
-    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/osgeo/__init__.py")
-  list(APPEND GDAL_PYTHON_PYSOURCES "${CMAKE_CURRENT_BINARY_DIR}/osgeo/__init__.py")
+  if (NOT "${CMAKE_BINARY_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
+      add_custom_command(
+        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/osgeo/__init__.py"
+        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/osgeo/__init__.py" "${CMAKE_CURRENT_BINARY_DIR}/osgeo"
+        DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/osgeo/__init__.py")
+      list(APPEND GDAL_PYTHON_PYSOURCES "${CMAKE_CURRENT_BINARY_DIR}/osgeo/__init__.py")
+  endif()
 
   foreach(_file IN ITEMS ${GDAL_PYTHON_CSOURCES})
       add_custom_command(
@@ -99,46 +102,49 @@ if (SWIG_REGENERATE_PYTHON)
         COMMAND ${CMAKE_COMMAND} ${WERROR_DEV_FLAG} "-DFILE=${_file}" -P ${CMAKE_CURRENT_SOURCE_DIR}/modify_cpp_files.cmake)
   endforeach()
 
-  if (Python_VERSION_MAJOR EQUAL 3 AND Python_EXECUTABLE)
-    foreach(_file IN ITEMS ${GDAL_PYTHON_PYSOURCES})
-        file(TO_NATIVE_PATH "${_file}" _native_file)
-        add_custom_command(
-          OUTPUT ${_file}
-          APPEND
-          COMMAND
-            ${Python_EXECUTABLE} -m lib2to3 --fix=import --fix=next --fix=renames --fix=unicode --fix=ws_comma --fix=xrange
-            --write --write-unchanged-files --nobackups  ${_native_file})
-    endforeach()
+  if (NOT Python_EXECUTABLE)
+    message(FATAL_ERROR "Python_EXECUTABLE variable not set")
+  endif()
+  foreach(_file IN ITEMS ${GDAL_PYTHON_PYSOURCES})
+      file(TO_NATIVE_PATH "${_file}" _native_file)
+      add_custom_command(
+        OUTPUT ${_file}
+        APPEND
+        COMMAND
+          ${Python_EXECUTABLE} -m lib2to3 --fix=import --fix=next --fix=renames --fix=unicode --fix=ws_comma --fix=xrange
+          --write --write-unchanged-files --nobackups  ${_native_file})
+  endforeach()
+
+  if (NOT "${CMAKE_BINARY_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
+      option(SWIG_COPY_REGENERATED_PYTHON_IN_SOURCE_DIR "Copy SWIG regenerated Python bindings into source directory." ON)
+      if(SWIG_COPY_REGENERATED_PYTHON_IN_SOURCE_DIR)
+          file(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/extensions" GDAL_PYTHON_CSOURCE_SRC_DIR_NATIVE_PATH)
+          foreach(_file IN ITEMS ${GDAL_PYTHON_CSOURCES})
+              file(TO_NATIVE_PATH "${_file}" _native_file)
+              add_custom_command(
+                OUTPUT ${_file}
+                APPEND
+                COMMAND
+                  ${CMAKE_COMMAND} -E copy_if_different
+                  ${_native_file}
+                  ${GDAL_PYTHON_CSOURCE_SRC_DIR_NATIVE_PATH})
+          endforeach()
+
+          file(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/osgeo" GDAL_PYTHON_PYSOURCE_SRC_DIR_NATIVE_PATH)
+          foreach(_file IN ITEMS ${GDAL_PYTHON_PYSOURCES})
+              file(TO_NATIVE_PATH "${_file}" _native_file)
+              add_custom_command(
+                OUTPUT ${_file}
+                APPEND
+                COMMAND
+                  ${CMAKE_COMMAND} -E copy_if_different
+                  ${_native_file}
+                  ${GDAL_PYTHON_PYSOURCE_SRC_DIR_NATIVE_PATH})
+          endforeach()
+      endif()
   endif()
 
-  option(SWIG_COPY_REGENERATED_PYTHON_IN_SOURCE_DIR "Copy SWIG regenerated Python bindings into source directory." ON)
-  if(SWIG_COPY_REGENERATED_PYTHON_IN_SOURCE_DIR)
-      file(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/extensions" GDAL_PYTHON_CSOURCE_SRC_DIR_NATIVE_PATH)
-      foreach(_file IN ITEMS ${GDAL_PYTHON_CSOURCES})
-          file(TO_NATIVE_PATH "${_file}" _native_file)
-          add_custom_command(
-            OUTPUT ${_file}
-            APPEND
-            COMMAND
-              ${CMAKE_COMMAND} -E copy_if_different
-              ${_native_file}
-              ${GDAL_PYTHON_CSOURCE_SRC_DIR_NATIVE_PATH})
-      endforeach()
-
-      file(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/osgeo" GDAL_PYTHON_PYSOURCE_SRC_DIR_NATIVE_PATH)
-      foreach(_file IN ITEMS ${GDAL_PYTHON_PYSOURCES})
-          file(TO_NATIVE_PATH "${_file}" _native_file)
-          add_custom_command(
-            OUTPUT ${_file}
-            APPEND
-            COMMAND
-              ${CMAKE_COMMAND} -E copy_if_different
-              ${_native_file}
-              ${GDAL_PYTHON_PYSOURCE_SRC_DIR_NATIVE_PATH})
-      endforeach()
-  endif()
-
-else ()
+elseif (NOT "${CMAKE_BINARY_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
   set(GDAL_PYTHON_CSOURCES_SRC
       ${CMAKE_CURRENT_SOURCE_DIR}/extensions/gdal_wrap.cpp ${CMAKE_CURRENT_SOURCE_DIR}/extensions/gdalconst_wrap.c
       ${CMAKE_CURRENT_SOURCE_DIR}/extensions/gnm_wrap.cpp ${CMAKE_CURRENT_SOURCE_DIR}/extensions/ogr_wrap.cpp
@@ -158,22 +164,12 @@ else ()
     list(APPEND GDAL_PYTHON_CSOURCES_SRC "${CMAKE_CURRENT_SOURCE_DIR}/extensions/gdal_array_wrap.cpp")
     list(APPEND GDAL_PYTHON_PYSOURCES "${CMAKE_CURRENT_BINARY_DIR}/osgeo/gdal_array.py")
   endif ()
-  if (Python_VERSION_MAJOR EQUAL 3 AND Python_EXECUTABLE)
-    add_custom_command(
-      OUTPUT ${GDAL_PYTHON_PYSOURCES}
-      COMMAND
-        ${Python_EXECUTABLE} -m lib2to3 --fix=import --fix=next --fix=renames --fix=unicode --fix=ws_comma --fix=xrange
-        --write --write-unchanged-files --nobackups --output-dir=${OSGEO_BINARY_DIR} ${OSGEO_SOURCE_DIR}__init__.py
-        ${OSGEO_SOURCE_DIR}gdal.py ${OSGEO_SOURCE_DIR}gdalconst.py ${OSGEO_SOURCE_DIR}gdalnumeric.py
-        ${OSGEO_SOURCE_DIR}ogr.py ${OSGEO_SOURCE_DIR}osr.py ${OSGEO_SOURCE_DIR}gnm.py ${OSGEO_SOURCE_DIR}gdal_array.py)
-  else ()
-    add_custom_command(
-      OUTPUT ${GDAL_PYTHON_PYSOURCES}
-      COMMAND
-        ${CMAKE_COMMAND} -E copy ${OSGEO_SOURCE_DIR}__init__.py ${OSGEO_SOURCE_DIR}gdal.py
-        ${OSGEO_SOURCE_DIR}gdalconst.py ${OSGEO_SOURCE_DIR}gdalnumeric.py ${OSGEO_SOURCE_DIR}ogr.py
-        ${OSGEO_SOURCE_DIR}osr.py ${OSGEO_SOURCE_DIR}gnm.py ${OSGEO_SOURCE_DIR}gdal_array.py ${OSGEO_BINARY_DIR})
-  endif ()
+  add_custom_command(
+    OUTPUT ${GDAL_PYTHON_PYSOURCES}
+    COMMAND
+      ${CMAKE_COMMAND} -E copy ${OSGEO_SOURCE_DIR}__init__.py ${OSGEO_SOURCE_DIR}gdal.py
+      ${OSGEO_SOURCE_DIR}gdalconst.py ${OSGEO_SOURCE_DIR}gdalnumeric.py ${OSGEO_SOURCE_DIR}ogr.py
+      ${OSGEO_SOURCE_DIR}osr.py ${OSGEO_SOURCE_DIR}gnm.py ${OSGEO_SOURCE_DIR}gdal_array.py ${OSGEO_BINARY_DIR})
   file(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/extensions/" GDAL_PYTHON_CSOURCE_SRC_DIR_NATIVE_PATH)
   file(TO_NATIVE_PATH "${GDAL_PYTHON_CSOURCE_DIR}/" GDAL_PYTHON_CSOURCE_DIR_NATIVE_PATH)
   add_custom_command(
@@ -233,9 +229,7 @@ if (Python_Interpreter_FOUND)
   endif()
 
   file(TO_NATIVE_PATH "${GDAL_PYTHON_CSOURCE_DIR}" GDAL_PYTHON_EXT_SOURCE_DIR)
-  if ("${CMAKE_BINARY_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}" AND EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/setup.py)
-    # FIXME: remove this branch when we remove setup.py from source tree
-  elseif (_isMultiConfig)
+  if (_isMultiConfig)
     set(GDAL_LIB_DIR "os.path.dirname('$<TARGET_FILE:${GDAL_LIB_TARGET_NAME}>')")
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in ${CMAKE_CURRENT_BINARY_DIR}/setup.py.tmp @ONLY)
     if (ONLY_GENERATE_FOR_NON_DEBUG)
@@ -475,94 +469,4 @@ elseif (Python_Development_FOUND)
     DESTINATION ${Python_SITELIB}/osgeo)
 else ()
 
-endif ()
-
-if (REGENERATE_PYTHON_DOCS)
-  # Do not do this by default: make clean cause them to be removed as they are generated in the source tree.
-  file(COPY ${PROJECT_SOURCE_DIR}/Doxyfile DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-  file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile "GENERATE_XML=YES")
-  add_custom_command(
-    OUTPUT ${PROJECT_SOURCE_DIR}/xml/ogrlayer_8cpp.xml ${PROJECT_SOURCE_DIR}/xml/ogrgeometry_8cpp.xml
-           ${PROJECT_SOURCE_DIR}/xml/ogrsfdriver_8cpp.xml ${PROJECT_SOURCE_DIR}/xml/ogrfeature_8cpp.xml
-           ${PROJECT_SOURCE_DIR}/xml/ogrfeaturedefn_8cpp.xml ${PROJECT_SOURCE_DIR}/xml/ogrfielddefn_8cpp.xml
-    COMMAND doxygen ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-    COMMENT "Generate xml by doxygen"
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/gdal)
-  add_custom_target(
-    python_interface_docs
-    DEPENDS ${PROJECT_SOURCE_DIR}/swig/include/python/docs/ogr_layer_docs.i
-            ${PROJECT_SOURCE_DIR}/swig/include/python/docs/ogr_geometry_docs.i
-            ${PROJECT_SOURCE_DIR}/swig/include/python/docs/ogr_datasource_docs.i
-            ${PROJECT_SOURCE_DIR}/swig/include/python/docs/ogr_driver_docs.i
-            ${PROJECT_SOURCE_DIR}/swig/include/python/docs/ogr_feature_docs.i
-            ${PROJECT_SOURCE_DIR}/swig/include/python/docs/ogr_featuredef_docs.i
-            ${PROJECT_SOURCE_DIR}/swig/include/python/docs/ogr_fielddef_docs.i
-    COMMENT "Generate document interfaces for python")
-  add_custom_command(
-    OUTPUT ${PROJECT_SOURCE_DIR}/swig/include/python/docs/ogr_layer_docs.i
-    COMMAND
-      ${Python_EXECUTABLE} ${PROJECT_SOURCE_DIR}/swig/include/python/docs/doxy2swig.py
-      ${PROJECT_SOURCE_DIR}/xml/ogrlayer_8cpp.xml ${PROJECT_SOURCE_DIR}/swig/include/python/docs/ogr_layer_docs.i
-      OGRLayerShadow OGR_L_
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    DEPENDS ${PROJECT_SOURCE_DIR}/xml/ogrlayer_8cpp.xml
-    COMMENT "Generate ogr_layer_docs.i by doxy2swig")
-  add_custom_command(
-    OUTPUT ${PROJECT_SOURCE_DIR}/swig/include/python/docs/ogr_geometry_docs.i
-    COMMAND
-      ${Python_EXECUTABLE} ${PROJECT_SOURCE_DIR}/swig/include/python/docs/doxy2swig.py
-      ${PROJECT_SOURCE_DIR}/xml/ogrgeometry_8cpp.xml ${PROJECT_SOURCE_DIR}/swig/include/python/docs/ogr_geometry_docs.i
-      OGRGeometryShadow OGR_G_
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    DEPENDS ${PROJECT_SOURCE_DIR}/xml/ogrgeometry_8cpp.xml
-    COMMENT "Generate ogr_geometory_docs.i by doxy2swig")
-  add_custom_command(
-    OUTPUT ${PROJECT_SOURCE_DIR}/swig/include/python/docs/ogr_datasource_docs.i
-    COMMAND
-      ${Python_EXECUTABLE} ${PROJECT_SOURCE_DIR}/swig/include/python/docs/doxy2swig.py
-      ${PROJECT_SOURCE_DIR}/xml/ogrdatasource_8cpp.xml
-      ${PROJECT_SOURCE_DIR}/swig/include/python/docs/ogr_datasource_docs.i OGRDataSourceShadow OGR_DS_
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    DEPENDS ${PROJECT_SOURCE_DIR}/xml/ogrdatasource_8cpp.xml
-    COMMENT "Generate ogr_datasource_docs.i by doxy2swig")
-  add_custom_command(
-    OUTPUT ${PROJECT_SOURCE_DIR}/swig/include/python/docs/ogr_driver_docs.i
-    COMMAND
-      ${Python_EXECUTABLE} ${PROJECT_SOURCE_DIR}/swig/include/python/docs/doxy2swig.py
-      ${PROJECT_SOURCE_DIR}/xml/ogrsfdriver_8cpp.xml ${PROJECT_SOURCE_DIR}/swig/include/python/docs/ogr_driver_docs.i
-      OGRDriverShadow OGR_Dr_
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    DEPENDS ${PROJECT_SOURCE_DIR}/xml/ogrsfdriver_8cpp.xml
-    COMMENT "Generate ogr_driver_docs.i by doxy2swig")
-  add_custom_command(
-    OUTPUT ${PROJECT_SOURCE_DIR}/swig/include/python/docs/ogr_feature_docs.i
-    COMMAND
-      ${Python_EXECUTABLE} ${PROJECT_SOURCE_DIR}/swig/include/python/docs/doxy2swig.py
-      ${PROJECT_SOURCE_DIR}/xml/ogrfeature_8cpp.xml ${PROJECT_SOURCE_DIR}/swig/include/python/docs/ogr_feature_docs.i
-      OGRFeatureShadow OGR_F_
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    DEPENDS ${PROJECT_SOURCE_DIR}/xml/ogrfeature_8cpp.xml
-    COMMENT "Generate ogr_feature_docs.i by doxy2swig")
-  add_custom_command(
-    OUTPUT ${PROJECT_SOURCE_DIR}/swig/include/python/docs/ogr_featuredef_docs.i
-    COMMAND
-      ${Python_EXECUTABLE} ${PROJECT_SOURCE_DIR}/swig/include/python/docs/doxy2swig.py
-      ${PROJECT_SOURCE_DIR}/xml/ogrfeaturedefn_8cpp.xml
-      ${PROJECT_SOURCE_DIR}/swig/include/python/docs/ogr_featuredef_docs.i OGRFeatureDefnShadow OGR_FD_
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    DEPENDS ${PROJECT_SOURCE_DIR}/xml/ogrfeaturedefn_8cpp.xml
-    COMMENT "Generate ogr_featuredef_docs.i by doxy2swig")
-  add_custom_command(
-    OUTPUT ${PROJECT_SOURCE_DIR}/swig/include/python/docs/ogr_fielddef_docs.i
-    COMMAND
-      ${Python_EXECUTABLE} ${PROJECT_SOURCE_DIR}/swig/include/python/docs/doxy2swig.py
-      ${PROJECT_SOURCE_DIR}/xml/ogrfielddefn_8cpp.xml ${PROJECT_SOURCE_DIR}/swig/include/python/docs/ogr_fielddef_docs.i
-      OGRFieldDefnShadow OGR_Fld_
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    DEPENDS ${PROJECT_SOURCE_DIR}/xml/ogrfielddefn_8cpp.xml
-    COMMENT "Generate ogr_fielddef_docs.i by doxy2swig")
-  add_custom_target(
-    epydoc
-    COMMAND epydoc --config ${CMAKE_CURRENT_SOURCE_DIR}/epydoc.conf
-    COMMENT "Generate epydoc")
 endif ()
