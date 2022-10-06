@@ -339,7 +339,9 @@ enum class GTiffProfile: GByte
     GDALGEOTIFF
 };
 
+#ifdef SUPPORTS_GET_OFFSET_BYTECOUNT
 static void ThreadDecompressionFunc(void*);
+#endif
 
 class GTiffDataset final : public GDALPamDataset
 {
@@ -362,7 +364,9 @@ private:
     friend class GTiffSplitBand;
     friend class GTiffSplitBitmapBand;
 
+#ifdef SUPPORTS_GET_OFFSET_BYTECOUNT
     friend void  ThreadDecompressionFunc(void*);
+#endif
 
     friend void  GTIFFSetJpegQuality( GDALDatasetH hGTIFFDS, int nJpegQuality );
     friend void  GTIFFSetJpegTablesMode( GDALDatasetH hGTIFFDS, int nJpegTablesMode );
@@ -2711,6 +2715,10 @@ static void ThreadDecompressionFunc(void* pData)
             if( !psContext->bSuccess )
                 return;
 
+            // Coverity Scan notices that GDALRasterBlock::Internalize() calls
+            // CPLSleep() in a debug code path, and warns about that while
+            // holding the above mutex.
+            // coverity[sleep]
             if( !psContext->bSkipBlockCache && !LoadBlocks() )
             {
                 psContext->bSuccess = false;
@@ -2744,6 +2752,10 @@ static void ThreadDecompressionFunc(void* pData)
         if( !psContext->bSuccess )
             return;
 
+        // Coverity Scan notices that GDALRasterBlock::Internalize() calls
+        // CPLSleep() in a debug code path, and warns about that while
+        // holding the above mutex.
+        // coverity[sleep]
         if( !psContext->bSkipBlockCache && !LoadBlocks() )
         {
             psContext->bSuccess = false;
@@ -3139,7 +3151,7 @@ CPLErr GTiffDataset::MultiThreadedRead( int nXOff, int nYOff, int nXSize, int nY
 
     if( m_nPlanarConfig == PLANARCONFIG_CONTIG &&
         nBandCount == nBands &&
-        nPixelSpace == nBands * sContext.nBufDTSize )
+        nPixelSpace == nBands * static_cast<GSpacing>(sContext.nBufDTSize) )
     {
         sContext.bUseBIPOptim = true;
         for( int i = 0; i < nBands; ++i )
