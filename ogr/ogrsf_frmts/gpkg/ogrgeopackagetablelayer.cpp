@@ -37,6 +37,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <limits>
 
 #undef SQLITE_STATIC
 #define SQLITE_STATIC      static_cast<sqlite3_destructor_type>(nullptr)
@@ -6337,7 +6338,8 @@ OGRGeometryTypeCounter* OGRGeoPackageTableLayer::GetGeometryTypes(
         static int ProgressHandler(void* pData)
         {
             CancelCallback* psCancelCallback = static_cast<CancelCallback*>(pData);
-            return psCancelCallback->m_pfnProgress(0.0, "", psCancelCallback->m_pProgressData) ? 0 : 1;
+            return psCancelCallback->m_pfnProgress != nullptr &&
+                   psCancelCallback->m_pfnProgress(0.0, "", psCancelCallback->m_pProgressData) ? 0 : 1;
         }
     };
 
