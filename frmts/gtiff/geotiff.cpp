@@ -110,7 +110,7 @@
 
 #define DEFAULT_WEBP_LEVEL  75
 
-static bool bGlobalInExternalOvr = false;
+static thread_local bool bThreadLocalInExternalOvr = false;
 
 static thread_local int gnThreadLocalLibtiffError = 0;
 
@@ -123,6 +123,10 @@ constexpr double DEFAULT_NODATA_VALUE = -9999.0;
 
 #if TIFFLIB_VERSION > 20181110 // > 4.0.10
 #define SUPPORTS_GET_OFFSET_BYTECOUNT
+#endif
+
+#if (TIFFLIB_VERSION > 20220520) || defined(INTERNAL_LIBTIFF)  // > 4.4.0
+#define SUPPORTS_LIBTIFF_OPEN_OPTIONS
 #endif
 
 const char* const szJPEGGTiffDatasetTmpPrefix = "/vsimem/gtiffdataset_jpg_tmp_";
@@ -241,12 +245,12 @@ bool GTIFFSupportsPredictor(int nCompression)
 }
 
 /************************************************************************/
-/*                          GTIFFSetInExternalOvr()                     */
+/*                     GTIFFSetThreadLocalInExternalOvr()               */
 /************************************************************************/
 
-void GTIFFSetInExternalOvr( bool b )
+void GTIFFSetThreadLocalInExternalOvr( bool b )
 {
-    bGlobalInExternalOvr = b;
+    bThreadLocalInExternalOvr = b;
 }
 
 /************************************************************************/
@@ -6732,7 +6736,17 @@ const char *GTiffRasterBand::GetMetadataItem( const char * pszName,
             return CPLSPrintf(CPL_FRMT_GUIB, static_cast<GUIntBig>(nByteCount));
         }
     }
-    return m_oGTiffMDMD.GetMetadataItem( pszName, pszDomain );
+
+    const char* pszRet = m_oGTiffMDMD.GetMetadataItem( pszName, pszDomain );
+
+    if( pszRet == nullptr && eDataType == GDT_Byte &&
+        pszDomain != nullptr && EQUAL(pszDomain, "IMAGE_STRUCTURE") &&
+        EQUAL(pszName, "PIXELTYPE") )
+    {
+        // to get a chance of emitting the warning about this legacy usage
+        pszRet = GDALRasterBand::GetMetadataItem( pszName, pszDomain );
+    }
+    return pszRet;
 }
 
 /************************************************************************/
@@ -13413,6 +13427,35 @@ static GTIF* GTiffDatasetGTIFNew( TIFF* hTIFF )
 }
 
 /************************************************************************/
+/*                    IsSRSCompatibleOfGeoTIFF()                        */
+/************************************************************************/
+
+static bool IsSRSCompatibleOfGeoTIFF( const OGRSpatialReference* poSRS )
+{
+    char* pszWKT = nullptr;
+    OGRErr eErr;
+    {
+        CPLErrorStateBackuper oErrorStateBackuper;
+        CPLErrorHandlerPusher oErrorHandler(CPLQuietErrorHandler);
+        if( poSRS->IsDerivedGeographic() )
+            eErr = OGRERR_FAILURE;
+        else
+        {
+            // Geographic3D CRS can't be exported to WKT1, but are
+            // valid GeoTIFF 1.1
+            const char* const apszOptions[] = {
+                poSRS->IsGeographic() ? nullptr : "FORMAT=WKT1", nullptr };
+            eErr = poSRS->exportToWkt(&pszWKT, apszOptions);
+        }
+    }
+    const bool bCompatibleOfGeoTIFF =
+        ( eErr == OGRERR_NONE && pszWKT != nullptr &&
+          strstr(pszWKT, "custom_proj4") == nullptr );
+    CPLFree(pszWKT);
+    return bCompatibleOfGeoTIFF;
+}
+
+/************************************************************************/
 /*                          WriteGeoTIFFInfo()                          */
 /************************************************************************/
 
@@ -13588,18 +13631,7 @@ void GTiffDataset::WriteGeoTIFFInfo()
         // Set according to coordinate system.
         if( bHasProjection )
         {
-            char* pszProjection = nullptr;
-            OGRErr eErr;
-            {
-                CPLErrorStateBackuper oErrorStateBackuper;
-                CPLErrorHandlerPusher oErrorHandler(CPLQuietErrorHandler);
-                if( m_oSRS.IsDerivedGeographic() )
-                    eErr = OGRERR_FAILURE;
-                else
-                    eErr = m_oSRS.exportToWkt(&pszProjection);
-            }
-            if( eErr == OGRERR_NONE && pszProjection && pszProjection[0] &&
-                strstr(pszProjection, "custom_proj4") == nullptr )
+            if( IsSRSCompatibleOfGeoTIFF(&m_oSRS) )
             {
                 GTIFSetFromOGISDefnEx( psGTIF,
                                        OGRSpatialReference::ToHandle(&m_oSRS),
@@ -13610,7 +13642,6 @@ void GTiffDataset::WriteGeoTIFFInfo()
             {
                 GDALPamDataset::SetSpatialRef(&m_oSRS);
             }
-            CPLFree(pszProjection);
         }
 
         if( bPixelIsPoint )
@@ -18099,8 +18130,8 @@ static GTiffDataset::MaskOffset* GetDiscardLsbOption(TIFF* hTIFF, char** papszOp
             const int nMaxBits =
                 (nSampleFormat == SAMPLEFORMAT_IEEEFP && nBits == 32) ? 23-1 :
                 (nSampleFormat == SAMPLEFORMAT_IEEEFP && nBits == 64) ? 53-1 :
-                nSampleFormat == SAMPLEFORMAT_INT ? nBitsPerSample - 1:
-                nBitsPerSample;
+                nSampleFormat == SAMPLEFORMAT_INT ? nBitsPerSample - 2:
+                nBitsPerSample - 1;
 
             if( nBits < 0 || nBits > nMaxBits)
             {
@@ -19908,13 +19939,17 @@ GTiffDataset::CreateCopy( const char * pszFilename, GDALDataset *poSrcDS,
     }
 
     if( CSLFetchNameValue( papszOptions, "PIXELTYPE" ) == nullptr
-        && eType == GDT_Byte
-        && poPBand->GetMetadataItem( "PIXELTYPE", "IMAGE_STRUCTURE" ) )
+        && eType == GDT_Byte )
     {
-        papszCreateOptions =
-            CSLSetNameValue( papszCreateOptions, "PIXELTYPE",
-                             poPBand->GetMetadataItem(
-                                 "PIXELTYPE", "IMAGE_STRUCTURE" ) );
+        poPBand->EnablePixelTypeSignedByteWarning(false);
+        const char* pszPixelType = poPBand->GetMetadataItem( "PIXELTYPE", "IMAGE_STRUCTURE" );
+        poPBand->EnablePixelTypeSignedByteWarning(true);
+        if( pszPixelType )
+        {
+            papszCreateOptions =
+                CSLSetNameValue( papszCreateOptions, "PIXELTYPE",
+                                 pszPixelType );
+        }
     }
 
 /* -------------------------------------------------------------------- */
@@ -20569,18 +20604,7 @@ GTiffDataset::CreateCopy( const char * pszFilename, GDALDataset *poSrcDS,
 
         if( bHasProjection )
         {
-            char* pszWKT = nullptr;
-            OGRErr eErr;
-            {
-                CPLErrorStateBackuper oErrorStateBackuper;
-                CPLErrorHandlerPusher oErrorHandler(CPLQuietErrorHandler);
-                if( l_poSRS->IsDerivedGeographic() )
-                    eErr = OGRERR_FAILURE;
-                else
-                    eErr = l_poSRS->exportToWkt(&pszWKT);
-            }
-            if( eErr == OGRERR_NONE && pszWKT != nullptr &&
-                strstr(pszWKT, "custom_proj4") == nullptr )
+            if( IsSRSCompatibleOfGeoTIFF(l_poSRS) )
             {
                 GTIFSetFromOGISDefnEx( psGTIF,
                                        OGRSpatialReference::ToHandle(
@@ -20592,7 +20616,6 @@ GTiffDataset::CreateCopy( const char * pszFilename, GDALDataset *poSrcDS,
             {
                 bExportSRSToPAM = true;
             }
-            CPLFree(pszWKT);
         }
 
         if( bPixelIsPoint )
@@ -20727,8 +20750,11 @@ GTiffDataset::CreateCopy( const char * pszFilename, GDALDataset *poSrcDS,
     {
         for(int i = 0; i < poDS->nBands; ++i )
         {
-            static_cast<GTiffRasterBand*>(poDS->papoBands[i])->eDataType = GDT_Byte;
-            poDS->papoBands[i]->SetMetadataItem("PIXELTYPE", "SIGNEDBYTE", "IMAGE_STRUCTURE");
+            auto poBand = static_cast<GTiffRasterBand*>(poDS->papoBands[i]);
+            poBand->eDataType = GDT_Byte;
+            poBand->EnablePixelTypeSignedByteWarning(false);
+            poBand->SetMetadataItem("PIXELTYPE", "SIGNEDBYTE", "IMAGE_STRUCTURE");
+            poBand->EnablePixelTypeSignedByteWarning(true);
         }
     }
 
@@ -22667,6 +22693,8 @@ static char *PrepareTIFFErrorFormat( const char *module, const char *fmt )
     return pszModFmt;
 }
 
+#if !defined(SUPPORTS_LIBTIFF_OPEN_OPTIONS)
+
 /************************************************************************/
 /*                        GTiffWarningHandler()                         */
 /************************************************************************/
@@ -22695,6 +22723,7 @@ GTiffWarningHandler(const char* module, const char* fmt, va_list ap )
         CPLErrorV( CE_Warning, CPLE_AppDefined, pszModFmt, ap );
     }
     CPLFree( pszModFmt );
+    return;
 }
 
 /************************************************************************/
@@ -22712,11 +22741,7 @@ GTiffErrorHandler( const char* module, const char* fmt, va_list ap )
 
     if( strcmp(fmt, "Maximum TIFF file size exceeded") == 0 )
     {
-        // Ideally there would be a thread-safe way of setting this flag,
-        // but we cannot really use the extended error handler, since the
-        // handler is for all TIFF handles, and not necessarily the ones of
-        // this driver.
-        if( bGlobalInExternalOvr )
+        if( bThreadLocalInExternalOvr )
             fmt =
                 "Maximum TIFF file size exceeded. "
                 "Use --config BIGTIFF_OVERVIEW YES configuration option.";
@@ -22729,7 +22754,83 @@ GTiffErrorHandler( const char* module, const char* fmt, va_list ap )
     char* pszModFmt = PrepareTIFFErrorFormat( module, fmt );
     CPLErrorV( CE_Failure, CPLE_AppDefined, pszModFmt, ap );
     CPLFree( pszModFmt );
+    return;
 }
+#else
+
+/************************************************************************/
+/*                      GTiffWarningHandlerExt()                        */
+/************************************************************************/
+extern int
+GTiffWarningHandlerExt( TIFF* tif, void* user_data, const char* module, const char* fmt, va_list ap );
+
+int
+GTiffWarningHandlerExt( TIFF* tif, void* user_data, const char* module, const char* fmt, va_list ap )
+{
+    (void)tif;
+    (void)user_data;
+    if( gnThreadLocalLibtiffError > 0 )
+    {
+        gnThreadLocalLibtiffError ++;
+        if( gnThreadLocalLibtiffError > 10 )
+            return 1;
+    }
+
+    if( strstr(fmt,"nknown field") != nullptr )
+        return 1;
+
+    char *pszModFmt = PrepareTIFFErrorFormat( module, fmt );
+    if( strstr(fmt, "does not end in null byte") != nullptr )
+    {
+        CPLString osMsg;
+        osMsg.vPrintf(pszModFmt, ap);
+        CPLDebug( "GTiff", "%s", osMsg.c_str() );
+    }
+    else
+    {
+        CPLErrorV( CE_Warning, CPLE_AppDefined, pszModFmt, ap );
+    }
+    CPLFree( pszModFmt );
+    return 1;
+}
+
+/************************************************************************/
+/*                       GTiffErrorHandlerExt()                         */
+/************************************************************************/
+extern int
+GTiffErrorHandlerExt( TIFF* tif, void* user_data, const char* module, const char* fmt, va_list ap );
+
+int
+GTiffErrorHandlerExt( TIFF* tif, void* user_data, const char* module, const char* fmt, va_list ap )
+{
+    (void)tif;
+    (void)user_data;
+    if( gnThreadLocalLibtiffError > 0 )
+    {
+        gnThreadLocalLibtiffError ++;
+        if( gnThreadLocalLibtiffError > 10 )
+            return 1;
+    }
+
+    if( strcmp(fmt, "Maximum TIFF file size exceeded") == 0 )
+    {
+        if( bThreadLocalInExternalOvr )
+            fmt =
+                "Maximum TIFF file size exceeded. "
+                "Use --config BIGTIFF_OVERVIEW YES configuration option.";
+        else
+            fmt =
+                "Maximum TIFF file size exceeded. "
+                "Use BIGTIFF=YES creation option.";
+    }
+
+    char* pszModFmt = PrepareTIFFErrorFormat( module, fmt );
+    CPLErrorV( CE_Failure, CPLE_AppDefined, pszModFmt, ap );
+    CPLFree( pszModFmt );
+    return 1;
+}
+
+#endif
 
 /************************************************************************/
 /*                          GTiffTagExtender()                          */
@@ -22797,8 +22898,10 @@ int GTiffOneTimeInit()
 
     _ParentExtender = TIFFSetTagExtender(GTiffTagExtender);
 
+#if !defined(SUPPORTS_LIBTIFF_OPEN_OPTIONS)
     TIFFSetWarningHandler( GTiffWarningHandler );
     TIFFSetErrorHandler( GTiffErrorHandler );
+#endif
 
     LibgeotiffOneTimeInit();
 
