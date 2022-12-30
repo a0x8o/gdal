@@ -734,25 +734,29 @@ def test_ogr_gml_15():
 
 
 ###############################################################################
-# Read CityGML generic attributes
+# Read CityGML generic attributes and reading 3D geometries by default
 
 
-def test_ogr_gml_16():
+def test_ogr_gml_city_gml():
 
     if not gdaltest.have_gml_reader:
         pytest.skip()
 
     ds = ogr.Open("data/gml/citygml.gml")
     lyr = ds.GetLayer(0)
+    assert lyr.GetGeomType() == ogr.wkbMultiPolygon25D
     feat = lyr.GetNextFeature()
 
-    if (
-        feat.GetField("Name_") != "aname"
-        or feat.GetField("a_int_attr") != 2
-        or feat.GetField("a_double_attr") != 3.45
-    ):
-        feat.DumpReadable()
-        pytest.fail("did not get expected values")
+    assert feat.GetField("Name_") == "aname"
+    assert feat.GetField("a_int_attr") == 2
+    assert feat.GetField("a_double_attr") == 3.45
+    assert (
+        feat.GetGeometryRef().ExportToIsoWkt()
+        == "MULTIPOLYGON Z (((0 0 0,0.0 0.5 0,0 1 0,1 1 0,1 0 0,0 0 0)))"
+    )
+    ds = None
+
+    gdal.Unlink("data/gml/citygml.gfs")
 
 
 ###############################################################################
@@ -4492,3 +4496,21 @@ def test_ogr_gml_read_feature_with_gml_description():
     assert f["identifier"] == "gml_identifier"
     assert f["name"] == "gml_name"
     assert f["bar"] == 1
+
+
+###############################################################################
+# Test reading a file with srsDimension="3" only on top gml:Envelope (#6986)
+
+
+def test_ogr_gml_read_srsDimension_3_on_top_gml_Envelope():
+
+    if not gdaltest.have_gml_reader:
+        pytest.skip()
+
+    ds = gdal.OpenEx("data/gml/global_srsDimension_3.gml")
+    lyr = ds.GetLayer(0)
+    f = lyr.GetNextFeature()
+    assert (
+        f.GetGeometryRef().ExportToIsoWkt()
+        == "LINESTRING Z (1 2 3,4 5 6,7 8 9,10 11 12)"
+    )
