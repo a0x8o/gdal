@@ -686,13 +686,15 @@ def Translate(destName, srcDS, **kwargs):
     return TranslateInternal(destName, srcDS, opts, callback, callback_data)
 
 def WarpOptions(options=None, format=None,
+         srcBands=None,
+         dstBands=None,
          outputBounds=None,
          outputBoundsSRS=None,
          xRes=None, yRes=None, targetAlignedPixels = False,
          width = 0, height = 0,
          srcSRS=None, dstSRS=None,
          coordinateOperation=None,
-         srcAlpha = False, dstAlpha = False,
+         srcAlpha = None, dstAlpha = False,
          warpOptions=None, errorThreshold=None,
          warpMemoryLimit=None, creationOptions=None, outputType = gdalconst.GDT_Unknown,
          workingType = gdalconst.GDT_Unknown, resampleAlg=None,
@@ -712,6 +714,10 @@ def WarpOptions(options=None, format=None,
         can be be an array of strings, a string or let empty and filled from other keywords.
     format:
         output format ("GTiff", etc...)
+    srcBands:
+        list of source band numbers (between 1 and the number of input bands)
+    dstBands:
+        list of output band numbers
     outputBounds:
         output bounds as (minX, minY, maxX, maxY) in target SRS
     outputBoundsSRS:
@@ -733,7 +739,8 @@ def WarpOptions(options=None, format=None,
     coordinateOperation:
         coordinate operation as a PROJ string or WKT string
     srcAlpha:
-        whether to force the last band of the input dataset to be considered as an alpha band
+        whether to force the last band of the input dataset to be considered as an alpha band.
+        If set to False, source alpha warping will be disabled.
     dstAlpha:
         whether to force the creation of an output alpha band
     outputType:
@@ -803,6 +810,12 @@ def WarpOptions(options=None, format=None,
         new_options = ParseCommandLine(options)
     else:
         new_options = options
+        if srcBands:
+            for b in srcBands:
+                new_options += ['-srcband', str(b)]
+        if dstBands:
+            for b in dstBands:
+                new_options += ['-dstband', str(b)]
         if format is not None:
             new_options += ['-of', format]
         if outputType != gdalconst.GDT_Unknown:
@@ -827,6 +840,8 @@ def WarpOptions(options=None, format=None,
             new_options += ['-tap']
         if srcAlpha:
             new_options += ['-srcalpha']
+        elif srcAlpha is not None:
+            new_options += ['-nosrcalpha']
         if dstAlpha:
             new_options += ['-dstalpha']
         if warpOptions is not None:
@@ -1027,7 +1042,7 @@ def VectorTranslateOptions(options=None, format=None,
         spatial filter as (minX, minY, maxX, maxY) bounding box
     spatSRS:
         SRS in which the spatFilter is expressed. If not specified, it is assumed to be
-        the one of the layer(s).
+        the one of the layer(s)
     datasetCreationOptions:
         list of dataset creation options
     layerCreationOptions:
@@ -1066,7 +1081,7 @@ def VectorTranslateOptions(options=None, format=None,
     clipDstLayer:
         select the named layer from the destination clip datasource.
     clipDstWhere:
-        restrict desired geometries based on attribute query.        
+        restrict desired geometries based on attribute query.
     simplifyTolerance:
         distance tolerance for simplification. The algorithm used preserves topology per
         feature, in particular for polygon geometries, but not for a whole layer.
@@ -1147,7 +1162,7 @@ def VectorTranslateOptions(options=None, format=None,
                     val += ','
                 val += item
             new_options += ['-select', val]
-        
+
         if datasetCreationOptions is not None:
             for opt in datasetCreationOptions:
                 new_options += ['-dsco', opt]
@@ -1161,7 +1176,7 @@ def VectorTranslateOptions(options=None, format=None,
             else:
                 for lyr in layers:
                     new_options += [lyr]
-        
+
         if transactionSize is not None:
             new_options += ['-gt', str(transactionSize)]
 
@@ -2110,6 +2125,94 @@ def ApplyVerticalShiftGrid(*args, **kwargs):
     from warnings import warn
     warn('ApplyVerticalShiftGrid() will be removed in GDAL 4.0', DeprecationWarning)
     return _ApplyVerticalShiftGrid(*args, **kwargs)
+
+
+import contextlib
+@contextlib.contextmanager
+def config_options(options, thread_local=True):
+    """Temporarily define a set of configuration options.
+
+       Parameters
+       ----------
+       options: dict
+            Dictionary of configuration options passed as key, value
+       thread_local: bool
+            Whether the configuration options should be only set on the current
+            thread. The default is True.
+
+       Returns
+       -------
+            A context manager
+
+       Example
+       -------
+
+           with gdal.config_options({"GDAL_NUM_THREADS": "ALL_CPUS"}):
+               gdal.Warp("out.tif", "in.tif", dstSRS="EPSG:4326")
+    """
+    oldvals = {key: GetConfigOption(key) for key in options}
+    set_config_option = SetThreadLocalConfigOption if thread_local else SetConfigOption
+    for key in options:
+        set_config_option(key, options[key])
+    try:
+        yield
+    finally:
+        for key in options:
+            set_config_option(key, oldvals[key])
+
+
+def config_option(key, value, thread_local=True):
+    """Temporarily define a configuration option.
+
+       Parameters
+       ----------
+       key: str
+            Name of the configuration option
+       value: str
+            Value of the configuration option
+       thread_local: bool
+            Whether the configuration option should be only set on the current
+            thread. The default is True.
+
+       Returns
+       -------
+            A context manager
+
+       Example
+       -------
+
+           with gdal.config_option("GDAL_NUM_THREADS", "ALL_CPUS"):
+               gdal.Warp("out.tif", "in.tif", dstSRS="EPSG:4326")
+    """
+    return config_options({key: value}, thread_local=thread_local)
+
+
+@contextlib.contextmanager
+def enable_exceptions():
+    """Temporarily enable exceptions.
+
+       Note: this will only affect the osgeo.gdal module. For ogr or osr
+       modules, use respectively osgeo.ogr.enable_exceptions() and
+       osgeo.osr.enable_exceptions().
+
+       Returns
+       -------
+            A context manager
+
+       Example
+       -------
+
+           with gdal.enable_exceptions():
+               gdal.Translate("out.tif", "in.tif", format="COG")
+    """
+    if GetUseExceptions():
+        yield
+    else:
+        UseExceptions()
+        try:
+            yield
+        finally:
+            DontUseExceptions()
 
 
 
