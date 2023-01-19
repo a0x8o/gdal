@@ -4835,7 +4835,7 @@ void netCDFDataset::SetProjectionFromVar(int nGroupId, int nVarId,
                 CPLFree(pszTempProjection);
 
                 CPLDebug("netCDF",
-                         "Assummed Longitude Latitude CRS 'OGC:CRS84' because "
+                         "Assumed Longitude Latitude CRS 'OGC:CRS84' because "
                          "none otherwise available and geotransform within "
                          "suitable bounds. "
                          "Set GDAL_NETCDF_ASSUME_LONGLAT=NO as configuration "
@@ -6906,10 +6906,21 @@ void netCDFDataset::CreateSubDatasetList(int nGroupId)
             snprintf(szTemp, sizeof(szTemp), "SUBDATASET_%d_NAME",
                      nSubDatasets);
 
-            poDS->papszSubDatasets =
-                CSLSetNameValue(poDS->papszSubDatasets, szTemp,
-                                CPLSPrintf("NETCDF:\"%s\":%s",
-                                           poDS->osFilename.c_str(), pszName));
+            if (strchr(pszName, ' ') || strchr(pszName, ':'))
+            {
+                poDS->papszSubDatasets = CSLSetNameValue(
+                    poDS->papszSubDatasets, szTemp,
+                    CPLSPrintf("NETCDF:\"%s\":\"%s\"", poDS->osFilename.c_str(),
+                               pszName));
+            }
+            else
+            {
+                poDS->papszSubDatasets = CSLSetNameValue(
+                    poDS->papszSubDatasets, szTemp,
+                    CPLSPrintf("NETCDF:\"%s\":%s", poDS->osFilename.c_str(),
+                               pszName));
+            }
+
             CPLFree(pszName);
 
             snprintf(szTemp, sizeof(szTemp), "SUBDATASET_%d_DESC",

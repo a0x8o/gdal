@@ -109,6 +109,9 @@ struct GDALWarpAppOptions
     double dfXRes = 0;
     double dfYRes = 0;
 
+    /*! whether target pixels should have dfXRes == dfYRes */
+    bool bSquarePixels = false;
+
     /*! align the coordinates of the extent of the output file to the values of
        the GDALWarpAppOptions::dfXRes and GDALWarpAppOptions::dfYRes, such that
        the aligned extent includes the minimum extent. */
@@ -667,6 +670,12 @@ static bool ApplyVerticalShift(GDALDatasetH hWrkSrcDS,
             const char *pszUnit =
                 GDALGetRasterUnitType(GDALGetRasterBand(hWrkSrcDS, 1));
 
+            double dfToMeterSrcAxis = 1.0;
+            if (bSrcHasVertAxis)
+            {
+                oSRSSrc.GetAxis(nullptr, 2, nullptr, &dfToMeterSrcAxis);
+            }
+
             if (pszUnit && (EQUAL(pszUnit, "m") || EQUAL(pszUnit, "meter") ||
                             EQUAL(pszUnit, "metre")))
             {
@@ -684,10 +693,7 @@ static bool ApplyVerticalShift(GDALDatasetH hWrkSrcDS,
             {
                 if (bSrcHasVertAxis)
                 {
-                    oSRSSrc.GetAxis(nullptr, 2, nullptr, &dfToMeterSrc);
-                    CPLError(CE_Warning, CPLE_AppDefined,
-                             "Unknown units=%s. Using source vertical units.",
-                             pszUnit);
+                    dfToMeterSrc = dfToMeterSrcAxis;
                 }
                 else
                 {
@@ -714,6 +720,16 @@ static bool ApplyVerticalShift(GDALDatasetH hWrkSrcDS,
                 psWO->papszWarpOptions = CSLSetNameValue(
                     psWO->papszWarpOptions, "MULT_FACTOR_VERTICAL_SHIFT",
                     CPLSPrintf("%.18g", dfMultFactorVerticalShift));
+
+                const double dfMultFactorVerticalShiftPipeline =
+                    dfToMeterSrcAxis / dfToMeterDst;
+                CPLDebug("WARP",
+                         "Applying MULT_FACTOR_VERTICAL_SHIFT_PIPELINE=%.18g",
+                         dfMultFactorVerticalShiftPipeline);
+                psWO->papszWarpOptions = CSLSetNameValue(
+                    psWO->papszWarpOptions,
+                    "MULT_FACTOR_VERTICAL_SHIFT_PIPELINE",
+                    CPLSPrintf("%.18g", dfMultFactorVerticalShiftPipeline));
             }
         }
     }
@@ -2578,6 +2594,9 @@ static GDALDatasetH GDALWarpDirect(const char *pszDest, GDALDatasetH hDstDS,
         if (psOptions->nOvLevel <= OVR_LEVEL_AUTO && nOvCount > 0)
         {
             double dfTargetRatio = 0;
+            double dfTargetRatioX = 0;
+            double dfTargetRatioY = 0;
+
             if (bFigureoutCorrespondingWindow)
             {
                 // If the user has explicitly set the target bounds and
@@ -2608,19 +2627,30 @@ static GDALDatasetH GDALWarpDirect(const char *pszDest, GDALDatasetH hDstDS,
                 {
                     double dfMinSrcX = std::numeric_limits<double>::infinity();
                     double dfMaxSrcX = -std::numeric_limits<double>::infinity();
+                    double dfMinSrcY = std::numeric_limits<double>::infinity();
+                    double dfMaxSrcY = -std::numeric_limits<double>::infinity();
                     for (int i = 0; i < nPoints; i++)
                     {
                         if (abSuccess[i])
                         {
                             dfMinSrcX = std::min(dfMinSrcX, adfX[i]);
                             dfMaxSrcX = std::max(dfMaxSrcX, adfX[i]);
+                            dfMinSrcY = std::min(dfMinSrcY, adfY[i]);
+                            dfMaxSrcY = std::max(dfMaxSrcY, adfY[i]);
                         }
                     }
                     if (dfMaxSrcX > dfMinSrcX)
                     {
-                        dfTargetRatio = (dfMaxSrcX - dfMinSrcX) /
-                                        GDALGetRasterXSize(hDstDS);
+                        dfTargetRatioX = (dfMaxSrcX - dfMinSrcX) /
+                                         GDALGetRasterXSize(hDstDS);
                     }
+                    if (dfMaxSrcY > dfMinSrcY)
+                    {
+                        dfTargetRatioY = (dfMaxSrcY - dfMinSrcY) /
+                                         GDALGetRasterYSize(hDstDS);
+                    }
+                    // take the minimum of these ratios #7019
+                    dfTargetRatio = std::min(dfTargetRatioX, dfTargetRatioY);
                 }
             }
             else
@@ -3573,9 +3603,9 @@ static GDALDatasetH GDALWarpCreateOutput(
         /*      dataset, if not set already. */
         /* --------------------------------------------------------------------
          */
+        const auto osThisSourceSRS = GetSrcDSProjection(hSrcDS, papszTO);
         if (iSrc == 0 && osThisTargetSRS.empty())
         {
-            const auto osThisSourceSRS = GetSrcDSProjection(hSrcDS, papszTO);
             if (!osThisSourceSRS.empty())
             {
                 osThisTargetSRS = osThisSourceSRS;
@@ -3746,11 +3776,10 @@ static GDALDatasetH GDALWarpCreateOutput(
         /*      Get approximate output definition. */
         /* --------------------------------------------------------------------
          */
-
+        double adfThisGeoTransform[6];
+        double adfExtent[4];
         if (bNeedsSuggestedWarpOutput)
         {
-            double adfThisGeoTransform[6];
-            double adfExtent[4];
             int nThisPixels, nThisLines;
 
             // For sum, round-up dimension, to be sure that the output extent
@@ -3853,7 +3882,41 @@ static GDALDatasetH GDALWarpCreateOutput(
                     }
                 }
             }
+        }
 
+        // If no reprojection or geometry change is involved, and that the
+        // source image is north-up, preserve source resolution instead of
+        // forcing square pixels.
+        const char *pszMethod = CSLFetchNameValue(papszTO, "METHOD");
+        double adfThisGeoTransformTmp[6];
+        if (!psOptions->bSquarePixels && bNeedsSuggestedWarpOutput &&
+            osThisSourceSRS == osThisTargetSRS && psOptions->dfXRes == 0 &&
+            psOptions->dfYRes == 0 && psOptions->nForcePixels == 0 &&
+            psOptions->nForceLines == 0 &&
+            (pszMethod == nullptr || EQUAL(pszMethod, "GEOTRANSFORM")) &&
+            CSLFetchNameValue(papszTO, "COORDINATE_OPERATION") == nullptr &&
+            CSLFetchNameValue(papszTO, "SRC_METHOD") == nullptr &&
+            CSLFetchNameValue(papszTO, "DST_METHOD") == nullptr &&
+            GDALGetGeoTransform(hSrcDS, adfThisGeoTransformTmp) == CE_None &&
+            adfThisGeoTransformTmp[2] == 0 && adfThisGeoTransformTmp[4] == 0 &&
+            adfThisGeoTransformTmp[5] < 0 &&
+            GDALGetMetadata(hSrcDS, "GEOLOC_ARRAY") == nullptr &&
+            GDALGetMetadata(hSrcDS, "RPC") == nullptr)
+        {
+            memcpy(adfThisGeoTransform, adfThisGeoTransformTmp,
+                   6 * sizeof(double));
+            adfExtent[0] = adfThisGeoTransform[0];
+            adfExtent[1] = adfThisGeoTransform[3] +
+                           GDALGetRasterYSize(hSrcDS) * adfThisGeoTransform[5];
+            adfExtent[2] = adfThisGeoTransform[0] +
+                           GDALGetRasterXSize(hSrcDS) * adfThisGeoTransform[1];
+            adfExtent[3] = adfThisGeoTransform[3];
+            dfResFromSourceAndTargetExtent =
+                std::numeric_limits<double>::infinity();
+        }
+
+        if (bNeedsSuggestedWarpOutput)
+        {
             /* --------------------------------------------------------------------
              */
             /*      Expand the working bounds to include this region, ensure the
@@ -5027,6 +5090,13 @@ GDALWarpAppOptionsNew(char **papszArgv,
         else if (EQUAL(papszArgv[i], "-dstnodata") && i + 1 < argc)
         {
             psOptions->osDstNodata = papszArgv[++i];
+        }
+        else if (EQUAL(papszArgv[i], "-tr") && i + 1 < argc &&
+                 EQUAL(papszArgv[i + 1], "square"))
+        {
+            ++i;
+            psOptions->bSquarePixels = true;
+            psOptions->bCreateOutput = true;
         }
         else if (EQUAL(papszArgv[i], "-tr") && i + 2 < argc)
         {

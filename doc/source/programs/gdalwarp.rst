@@ -22,7 +22,7 @@ Synopsis
         [-order n | -tps | -rpc | -geoloc] [-et err_threshold]
         [-refine_gcps tolerance [minimum_gcps]]
         [-te xmin ymin xmax ymax] [-te_srs srs_def]
-        [-tr xres yres] [-tap] [-ts width height]
+        [-tr xres yres]|[-tr square] [-tap] [-ts width height]
         [-ovr level|AUTO|AUTO-n|NONE] [-wo "NAME=VALUE"] [-ot Byte/Int16/...] [-wt Byte/Int16]
         [-srcnodata "value [value...]"] [-dstnodata "value [value...]"]
         [-srcalpha|-nosrcalpha] [-dstalpha]
@@ -63,7 +63,7 @@ with control information.
     The alpha band should not be specified in the list, as it will be
     automatically retrieved (unless :option:`-nosrcalpha` is specified).
 
-    The following invokation will warp an input datasets with bands ordered as
+    The following invocation will warp an input datasets with bands ordered as
     Blue, Green, Red, NearInfraRed in an output dataset with bands ordered as
     Red, Green, Blue.
 
@@ -88,7 +88,7 @@ with control information.
         gdalwarp in_blue.tif out_rgb.tif -srcband 1 -dstband 3
 
 
-    If :option:`-srcband` is specified, there must be as many occurences of
+    If :option:`-srcband` is specified, there must be as many occurrences of
     :option:`-dstband` as there are of :option:`-srcband`.
 
     The output alpha band should not be specified, as it will be automatically
@@ -219,13 +219,19 @@ with control information.
     dataset. :option:`-te_srs` is a convenience e.g. when knowing the output coordinates in a
     geodetic long/lat SRS, but still wanting a result in a projected coordinate system.
 
-.. option:: -tr <xres> <yres>
+.. option:: -tr <xres> <yres> | -tr square
 
     Set output file resolution (in target georeferenced units).
 
-    If not specified (or not deduced from -te and -ts), gdalwarp will generate
-    an output raster with xres=yres, and that even when using gdalwarp in scenarios
-    not involving reprojection.
+    If not specified (or not deduced from -te and -ts), gdalwarp will, in the
+    general case, generate an output raster with xres=yres.
+
+    Starting with GDAL 3.7, if neither :option:`-tr` nor :option:`-ts` are specified,
+    that no reprojection is involved (including taking into account geolocation arrays
+    or RPC), the resolution of the source file(s) will be preserved (in previous
+    version, an output raster with xres=yres was always generated).
+    It is possible to ask square pixels to still be generated, by specifying
+    ``square`` as the value for :option:`-tr`.
 
 .. option:: -tap
 
