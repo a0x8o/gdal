@@ -257,11 +257,11 @@ OGRErr GDALGeoPackageDataset::SetApplicationAndUserVersionId()
 #endif
 }
 
-void GDALGeoPackageDataset::CloseDB()
+bool GDALGeoPackageDataset::CloseDB()
 {
     OGRSQLiteUnregisterSQLFunctions(m_pSQLFunctionData);
     m_pSQLFunctionData = nullptr;
-    OGRSQLiteBaseDataSource::CloseDB();
+    return OGRSQLiteBaseDataSource::CloseDB();
 }
 
 bool GDALGeoPackageDataset::ReOpenDB()
@@ -958,55 +958,76 @@ GDALGeoPackageDataset::GDALGeoPackageDataset()
 
 GDALGeoPackageDataset::~GDALGeoPackageDataset()
 {
-    SetPamFlags(0);
+    GDALGeoPackageDataset::Close();
+}
 
-    if (eAccess == GA_Update && m_poParentDS == nullptr &&
-        !m_osRasterTable.empty() && !m_bGeoTransformValid)
+/************************************************************************/
+/*                              Close()                                 */
+/************************************************************************/
+
+CPLErr GDALGeoPackageDataset::Close()
+{
+    CPLErr eErr = CE_None;
+    if (nOpenFlags != OPEN_FLAGS_CLOSED)
     {
-        CPLError(CE_Failure, CPLE_AppDefined,
-                 "Raster table %s not correctly initialized due to missing "
-                 "call to SetGeoTransform()",
-                 m_osRasterTable.c_str());
+        SetPamFlags(0);
+
+        if (eAccess == GA_Update && m_poParentDS == nullptr &&
+            !m_osRasterTable.empty() && !m_bGeoTransformValid)
+        {
+            CPLError(CE_Failure, CPLE_AppDefined,
+                     "Raster table %s not correctly initialized due to missing "
+                     "call to SetGeoTransform()",
+                     m_osRasterTable.c_str());
+        }
+
+        if (GDALGeoPackageDataset::FlushCache(true) != CE_None)
+            eErr = CE_Failure;
+
+        if (FlushMetadata() != CE_None)
+            eErr = CE_Failure;
+
+        // Destroy bands now since we don't want
+        // GDALGPKGMBTilesLikeRasterBand::FlushCache() to run after dataset
+        // destruction
+        for (int i = 0; i < nBands; i++)
+            delete papoBands[i];
+        nBands = 0;
+        CPLFree(papoBands);
+        papoBands = nullptr;
+
+        // Destroy overviews before cleaning m_hTempDB as they could still
+        // need it
+        for (int i = 0; i < m_nOverviewCount; i++)
+            delete m_papoOverviewDS[i];
+
+        if (m_poParentDS)
+        {
+            hDB = nullptr;
+        }
+
+        for (int i = 0; i < m_nLayers; i++)
+            delete m_papoLayers[i];
+
+        CPLFree(m_papoLayers);
+        CPLFree(m_papoOverviewDS);
+
+        std::map<int, OGRSpatialReference *>::iterator oIter =
+            m_oMapSrsIdToSrs.begin();
+        for (; oIter != m_oMapSrsIdToSrs.end(); ++oIter)
+        {
+            OGRSpatialReference *poSRS = oIter->second;
+            if (poSRS)
+                poSRS->Release();
+        }
+
+        if (!CloseDB())
+            eErr = CE_Failure;
+
+        if (OGRSQLiteBaseDataSource::Close() != CE_None)
+            eErr = CE_Failure;
     }
-
-    GDALGeoPackageDataset::FlushCache(true);
-    FlushMetadata();
-
-    // Destroy bands now since we don't want
-    // GDALGPKGMBTilesLikeRasterBand::FlushCache() to run after dataset
-    // destruction
-    for (int i = 0; i < nBands; i++)
-        delete papoBands[i];
-    nBands = 0;
-    CPLFree(papoBands);
-    papoBands = nullptr;
-
-    // Destroy overviews before cleaning m_hTempDB as they could still
-    // need it
-    for (int i = 0; i < m_nOverviewCount; i++)
-        delete m_papoOverviewDS[i];
-
-    if (m_poParentDS != nullptr)
-    {
-        hDB = nullptr;
-    }
-
-    for (int i = 0; i < m_nLayers; i++)
-        delete m_papoLayers[i];
-
-    CPLFree(m_papoLayers);
-    CPLFree(m_papoOverviewDS);
-
-    std::map<int, OGRSpatialReference *>::iterator oIter =
-        m_oMapSrsIdToSrs.begin();
-    for (; oIter != m_oMapSrsIdToSrs.end(); ++oIter)
-    {
-        OGRSpatialReference *poSRS = oIter->second;
-        if (poSRS)
-            poSRS->Release();
-    }
-
-    CloseDB();
+    return eErr;
 }
 
 /************************************************************************/
@@ -1273,8 +1294,10 @@ GDALGeoPackageDataset::GetContents()
 /*                                Open()                                */
 /************************************************************************/
 
-int GDALGeoPackageDataset::Open(GDALOpenInfo *poOpenInfo)
+int GDALGeoPackageDataset::Open(GDALOpenInfo *poOpenInfo,
+                                const std::string &osFilenameInZip)
 {
+    m_osFilenameInZip = osFilenameInZip;
     CPLAssert(m_nLayers == 0);
     CPLAssert(hDB == nullptr);
 
@@ -1338,7 +1361,15 @@ int GDALGeoPackageDataset::Open(GDALOpenInfo *poOpenInfo)
     }
 
     eAccess = poOpenInfo->eAccess;
-    m_pszFilename = CPLStrdup(osFilename);
+    if (!m_osFilenameInZip.empty())
+    {
+        m_pszFilename = CPLStrdup(CPLSPrintf(
+            "/vsizip/{%s}/%s", osFilename.c_str(), m_osFilenameInZip.c_str()));
+    }
+    else
+    {
+        m_pszFilename = CPLStrdup(osFilename);
+    }
 
     if (poOpenInfo->papszOpenOptions)
     {
@@ -3275,7 +3306,7 @@ CPLErr GDALGeoPackageDataset::FinalizeRasterRegistration()
 /*                             FlushCache()                             */
 /************************************************************************/
 
-void GDALGeoPackageDataset::FlushCache(bool bAtClosing)
+CPLErr GDALGeoPackageDataset::FlushCache(bool bAtClosing)
 {
     if (m_bRemoveOGREmptyTable)
     {
@@ -3283,7 +3314,7 @@ void GDALGeoPackageDataset::FlushCache(bool bAtClosing)
         RemoveOGREmptyTable();
     }
 
-    IFlushCacheWithErrCode(bAtClosing);
+    return IFlushCacheWithErrCode(bAtClosing);
 }
 
 CPLErr GDALGeoPackageDataset::IFlushCacheWithErrCode(bool bAtClosing)
@@ -4796,13 +4827,19 @@ int GDALGeoPackageDataset::Create(const char *pszFilename, int nXSize,
         }
     }
 
+    const size_t nFilenameLen = strlen(pszFilename);
+    const bool bGpkgZip =
+        (nFilenameLen > strlen(".gpkg.zip") &&
+         !STARTS_WITH(pszFilename, "/vsizip/") &&
+         EQUAL(pszFilename + nFilenameLen - strlen(".gpkg.zip"), ".gpkg.zip"));
+
     const bool bUseTempFile =
-        CPLTestBool(CPLGetConfigOption(
-            "CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE", "NO")) &&
-        (VSIHasOptimizedReadMultiRange(pszFilename) != FALSE ||
-         EQUAL(
-             CPLGetConfigOption("CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE", ""),
-             "FORCED"));
+        bGpkgZip || (CPLTestBool(CPLGetConfigOption(
+                         "CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE", "NO")) &&
+                     (VSIHasOptimizedReadMultiRange(pszFilename) != FALSE ||
+                      EQUAL(CPLGetConfigOption(
+                                "CPL_VSIL_USE_TEMP_FILE_FOR_RANDOM_WRITE", ""),
+                            "FORCED")));
 
     bool bFileExists = false;
     if (VSIStatL(pszFilename, &sStatBuf) == 0)
@@ -4822,7 +4859,17 @@ int GDALGeoPackageDataset::Create(const char *pszFilename, int nXSize,
 
     if (bUseTempFile)
     {
-        m_osFinalFilename = pszFilename;
+        if (bGpkgZip)
+        {
+            std::string osFilenameInZip(CPLGetFilename(pszFilename));
+            osFilenameInZip.resize(osFilenameInZip.size() - strlen(".zip"));
+            m_osFinalFilename =
+                std::string("/vsizip/{") + pszFilename + "}/" + osFilenameInZip;
+        }
+        else
+        {
+            m_osFinalFilename = pszFilename;
+        }
         m_pszFilename =
             CPLStrdup(CPLGenerateTempFilename(CPLGetFilename(pszFilename)));
         CPLDebug("GPKG", "Creating temporary file %s", m_pszFilename);

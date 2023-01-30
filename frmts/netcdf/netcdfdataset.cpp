@@ -2874,62 +2874,87 @@ netCDFDataset::netCDFDataset()
 netCDFDataset::~netCDFDataset()
 
 {
-    CPLMutexHolderD(&hNCMutex);
+    netCDFDataset::Close();
+}
+
+/************************************************************************/
+/*                              Close()                                 */
+/************************************************************************/
+
+CPLErr netCDFDataset::Close()
+{
+    CPLErr eErr = CE_None;
+    if (nOpenFlags != OPEN_FLAGS_CLOSED)
+    {
+        CPLMutexHolderD(&hNCMutex);
 
 #ifdef NCDF_DEBUG
-    CPLDebug("GDAL_netCDF",
-             "netCDFDataset::~netCDFDataset(), cdfid=%d filename=%s", cdfid,
-             osFilename.c_str());
+        CPLDebug("GDAL_netCDF",
+                 "netCDFDataset::~netCDFDataset(), cdfid=%d filename=%s", cdfid,
+                 osFilename.c_str());
 #endif
 
-    // Write data related to geotransform
-    if (GetAccess() == GA_Update && !m_bAddedProjectionVarsData &&
-        (m_bHasProjection || m_bHasGeoTransform))
-    {
-        // Ensure projection is written if GeoTransform OR Projection are
-        // missing.
-        if (!m_bAddedProjectionVarsDefs)
+        // Write data related to geotransform
+        if (GetAccess() == GA_Update && !m_bAddedProjectionVarsData &&
+            (m_bHasProjection || m_bHasGeoTransform))
         {
-            AddProjectionVars(true, nullptr, nullptr);
+            // Ensure projection is written if GeoTransform OR Projection are
+            // missing.
+            if (!m_bAddedProjectionVarsDefs)
+            {
+                AddProjectionVars(true, nullptr, nullptr);
+            }
+            AddProjectionVars(false, nullptr, nullptr);
         }
-        AddProjectionVars(false, nullptr, nullptr);
-    }
 
-    netCDFDataset::FlushCache(true);
-    SGCommitPendingTransaction();
+        if (netCDFDataset::FlushCache(true) != CE_None)
+            eErr = CE_Failure;
 
-    for (size_t i = 0; i < apoVectorDatasets.size(); i++)
-        delete apoVectorDatasets[i];
+        if (!SGCommitPendingTransaction())
+            eErr = CE_Failure;
 
-    // Make sure projection variable is written to band variable.
-    if (GetAccess() == GA_Update && !bAddedGridMappingRef)
-        AddGridMappingRef();
+        for (size_t i = 0; i < apoVectorDatasets.size(); i++)
+            delete apoVectorDatasets[i];
 
-    CSLDestroy(papszMetadata);
-    CSLDestroy(papszSubDatasets);
-    CSLDestroy(papszCreationOptions);
+        // Make sure projection variable is written to band variable.
+        if (GetAccess() == GA_Update && !bAddedGridMappingRef)
+        {
+            if (!AddGridMappingRef())
+                eErr = CE_Failure;
+        }
 
-    CPLFree(pszCFProjection);
+        CSLDestroy(papszMetadata);
+        CSLDestroy(papszSubDatasets);
+        CSLDestroy(papszCreationOptions);
 
-    if (cdfid > 0)
-    {
+        CPLFree(pszCFProjection);
+
+        if (cdfid > 0)
+        {
 #ifdef NCDF_DEBUG
-        CPLDebug("GDAL_netCDF", "calling nc_close( %d)", cdfid);
+            CPLDebug("GDAL_netCDF", "calling nc_close( %d)", cdfid);
 #endif
-        int status = GDAL_nc_close(cdfid);
+            int status = GDAL_nc_close(cdfid);
 #ifdef ENABLE_UFFD
-        NETCDF_UFFD_UNMAP(pCtx);
+            NETCDF_UFFD_UNMAP(pCtx);
 #endif
-        NCDF_ERR(status);
-    }
+            NCDF_ERR(status);
+            if (status != NC_NOERR)
+                eErr = CE_Failure;
+        }
 
-    if (fpVSIMEM)
-        VSIFCloseL(fpVSIMEM);
+        if (fpVSIMEM)
+            VSIFCloseL(fpVSIMEM);
 
 #ifdef ENABLE_NCDUMP
-    if (bFileToDestroyAtClosing)
-        VSIUnlink(osFilename);
+        if (bFileToDestroyAtClosing)
+            VSIUnlink(osFilename);
 #endif
+
+        if (GDALPamDataset::Close() != CE_None)
+            eErr = CE_Failure;
+    }
+    return eErr;
 }
 
 /************************************************************************/
@@ -4775,6 +4800,53 @@ void netCDFDataset::SetProjectionFromVar(int nGroupId, int nVarId,
             bGotCfGT = false;
         }
     }
+    else if (!bGotCfGT && !bReadSRSOnly && (nVarDimXID != -1) &&
+             (nVarDimYID != -1) && xdim > 0 && ydim > 0 &&
+             ((!bSwitchedXY &&
+               NCDFIsVarLongitude(nGroupId, nVarDimXID, nullptr) &&
+               NCDFIsVarLatitude(nGroupId, nVarDimYID, nullptr)) ||
+              (bSwitchedXY &&
+               NCDFIsVarLongitude(nGroupId, nVarDimYID, nullptr) &&
+               NCDFIsVarLatitude(nGroupId, nVarDimXID, nullptr))))
+    {
+        // Case of autotest/gdrivers/data/netcdf/GLMELT_4X5.OCN.nc
+        // which is indexed by lat, lon variables, but lat has irregular
+        // spacing.
+        const char *pszGeolocXFullName = poDS->papszDimName[poDS->nXDimID];
+        const char *pszGeolocYFullName = poDS->papszDimName[poDS->nYDimID];
+        if (bSwitchedXY)
+        {
+            std::swap(pszGeolocXFullName, pszGeolocYFullName);
+            GDALPamDataset::SetMetadataItem("SWAP_XY", "YES", "GEOLOCATION");
+        }
+
+        CPLDebug("GDAL_netCDF", "using variables %s and %s for GEOLOCATION",
+                 pszGeolocXFullName, pszGeolocYFullName);
+
+        GDALPamDataset::SetMetadataItem("SRS", SRS_WKT_WGS84_LAT_LONG,
+                                        "GEOLOCATION");
+
+        CPLString osTMP;
+        osTMP.Printf("NETCDF:\"%s\":%s", osFilename.c_str(),
+                     pszGeolocXFullName);
+
+        GDALPamDataset::SetMetadataItem("X_DATASET", osTMP, "GEOLOCATION");
+        GDALPamDataset::SetMetadataItem("X_BAND", "1", "GEOLOCATION");
+        osTMP.Printf("NETCDF:\"%s\":%s", osFilename.c_str(),
+                     pszGeolocYFullName);
+
+        GDALPamDataset::SetMetadataItem("Y_DATASET", osTMP, "GEOLOCATION");
+        GDALPamDataset::SetMetadataItem("Y_BAND", "1", "GEOLOCATION");
+
+        GDALPamDataset::SetMetadataItem("PIXEL_OFFSET", "0", "GEOLOCATION");
+        GDALPamDataset::SetMetadataItem("PIXEL_STEP", "1", "GEOLOCATION");
+
+        GDALPamDataset::SetMetadataItem("LINE_OFFSET", "0", "GEOLOCATION");
+        GDALPamDataset::SetMetadataItem("LINE_STEP", "1", "GEOLOCATION");
+
+        GDALPamDataset::SetMetadataItem("GEOREFERENCING_CONVENTION",
+                                        "PIXEL_CENTER", "GEOLOCATION");
+    }
 
     // Set GeoTransform if we got a complete one - after projection has been set
     if (bGotCfGT || bGotGdalGT)
@@ -6546,8 +6618,9 @@ CPLErr netCDFDataset::AddProjectionVars(bool bDefsOnly,
 // Write Projection variable to band variable.
 // Moved from AddProjectionVars() for cases when bands are added after
 // projection.
-void netCDFDataset::AddGridMappingRef()
+bool netCDFDataset::AddGridMappingRef()
 {
+    bool bRet = true;
     bool bOldDefineMode = bDefineMode;
 
     if ((GetAccess() == GA_Update) && (nBands >= 1) && (GetRasterBand(1)) &&
@@ -6570,6 +6643,8 @@ void netCDFDataset::AddGridMappingRef()
                     nc_put_att_text(cdfid, nVarId, CF_GRD_MAPPING,
                                     strlen(pszCFProjection), pszCFProjection);
                 NCDF_ERR(status);
+                if (status != NC_NOERR)
+                    bRet = false;
             }
             if (pszCFCoordinates != nullptr && !EQUAL(pszCFCoordinates, ""))
             {
@@ -6577,12 +6652,15 @@ void netCDFDataset::AddGridMappingRef()
                     nc_put_att_text(cdfid, nVarId, CF_COORDINATES,
                                     strlen(pszCFCoordinates), pszCFCoordinates);
                 NCDF_ERR(status);
+                if (status != NC_NOERR)
+                    bRet = false;
             }
         }
 
         // Go back to previous define mode.
         SetDefineMode(bOldDefineMode);
     }
+    return bRet;
 }
 
 /************************************************************************/

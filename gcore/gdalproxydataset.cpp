@@ -147,14 +147,30 @@ D_PROXY_METHOD_WITH_RET(CPLErr, CE_Failure, IBuildOverviews,
                         (pszResampling, nOverviews, panOverviewList, nListBands,
                          panBandList, pfnProgress, pProgressData, papszOptions))
 
-void GDALProxyDataset::FlushCache(bool bAtClosing)
+D_PROXY_METHOD_WITH_RET(CPLStringList, CPLStringList(), GetCompressionFormats,
+                        (int nXOff, int nYOff, int nXSize, int nYSize,
+                         int nBandCount, const int *panBandList),
+                        (nXOff, nYOff, nXSize, nYSize, nBandCount, panBandList))
+
+D_PROXY_METHOD_WITH_RET(CPLErr, CE_Failure, ReadCompressedData,
+                        (const char *pszFormat, int nXOff, int nYOff,
+                         int nXSize, int nYSize, int nBandCount,
+                         const int *panBandList, void **ppBuffer,
+                         size_t *pnBufferSize, char **ppszDetailedFormat),
+                        (pszFormat, nXOff, nYOff, nXSize, nYSize, nBandCount,
+                         panBandList, ppBuffer, pnBufferSize,
+                         ppszDetailedFormat))
+
+CPLErr GDALProxyDataset::FlushCache(bool bAtClosing)
 {
+    CPLErr eErr = CE_None;
     GDALDataset *poUnderlyingDataset = RefUnderlyingDataset();
     if (poUnderlyingDataset)
     {
-        poUnderlyingDataset->FlushCache(bAtClosing);
+        eErr = poUnderlyingDataset->FlushCache(bAtClosing);
         UnrefUnderlyingDataset(poUnderlyingDataset);
     }
+    return eErr;
 }
 
 D_PROXY_METHOD_WITH_RET(char **, nullptr, GetMetadataDomainList, (), ())

@@ -48,6 +48,11 @@
 #undef GetDiskFreeSpace
 #endif
 
+// To avoid aliasing to CopyFile to CopyFileA on Windows
+#ifdef CopyFile
+#undef CopyFile
+#endif
+
 /************************************************************************/
 /*                           VSIVirtualHandle                           */
 /************************************************************************/
@@ -62,6 +67,25 @@ class CPL_DLL VSIVirtualHandle
     virtual int ReadMultiRange(int nRanges, void **ppData,
                                const vsi_l_offset *panOffsets,
                                const size_t *panSizes);
+
+    /** This method is called when code plans to access soon one or several
+     * ranges in a file. Some file systems may be able to use this hint to
+     * for example asynchronously start such requests.
+     *
+     * Offsets may be given in a non-increasing order, and may potentially
+     * overlap.
+     *
+     * @param nRanges Size of the panOffsets and panSizes arrays.
+     * @param panOffsets Array containing the start offset of each range.
+     * @param panSizes Array containing the size (in bytes) of each range.
+     * @since GDAL 3.7
+     */
+    virtual void AdviseRead(CPL_UNUSED int nRanges,
+                            CPL_UNUSED const vsi_l_offset *panOffsets,
+                            CPL_UNUSED const size_t *panSizes)
+    {
+    }
+
     virtual size_t Write(const void *pBuffer, size_t nSize, size_t nCount) = 0;
     virtual int Eof() = 0;
     virtual int Flush()
@@ -187,6 +211,11 @@ class CPL_DLL VSIFilesystemHandler
                       const char *const *papszOptions,
                       GDALProgressFunc pProgressFunc, void *pProgressData,
                       char ***ppapszOutputs);
+
+    virtual int CopyFile(const char *pszSource, const char *pszTarget,
+                         VSILFILE *fpSource, vsi_l_offset nSourceSize,
+                         const char *const *papszOptions,
+                         GDALProgressFunc pProgressFunc, void *pProgressData);
 
     virtual VSIDIR *OpenDir(const char *pszPath, int nRecurseDepth,
                             const char *const *papszOptions);
@@ -399,6 +428,13 @@ const int CPL_DEFLATE_TYPE_RAW_DEFLATE = 2;
 VSIVirtualHandle CPL_DLL *VSICreateGZipWritable(VSIVirtualHandle *poBaseHandle,
                                                 int nDeflateType,
                                                 int bAutoCloseBaseHandle);
+
+VSIVirtualHandle *VSICreateGZipWritable(VSIVirtualHandle *poBaseHandle,
+                                        int nDeflateType,
+                                        bool bAutoCloseBaseHandle, int nThreads,
+                                        size_t nChunkSize,
+                                        size_t nSOZIPIndexEltSize,
+                                        std::vector<uint8_t> *panSOZIPIndex);
 
 VSIVirtualHandle *VSICreateUploadOnCloseFile(VSIVirtualHandle *poBaseHandle);
 

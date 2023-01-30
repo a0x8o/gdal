@@ -119,33 +119,34 @@ VRTDataset::~VRTDataset()
 /*                             FlushCache()                             */
 /************************************************************************/
 
-void VRTDataset::FlushCache(bool bAtClosing)
+CPLErr VRTDataset::FlushCache(bool bAtClosing)
 
 {
     if (m_poRootGroup)
-        m_poRootGroup->Serialize();
+        return m_poRootGroup->Serialize() ? CE_None : CE_Failure;
     else
-        VRTFlushCacheStruct<VRTDataset>::FlushCache(*this, bAtClosing);
+        return VRTFlushCacheStruct<VRTDataset>::FlushCache(*this, bAtClosing);
 }
 
 /************************************************************************/
 /*                             FlushCache()                             */
 /************************************************************************/
 
-void VRTWarpedDataset::FlushCache(bool bAtClosing)
+CPLErr VRTWarpedDataset::FlushCache(bool bAtClosing)
 
 {
-    VRTFlushCacheStruct<VRTWarpedDataset>::FlushCache(*this, bAtClosing);
+    return VRTFlushCacheStruct<VRTWarpedDataset>::FlushCache(*this, bAtClosing);
 }
 
 /************************************************************************/
 /*                             FlushCache()                             */
 /************************************************************************/
 
-void VRTPansharpenedDataset::FlushCache(bool bAtClosing)
+CPLErr VRTPansharpenedDataset::FlushCache(bool bAtClosing)
 
 {
-    VRTFlushCacheStruct<VRTPansharpenedDataset>::FlushCache(*this, bAtClosing);
+    return VRTFlushCacheStruct<VRTPansharpenedDataset>::FlushCache(*this,
+                                                                   bAtClosing);
 }
 
 /************************************************************************/
@@ -153,26 +154,28 @@ void VRTPansharpenedDataset::FlushCache(bool bAtClosing)
 /************************************************************************/
 
 template <class T>
-void VRTFlushCacheStruct<T>::FlushCache(T &obj, bool bAtClosing)
+CPLErr VRTFlushCacheStruct<T>::FlushCache(T &obj, bool bAtClosing)
 {
-    obj.GDALDataset::FlushCache(bAtClosing);
+    CPLErr eErr = obj.GDALDataset::FlushCache(bAtClosing);
 
     if (!obj.m_bNeedsFlush || !obj.m_bWritable)
-        return;
+        return eErr;
 
     // We don't write to disk if there is no filename.  This is a
     // memory only dataset.
     if (strlen(obj.GetDescription()) == 0 ||
         STARTS_WITH_CI(obj.GetDescription(), "<VRTDataset"))
-        return;
+        return eErr;
 
     obj.m_bNeedsFlush = false;
 
     // Serialize XML representation to disk
     const std::string osVRTPath(CPLGetPath(obj.GetDescription()));
     CPLXMLNode *psDSTree = obj.T::SerializeToXML(osVRTPath.c_str());
-    CPLSerializeXMLTreeToFile(psDSTree, obj.GetDescription());
+    if (!CPLSerializeXMLTreeToFile(psDSTree, obj.GetDescription()))
+        eErr = CE_Failure;
     CPLDestroyXMLNode(psDSTree);
+    return eErr;
 }
 
 /************************************************************************/
@@ -2208,6 +2211,105 @@ CPLErr VRTDataset::IBuildOverviews(const char *pszResampling, int nOverviews,
 
     m_apoOverviews.clear();
     return eErr;
+}
+
+/************************************************************************/
+/*                         GetShiftedDataset()                          */
+/*                                                                      */
+/* Returns true if the VRT is made of a single source that is a simple  */
+/* in its full resolution.                                              */
+/************************************************************************/
+
+bool VRTDataset::GetShiftedDataset(int nXOff, int nYOff, int nXSize, int nYSize,
+                                   GDALDataset *&poSrcDataset, int &nSrcXOff,
+                                   int &nSrcYOff)
+{
+    if (!CheckCompatibleForDatasetIO())
+        return false;
+
+    VRTSourcedRasterBand *poVRTBand =
+        static_cast<VRTSourcedRasterBand *>(papoBands[0]);
+    if (poVRTBand->nSources != 1)
+        return false;
+
+    VRTSimpleSource *poSource =
+        static_cast<VRTSimpleSource *>(poVRTBand->papoSources[0]);
+
+    GDALRasterBand *poBand = poSource->GetRasterBand();
+    if (!poBand || poSource->GetMaskBandMainBand())
+        return false;
+
+    poSrcDataset = poBand->GetDataset();
+    if (!poSrcDataset)
+        return false;
+
+    double dfReqXOff = 0.0;
+    double dfReqYOff = 0.0;
+    double dfReqXSize = 0.0;
+    double dfReqYSize = 0.0;
+    int nReqXOff = 0;
+    int nReqYOff = 0;
+    int nReqXSize = 0;
+    int nReqYSize = 0;
+    int nOutXOff = 0;
+    int nOutYOff = 0;
+    int nOutXSize = 0;
+    int nOutYSize = 0;
+    bool bError = false;
+    if (!poSource->GetSrcDstWindow(nXOff, nYOff, nXSize, nYSize, nXSize, nYSize,
+                                   &dfReqXOff, &dfReqYOff, &dfReqXSize,
+                                   &dfReqYSize, &nReqXOff, &nReqYOff,
+                                   &nReqXSize, &nReqYSize, &nOutXOff, &nOutYOff,
+                                   &nOutXSize, &nOutYSize, bError))
+        return false;
+
+    if (nReqXSize != nXSize || nReqYSize != nYSize || nReqXSize != nOutXSize ||
+        nReqYSize != nOutYSize)
+        return false;
+
+    nSrcXOff = nReqXOff;
+    nSrcYOff = nReqYOff;
+    return true;
+}
+
+/************************************************************************/
+/*                       GetCompressionFormats()                        */
+/************************************************************************/
+
+CPLStringList VRTDataset::GetCompressionFormats(int nXOff, int nYOff,
+                                                int nXSize, int nYSize,
+                                                int nBandCount,
+                                                const int *panBandList)
+{
+    GDALDataset *poSrcDataset;
+    int nSrcXOff;
+    int nSrcYOff;
+    if (!GetShiftedDataset(nXOff, nYOff, nXSize, nYSize, poSrcDataset, nSrcXOff,
+                           nSrcYOff))
+        return CPLStringList();
+    return poSrcDataset->GetCompressionFormats(nSrcXOff, nSrcYOff, nXSize,
+                                               nYSize, nBandCount, panBandList);
+}
+
+/************************************************************************/
+/*                       ReadCompressedData()                           */
+/************************************************************************/
+
+CPLErr VRTDataset::ReadCompressedData(const char *pszFormat, int nXOff,
+                                      int nYOff, int nXSize, int nYSize,
+                                      int nBandCount, const int *panBandList,
+                                      void **ppBuffer, size_t *pnBufferSize,
+                                      char **ppszDetailedFormat)
+{
+    GDALDataset *poSrcDataset;
+    int nSrcXOff;
+    int nSrcYOff;
+    if (!GetShiftedDataset(nXOff, nYOff, nXSize, nYSize, poSrcDataset, nSrcXOff,
+                           nSrcYOff))
+        return CE_Failure;
+    return poSrcDataset->ReadCompressedData(
+        pszFormat, nSrcXOff, nSrcYOff, nXSize, nYSize, nBandCount, panBandList,
+        ppBuffer, pnBufferSize, ppszDetailedFormat);
 }
 
 /*! @endcond */

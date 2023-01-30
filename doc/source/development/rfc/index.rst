@@ -96,3 +96,5 @@ RFC list
     rfc87_signed_int8
     rfc88_googletest
     rfc89_sql_logging_callback
+    rfc90_read_compressed_data
+    rfc91_dataset_close

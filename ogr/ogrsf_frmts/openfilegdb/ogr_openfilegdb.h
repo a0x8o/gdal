@@ -33,6 +33,7 @@
 #include "ogrsf_frmts.h"
 #include "filegdbtable.h"
 #include "ogr_swq.h"
+#include "cpl_mem_cache.h"
 #include "cpl_quad_tree.h"
 
 #include <vector>
@@ -164,7 +165,7 @@ class OGROpenFileGDBLayer final : public OGRLayer
                                 void *pQTUserData);
 
     void TryToDetectMultiPatchKind();
-    static OGRSpatialReference *BuildSRS(const CPLXMLNode *psInfo);
+    OGRSpatialReference *BuildSRS(const CPLXMLNode *psInfo) const;
     void BuildCombinedIterator();
     bool RegisterTable();
     void RefreshXMLDefinitionInMemory();
@@ -411,6 +412,9 @@ class OGROpenFileGDBDataSource final : public OGRDataSource
     std::map<std::string, int> m_osMapNameToIdx;
     std::shared_ptr<GDALGroup> m_poRootGroup{};
 
+    lru11::Cache<std::string, std::shared_ptr<OGRSpatialReference>>
+        m_oCacheWKTToSRS{};
+
     std::string m_osRootGUID{};
     std::string m_osGDBSystemCatalogFilename{};
     std::string m_osGDBSpatialRefsFilename{};
@@ -455,6 +459,8 @@ class OGROpenFileGDBDataSource final : public OGRDataSource
 
     bool BackupSystemTablesForTransaction();
 
+    CPLErr Close() override;
+
   public:
     OGROpenFileGDBDataSource();
     virtual ~OGROpenFileGDBDataSource();
@@ -462,7 +468,7 @@ class OGROpenFileGDBDataSource final : public OGRDataSource
     int Open(const GDALOpenInfo *poOpenInfo);
     bool Create(const char *pszName);
 
-    virtual void FlushCache(bool bAtClosing = false) override;
+    virtual CPLErr FlushCache(bool bAtClosing = false) override;
 
     virtual const char *GetName() override
     {
@@ -587,6 +593,8 @@ class OGROpenFileGDBDataSource final : public OGRDataSource
     {
         return m_osTransactionBackupDirname;
     }
+
+    OGRSpatialReference *BuildSRS(const char *pszWKT);
 };
 
 /************************************************************************/

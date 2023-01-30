@@ -258,8 +258,27 @@ TEST_F(test_cpl, CSLTokenizeString2)
         ASSERT_TRUE(EQUAL(aosStringList[0], "one"));
         ASSERT_TRUE(EQUAL(aosStringList[1], "two"));
         ASSERT_TRUE(EQUAL(aosStringList[2], "three"));
-    }
 
+        // Test range-based for loop
+        int i = 0;
+        for (const char *pszVal : aosStringList)
+        {
+            EXPECT_STREQ(pszVal, aosStringList[i]);
+            ++i;
+        }
+        EXPECT_EQ(i, 3);
+    }
+    {
+        CPLStringList aosStringList;
+        // Test range-based for loop on empty list
+        int i = 0;
+        for (const char *pszVal : aosStringList)
+        {
+            EXPECT_EQ(pszVal, nullptr);  // should not reach that point...
+            ++i;
+        }
+        EXPECT_EQ(i, 0);
+    }
     {
         CPLStringList aosStringList(
             CSLTokenizeString2("one two, three;four,five; six", " ;,", 0));
@@ -4007,8 +4026,55 @@ TEST_F(test_cpl, VSI_plugin_minimal_testing)
     VSIFreeFilesystemPluginCallbacksStruct(psCallbacks);
     VSILFILE *fp = VSIFOpenL("/vsimyplugin/test", "rb");
     EXPECT_TRUE(fp != nullptr);
+
+    // Check it doesn't crash
+    vsi_l_offset nOffset = 5;
+    size_t nSize = 10;
+    reinterpret_cast<VSIVirtualHandle *>(fp)->AdviseRead(1, &nOffset, &nSize);
+
     VSIFCloseL(fp);
     EXPECT_TRUE(VSIFOpenL("/vsimyplugin/i_dont_exist", "rb") == nullptr);
+}
+
+TEST_F(test_cpl, VSI_plugin_advise_read)
+{
+    auto psCallbacks = VSIAllocFilesystemPluginCallbacksStruct();
+
+    struct UserData
+    {
+        int nRanges = 0;
+        const vsi_l_offset *panOffsets = nullptr;
+        const size_t *panSizes = nullptr;
+    };
+    UserData userData;
+
+    psCallbacks->pUserData = &userData;
+    psCallbacks->open = [](void *pUserData, const char * /*pszFilename*/,
+                           const char * /*pszAccess*/) -> void *
+    { return pUserData; };
+
+    psCallbacks->advise_read = [](void *pFile, int nRanges,
+                                  const vsi_l_offset *panOffsets,
+                                  const size_t *panSizes)
+    {
+        static_cast<UserData *>(pFile)->nRanges = nRanges;
+        static_cast<UserData *>(pFile)->panOffsets = panOffsets;
+        static_cast<UserData *>(pFile)->panSizes = panSizes;
+    };
+    EXPECT_EQ(VSIInstallPluginHandler("/VSI_plugin_advise_read/", psCallbacks),
+              0);
+    VSIFreeFilesystemPluginCallbacksStruct(psCallbacks);
+    VSILFILE *fp = VSIFOpenL("/VSI_plugin_advise_read/test", "rb");
+    EXPECT_TRUE(fp != nullptr);
+
+    vsi_l_offset nOffset = 5;
+    size_t nSize = 10;
+    reinterpret_cast<VSIVirtualHandle *>(fp)->AdviseRead(1, &nOffset, &nSize);
+    EXPECT_EQ(userData.nRanges, 1);
+    EXPECT_EQ(userData.panOffsets, &nOffset);
+    EXPECT_EQ(userData.panSizes, &nSize);
+
+    VSIFCloseL(fp);
 }
 
 // Test CPLIsASCII()

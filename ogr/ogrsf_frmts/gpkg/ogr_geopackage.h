@@ -125,6 +125,7 @@ class GDALGeoPackageDataset final : public OGRSQLiteBaseDataSource,
     friend void OGRGeoPackageTransform(sqlite3_context *pContext, int argc,
                                        sqlite3_value **argv);
 
+    std::string m_osFilenameInZip{};
     void *m_pSQLFunctionData = nullptr;
     GUInt32 m_nApplicationId = GPKG_APPLICATION_ID;
     GUInt32 m_nUserVersion = GPKG_1_2_VERSION;
@@ -261,7 +262,8 @@ class GDALGeoPackageDataset final : public OGRSQLiteBaseDataSource,
     // Used by GDALGeoPackageDataset::GetRasterLayerDataset()
     std::map<std::string, std::unique_ptr<GDALDataset>> m_oCachedRasterDS{};
 
-    void CloseDB();
+    bool CloseDB();
+    CPLErr Close() override;
 
     CPL_DISALLOW_COPY_ASSIGN(GDALGeoPackageDataset)
 
@@ -284,7 +286,7 @@ class GDALGeoPackageDataset final : public OGRSQLiteBaseDataSource,
     virtual CPLErr GetGeoTransform(double *padfGeoTransform) override;
     virtual CPLErr SetGeoTransform(double *padfGeoTransform) override;
 
-    virtual void FlushCache(bool bAtClosing) override;
+    virtual CPLErr FlushCache(bool bAtClosing) override;
     virtual CPLErr IBuildOverviews(const char *, int, const int *, int,
                                    const int *, GDALProgressFunc, void *,
                                    CSLConstList papszOptions) override;
@@ -293,7 +295,7 @@ class GDALGeoPackageDataset final : public OGRSQLiteBaseDataSource,
     {
         return m_nLayers;
     }
-    int Open(GDALOpenInfo *poOpenInfo);
+    int Open(GDALOpenInfo *poOpenInfo, const std::string &osFilenameInZip);
     int Create(const char *pszFilename, int nXSize, int nYSize, int nBands,
                GDALDataType eDT, char **papszOptions);
     OGRLayer *GetLayer(int iLayer) override;

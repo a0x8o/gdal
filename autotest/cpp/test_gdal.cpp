@@ -26,6 +26,8 @@
  * DEALINGS IN THE SOFTWARE.
  ****************************************************************************/
 
+#include "gdal_unit_test.h"
+
 #include "gdal_alg.h"
 #include "gdal_priv.h"
 #include "gdal_utils.h"
@@ -457,12 +459,18 @@ class DatasetWithErrorInFlushCache : public GDALDataset
     {
         FlushCache(true);
     }
-    virtual void FlushCache(bool bAtClosing) override
+    virtual CPLErr FlushCache(bool bAtClosing) override
     {
+        CPLErr eErr = CE_None;
         if (!bHasFlushCache)
+        {
             CPLError(CE_Failure, CPLE_AppDefined, "some error");
-        GDALDataset::FlushCache(bAtClosing);
+            eErr = CE_Failure;
+        }
+        if (GDALDataset::FlushCache(bAtClosing) != CE_None)
+            eErr = CE_Failure;
         bHasFlushCache = true;
+        return eErr;
     }
     CPLErr SetSpatialRef(const OGRSpatialReference *) override
     {
@@ -1858,19 +1866,25 @@ TEST_F(test_gdal, TileMatrixSet)
     {
         auto poTMS = gdal::TileMatrixSet::parse("LINZAntarticaMapTileGrid");
         EXPECT_TRUE(poTMS != nullptr);
-        EXPECT_TRUE(poTMS->haveAllLevelsSameTopLeft());
-        EXPECT_TRUE(poTMS->haveAllLevelsSameTileSize());
-        EXPECT_TRUE(poTMS->hasOnlyPowerOfTwoVaryingScales());
-        EXPECT_TRUE(!poTMS->hasVariableMatrixWidth());
+        if (poTMS)
+        {
+            EXPECT_TRUE(poTMS->haveAllLevelsSameTopLeft());
+            EXPECT_TRUE(poTMS->haveAllLevelsSameTileSize());
+            EXPECT_TRUE(poTMS->hasOnlyPowerOfTwoVaryingScales());
+            EXPECT_TRUE(!poTMS->hasVariableMatrixWidth());
+        }
     }
 
     {
         auto poTMS = gdal::TileMatrixSet::parse("NZTM2000");
         EXPECT_TRUE(poTMS != nullptr);
-        EXPECT_TRUE(poTMS->haveAllLevelsSameTopLeft());
-        EXPECT_TRUE(poTMS->haveAllLevelsSameTileSize());
-        EXPECT_TRUE(!poTMS->hasOnlyPowerOfTwoVaryingScales());
-        EXPECT_TRUE(!poTMS->hasVariableMatrixWidth());
+        if (poTMS)
+        {
+            EXPECT_TRUE(poTMS->haveAllLevelsSameTopLeft());
+            EXPECT_TRUE(poTMS->haveAllLevelsSameTileSize());
+            EXPECT_TRUE(!poTMS->hasOnlyPowerOfTwoVaryingScales());
+            EXPECT_TRUE(!poTMS->hasVariableMatrixWidth());
+        }
     }
 
     // Inline JSON with minimal structure
@@ -1880,10 +1894,13 @@ TEST_F(test_gdal, TileMatrixSet)
             "\"http://www.opengis.net/def/crs/OGC/1.3/CRS84\", \"tileMatrix\": "
             "[{ \"topLeftCorner\": [-180, 90],\"scaleDenominator\":1.0}] }");
         EXPECT_TRUE(poTMS != nullptr);
-        EXPECT_TRUE(poTMS->haveAllLevelsSameTopLeft());
-        EXPECT_TRUE(poTMS->haveAllLevelsSameTileSize());
-        EXPECT_TRUE(poTMS->hasOnlyPowerOfTwoVaryingScales());
-        EXPECT_TRUE(!poTMS->hasVariableMatrixWidth());
+        if (poTMS)
+        {
+            EXPECT_TRUE(poTMS->haveAllLevelsSameTopLeft());
+            EXPECT_TRUE(poTMS->haveAllLevelsSameTileSize());
+            EXPECT_TRUE(poTMS->hasOnlyPowerOfTwoVaryingScales());
+            EXPECT_TRUE(!poTMS->hasVariableMatrixWidth());
+        }
     }
 
     // Invalid scaleDenominator
@@ -1953,36 +1970,41 @@ TEST_F(test_gdal, TileMatrixSet)
         VSIUnlink("/vsimem/tmp.json");
 
         EXPECT_TRUE(poTMS != nullptr);
-        EXPECT_EQ(poTMS->title(), "CRS84 for the World");
-        EXPECT_EQ(poTMS->identifier(), "WorldCRS84Quad");
-        EXPECT_EQ(poTMS->abstract(), "my abstract");
-        EXPECT_EQ(poTMS->crs(), "http://www.opengis.net/def/crs/OGC/1.3/CRS84");
-        EXPECT_EQ(poTMS->wellKnownScaleSet(),
-                  "http://www.opengis.net/def/wkss/OGC/1.0/GoogleCRS84Quad");
-        EXPECT_EQ(poTMS->bbox().mCrs,
-                  "http://www.opengis.net/def/crs/OGC/1.X/CRS84");
-        EXPECT_EQ(poTMS->bbox().mLowerCornerX, -180.0);
-        EXPECT_EQ(poTMS->bbox().mLowerCornerY, -90.0);
-        EXPECT_EQ(poTMS->bbox().mUpperCornerX, 180.0);
-        EXPECT_EQ(poTMS->bbox().mUpperCornerY, 90.0);
-        ASSERT_EQ(poTMS->tileMatrixList().size(), 2U);
-        EXPECT_TRUE(poTMS->haveAllLevelsSameTopLeft());
-        EXPECT_TRUE(poTMS->haveAllLevelsSameTileSize());
-        EXPECT_TRUE(poTMS->hasOnlyPowerOfTwoVaryingScales());
-        EXPECT_TRUE(!poTMS->hasVariableMatrixWidth());
-        const auto &tm = poTMS->tileMatrixList()[0];
-        EXPECT_EQ(tm.mId, "0");
-        EXPECT_EQ(tm.mScaleDenominator, 279541132.014358);
-        EXPECT_TRUE(fabs(tm.mResX - tm.mScaleDenominator * 0.28e-3 /
-                                        (6378137. * M_PI / 180)) < 1e-10);
-        EXPECT_TRUE(fabs(tm.mResX - 180. / 256) < 1e-10);
-        EXPECT_EQ(tm.mResY, tm.mResX);
-        EXPECT_EQ(tm.mTopLeftX, -180.0);
-        EXPECT_EQ(tm.mTopLeftY, 90.0);
-        EXPECT_EQ(tm.mTileWidth, 256);
-        EXPECT_EQ(tm.mTileHeight, 256);
-        EXPECT_EQ(tm.mMatrixWidth, 2);
-        EXPECT_EQ(tm.mMatrixHeight, 1);
+        if (poTMS)
+        {
+            EXPECT_EQ(poTMS->title(), "CRS84 for the World");
+            EXPECT_EQ(poTMS->identifier(), "WorldCRS84Quad");
+            EXPECT_EQ(poTMS->abstract(), "my abstract");
+            EXPECT_EQ(poTMS->crs(),
+                      "http://www.opengis.net/def/crs/OGC/1.3/CRS84");
+            EXPECT_EQ(
+                poTMS->wellKnownScaleSet(),
+                "http://www.opengis.net/def/wkss/OGC/1.0/GoogleCRS84Quad");
+            EXPECT_EQ(poTMS->bbox().mCrs,
+                      "http://www.opengis.net/def/crs/OGC/1.X/CRS84");
+            EXPECT_EQ(poTMS->bbox().mLowerCornerX, -180.0);
+            EXPECT_EQ(poTMS->bbox().mLowerCornerY, -90.0);
+            EXPECT_EQ(poTMS->bbox().mUpperCornerX, 180.0);
+            EXPECT_EQ(poTMS->bbox().mUpperCornerY, 90.0);
+            ASSERT_EQ(poTMS->tileMatrixList().size(), 2U);
+            EXPECT_TRUE(poTMS->haveAllLevelsSameTopLeft());
+            EXPECT_TRUE(poTMS->haveAllLevelsSameTileSize());
+            EXPECT_TRUE(poTMS->hasOnlyPowerOfTwoVaryingScales());
+            EXPECT_TRUE(!poTMS->hasVariableMatrixWidth());
+            const auto &tm = poTMS->tileMatrixList()[0];
+            EXPECT_EQ(tm.mId, "0");
+            EXPECT_EQ(tm.mScaleDenominator, 279541132.014358);
+            EXPECT_TRUE(fabs(tm.mResX - tm.mScaleDenominator * 0.28e-3 /
+                                            (6378137. * M_PI / 180)) < 1e-10);
+            EXPECT_TRUE(fabs(tm.mResX - 180. / 256) < 1e-10);
+            EXPECT_EQ(tm.mResY, tm.mResX);
+            EXPECT_EQ(tm.mTopLeftX, -180.0);
+            EXPECT_EQ(tm.mTopLeftY, 90.0);
+            EXPECT_EQ(tm.mTileWidth, 256);
+            EXPECT_EQ(tm.mTileHeight, 256);
+            EXPECT_EQ(tm.mMatrixWidth, 2);
+            EXPECT_EQ(tm.mMatrixHeight, 1);
+        }
     }
 
     {
@@ -2040,17 +2062,20 @@ TEST_F(test_gdal, TileMatrixSet)
             "    ]"
             "}");
         EXPECT_TRUE(poTMS != nullptr);
-        ASSERT_EQ(poTMS->tileMatrixList().size(), 2U);
-        EXPECT_TRUE(!poTMS->haveAllLevelsSameTopLeft());
-        EXPECT_TRUE(!poTMS->haveAllLevelsSameTileSize());
-        EXPECT_TRUE(!poTMS->hasOnlyPowerOfTwoVaryingScales());
-        EXPECT_TRUE(poTMS->hasVariableMatrixWidth());
-        const auto &tm = poTMS->tileMatrixList()[1];
-        EXPECT_EQ(tm.mVariableMatrixWidthList.size(), 1U);
-        const auto &vmw = tm.mVariableMatrixWidthList[0];
-        EXPECT_EQ(vmw.mCoalesce, 2);
-        EXPECT_EQ(vmw.mMinTileRow, 0);
-        EXPECT_EQ(vmw.mMaxTileRow, 1);
+        if (poTMS)
+        {
+            ASSERT_EQ(poTMS->tileMatrixList().size(), 2U);
+            EXPECT_TRUE(!poTMS->haveAllLevelsSameTopLeft());
+            EXPECT_TRUE(!poTMS->haveAllLevelsSameTileSize());
+            EXPECT_TRUE(!poTMS->hasOnlyPowerOfTwoVaryingScales());
+            EXPECT_TRUE(poTMS->hasVariableMatrixWidth());
+            const auto &tm = poTMS->tileMatrixList()[1];
+            EXPECT_EQ(tm.mVariableMatrixWidthList.size(), 1U);
+            const auto &vmw = tm.mVariableMatrixWidthList[0];
+            EXPECT_EQ(vmw.mCoalesce, 2);
+            EXPECT_EQ(vmw.mMinTileRow, 0);
+            EXPECT_EQ(vmw.mMaxTileRow, 1);
+        }
     }
 
     {
@@ -2101,13 +2126,16 @@ TEST_F(test_gdal, TileMatrixSet)
             "    ]"
             "}");
         EXPECT_TRUE(poTMS != nullptr);
-        ASSERT_EQ(poTMS->tileMatrixList().size(), 1U);
-        const auto &tm = poTMS->tileMatrixList()[0];
-        EXPECT_EQ(tm.mVariableMatrixWidthList.size(), 2U);
-        const auto &vmw = tm.mVariableMatrixWidthList[0];
-        EXPECT_EQ(vmw.mCoalesce, 12);
-        EXPECT_EQ(vmw.mMinTileRow, 0);
-        EXPECT_EQ(vmw.mMaxTileRow, 0);
+        if (poTMS)
+        {
+            ASSERT_EQ(poTMS->tileMatrixList().size(), 1U);
+            const auto &tm = poTMS->tileMatrixList()[0];
+            EXPECT_EQ(tm.mVariableMatrixWidthList.size(), 2U);
+            const auto &vmw = tm.mVariableMatrixWidthList[0];
+            EXPECT_EQ(vmw.mCoalesce, 12);
+            EXPECT_EQ(vmw.mMinTileRow, 0);
+            EXPECT_EQ(vmw.mMaxTileRow, 0);
+        }
     }
 }
 
@@ -2780,6 +2808,507 @@ TEST_F(test_gdal, GDALDatasetReportError)
         CE_Warning, CPLE_AppDefined, "bar");
     CPLPopErrorHandler();
     EXPECT_STREQ(CPLGetLastErrorMsg(), "foo: bar");
+}
+
+// Test GDALDataset::GetCompressionFormats() and ReadCompressedData()
+TEST_F(test_gdal, gtiff_ReadCompressedData)
+{
+    if (GDALGetDriverByName("JPEG") == nullptr)
+    {
+        GTEST_SKIP() << "JPEG support missing";
+    }
+
+    GDALDatasetUniquePtr poSrcDS(GDALDataset::FromHandle(
+        GDALDataset::Open((tut::common::data_basedir +
+                           "/../../gcore/data/byte_jpg_unusual_jpegtable.tif")
+                              .c_str())));
+    ASSERT_TRUE(poSrcDS);
+
+    const CPLStringList aosRet(GDALDatasetGetCompressionFormats(
+        GDALDataset::ToHandle(poSrcDS.get()), 0, 0, 20, 20, 1, nullptr));
+    EXPECT_EQ(aosRet.size(), 1);
+    if (aosRet.size() == 1)
+    {
+        EXPECT_STREQ(aosRet[0], "JPEG");
+    }
+
+    {
+        int nBand = 1;
+        EXPECT_EQ(CPLStringList(GDALDatasetGetCompressionFormats(
+                                    GDALDataset::ToHandle(poSrcDS.get()), 0, 0,
+                                    20, 20, 1, &nBand))
+                      .size(),
+                  1);
+    }
+
+    // nBandCout > nBands
+    EXPECT_EQ(CPLStringList(GDALDatasetGetCompressionFormats(
+                                GDALDataset::ToHandle(poSrcDS.get()), 0, 0, 20,
+                                20, 2, nullptr))
+                  .size(),
+              0);
+
+    // Cannot subset just one pixel
+    EXPECT_EQ(CPLStringList(GDALDatasetGetCompressionFormats(
+                                GDALDataset::ToHandle(poSrcDS.get()), 0, 0, 1,
+                                1, 1, nullptr))
+                  .size(),
+              0);
+
+    // Wrong band number
+    {
+        int nBand = 2;
+        EXPECT_EQ(CPLStringList(GDALDatasetGetCompressionFormats(
+                                    GDALDataset::ToHandle(poSrcDS.get()), 0, 0,
+                                    20, 20, 1, &nBand))
+                      .size(),
+                  0);
+    }
+
+    EXPECT_EQ(GDALDatasetReadCompressedData(
+                  GDALDataset::ToHandle(poSrcDS.get()), "JPEG", 0, 0, 20, 20, 1,
+                  nullptr, nullptr, nullptr, nullptr),
+              CE_None);
+
+    size_t nNeededSize;
+    {
+        char *pszDetailedFormat = nullptr;
+        EXPECT_EQ(GDALDatasetReadCompressedData(
+                      GDALDataset::ToHandle(poSrcDS.get()), "JPEG", 0, 0, 20,
+                      20, 1, nullptr, nullptr, &nNeededSize,
+                      &pszDetailedFormat),
+                  CE_None);
+        EXPECT_EQ(nNeededSize, 476);
+        EXPECT_TRUE(pszDetailedFormat != nullptr);
+        if (pszDetailedFormat)
+        {
+            ASSERT_STREQ(pszDetailedFormat, "JPEG");
+            VSIFree(pszDetailedFormat);
+        }
+    }
+
+    {
+        const GByte abyCanary[] = {0xDE, 0xAD, 0xBE, 0xEF};
+        std::vector<GByte> abyBuffer(nNeededSize + sizeof(abyCanary));
+        memcpy(&abyBuffer[nNeededSize], abyCanary, sizeof(abyCanary));
+        void *pabyBuffer = abyBuffer.data();
+        void **ppabyBuffer = &pabyBuffer;
+        size_t nProvidedSize = nNeededSize;
+        char *pszDetailedFormat = nullptr;
+        EXPECT_EQ(GDALDatasetReadCompressedData(
+                      GDALDataset::ToHandle(poSrcDS.get()), "JPEG", 0, 0, 20,
+                      20, 1, nullptr, ppabyBuffer, &nProvidedSize,
+                      &pszDetailedFormat),
+                  CE_None);
+        ASSERT_EQ(nProvidedSize, nNeededSize);
+        ASSERT_TRUE(*ppabyBuffer == pabyBuffer);
+        EXPECT_TRUE(pszDetailedFormat != nullptr);
+        if (pszDetailedFormat)
+        {
+            ASSERT_STREQ(pszDetailedFormat,
+                         "JPEG;frame_type=SOF0_baseline;bit_depth=8;num_"
+                         "components=1;colorspace=unknown");
+            VSIFree(pszDetailedFormat);
+        }
+        EXPECT_TRUE(
+            memcmp(&abyBuffer[nNeededSize], abyCanary, sizeof(abyCanary)) == 0);
+        EXPECT_EQ(abyBuffer[0], 0xFF);
+        EXPECT_EQ(abyBuffer[1], 0xD8);
+        EXPECT_EQ(abyBuffer[nNeededSize - 2], 0xFF);
+        EXPECT_EQ(abyBuffer[nNeededSize - 1], 0xD9);
+
+        // Buffer larger than needed: OK
+        nProvidedSize = nNeededSize + 1;
+        EXPECT_EQ(GDALDatasetReadCompressedData(
+                      GDALDataset::ToHandle(poSrcDS.get()), "JPEG", 0, 0, 20,
+                      20, 1, nullptr, ppabyBuffer, &nProvidedSize, nullptr),
+                  CE_None);
+
+        // Too small buffer
+        nProvidedSize = nNeededSize - 1;
+        EXPECT_EQ(GDALDatasetReadCompressedData(
+                      GDALDataset::ToHandle(poSrcDS.get()), "JPEG", 0, 0, 20,
+                      20, 1, nullptr, ppabyBuffer, &nProvidedSize, nullptr),
+                  CE_Failure);
+
+        // Missing pointer to size
+        EXPECT_EQ(GDALDatasetReadCompressedData(
+                      GDALDataset::ToHandle(poSrcDS.get()), "JPEG", 0, 0, 20,
+                      20, 1, nullptr, ppabyBuffer, nullptr, nullptr),
+                  CE_Failure);
+    }
+
+    // Let GDAL allocate buffer
+    {
+        void *pBuffer = nullptr;
+        size_t nGotSize = 0;
+        EXPECT_EQ(GDALDatasetReadCompressedData(
+                      GDALDataset::ToHandle(poSrcDS.get()), "JPEG", 0, 0, 20,
+                      20, 1, nullptr, &pBuffer, &nGotSize, nullptr),
+                  CE_None);
+        EXPECT_EQ(nGotSize, nNeededSize);
+        EXPECT_NE(pBuffer, nullptr);
+        if (pBuffer != nullptr && nGotSize == nNeededSize)
+        {
+            const GByte *pabyBuffer = static_cast<GByte *>(pBuffer);
+            EXPECT_EQ(pabyBuffer[0], 0xFF);
+            EXPECT_EQ(pabyBuffer[1], 0xD8);
+            EXPECT_EQ(pabyBuffer[nNeededSize - 2], 0xFF);
+            EXPECT_EQ(pabyBuffer[nNeededSize - 1], 0xD9);
+        }
+        VSIFree(pBuffer);
+    }
+
+    // Cannot subset just one pixel
+    EXPECT_EQ(GDALDatasetReadCompressedData(
+                  GDALDataset::ToHandle(poSrcDS.get()), "JPEG", 0, 0, 1, 1, 1,
+                  nullptr, nullptr, nullptr, nullptr),
+              CE_Failure);
+
+    EXPECT_EQ(GDALDatasetReadCompressedData(
+                  GDALDataset::ToHandle(poSrcDS.get()), "wrong_format", 0, 0,
+                  20, 20, 1, nullptr, nullptr, nullptr, nullptr),
+              CE_Failure);
+}
+
+// Test GDALDataset::GetCompressionFormats() and ReadCompressedData()
+TEST_F(test_gdal, gtiff_ReadCompressedData_jpeg_rgba)
+{
+    if (GDALGetDriverByName("JPEG") == nullptr)
+    {
+        GTEST_SKIP() << "JPEG support missing";
+    }
+
+    GDALDatasetUniquePtr poSrcDS(GDALDataset::FromHandle(
+        GDALDataset::Open((tut::common::data_basedir +
+                           "/../../gcore/data/stefan_full_rgba_jpeg_contig.tif")
+                              .c_str())));
+    ASSERT_TRUE(poSrcDS);
+
+    const CPLStringList aosRet(GDALDatasetGetCompressionFormats(
+        GDALDataset::ToHandle(poSrcDS.get()), 0, 0, 162, 16, 4, nullptr));
+    EXPECT_EQ(aosRet.size(), 1);
+    if (aosRet.size() == 1)
+    {
+        EXPECT_STREQ(aosRet[0], "JPEG;colorspace=RGBA");
+    }
+
+    // Let GDAL allocate buffer
+    {
+        void *pBuffer = nullptr;
+        size_t nGotSize = 0;
+        char *pszDetailedFormat = nullptr;
+        EXPECT_EQ(GDALDatasetReadCompressedData(
+                      GDALDataset::ToHandle(poSrcDS.get()), "JPEG", 0, 0, 162,
+                      16, 4, nullptr, &pBuffer, &nGotSize, &pszDetailedFormat),
+                  CE_None);
+        if (pszDetailedFormat)
+        {
+            ASSERT_STREQ(pszDetailedFormat,
+                         "JPEG;frame_type=SOF0_baseline;bit_depth=8;num_"
+                         "components=4;colorspace=RGBA");
+            VSIFree(pszDetailedFormat);
+        }
+        VSIFree(pBuffer);
+    }
+}
+
+// Test GDALDataset::GetCompressionFormats() and ReadCompressedData()
+TEST_F(test_gdal, jpeg_ReadCompressedData)
+{
+    if (GDALGetDriverByName("JPEG") == nullptr)
+    {
+        GTEST_SKIP() << "JPEG support missing";
+    }
+
+    GDALDatasetUniquePtr poSrcDS(GDALDataset::FromHandle(GDALDataset::Open(
+        (tut::common::data_basedir + "/../../gdrivers/data/jpeg/albania.jpg")
+            .c_str())));
+    ASSERT_TRUE(poSrcDS);
+
+    const CPLStringList aosRet(GDALDatasetGetCompressionFormats(
+        GDALDataset::ToHandle(poSrcDS.get()), 0, 0, 361, 260, 3, nullptr));
+    EXPECT_EQ(aosRet.size(), 1);
+    if (aosRet.size() == 1)
+    {
+        EXPECT_STREQ(aosRet[0],
+                     "JPEG;frame_type=SOF0_baseline;bit_depth=8;num_components="
+                     "3;subsampling=4:2:0;colorspace=YCbCr");
+    }
+
+    size_t nUpperBoundSize;
+    EXPECT_EQ(GDALDatasetReadCompressedData(
+                  GDALDataset::ToHandle(poSrcDS.get()), "JPEG", 0, 0, 361, 260,
+                  3, nullptr, nullptr, &nUpperBoundSize, nullptr),
+              CE_None);
+    EXPECT_EQ(nUpperBoundSize, 12574);
+
+    {
+        std::vector<GByte> abyBuffer(nUpperBoundSize);
+        void *pabyBuffer = abyBuffer.data();
+        void **ppabyBuffer = &pabyBuffer;
+        size_t nSize = nUpperBoundSize;
+        char *pszDetailedFormat = nullptr;
+        EXPECT_EQ(GDALDatasetReadCompressedData(
+                      GDALDataset::ToHandle(poSrcDS.get()), "JPEG", 0, 0, 361,
+                      260, 3, nullptr, ppabyBuffer, &nSize, &pszDetailedFormat),
+                  CE_None);
+        ASSERT_LT(nSize, nUpperBoundSize);
+        ASSERT_TRUE(*ppabyBuffer == pabyBuffer);
+        EXPECT_TRUE(pszDetailedFormat != nullptr);
+        if (pszDetailedFormat)
+        {
+            ASSERT_STREQ(pszDetailedFormat,
+                         "JPEG;frame_type=SOF0_baseline;bit_depth=8;num_"
+                         "components=3;subsampling=4:2:0;colorspace=YCbCr");
+            VSIFree(pszDetailedFormat);
+        }
+        EXPECT_EQ(abyBuffer[0], 0xFF);
+        EXPECT_EQ(abyBuffer[1], 0xD8);
+        EXPECT_EQ(abyBuffer[nSize - 2], 0xFF);
+        EXPECT_EQ(abyBuffer[nSize - 1], 0xD9);
+
+        // Buffer larger than needed: OK
+        nSize = nUpperBoundSize + 1;
+        EXPECT_EQ(GDALDatasetReadCompressedData(
+                      GDALDataset::ToHandle(poSrcDS.get()), "JPEG", 0, 0, 361,
+                      260, 3, nullptr, ppabyBuffer, &nSize, nullptr),
+                  CE_None);
+
+        // Too small buffer
+        nSize = nUpperBoundSize - 1;
+        EXPECT_EQ(GDALDatasetReadCompressedData(
+                      GDALDataset::ToHandle(poSrcDS.get()), "JPEG", 0, 0, 361,
+                      260, 3, nullptr, ppabyBuffer, &nSize, nullptr),
+                  CE_Failure);
+
+        // Missing pointer to size
+        EXPECT_EQ(GDALDatasetReadCompressedData(
+                      GDALDataset::ToHandle(poSrcDS.get()), "JPEG", 0, 0, 361,
+                      260, 3, nullptr, ppabyBuffer, nullptr, nullptr),
+                  CE_Failure);
+    }
+
+    // Let GDAL allocate buffer
+    {
+        void *pBuffer = nullptr;
+        size_t nSize = nUpperBoundSize;
+        EXPECT_EQ(GDALDatasetReadCompressedData(
+                      GDALDataset::ToHandle(poSrcDS.get()), "JPEG", 0, 0, 361,
+                      260, 3, nullptr, &pBuffer, &nSize, nullptr),
+                  CE_None);
+        EXPECT_GT(nSize, 4);
+        EXPECT_LT(nSize, nUpperBoundSize);
+        EXPECT_NE(pBuffer, nullptr);
+        if (pBuffer != nullptr && nSize >= 4 && nSize <= nUpperBoundSize)
+        {
+            const GByte *pabyBuffer = static_cast<GByte *>(pBuffer);
+            EXPECT_EQ(pabyBuffer[0], 0xFF);
+            EXPECT_EQ(pabyBuffer[1], 0xD8);
+            EXPECT_EQ(pabyBuffer[nSize - 2], 0xFF);
+            EXPECT_EQ(pabyBuffer[nSize - 1], 0xD9);
+        }
+        VSIFree(pBuffer);
+    }
+}
+
+// Test GDALDataset::GetCompressionFormats() and ReadCompressedData()
+TEST_F(test_gdal, jpegxl_ReadCompressedData)
+{
+    if (GDALGetDriverByName("JPEGXL") == nullptr)
+    {
+        GTEST_SKIP() << "JPEGXL support missing";
+    }
+
+    GDALDatasetUniquePtr poSrcDS(GDALDataset::FromHandle(GDALDataset::Open(
+        (tut::common::data_basedir + "/../../gdrivers/data/jpegxl/byte.jxl")
+            .c_str())));
+    ASSERT_TRUE(poSrcDS);
+
+    const CPLStringList aosRet(GDALDatasetGetCompressionFormats(
+        GDALDataset::ToHandle(poSrcDS.get()), 0, 0, 20, 20, 1, nullptr));
+    EXPECT_EQ(aosRet.size(), 1);
+    if (aosRet.size() == 1)
+    {
+        EXPECT_STREQ(aosRet[0], "JXL");
+    }
+
+    size_t nUpperBoundSize;
+    EXPECT_EQ(GDALDatasetReadCompressedData(
+                  GDALDataset::ToHandle(poSrcDS.get()), "JXL", 0, 0, 20, 20, 1,
+                  nullptr, nullptr, &nUpperBoundSize, nullptr),
+              CE_None);
+    EXPECT_EQ(nUpperBoundSize, 719);
+
+    {
+        std::vector<GByte> abyBuffer(nUpperBoundSize);
+        void *pabyBuffer = abyBuffer.data();
+        void **ppabyBuffer = &pabyBuffer;
+        size_t nSize = nUpperBoundSize;
+        char *pszDetailedFormat = nullptr;
+        EXPECT_EQ(GDALDatasetReadCompressedData(
+                      GDALDataset::ToHandle(poSrcDS.get()), "JXL", 0, 0, 20, 20,
+                      1, nullptr, ppabyBuffer, &nSize, &pszDetailedFormat),
+                  CE_None);
+        ASSERT_LT(nSize, nUpperBoundSize);
+        ASSERT_TRUE(*ppabyBuffer == pabyBuffer);
+        EXPECT_TRUE(pszDetailedFormat != nullptr);
+        if (pszDetailedFormat)
+        {
+            ASSERT_STREQ(pszDetailedFormat, "JXL");
+            VSIFree(pszDetailedFormat);
+        }
+        EXPECT_EQ(abyBuffer[0], 0x00);
+        EXPECT_EQ(abyBuffer[1], 0x00);
+        EXPECT_EQ(abyBuffer[2], 0x00);
+        EXPECT_EQ(abyBuffer[3], 0x0C);
+        EXPECT_EQ(abyBuffer[nSize - 2], 0x4C);
+        EXPECT_EQ(abyBuffer[nSize - 1], 0x01);
+
+        // Buffer larger than needed: OK
+        nSize = nUpperBoundSize + 1;
+        EXPECT_EQ(GDALDatasetReadCompressedData(
+                      GDALDataset::ToHandle(poSrcDS.get()), "JXL", 0, 0, 20, 20,
+                      1, nullptr, ppabyBuffer, &nSize, nullptr),
+                  CE_None);
+
+        // Too small buffer
+        nSize = nUpperBoundSize - 1;
+        EXPECT_EQ(GDALDatasetReadCompressedData(
+                      GDALDataset::ToHandle(poSrcDS.get()), "JXL", 0, 0, 20, 20,
+                      1, nullptr, ppabyBuffer, &nSize, nullptr),
+                  CE_Failure);
+
+        // Missing pointer to size
+        EXPECT_EQ(GDALDatasetReadCompressedData(
+                      GDALDataset::ToHandle(poSrcDS.get()), "JXL", 0, 0, 20, 20,
+                      1, nullptr, ppabyBuffer, nullptr, nullptr),
+                  CE_Failure);
+    }
+
+    // Let GDAL allocate buffer
+    {
+        void *pBuffer = nullptr;
+        size_t nSize = nUpperBoundSize;
+        EXPECT_EQ(GDALDatasetReadCompressedData(
+                      GDALDataset::ToHandle(poSrcDS.get()), "JXL", 0, 0, 20, 20,
+                      1, nullptr, &pBuffer, &nSize, nullptr),
+                  CE_None);
+        EXPECT_GT(nSize, 6);
+        EXPECT_LT(nSize, nUpperBoundSize);
+        EXPECT_NE(pBuffer, nullptr);
+        if (pBuffer != nullptr && nSize >= 6 && nSize <= nUpperBoundSize)
+        {
+            const GByte *pabyBuffer = static_cast<GByte *>(pBuffer);
+            EXPECT_EQ(pabyBuffer[0], 0x00);
+            EXPECT_EQ(pabyBuffer[1], 0x00);
+            EXPECT_EQ(pabyBuffer[2], 0x00);
+            EXPECT_EQ(pabyBuffer[3], 0x0C);
+            EXPECT_EQ(pabyBuffer[nSize - 2], 0x4C);
+            EXPECT_EQ(pabyBuffer[nSize - 1], 0x01);
+        }
+        VSIFree(pBuffer);
+    }
+}
+
+// Test GDALDataset::GetCompressionFormats() and ReadCompressedData()
+TEST_F(test_gdal, jpegxl_jpeg_compatible_ReadCompressedData)
+{
+    auto poDrv = GDALDriver::FromHandle(GDALGetDriverByName("JPEGXL"));
+    if (poDrv == nullptr)
+    {
+        GTEST_SKIP() << "JPEGXL support missing";
+    }
+
+    GDALDatasetUniquePtr poSrcDS(GDALDataset::FromHandle(GDALDataset::Open(
+        (tut::common::data_basedir +
+         "/../../gdrivers/data/jpegxl/exif_orientation/F1.jxl")
+            .c_str())));
+    ASSERT_TRUE(poSrcDS);
+
+    const CPLStringList aosRet(GDALDatasetGetCompressionFormats(
+        GDALDataset::ToHandle(poSrcDS.get()), 0, 0, 3, 5, 1, nullptr));
+    EXPECT_EQ(aosRet.size(), 2);
+    if (aosRet.size() == 2)
+    {
+        EXPECT_STREQ(aosRet[0], "JXL");
+        EXPECT_STREQ(aosRet[1], "JPEG");
+    }
+
+    size_t nUpperBoundSize;
+    EXPECT_EQ(GDALDatasetReadCompressedData(
+                  GDALDataset::ToHandle(poSrcDS.get()), "JPEG", 0, 0, 3, 5, 1,
+                  nullptr, nullptr, &nUpperBoundSize, nullptr),
+              CE_None);
+    EXPECT_EQ(nUpperBoundSize, 235);
+
+    {
+        std::vector<GByte> abyBuffer(nUpperBoundSize);
+        void *pabyBuffer = abyBuffer.data();
+        void **ppabyBuffer = &pabyBuffer;
+        size_t nSize = nUpperBoundSize;
+        char *pszDetailedFormat = nullptr;
+        EXPECT_EQ(GDALDatasetReadCompressedData(
+                      GDALDataset::ToHandle(poSrcDS.get()), "JPEG", 0, 0, 3, 5,
+                      1, nullptr, ppabyBuffer, &nSize, &pszDetailedFormat),
+                  CE_None);
+        ASSERT_LE(nSize, nUpperBoundSize);
+        ASSERT_TRUE(*ppabyBuffer == pabyBuffer);
+        EXPECT_TRUE(pszDetailedFormat != nullptr);
+        if (pszDetailedFormat)
+        {
+            ASSERT_STREQ(pszDetailedFormat,
+                         "JPEG;frame_type=SOF0_baseline;bit_depth=8;num_"
+                         "components=1;colorspace=unknown");
+            VSIFree(pszDetailedFormat);
+        }
+        EXPECT_EQ(abyBuffer[0], 0xFF);
+        EXPECT_EQ(abyBuffer[1], 0xD8);
+        EXPECT_EQ(abyBuffer[nSize - 2], 0xFF);
+        EXPECT_EQ(abyBuffer[nSize - 1], 0xD9);
+
+        // Buffer larger than needed: OK
+        nSize = nUpperBoundSize + 1;
+        EXPECT_EQ(GDALDatasetReadCompressedData(
+                      GDALDataset::ToHandle(poSrcDS.get()), "JPEG", 0, 0, 3, 5,
+                      1, nullptr, ppabyBuffer, &nSize, nullptr),
+                  CE_None);
+
+        // Too small buffer
+        nSize = nUpperBoundSize - 1;
+        EXPECT_EQ(GDALDatasetReadCompressedData(
+                      GDALDataset::ToHandle(poSrcDS.get()), "JPEG", 0, 0, 3, 5,
+                      1, nullptr, ppabyBuffer, &nSize, nullptr),
+                  CE_Failure);
+
+        // Missing pointer to size
+        EXPECT_EQ(GDALDatasetReadCompressedData(
+                      GDALDataset::ToHandle(poSrcDS.get()), "JPEG", 0, 0, 3, 5,
+                      1, nullptr, ppabyBuffer, nullptr, nullptr),
+                  CE_Failure);
+    }
+
+    // Let GDAL allocate buffer
+    {
+        void *pBuffer = nullptr;
+        size_t nSize = nUpperBoundSize;
+        EXPECT_EQ(GDALDatasetReadCompressedData(
+                      GDALDataset::ToHandle(poSrcDS.get()), "JPEG", 0, 0, 3, 5,
+                      1, nullptr, &pBuffer, &nSize, nullptr),
+                  CE_None);
+        EXPECT_GT(nSize, 4);
+        EXPECT_LE(nSize, nUpperBoundSize);
+        EXPECT_NE(pBuffer, nullptr);
+        if (pBuffer != nullptr && nSize >= 4 && nSize <= nUpperBoundSize)
+        {
+            const GByte *pabyBuffer = static_cast<GByte *>(pBuffer);
+            EXPECT_EQ(pabyBuffer[0], 0xFF);
+            EXPECT_EQ(pabyBuffer[1], 0xD8);
+            EXPECT_EQ(pabyBuffer[nSize - 2], 0xFF);
+            EXPECT_EQ(pabyBuffer[nSize - 1], 0xD9);
+        }
+        VSIFree(pBuffer);
+    }
 }
 
 }  // namespace

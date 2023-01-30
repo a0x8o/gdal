@@ -42,10 +42,17 @@
 #include "cpl_curl_priv.h"
 
 #include <algorithm>
+#include <condition_variable>
 #include <set>
 #include <map>
 #include <memory>
 #include <mutex>
+#include <thread>
+
+// To avoid aliasing to CopyFile to CopyFileA on Windows
+#ifdef CopyFile
+#undef CopyFile
+#endif
 
 //! @cond Doxygen_Suppress
 
@@ -402,6 +409,19 @@ class VSICurlHandle : public VSIVirtualHandle
     void UpdateRedirectInfo(CURL *hCurlHandle,
                             const WriteFuncStruct &sWriteFuncHeaderData);
 
+    // Used by AdviseRead()
+    struct AdviseReadRange
+    {
+        bool bDone = false;
+        std::mutex oMutex{};
+        std::condition_variable oCV{};
+        vsi_l_offset nStartOffset = 0;
+        size_t nSize = 0;
+        std::vector<GByte> abyData{};
+    };
+    std::vector<std::unique_ptr<AdviseReadRange>> m_aoAdviseReadRanges{};
+    std::thread m_oThreadAdviseRead{};
+
   protected:
     virtual struct curl_slist *
     GetCurlHeaders(const CPLString & /*osVerb*/,
@@ -458,6 +478,9 @@ class VSICurlHandle : public VSIVirtualHandle
     size_t PRead(void *pBuffer, size_t nSize,
                  vsi_l_offset nOffset) const override;
 
+    void AdviseRead(int nRanges, const vsi_l_offset *panOffsets,
+                    const size_t *panSizes) override;
+
     bool IsKnownFileSize() const
     {
         return oFileProp.bHasComputedFileSize;
@@ -503,10 +526,6 @@ class IVSIS3LikeFSHandler : public VSICurlFilesystemHandlerBase
 {
     CPL_DISALLOW_COPY_ASSIGN(IVSIS3LikeFSHandler)
 
-    bool CopyFile(VSILFILE *fpIn, vsi_l_offset nSourceSize,
-                  const char *pszSource, const char *pszTarget,
-                  CSLConstList papszOptions, GDALProgressFunc pProgressFunc,
-                  void *pProgressData);
     virtual int MkdirInternal(const char *pszDirname, long nMode,
                               bool bDoStatCheck);
 
@@ -537,6 +556,12 @@ class IVSIS3LikeFSHandler : public VSICurlFilesystemHandlerBase
     int Stat(const char *pszFilename, VSIStatBufL *pStatBuf,
              int nFlags) override;
     int Rename(const char *oldpath, const char *newpath) override;
+
+    virtual int CopyFile(const char *pszSource, const char *pszTarget,
+                         VSILFILE *fpSource, vsi_l_offset nSourceSize,
+                         const char *const *papszOptions,
+                         GDALProgressFunc pProgressFunc,
+                         void *pProgressData) override;
 
     virtual int DeleteObject(const char *pszFilename);
 

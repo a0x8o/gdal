@@ -2446,6 +2446,10 @@ def AbortPendingUploads(*args) -> "bool":
     r"""AbortPendingUploads(char const * utf8_path) -> bool"""
     return _gdal.AbortPendingUploads(*args)
 
+def CopyFile(*args, **kwargs) -> "int":
+    r"""CopyFile(char const * pszSource, char const * pszTarget, VSILFILE fpSource=None, GIntBig nSourceSize=-1, char ** options=None, GDALProgressFunc callback=0, void * callback_data=None) -> int"""
+    return _gdal.CopyFile(*args, **kwargs)
+
 def GetActualURL(*args) -> "char const *":
     r"""GetActualURL(char const * utf8_path) -> char const *"""
     return _gdal.GetActualURL(*args)
@@ -2948,8 +2952,8 @@ class Dataset(MajorObject):
         r"""_SetGCPs2(Dataset self, int nGCPs, SpatialReference hSRS) -> CPLErr"""
         return _gdal.Dataset__SetGCPs2(self, *args)
 
-    def FlushCache(self, *args) -> "void":
-        r"""FlushCache(Dataset self)"""
+    def FlushCache(self, *args) -> "CPLErr":
+        r"""FlushCache(Dataset self) -> CPLErr"""
         return _gdal.Dataset_FlushCache(self, *args)
 
     def AddBand(self, *args, **kwargs) -> "CPLErr":

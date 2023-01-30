@@ -1051,7 +1051,7 @@ void CPL_DLL CPL_STDCALL GDALSetDescription(GDALMajorObjectH, const char *);
 
 GDALDriverH CPL_DLL CPL_STDCALL GDALGetDatasetDriver(GDALDatasetH);
 char CPL_DLL **CPL_STDCALL GDALGetFileList(GDALDatasetH);
-void CPL_DLL CPL_STDCALL GDALClose(GDALDatasetH);
+CPLErr CPL_DLL CPL_STDCALL GDALClose(GDALDatasetH);
 int CPL_DLL CPL_STDCALL GDALGetRasterXSize(GDALDatasetH);
 int CPL_DLL CPL_STDCALL GDALGetRasterYSize(GDALDatasetH);
 int CPL_DLL CPL_STDCALL GDALGetRasterCount(GDALDatasetH);
@@ -1087,6 +1087,15 @@ CPLErr CPL_DLL CPL_STDCALL GDALDatasetAdviseRead(
     int nBXSize, int nBYSize, GDALDataType eBDataType, int nBandCount,
     int *panBandCount, CSLConstList papszOptions);
 
+char CPL_DLL **
+GDALDatasetGetCompressionFormats(GDALDatasetH hDS, int nXOff, int nYOff,
+                                 int nXSize, int nYSize, int nBandCount,
+                                 const int *panBandList) CPL_WARN_UNUSED_RESULT;
+CPLErr CPL_DLL GDALDatasetReadCompressedData(
+    GDALDatasetH hDS, const char *pszFormat, int nXOff, int nYOff, int nXSize,
+    int nYSize, int nBandCount, const int *panBandList, void **ppBuffer,
+    size_t *pnBufferSize, char **ppszDetailedFormat);
+
 const char CPL_DLL *CPL_STDCALL GDALGetProjectionRef(GDALDatasetH);
 OGRSpatialReferenceH CPL_DLL GDALGetSpatialRef(GDALDatasetH);
 CPLErr CPL_DLL CPL_STDCALL GDALSetProjection(GDALDatasetH, const char *);
@@ -1117,7 +1126,7 @@ CPLErr CPL_DLL CPL_STDCALL GDALBuildOverviewsEx(
     GDALProgressFunc, void *, CSLConstList papszOptions) CPL_WARN_UNUSED_RESULT;
 void CPL_DLL CPL_STDCALL GDALGetOpenDatasets(GDALDatasetH **hDS, int *pnCount);
 int CPL_DLL CPL_STDCALL GDALGetAccess(GDALDatasetH hDS);
-void CPL_DLL CPL_STDCALL GDALFlushCache(GDALDatasetH hDS);
+CPLErr CPL_DLL CPL_STDCALL GDALFlushCache(GDALDatasetH hDS);
 
 CPLErr CPL_DLL CPL_STDCALL GDALCreateDatasetMaskBand(GDALDatasetH hDS,
                                                      int nFlags);
