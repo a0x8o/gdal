@@ -749,6 +749,13 @@ OGRErr GMLHandler::startElementBoundedBy(const char *pszName, int /*nLenName*/,
 OGRErr GMLHandler::startElementGeometry(const char *pszName, int nLenName,
                                         void *attr)
 {
+    if (stateStack[nStackDepth] == STATE_BOUNDED_BY_IN_FEATURE &&
+        apsXMLNode.empty())
+    {
+        CPLError(CE_Failure, CPLE_AppDefined, "Invalid <boundedBy> construct");
+        return OGRERR_FAILURE;
+    }
+
     /* Create new XML Element */
     CPLXMLNode *psCurNode = (CPLXMLNode *)CPLCalloc(sizeof(CPLXMLNode), 1);
     psCurNode->eType = CXT_Element;
@@ -1549,6 +1556,9 @@ OGRErr GMLHandler::endElementBoundedByInFeature()
     else
     {
         POP_STATE();
+        if (apsXMLNode.size() >= 2 && apsXMLNode[1].psNode != nullptr)
+            CPLDestroyXMLNode(apsXMLNode[1].psNode);
+        apsXMLNode.clear();
         return OGRERR_NONE;
     }
 }
@@ -1635,6 +1645,9 @@ OGRErr GMLHandler::endElementGeometry()
 
     if (m_nDepth == m_nGeometryDepth)
     {
+        m_nGeometryDepth = 0;
+
+        CPLAssert(apsXMLNode.size() == 2);
         CPLXMLNode *psInterestNode = apsXMLNode.back().psNode;
 
         /*char* pszXML = CPLSerializeXMLTree(psInterestNode);
@@ -1692,7 +1705,10 @@ OGRErr GMLHandler::endElementGeometry()
         GMLFeature *poGMLFeature = m_poReader->GetState()->m_poFeature;
         if (stateStack[nStackDepth] == STATE_BOUNDED_BY_IN_FEATURE)
         {
-            poGMLFeature->SetBoundedByGeometry(psInterestNode);
+            if (eAppSchemaType == APPSCHEMA_CITYGML)
+                CPLDestroyXMLNode(psInterestNode);
+            else
+                poGMLFeature->SetBoundedByGeometry(psInterestNode);
         }
         else
         {
