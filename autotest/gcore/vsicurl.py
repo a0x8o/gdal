@@ -40,9 +40,8 @@ from osgeo import gdal, ogr
 #
 
 
+@pytest.mark.slow()
 def test_vsicurl_1():
-    if not gdaltest.run_slow_tests():
-        pytest.skip()
 
     if not gdaltest.built_against_curl():
         pytest.skip()
@@ -57,9 +56,8 @@ def test_vsicurl_1():
 #
 
 
+@pytest.mark.slow()
 def vsicurl_2():
-    if not gdaltest.run_slow_tests():
-        pytest.skip()
 
     if not gdaltest.built_against_curl():
         pytest.skip()
@@ -74,9 +72,8 @@ def vsicurl_2():
 # This server doesn't support range downloading
 
 
+@pytest.mark.slow()
 def vsicurl_3():
-    if not gdaltest.run_slow_tests():
-        pytest.skip()
 
     if not gdaltest.built_against_curl():
         pytest.skip()
@@ -91,9 +88,8 @@ def vsicurl_3():
 # This server doesn't support range downloading
 
 
+@pytest.mark.slow()
 def test_vsicurl_4():
-    if not gdaltest.run_slow_tests():
-        pytest.skip()
 
     if not gdaltest.built_against_curl():
         pytest.skip()
@@ -108,10 +104,8 @@ def test_vsicurl_4():
 # Test URL unescaping when reading HTTP file list
 
 
+@pytest.mark.slow()
 def test_vsicurl_5():
-    if not gdaltest.run_slow_tests():
-        pytest.skip()
-
     if not gdaltest.built_against_curl():
         pytest.skip()
 
@@ -125,9 +119,8 @@ def test_vsicurl_5():
 # Test with FTP server that doesn't support EPSV command
 
 
+@pytest.mark.slow()
 def vsicurl_6_disabled():
-    if not gdaltest.run_slow_tests():
-        pytest.skip()
 
     if not gdaltest.built_against_curl():
         pytest.skip()
@@ -140,9 +133,8 @@ def vsicurl_6_disabled():
 # Test Microsoft-IIS/6.0 listing
 
 
+@pytest.mark.slow()
 def test_vsicurl_7():
-    if not gdaltest.run_slow_tests():
-        pytest.skip()
 
     if not gdaltest.built_against_curl():
         pytest.skip()
@@ -155,9 +147,8 @@ def test_vsicurl_7():
 # Test interleaved reading between 2 datasets
 
 
+@pytest.mark.slow()
 def vsicurl_8():
-    if not gdaltest.run_slow_tests():
-        pytest.skip()
 
     if not gdaltest.built_against_curl():
         pytest.skip()
@@ -177,9 +168,8 @@ def vsicurl_8():
 # returns escaped sequences instead of the Chinese characters.
 
 
+@pytest.mark.slow()
 def test_vsicurl_9():
-    if not gdaltest.run_slow_tests():
-        pytest.skip()
 
     if not gdaltest.built_against_curl():
         pytest.skip()
@@ -195,9 +185,8 @@ def test_vsicurl_9():
 # Test reading a file with escaped Chinese characters.
 
 
+@pytest.mark.slow()
 def test_vsicurl_10():
-    if not gdaltest.run_slow_tests():
-        pytest.skip()
 
     if not gdaltest.built_against_curl():
         pytest.skip()
@@ -212,9 +201,8 @@ def test_vsicurl_10():
 # Test ReadDir() after reading a file on the same server
 
 
+@pytest.mark.slow()
 def test_vsicurl_11():
-    if not gdaltest.run_slow_tests():
-        pytest.skip()
 
     if not gdaltest.built_against_curl():
         pytest.skip()
@@ -1091,6 +1079,53 @@ def test_vsicurl_GDAL_HTTP_HEADERS():
         statres = gdal.VSIStatL(filename)
     gdal.SetPathSpecificOption(filename, "GDAL_HTTP_HEADERS", None)
     assert statres.size == 3
+
+
+###############################################################################
+# Test CPL_VSIL_CURL_USE_HEAD=NO
+
+
+def test_vsicurl_test_CPL_VSIL_CURL_USE_HEAD_NO():
+
+    if gdaltest.webserver_port == 0:
+        pytest.skip()
+
+    gdal.VSICurlClearCache()
+
+    handler = webserver.SequentialHandler()
+    handler.add("GET", "/test_CPL_VSIL_CURL_USE_HEAD_NO/", 404)
+
+    def method(request):
+        response = "HTTP/1.1 200\r\n"
+        response += "Server: foo\r\n"
+        response += "Content-type: text/plain\r\n"
+        response += "Content-Length: 1000000\r\n"
+        response += "Connection: close\r\n"
+        response += "\r\n"
+        request.wfile.write(response.encode("ascii"))
+        # This will be interrupted by the client
+        for i in range(1000000):
+            request.wfile.write(b"X")
+
+    handler.add(
+        "GET",
+        "/test_CPL_VSIL_CURL_USE_HEAD_NO/test.bin",
+        custom_method=method,
+        silence_server_exception=True,
+    )
+
+    with webserver.install_http_handler(handler):
+        with gdaltest.config_option("CPL_VSIL_CURL_USE_HEAD", "NO"):
+            f = gdal.VSIFOpenL(
+                "/vsicurl/http://localhost:%d/test_CPL_VSIL_CURL_USE_HEAD_NO/test.bin"
+                % gdaltest.webserver_port,
+                "rb",
+            )
+    assert f is not None
+    gdal.VSIFSeekL(f, 0, 2)
+    assert gdal.VSIFTellL(f) == 1000000
+
+    gdal.VSIFCloseL(f)
 
 
 ###############################################################################

@@ -32,21 +32,19 @@
 import gdaltest
 import pytest
 
-from osgeo import gdal, ogr
+from osgeo import gdal
+
+pytestmark = pytest.mark.require_driver("SOSI")
 
 ###############################################################################
 
 
 def test_ogr_sosi_1():
 
-    if ogr.GetDriverByName("SOSI") is None:
-        pytest.skip()
-
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://trac.osgeo.org/gdal/raw-attachment/ticket/3638/20BygnAnlegg.SOS",
         "20BygnAnlegg.SOS",
-    ):
-        pytest.skip()
+    )
 
     import test_cli_utilities
 
@@ -66,16 +64,13 @@ def test_ogr_sosi_1():
 
 def test_ogr_sosi_2():
 
-    if ogr.GetDriverByName("SOSI") is None:
-        pytest.skip()
-
-        ds = gdal.OpenEx("data/sosi/test_duplicate_fields.sos", open_options=[])
-        lyr = ds.GetLayer(0)
-        assert lyr.GetFeatureCount() == 17
-        lyr = ds.GetLayer(1)
-        assert lyr.GetFeatureCount() == 1
-        f = lyr.GetNextFeature()
-        assert f["REINBEITEBRUKERID"] == "YD"
+    ds = gdal.OpenEx("data/sosi/test_duplicate_fields.sos", open_options=[])
+    lyr = ds.GetLayer(0)
+    assert lyr.GetFeatureCount() == 17
+    lyr = ds.GetLayer(1)
+    assert lyr.GetFeatureCount() == 1
+    f = lyr.GetNextFeature()
+    assert f["REINBEITEBRUKERID"] == "YD"
 
 
 ###############################################################################
@@ -84,19 +79,16 @@ def test_ogr_sosi_2():
 
 def test_ogr_sosi_3():
 
-    if ogr.GetDriverByName("SOSI") is None:
-        pytest.skip()
-
-        ds = gdal.OpenEx(
-            "data/sosi/test_duplicate_fields.sos",
-            open_options=["appendFieldsMap=BEITEBRUKERID&OPPHAV"],
-        )
-        lyr = ds.GetLayer(0)
-        assert lyr.GetFeatureCount() == 17
-        lyr = ds.GetLayer(1)
-        assert lyr.GetFeatureCount() == 1
-        f = lyr.GetNextFeature()
-        assert f["REINBEITEBRUKERID"] == "YD,YG"
+    ds = gdal.OpenEx(
+        "data/sosi/test_duplicate_fields.sos",
+        open_options=["appendFieldsMap=BEITEBRUKERID&OPPHAV"],
+    )
+    lyr = ds.GetLayer(0)
+    assert lyr.GetFeatureCount() == 17
+    lyr = ds.GetLayer(1)
+    assert lyr.GetFeatureCount() == 1
+    f = lyr.GetNextFeature()
+    assert f["REINBEITEBRUKERID"] == "YD,YG"
 
 
 ###############################################################################
@@ -105,16 +97,13 @@ def test_ogr_sosi_3():
 
 def test_ogr_sosi_4():
 
-    if ogr.GetDriverByName("SOSI") is None:
-        pytest.skip()
-
-        ds = gdal.OpenEx(
-            "data/sosi/test_duplicate_fields.sos",
-            open_options=["appendFieldsMap=BEITEBRUKERID:;&OPPHAV:;"],
-        )
-        lyr = ds.GetLayer(0)
-        assert lyr.GetFeatureCount() == 17
-        lyr = ds.GetLayer(1)
-        assert lyr.GetFeatureCount() == 1
-        f = lyr.GetNextFeature()
-        assert f["REINBEITEBRUKERID"] == "YD;YG"
+    ds = gdal.OpenEx(
+        "data/sosi/test_duplicate_fields.sos",
+        open_options=["appendFieldsMap=BEITEBRUKERID:;&OPPHAV:;"],
+    )
+    lyr = ds.GetLayer(0)
+    assert lyr.GetFeatureCount() == 17
+    lyr = ds.GetLayer(1)
+    assert lyr.GetFeatureCount() == 1
+    f = lyr.GetNextFeature()
+    assert f["REINBEITEBRUKERID"] == "YD;YG"

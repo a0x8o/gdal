@@ -1034,6 +1034,32 @@ GDALDataset *VRTDataset::OpenVRTProtocol(const char *pszSpec)
                 argv.AddString(aosUllr[2]);
                 argv.AddString(aosUllr[3]);
             }
+
+            else if (EQUAL(pszKey, "ovr"))
+            {
+                argv.AddString("-ovr");
+                argv.AddString(pszValue);
+            }
+            else if (EQUAL(pszKey, "expand"))
+            {
+                argv.AddString("-expand");
+                argv.AddString(pszValue);
+            }
+            else if (EQUAL(pszKey, "a_scale"))
+            {
+                argv.AddString("-a_scale");
+                argv.AddString(pszValue);
+            }
+            else if (EQUAL(pszKey, "a_offset"))
+            {
+                argv.AddString("-a_offset");
+                argv.AddString(pszValue);
+            }
+            else if (EQUAL(pszKey, "ot"))
+            {
+                argv.AddString("-ot");
+                argv.AddString(pszValue);
+            }
             else
             {
                 CPLError(CE_Failure, CPLE_NotSupported, "Unknown option: %s",

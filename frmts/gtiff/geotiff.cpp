@@ -330,6 +330,8 @@ typedef struct
     uint16_t nPredictor;
     bool bTIFFIsBigEndian;
     bool bReady;
+    uint16_t *pExtraSamples;
+    uint16_t nExtraSampleCount;
 } GTiffCompressionJob;
 #if !defined(__MINGW32__)
 }
@@ -418,6 +420,7 @@ class GTiffDataset final : public GDALPamDataset
     char *m_pszFilename = nullptr;
     char *m_pszTmpFilename = nullptr;
     char *m_pszGeorefFilename = nullptr;
+    char *m_pszXMLFilename = nullptr;
 
     double m_adfGeoTransform[6]{0, 1, 0, 0, 0, 1};
     double m_dfMaxZError = 0.0;
@@ -425,6 +428,7 @@ class GTiffDataset final : public GDALPamDataset
 #if HAVE_JXL
     bool m_bJXLLossless = true;
     float m_fJXLDistance = 1.0f;
+    float m_fJXLAlphaDistance = -1.0f;  // -1 = same as non-alpha channel
     uint32_t m_nJXLEffort = 5;
 #endif
     double m_dfNoDataValue = DEFAULT_NODATA_VALUE;
@@ -465,6 +469,7 @@ class GTiffDataset final : public GDALPamDataset
     signed char m_nINTERNALGeorefSrcIndex = -1;
     signed char m_nTABFILEGeorefSrcIndex = -1;
     signed char m_nWORLDFILEGeorefSrcIndex = -1;
+    signed char m_nXMLGeorefSrcIndex = -1;
     signed char m_nGeoTransformGeorefSrcIndex = -1;
 
     signed char m_nHasOptimizedReadMultiRange = -1;
@@ -560,6 +565,8 @@ class GTiffDataset final : public GDALPamDataset
 
     void LoadMDAreaOrPoint();
     void LookForProjection();
+    void LookForProjectionFromGeoTIFF();
+    void LookForProjectionFromXML();
 
     void Crystalize();  // TODO: Spelling.
     void RestoreVolatileParameters(TIFF *hTIFF);
@@ -822,6 +829,12 @@ class GTiffJPEGOverviewBand final : public GDALRasterBand
     }
 
     virtual CPLErr IReadBlock(int, int, void *) override;
+    GDALColorInterp GetColorInterpretation() override
+    {
+        return cpl::down_cast<GTiffJPEGOverviewDS *>(poDS)
+            ->m_poParentDS->GetRasterBand(nBand)
+            ->GetColorInterpretation();
+    }
 };
 
 /************************************************************************/
@@ -9930,6 +9943,9 @@ std::tuple<CPLErr, bool> GTiffDataset::Finalize()
     CPLFree(m_pszGeorefFilename);
     m_pszGeorefFilename = nullptr;
 
+    CPLFree(m_pszXMLFilename);
+    m_pszXMLFilename = nullptr;
+
     m_bIsFinalized = true;
 
     return std::tuple<CPLErr, bool>(eErr, bDroppedRef);
@@ -10864,6 +10880,11 @@ void GTiffDataset::ThreadCompressionFunc(void *pData)
         TIFFSetField(hTIFFTmp, TIFFTAG_LERC_PARAMETERS, 2,
                      poDS->m_anLercAddCompressionAndVersion);
     }
+    if (psJob->nExtraSampleCount)
+    {
+        TIFFSetField(hTIFFTmp, TIFFTAG_EXTRASAMPLES, psJob->nExtraSampleCount,
+                     psJob->pExtraSamples);
+    }
 
     poDS->RestoreVolatileParameters(hTIFFTmp);
 
@@ -11225,6 +11246,11 @@ bool GTiffDataset::SubmitCompressionJob(int nStripOrTile, GByte *pabyData,
             {
                 TIFFGetField(m_hTIFF, TIFFTAG_PREDICTOR, &sJob.nPredictor);
             }
+
+            sJob.pExtraSamples = nullptr;
+            sJob.nExtraSampleCount = 0;
+            TIFFGetField(m_hTIFF, TIFFTAG_EXTRASAMPLES, &sJob.nExtraSampleCount,
+                         &sJob.pExtraSamples);
 
             ThreadCompressionFunc(&sJob);
 
@@ -12667,6 +12693,7 @@ CPLErr GTiffDataset::RegisterNewOverviewDataset(toff_t nOverviewOffset,
 #ifdef HAVE_JXL
     poODS->m_bJXLLossless = m_bJXLLossless;
     poODS->m_fJXLDistance = m_fJXLDistance;
+    poODS->m_fJXLAlphaDistance = m_fJXLAlphaDistance;
     poODS->m_nJXLEffort = m_nJXLEffort;
 #endif
 
@@ -14338,6 +14365,12 @@ static float GTiffGetJXLDistance(CSLConstList papszOptions)
         CPLAtof(CSLFetchNameValueDef(papszOptions, "JXL_DISTANCE", "1.0")));
 }
 
+static float GTiffGetJXLAlphaDistance(CSLConstList papszOptions)
+{
+    return static_cast<float>(CPLAtof(
+        CSLFetchNameValueDef(papszOptions, "JXL_ALPHA_DISTANCE", "-1.0")));
+}
+
 #endif
 
 /************************************************************************/
@@ -14549,6 +14582,7 @@ bool GTiffDataset::WriteMetadata(GDALDataset *poSrcDS, TIFF *l_hTIFF,
 #if HAVE_JXL
         else if (pszCompress && EQUAL(pszCompress, "JXL"))
         {
+            float fDistance = 0.0f;
             if (GTiffGetJXLLossless(l_papszCreationOptions))
             {
                 AppendMetadataItem(&psRoot, &psTail,
@@ -14557,11 +14591,18 @@ bool GTiffDataset::WriteMetadata(GDALDataset *poSrcDS, TIFF *l_hTIFF,
             }
             else
             {
-                AppendMetadataItem(
-                    &psRoot, &psTail, "JXL_DISTANCE",
-                    CPLSPrintf("%f",
-                               GTiffGetJXLDistance(l_papszCreationOptions)),
-                    0, nullptr, "IMAGE_STRUCTURE");
+                fDistance = GTiffGetJXLDistance(l_papszCreationOptions);
+                AppendMetadataItem(&psRoot, &psTail, "JXL_DISTANCE",
+                                   CPLSPrintf("%f", fDistance), 0, nullptr,
+                                   "IMAGE_STRUCTURE");
+            }
+            const float fAlphaDistance =
+                GTiffGetJXLAlphaDistance(l_papszCreationOptions);
+            if (fAlphaDistance >= 0.0f && fAlphaDistance != fDistance)
+            {
+                AppendMetadataItem(&psRoot, &psTail, "JXL_ALPHA_DISTANCE",
+                                   CPLSPrintf("%f", fAlphaDistance), 0, nullptr,
+                                   "IMAGE_STRUCTURE");
             }
             AppendMetadataItem(
                 &psRoot, &psTail, "JXL_EFFORT",
@@ -14984,6 +15025,8 @@ void GTiffDataset::RestoreVolatileParameters(TIFF *hTIFF)
                          m_bJXLLossless ? JXL_LOSSLESS : JXL_LOSSY);
             TIFFSetField(hTIFF, TIFFTAG_JXL_EFFORT, m_nJXLEffort);
             TIFFSetField(hTIFF, TIFFTAG_JXL_DISTANCE, m_fJXLDistance);
+            TIFFSetField(hTIFF, TIFFTAG_JXL_ALPHA_DISTANCE,
+                         m_fJXLAlphaDistance);
         }
 #endif
     }
@@ -15614,13 +15657,36 @@ void GTiffDataset::LookForProjection()
     m_bLookedForProjection = true;
 
     IdentifyAuthorizedGeoreferencingSources();
-    if (m_nINTERNALGeorefSrcIndex < 0)
-        return;
 
+    m_oSRS.Clear();
+
+    std::set<signed char> aoSetPriorities;
+    if (m_nINTERNALGeorefSrcIndex >= 0)
+        aoSetPriorities.insert(m_nINTERNALGeorefSrcIndex);
+    if (m_nXMLGeorefSrcIndex >= 0)
+        aoSetPriorities.insert(m_nXMLGeorefSrcIndex);
+    for (const auto nIndex : aoSetPriorities)
+    {
+        if (m_nINTERNALGeorefSrcIndex == nIndex)
+        {
+            LookForProjectionFromGeoTIFF();
+        }
+        else if (m_nXMLGeorefSrcIndex == nIndex)
+        {
+            LookForProjectionFromXML();
+        }
+    }
+}
+
+/************************************************************************/
+/*                      LookForProjectionFromGeoTIFF()                  */
+/************************************************************************/
+
+void GTiffDataset::LookForProjectionFromGeoTIFF()
+{
     /* -------------------------------------------------------------------- */
     /*      Capture the GeoTIFF projection, if available.                   */
     /* -------------------------------------------------------------------- */
-    m_oSRS.Clear();
 
     GTIF *hGTIF = GTiffDatasetGTIFNew(m_hTIFF);
 
@@ -15661,6 +15727,9 @@ void GTiffDataset::LookForProjection()
 
             if (hSRS)
             {
+                CPLFree(m_pszXMLFilename);
+                m_pszXMLFilename = nullptr;
+
                 m_oSRS = *(OGRSpatialReference::FromHandle(hSRS));
                 OSRDestroySpatialReference(hSRS);
             }
@@ -15690,7 +15759,7 @@ void GTiffDataset::LookForProjection()
             CPLErrorReset();
         }
 
-        if (m_oSRS.IsCompound())
+        if (ret && m_oSRS.IsCompound())
         {
             const char *pszVertUnit = nullptr;
             m_oSRS.GetTargetLinearUnits("COMPD_CS|VERT_CS", &pszVertUnit);
@@ -15725,6 +15794,93 @@ void GTiffDataset::LookForProjection()
 
         GTIFFree(hGTIF);
     }
+}
+
+/************************************************************************/
+/*                      LookForProjectionFromXML()                      */
+/************************************************************************/
+
+void GTiffDataset::LookForProjectionFromXML()
+{
+    char **papszSiblingFiles = GetSiblingFiles();
+
+    if (!GDALCanFileAcceptSidecarFile(m_pszFilename))
+        return;
+
+    const std::string osXMLFilenameLowerCase =
+        CPLResetExtension(m_pszFilename, "xml");
+
+    CPLString osXMLFilename;
+    if (papszSiblingFiles &&
+        GDALCanReliablyUseSiblingFileList(osXMLFilenameLowerCase.c_str()))
+    {
+        const int iSibling = CSLFindString(
+            papszSiblingFiles, CPLGetFilename(osXMLFilenameLowerCase.c_str()));
+        if (iSibling >= 0)
+        {
+            osXMLFilename = m_pszFilename;
+            osXMLFilename.resize(strlen(m_pszFilename) -
+                                 strlen(CPLGetFilename(m_pszFilename)));
+            osXMLFilename += papszSiblingFiles[iSibling];
+        }
+        else
+        {
+            return;
+        }
+    }
+
+    if (osXMLFilename.empty())
+    {
+        VSIStatBufL sStatBuf;
+        bool bGotXML = VSIStatExL(osXMLFilenameLowerCase.c_str(), &sStatBuf,
+                                  VSI_STAT_EXISTS_FLAG) == 0;
+
+        if (bGotXML)
+        {
+            osXMLFilename = osXMLFilenameLowerCase;
+        }
+        else if (VSIIsCaseSensitiveFS(osXMLFilenameLowerCase.c_str()))
+        {
+            const std::string osXMLFilenameUpperCase =
+                CPLResetExtension(m_pszFilename, "XML");
+            bGotXML = VSIStatExL(osXMLFilenameUpperCase.c_str(), &sStatBuf,
+                                 VSI_STAT_EXISTS_FLAG) == 0;
+            if (bGotXML)
+            {
+                osXMLFilename = osXMLFilenameUpperCase;
+            }
+        }
+
+        if (osXMLFilename.empty())
+        {
+            return;
+        }
+    }
+
+    GByte *pabyRet = nullptr;
+    vsi_l_offset nSize = 0;
+    constexpr int nMaxSize = 10 * 1024 * 1024;
+    if (!VSIIngestFile(nullptr, osXMLFilename.c_str(), &pabyRet, &nSize,
+                       nMaxSize))
+        return;
+    CPLXMLTreeCloser oXML(
+        CPLParseXMLString(reinterpret_cast<const char *>(pabyRet)));
+    VSIFree(pabyRet);
+    if (!oXML.get())
+        return;
+    const char *pszCode = CPLGetXMLValue(
+        oXML.get(), "=metadata.refSysInfo.RefSystem.refSysID.identCode.code",
+        "0");
+    const int nCode = atoi(pszCode);
+    if (nCode <= 0)
+        return;
+    if (nCode <= 32767)
+        m_oSRS.importFromEPSG(nCode);
+    else
+        m_oSRS.SetFromUserInput(CPLSPrintf("ESRI:%d", nCode));
+
+    CPLFree(m_pszXMLFilename);
+    m_pszXMLFilename = CPLStrdup(osXMLFilename.c_str());
 }
 
 /************************************************************************/
@@ -17260,6 +17416,18 @@ CPLErr GTiffDataset::OpenOffset(TIFF *hTIFFIn, toff_t nDirOffsetIn,
                     }
                 }
                 else if (m_nCompression == COMPRESSION_JXL &&
+                         EQUAL(pszKey, "JXL_ALPHA_DISTANCE"))
+                {
+                    const double dfVal = CPLAtof(pszValue);
+                    if (dfVal > 0 && dfVal <= 15)
+                    {
+                        m_oGTiffMDMD.SetMetadataItem(
+                            "COMPRESSION_REVERSIBILITY", "LOSSY",
+                            "IMAGE_STRUCTURE");
+                        m_fJXLAlphaDistance = static_cast<float>(dfVal);
+                    }
+                }
+                else if (m_nCompression == COMPRESSION_JXL &&
                          EQUAL(pszKey, "JXL_EFFORT"))
                 {
                     const int nEffort = atoi(pszValue);
@@ -17494,7 +17662,7 @@ void GTiffDataset::IdentifyAuthorizedGeoreferencingSources()
     CPLString osGeorefSources = CSLFetchNameValueDef(
         papszOpenOptions, "GEOREF_SOURCES",
         CPLGetConfigOption("GDAL_GEOREF_SOURCES",
-                           "PAM,INTERNAL,TABFILE,WORLDFILE"));
+                           "PAM,INTERNAL,TABFILE,WORLDFILE,XML"));
     char **papszTokens = CSLTokenizeString2(osGeorefSources, ",", 0);
     m_nPAMGeorefSrcIndex =
         static_cast<signed char>(CSLFindString(papszTokens, "PAM"));
@@ -17504,6 +17672,8 @@ void GTiffDataset::IdentifyAuthorizedGeoreferencingSources()
         static_cast<signed char>(CSLFindString(papszTokens, "TABFILE"));
     m_nWORLDFILEGeorefSrcIndex =
         static_cast<signed char>(CSLFindString(papszTokens, "WORLDFILE"));
+    m_nXMLGeorefSrcIndex =
+        static_cast<signed char>(CSLFindString(papszTokens, "XML"));
     CSLDestroy(papszTokens);
 }
 
@@ -18707,6 +18877,7 @@ TIFF *GTiffDataset::CreateLL(const char *pszFilename, int nXSize, int nYSize,
     const bool l_bJXLLossless = GTiffGetJXLLossless(papszParamList);
     const uint32_t l_nJXLEffort = GTiffGetJXLEffort(papszParamList);
     const float l_fJXLDistance = GTiffGetJXLDistance(papszParamList);
+    const float l_fJXLAlphaDistance = GTiffGetJXLAlphaDistance(papszParamList);
 #endif
     /* -------------------------------------------------------------------- */
     /*      Streaming related code                                          */
@@ -19219,6 +19390,7 @@ TIFF *GTiffDataset::CreateLL(const char *pszFilename, int nXSize, int nYSize,
                      l_bJXLLossless ? JXL_LOSSLESS : JXL_LOSSY);
         TIFFSetField(l_hTIFF, TIFFTAG_JXL_EFFORT, l_nJXLEffort);
         TIFFSetField(l_hTIFF, TIFFTAG_JXL_DISTANCE, l_fJXLDistance);
+        TIFFSetField(l_hTIFF, TIFFTAG_JXL_ALPHA_DISTANCE, l_fJXLAlphaDistance);
     }
 #endif
     if (l_nCompression == COMPRESSION_WEBP)
@@ -19915,6 +20087,7 @@ GDALDataset *GTiffDataset::Create(const char *pszFilename, int nXSize,
     poDS->m_bJXLLossless = GTiffGetJXLLossless(papszParamList);
     poDS->m_nJXLEffort = GTiffGetJXLEffort(papszParamList);
     poDS->m_fJXLDistance = GTiffGetJXLDistance(papszParamList);
+    poDS->m_fJXLAlphaDistance = GTiffGetJXLAlphaDistance(papszParamList);
 #endif
     poDS->InitCreationOrOpenOptions(true, papszParamList);
 
@@ -21208,6 +21381,7 @@ GDALDataset *GTiffDataset::CreateCopy(const char *pszFilename,
     poDS->m_bJXLLossless = GTiffGetJXLLossless(papszOptions);
     poDS->m_nJXLEffort = GTiffGetJXLEffort(papszOptions);
     poDS->m_fJXLDistance = GTiffGetJXLDistance(papszOptions);
+    poDS->m_fJXLAlphaDistance = GTiffGetJXLAlphaDistance(papszOptions);
 #endif
     poDS->InitCreationOrOpenOptions(true, papszOptions);
 
@@ -21255,6 +21429,8 @@ GDALDataset *GTiffDataset::CreateCopy(const char *pszFilename,
                      poDS->m_bJXLLossless ? JXL_LOSSLESS : JXL_LOSSY);
         TIFFSetField(l_hTIFF, TIFFTAG_JXL_EFFORT, poDS->m_nJXLEffort);
         TIFFSetField(l_hTIFF, TIFFTAG_JXL_DISTANCE, poDS->m_fJXLDistance);
+        TIFFSetField(l_hTIFF, TIFFTAG_JXL_ALPHA_DISTANCE,
+                     poDS->m_fJXLAlphaDistance);
     }
 #endif
     if (l_nCompression == COMPRESSION_WEBP)
@@ -22402,6 +22578,10 @@ const char *GTiffDataset::GetMetadataItem(const char *pszName,
         {
             return CPLSPrintf("%f", m_fJXLDistance);
         }
+        else if (EQUAL(pszName, "JXL_ALPHA_DISTANCE"))
+        {
+            return CPLSPrintf("%f", m_fJXLAlphaDistance);
+        }
         else if (EQUAL(pszName, "JXL_EFFORT"))
         {
             return CPLSPrintf("%u", m_nJXLEffort);
@@ -22642,6 +22822,15 @@ char **GTiffDataset::GetFileList()
         CSLFindString(papszFileList, m_pszGeorefFilename) == -1)
     {
         papszFileList = CSLAddString(papszFileList, m_pszGeorefFilename);
+    }
+
+    if (m_nXMLGeorefSrcIndex >= 0)
+        LookForProjection();
+
+    if (m_pszXMLFilename &&
+        CSLFindString(papszFileList, m_pszXMLFilename) == -1)
+    {
+        papszFileList = CSLAddString(papszFileList, m_pszXMLFilename);
     }
 
     return papszFileList;
@@ -23442,6 +23631,13 @@ void GDALRegister_GTiff()
         "   <Option name='JXL_DISTANCE' type='float' description='Distance "
         "level for lossy compression (0=mathematically lossless, 1.0=visually "
         "lossless, usual range [0.5,3])' default='1.0' min='0.1' max='15.0'/>";
+#ifdef HAVE_JxlEncoderSetExtraChannelDistance
+    osOptions += "   <Option name='JXL_ALPHA_DISTANCE' type='float' "
+                 "description='Distance level for alpha channel "
+                 "(-1=same as non-alpha channels, "
+                 "0=mathematically lossless, 1.0=visually lossless, "
+                 "usual range [0.5,3])' default='-1' min='-1' max='15.0'/>";
+#endif
 #endif
     osOptions +=
         ""
@@ -23578,9 +23774,10 @@ void GDALRegister_GTiff()
         "       <Value>ESRI_PE</Value>"
         "   </Option>"
         "   <Option name='GEOREF_SOURCES' type='string' description='Comma "
-        "separated list made with values INTERNAL/TABFILE/WORLDFILE/PAM/NONE "
+        "separated list made with values "
+        "INTERNAL/TABFILE/WORLDFILE/PAM/XML/NONE "
         "that describe the priority order for georeferencing' "
-        "default='PAM,INTERNAL,TABFILE,WORLDFILE'/>"
+        "default='PAM,INTERNAL,TABFILE,WORLDFILE,XML'/>"
         "   <Option name='SPARSE_OK' type='boolean' description='Should empty "
         "blocks be omitted on disk?' default='FALSE'/>"
         "</OpenOptionList>");

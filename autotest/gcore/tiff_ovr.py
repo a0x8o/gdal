@@ -372,12 +372,8 @@ def test_tiff_ovr_rms_palette(both_endian):
 
 @pytest.mark.parametrize("option_name_suffix", ["", "_OVERVIEW"])
 @pytest.mark.parametrize("read_only", [True, False])
+@gdaltest.require_creation_option("GTiff", "JPEG")
 def test_tiff_ovr_9(both_endian, option_name_suffix, read_only):
-
-    if "<Value>JPEG</Value>" not in gdal.GetDriverByName("GTIFF").GetMetadataItem(
-        "DMD_CREATIONOPTIONLIST"
-    ):
-        pytest.skip("JPEG support missing")
 
     tiff_drv = gdal.GetDriverByName("GTiff")
     tiff_drv.Delete("tmp/ovr9.tif")
@@ -434,12 +430,8 @@ def test_tiff_ovr_9(both_endian, option_name_suffix, read_only):
 # Similar to tiff_ovr_9 but with internal overviews.
 
 
+@gdaltest.require_creation_option("GTiff", "JPEG")
 def test_tiff_ovr_10(both_endian):
-
-    if "<Value>JPEG</Value>" not in gdal.GetDriverByName("GTIFF").GetMetadataItem(
-        "DMD_CREATIONOPTIONLIST"
-    ):
-        pytest.skip("JPEG support missing")
 
     src_ds = gdal.Open("data/rgbsmall.tif", gdal.GA_ReadOnly)
 
@@ -1602,11 +1594,8 @@ def test_tiff_ovr_42(both_endian):
 @pytest.mark.skipif(
     "SKIP_TIFF_JPEG12" in os.environ, reason="Crashes on build-windows-msys2-mingw"
 )
+@gdaltest.require_creation_option("GTiff", "JPEG")
 def test_tiff_ovr_43(both_endian):
-
-    md = gdaltest.tiff_drv.GetMetadata()
-    if md["DMD_CREATIONOPTIONLIST"].find("JPEG") == -1:
-        pytest.skip()
 
     with gdaltest.config_option("CPL_ACCUM_ERROR_MSG", "ON"):
         gdal.ErrorReset()
@@ -1838,10 +1827,8 @@ def test_tiff_ovr_sparse_ok_external_overview(apply_sparse):
 # Test overview on a dataset where width * height > 2 billion
 
 
+@pytest.mark.slow()
 def test_tiff_ovr_46():
-
-    if not gdaltest.run_slow_tests():
-        pytest.skip()
 
     # Test NEAREST
     with gdaltest.config_option("GTIFF_DONT_WRITE_BLOCKS", "YES"):
@@ -2155,12 +2142,8 @@ def test_tiff_ovr_53():
 # Test external overviews building in several steps with jpeg compression
 
 
+@gdaltest.require_creation_option("GTiff", "JPEG")
 def test_tiff_ovr_54():
-
-    drv = gdal.GetDriverByName("GTiff")
-    md = drv.GetMetadata()
-    if md["DMD_CREATIONOPTIONLIST"].find("JPEG") == -1:
-        pytest.skip()
 
     src_ds = gdal.Open("../gdrivers/data/small_world.tif")
     gdal.GetDriverByName("GTiff").CreateCopy("/vsimem/tiff_ovr_54.tif", src_ds)
@@ -2749,6 +2732,54 @@ def test_tiff_ovr_internal_overview_different_planar_config_to_band():
     assert ds.GetMetadataItem("INTERLEAVE", "IMAGE_STRUCTURE") == "PIXEL"
     ovr_ds = ds.GetRasterBand(1).GetOverview(0).GetDataset()
     assert ovr_ds.GetMetadataItem("INTERLEAVE", "IMAGE_STRUCTURE") == "BAND"
+    del ds
+    gdal.GetDriverByName("GTiff").Delete(temp_path)
+
+
+###############################################################################
+
+
+def test_tiff_ovr_external_1_px_wide_3_px_tall():
+
+    temp_path = "/vsimem/test.tif"
+    ds = gdal.GetDriverByName("GTiff").Create(temp_path, 1, 3)
+    ds.GetRasterBand(1).Fill(1)
+    ds = None
+    ds = gdal.OpenEx(temp_path)
+    with gdaltest.config_options({"COMPRESS_OVERVIEW": "LZW"}):
+        assert ds.BuildOverviews("nearest", overviewlist=[2]) == 0
+    del ds
+    ds = gdal.Open(temp_path + ".ovr")
+    assert ds.GetRasterBand(1).Checksum() == 2
+    with gdaltest.config_options({"COMPRESS_OVERVIEW": "LZW"}):
+        assert ds.BuildOverviews("nearest", overviewlist=[2]) == 0
+    del ds
+    ds = gdal.Open(temp_path + ".ovr.ovr")
+    assert ds.GetRasterBand(1).Checksum() == 1
+    del ds
+    gdal.GetDriverByName("GTiff").Delete(temp_path)
+
+
+###############################################################################
+
+
+def test_tiff_ovr_external_3_px_wide_1_px_tall():
+
+    temp_path = "/vsimem/test.tif"
+    ds = gdal.GetDriverByName("GTiff").Create(temp_path, 3, 1)
+    ds.GetRasterBand(1).Fill(1)
+    ds = None
+    ds = gdal.OpenEx(temp_path)
+    with gdaltest.config_options({"COMPRESS_OVERVIEW": "LZW"}):
+        assert ds.BuildOverviews("nearest", overviewlist=[2]) == 0
+    del ds
+    ds = gdal.Open(temp_path + ".ovr")
+    assert ds.GetRasterBand(1).Checksum() == 2
+    with gdaltest.config_options({"COMPRESS_OVERVIEW": "LZW"}):
+        assert ds.BuildOverviews("nearest", overviewlist=[2]) == 0
+    del ds
+    ds = gdal.Open(temp_path + ".ovr.ovr")
+    assert ds.GetRasterBand(1).Checksum() == 1
     del ds
     gdal.GetDriverByName("GTiff").Delete(temp_path)
 

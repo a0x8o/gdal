@@ -1966,10 +1966,8 @@ def test_ogr_mitab_38():
 # Read various geometry types from .mif
 
 
+@pytest.mark.require_driver("CSV")
 def test_ogr_mitab_39():
-
-    if gdal.GetDriverByName("CSV") is None:
-        pytest.skip("CSV driver is missing")
 
     ds = ogr.Open("data/mitab/all_geoms.mif")
     lyr = ds.GetLayer(0)
@@ -2015,10 +2013,8 @@ def test_ogr_mitab_40():
 # Read various geometry types from .tab
 
 
+@pytest.mark.require_driver("CSV")
 def test_ogr_mitab_41():
-
-    if gdal.GetDriverByName("CSV") is None:
-        pytest.skip("CSV driver is missing")
 
     ds = ogr.Open("data/mitab/all_geoms.tab")
     lyr = ds.GetLayer(0)
@@ -2044,10 +2040,8 @@ def test_ogr_mitab_41():
 # Read various geometry types from .tab with block size = 32256
 
 
+@pytest.mark.require_driver("CSV")
 def test_ogr_mitab_42():
-
-    if gdal.GetDriverByName("CSV") is None:
-        pytest.skip("CSV driver is missing")
 
     ds = ogr.Open("/vsizip/data/mitab/all_geoms_block_32256.zip")
     lyr = ds.GetLayer(0)
@@ -2794,6 +2788,47 @@ def test_ogr_mitab_read_single_field_mid():
 
 
 ###############################################################################
+# Test reading a .mif/.tab with all data types
+
+
+@pytest.mark.parametrize("ext", ["mif", "tab"])
+def test_ogr_mitab_read_write_all_data_types(ext):
+
+    ds = ogr.Open("data/mitab/all_possible_fields." + ext)
+    lyr = ds.GetLayer(0)
+    f = lyr.GetNextFeature()
+    assert f["field1"] == "test"
+    assert f["Field2"] == 120
+    assert f["Field3"] == 12345
+    assert (
+        lyr.GetLayerDefn()
+        .GetFieldDefn(lyr.GetLayerDefn().GetFieldIndex("Field4"))
+        .GetType()
+        == ogr.OFTInteger64
+    )
+    assert f["Field4"] == 123456789012345
+    assert f["Field5"] == 12.34
+    assert f["Field6"] == 12.34
+    assert f["Field7"] == "2022/12/31"
+    assert f["Field8"] == "23:59:00"
+    assert f["Field9"] == "2022/03/23 14:56:00"
+    assert f["Field10"] == "T"
+
+    filename = "/vsimem/test_ogr_mitab_read_write_all_data_types." + ext
+    out_ds = ogr.GetDriverByName("MapInfo File").CreateDataSource(filename)
+    out_lyr = out_ds.CreateLayer("test", geom_type=ogr.wkbNone)
+    for i in range(lyr.GetLayerDefn().GetFieldCount()):
+        out_lyr.CreateField(lyr.GetLayerDefn().GetFieldDefn(i))
+    out_f = ogr.Feature(out_lyr.GetLayerDefn())
+    out_f.SetFrom(f)
+    assert out_lyr.CreateFeature(out_f) == ogr.OGRERR_NONE
+    out_f = None
+    out_ds = None
+
+    ogr.GetDriverByName("MapInfo File").DeleteDataSource(filename)
+
+
+###############################################################################
 
 
 def _test_ogr_mitab_write_etrs89_from_crs_epsg_code(srs):
@@ -2968,6 +3003,55 @@ def test_ogr_mitab_write_epsg_3125_philippine_reference_system_1992():
     lyr = ds.GetLayer(0)
     got_srs = lyr.GetSpatialRef()
     assert got_srs.IsSame(ref_srs), got_srs.ExportToWkt()
+    ds = None
+
+    ogr.GetDriverByName("MapInfo File").DeleteDataSource(filename)
+
+
+###############################################################################
+
+
+def test_ogr_mitab_read_read_extended_transverse_mercator():
+
+    ds = ogr.Open("data/mitab/proj_34.mif")
+    lyr = ds.GetLayer(0)
+    ref_srs = lyr.GetSpatialRef()
+    assert ref_srs.ExportToProj4() == "+proj=utm +zone=1 +datum=WGS84 +units=m +no_defs"
+    ds = None
+
+
+###############################################################################
+
+
+@pytest.mark.parametrize("ext", ["mif", "tab"])
+def test_ogr_mitab_read_write_hotine_oblique_mercator_with_rectified_grid_angle(ext):
+
+    ds = ogr.Open("data/mitab/proj_35.mif")
+    lyr = ds.GetLayer(0)
+    ref_srs = lyr.GetSpatialRef()
+    assert (
+        ref_srs.ExportToProj4()
+        == "+proj=omerc +no_uoff +lat_0=4 +lonc=102.25 +alpha=323.025796466667 +gamma=323.130102361111 +k=0.99984 +x_0=804671 +y_0=123456 +ellps=evrst69 +units=m +no_defs"
+    )
+    ds = None
+
+    filename = (
+        "/vsimem/test_ogr_mitab_read_write_hotine_oblique_mercator_with_rectified_grid_angle."
+        + ext
+    )
+    ds = ogr.GetDriverByName("MapInfo File").CreateDataSource(filename)
+    lyr = ds.CreateLayer("test", srs=ref_srs, geom_type=ogr.wkbPoint)
+    lyr.CreateField(ogr.FieldDefn("foo"))
+    f = ogr.Feature(lyr.GetLayerDefn())
+    f.SetGeometry(ogr.CreateGeometryFromWkt("POINT(0 0)"))
+    lyr.CreateFeature(f)
+    f = None
+    ds = None
+
+    ds = ogr.Open(filename)
+    lyr = ds.GetLayer(0)
+    got_srs = lyr.GetSpatialRef()
+    assert got_srs.ExportToProj4() == ref_srs.ExportToProj4()
     ds = None
 
     ogr.GetDriverByName("MapInfo File").DeleteDataSource(filename)

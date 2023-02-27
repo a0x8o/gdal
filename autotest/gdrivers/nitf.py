@@ -152,9 +152,13 @@ def test_nitf_4():
 
 
 def nitf_check_created_file(
-    checksum1, checksum2, checksum3, set_inverted_color_interp=True
+    checksum1,
+    checksum2,
+    checksum3,
+    filename="tmp/test_create.ntf",
+    set_inverted_color_interp=True,
 ):
-    ds = gdal.Open("tmp/test_create.ntf")
+    ds = gdal.Open(filename)
 
     chksum = ds.GetRasterBand(1).Checksum()
     chksum_expect = checksum1
@@ -696,11 +700,8 @@ def test_nitf_27():
 # Test Create() with IC=C8 compression with the JP2ECW driver
 
 
+@pytest.mark.require_driver("JP2ECW")
 def test_nitf_28_jp2ecw():
-
-    gdaltest.nitf_28_jp2ecw_is_ok = False
-    if gdal.GetDriverByName("JP2ECW") is None:
-        pytest.skip("JP2ECW driver missing")
 
     import ecw
 
@@ -713,7 +714,6 @@ def test_nitf_28_jp2ecw():
         nitf_create(["ICORDS=G", "IC=C8", "TARGET=75"], set_inverted_color_interp=False)
 
         nitf_check_created_file(32398, 42502, 38882, set_inverted_color_interp=False)
-        gdaltest.nitf_28_jp2ecw_is_ok = True
 
         tmpfilename = "/vsimem/nitf_28_jp2ecw.ntf"
         src_ds = gdal.GetDriverByName("MEM").Create("", 1025, 1025)
@@ -734,18 +734,19 @@ def test_nitf_28_jp2ecw():
 # Test reading the previously create file with the JP2MrSID driver
 
 
+@pytest.mark.require_driver("JP2MrSID")
 def test_nitf_28_jp2mrsid():
-    if not gdaltest.nitf_28_jp2ecw_is_ok:
-        pytest.skip()
-
-    jp2mrsid_drv = gdal.GetDriverByName("JP2MrSID")
-    if jp2mrsid_drv is None:
-        pytest.skip("JP2MrSID driver missing")
 
     # Deregister other potential conflicting JPEG2000 drivers
     gdaltest.deregister_all_jpeg2000_drivers_but("JP2MrSID")
 
-    ret = nitf_check_created_file(32398, 42502, 38882, set_inverted_color_interp=False)
+    ret = nitf_check_created_file(
+        32398,
+        42502,
+        38882,
+        filename="data/nitf/test_jp2_ecw33.ntf",
+        set_inverted_color_interp=False,
+    )
 
     gdaltest.reregister_all_jpeg2000_drivers()
 
@@ -756,18 +757,19 @@ def test_nitf_28_jp2mrsid():
 # Test reading the previously create file with the JP2KAK driver
 
 
+@pytest.mark.require_driver("JP2KAK")
 def test_nitf_28_jp2kak():
-    if not gdaltest.nitf_28_jp2ecw_is_ok:
-        pytest.skip()
-
-    jp2kak_drv = gdal.GetDriverByName("JP2KAK")
-    if jp2kak_drv is None:
-        pytest.skip("JP2KAK driver missing")
 
     # Deregister other potential conflicting JPEG2000 drivers
     gdaltest.deregister_all_jpeg2000_drivers_but("JP2KAK")
 
-    ret = nitf_check_created_file(32398, 42502, 38882, set_inverted_color_interp=False)
+    ret = nitf_check_created_file(
+        32398,
+        42502,
+        38882,
+        filename="data/nitf/test_jp2_ecw33.ntf",
+        set_inverted_color_interp=False,
+    )
 
     gdaltest.reregister_all_jpeg2000_drivers()
 
@@ -778,18 +780,19 @@ def test_nitf_28_jp2kak():
 # Test reading the previously create file with the JP2KAK driver
 
 
+@pytest.mark.require_driver("JP2OpenJPEG")
 def test_nitf_28_jp2openjpeg():
-    if not gdaltest.nitf_28_jp2ecw_is_ok:
-        pytest.skip()
-
-    drv = gdal.GetDriverByName("JP2OpenJPEG")
-    if drv is None:
-        pytest.skip("JP2OpenJPEG driver missing")
 
     # Deregister other potential conflicting JPEG2000 drivers
     gdaltest.deregister_all_jpeg2000_drivers_but("JP2OpenJPEG")
     try:
-        nitf_check_created_file(32398, 42502, 38882, set_inverted_color_interp=False)
+        nitf_check_created_file(
+            32398,
+            42502,
+            38882,
+            filename="data/nitf/test_jp2_ecw33.ntf",
+            set_inverted_color_interp=False,
+        )
     finally:
         gdaltest.reregister_all_jpeg2000_drivers()
 
@@ -798,10 +801,8 @@ def test_nitf_28_jp2openjpeg():
 # Test CreateCopy() with IC=C8 compression with the JP2OpenJPEG driver
 
 
+@pytest.mark.require_driver("JP2OpenJPEG")
 def test_nitf_28_jp2openjpeg_bis():
-    drv = gdal.GetDriverByName("JP2OpenJPEG")
-    if drv is None:
-        pytest.skip()
 
     # Deregister other potential conflicting JPEG2000 drivers
     gdaltest.deregister_all_jpeg2000_drivers_but("JP2OpenJPEG")
@@ -1297,10 +1298,8 @@ def test_nitf_33():
 # Test CreateCopy() of a 16bit image with tiling
 
 
+@pytest.mark.require_driver("DTED")
 def test_nitf_34():
-
-    if gdal.GetDriverByName("DTED") is None:
-        pytest.skip("DTED driver missing")
 
     tst = gdaltest.GDALTest("NITF", "n43.dt0", 1, 49187, options=["BLOCKSIZE=64"])
     return tst.testCreateCopy()
@@ -1712,72 +1711,46 @@ def test_nitf_45():
 # Check overviews on a JPEG2000 compressed subdataset
 
 
-def nitf_46(driver_to_test):
+@pytest.mark.parametrize(
+    "driver_to_test", ["JP2ECW", "JP2MrSID", "JP2KAK", "JP2OpenJPEG"]
+)
+def test_nitf_check_jpeg2000_overviews(driver_to_test):
 
     jp2_drv = gdal.GetDriverByName(driver_to_test)
     if jp2_drv is None:
-        pytest.skip()
+        pytest.skip("Driver {driver_to_test} missing")
 
     # Deregister other potential conflicting JPEG2000 drivers
     gdaltest.deregister_all_jpeg2000_drivers_but(driver_to_test)
 
     try:
-        os.remove("tmp/nitf46.ntf.aux.xml")
-    except OSError:
-        pass
+        try:
+            os.remove("tmp/nitf46.ntf.aux.xml")
+        except OSError:
+            pass
 
-    try:
-        os.remove("tmp/nitf46.ntf_0.ovr")
-    except OSError:
-        pass
+        try:
+            os.remove("tmp/nitf46.ntf_0.ovr")
+        except OSError:
+            pass
 
-    shutil.copyfile("data/nitf/two_images_jp2.ntf", "tmp/nitf46.ntf")
+        shutil.copyfile("data/nitf/two_images_jp2.ntf", "tmp/nitf46.ntf")
 
-    ds = gdal.Open("NITF_IM:1:tmp/nitf46.ntf", gdal.GA_Update)
-    ds.BuildOverviews(overviewlist=[2])
-    # FIXME ? ds.GetRasterBand(1).GetOverview(0) is None until we reopen
-    ds = None
+        ds = gdal.Open("NITF_IM:1:tmp/nitf46.ntf", gdal.GA_Update)
+        ds.BuildOverviews(overviewlist=[2])
+        # FIXME ? ds.GetRasterBand(1).GetOverview(0) is None until we reopen
+        ds = None
 
-    ds = gdal.Open("NITF_IM:1:tmp/nitf46.ntf")
-    if ds.GetRasterBand(1).GetOverview(0) is None:
-        gdaltest.post_reason("no overview of subdataset")
-        ret = "fail"
-    else:
-        cs = ds.GetRasterBand(1).GetOverview(0).Checksum()
-        if cs != 1086:
-            print(cs)
-            gdaltest.post_reason(
-                "did not get expected checksum for overview of subdataset"
-            )
-            ret = "fail"
-        else:
-            ret = "success"
-
-    ds = None
-
-    gdaltest.reregister_all_jpeg2000_drivers()
-
-    return ret
-
-
-def nitf_46_jp2ecw():
-    return nitf_46("JP2ECW")
-
-
-def nitf_46_jp2mrsid():
-    return nitf_46("JP2MrSID")
-
-
-def nitf_46_jp2kak():
-    return nitf_46("JP2KAK")
-
-
-def test_nitf_46_jasper():
-    return nitf_46("JPEG2000")
-
-
-def nitf_46_openjpeg():
-    return nitf_46("JP2OpenJPEG")
+        if driver_to_test != "JP2ECW":
+            ds = gdal.Open("NITF_IM:1:tmp/nitf46.ntf")
+            assert ds.GetRasterBand(1).GetOverview(0) is not None
+            assert ds.GetRasterBand(1).GetOverview(0).Checksum() in (
+                1086,
+                1312,
+            )  # 1312 for JP2MrSID
+            ds = None
+    finally:
+        gdaltest.reregister_all_jpeg2000_drivers()
 
 
 ###############################################################################
@@ -5198,6 +5171,122 @@ def test_nitf_create_three_images_final_uncompressed():
 
 
 ###############################################################################
+# Test update of CLEVEL
+
+
+def test_nitf_CLEVEL_update():
+
+    gdal.Unlink("/vsimem/out.ntf")
+
+    if False:
+        # Realistic use case, but a bit slow
+
+        src_ds = gdal.GetDriverByName("MEM").Create("", 2048, 2048, 3)
+        # Fill with "random" data that compresses poorly
+        for b in range(3):
+            src_ds.GetRasterBand(b + 1).WriteRaster(
+                0,
+                0,
+                2048,
+                2048,
+                array.array(
+                    "B", [((i + b * 569) * 4391) % 251 for i in range(2048 * 2048)]
+                ),
+            )
+
+        # Write first image segment, reserve space for other ones
+        NUMI = 8
+        assert (
+            gdal.GetDriverByName("NITF").CreateCopy(
+                "/vsimem/out.ntf",
+                src_ds,
+                options=["NUMI=%d" % NUMI, "IC=C3", "QUALITY=100"],
+            )
+            is not None
+        )
+
+        # Check CLEVEL value
+        f = gdal.VSIFOpenL("/vsimem/out.ntf", "rb")
+        gdal.VSIFSeekL(f, 9, 0)
+        assert gdal.VSIFReadL(1, 2, f) == b"03"
+        gdal.VSIFCloseL(f)
+
+        got_clevel_05 = False
+        for i in range(NUMI - 1):
+            assert (
+                gdal.GetDriverByName("NITF").CreateCopy(
+                    "/vsimem/out.ntf",
+                    src_ds,
+                    options=["APPEND_SUBDATASET=YES", "IC=C3", "QUALITY=100"],
+                )
+                is not None
+            )
+
+            # Check CLEVEL value
+            f = gdal.VSIFOpenL("/vsimem/out.ntf", "rb")
+            gdal.VSIFSeekL(f, 9, 0)
+            if gdal.VSIStatL("/vsimem/out.ntf").size > 52428799:
+                assert gdal.VSIFReadL(1, 2, f) == b"05"
+                got_clevel_05 = True
+            else:
+                assert gdal.VSIFReadL(1, 2, f) == b"03"
+            gdal.VSIFCloseL(f)
+
+        assert got_clevel_05
+
+        gdal.GetDriverByName("NITF").Delete("/vsimem/out.ntf")
+
+    else:
+        # Artificial use case
+        src_ds = gdal.GetDriverByName("MEM").Create("", 10, 10)
+        assert (
+            gdal.GetDriverByName("NITF").CreateCopy(
+                "/vsimem/out.ntf", src_ds, options=["NUMI=2", "IC=C3"]
+            )
+            is not None
+        )
+
+        # Check CLEVEL value
+        f = gdal.VSIFOpenL("/vsimem/out.ntf", "rb+")
+        gdal.VSIFSeekL(f, 9, 0)
+        assert gdal.VSIFReadL(1, 2, f) == b"03"
+        file_size_before = gdal.VSIStatL("/vsimem/out.ntf").size
+
+        # Grow the image/file artificially up to the level where we'll have to
+        # switch to CLEVEL=5
+        file_size_after = 52428799
+        gdal.VSIFSeekL(f, file_size_after - 1, 0)
+        gdal.VSIFWriteL(b"\0", 1, 1, f)
+
+        # Read image size field...
+        gdal.VSIFSeekL(f, 369, 0)
+        image_size_before = int(gdal.VSIFReadL(1, 10, f))
+
+        # Update image size field...
+        gdal.VSIFSeekL(f, 369, 0)
+        gdal.VSIFWriteL(
+            "%010d" % (image_size_before + file_size_after - file_size_before), 10, 1, f
+        )
+        gdal.VSIFCloseL(f)
+
+        # Add second image
+        assert (
+            gdal.GetDriverByName("NITF").CreateCopy(
+                "/vsimem/out.ntf", src_ds, options=["APPEND_SUBDATASET=YES", "IC=C3"]
+            )
+            is not None
+        )
+
+        # Check CLEVEL value
+        f = gdal.VSIFOpenL("/vsimem/out.ntf", "rb")
+        gdal.VSIFSeekL(f, 9, 0)
+        assert gdal.VSIFReadL(1, 2, f) == b"05"
+        gdal.VSIFCloseL(f)
+
+        gdal.GetDriverByName("NITF").Delete("/vsimem/out.ntf")
+
+
+###############################################################################
 # Test writing/reading PAM metadata
 
 
@@ -5429,11 +5518,10 @@ def test_nitf_metadata_validation_des():
 
 def test_nitf_online_1():
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://download.osgeo.org/gdal/data/nitf/bugs/NITF21_CGM_ANNO_Uncompressed_unmasked.ntf",
         "NITF21_CGM_ANNO_Uncompressed_unmasked.ntf",
-    ):
-        pytest.skip()
+    )
 
     tst = gdaltest.GDALTest(
         "NITF",
@@ -5457,10 +5545,9 @@ def test_nitf_online_1():
 
 def test_nitf_online_2():
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://download.osgeo.org/gdal/data/nitf/nitf1.1/U_0001a.ntf", "U_0001a.ntf"
-    ):
-        pytest.skip()
+    )
 
     ds = gdal.Open("tmp/cache/U_0001a.ntf")
 
@@ -5475,10 +5562,9 @@ def test_nitf_online_2():
 
 def test_nitf_online_3():
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://download.osgeo.org/gdal/data/nitf/nitf1.1/U_0001a.ntf", "U_0001a.ntf"
-    ):
-        pytest.skip()
+    )
 
     tst = gdaltest.GDALTest(
         "NITF", "NITF_IM:3:tmp/cache/U_0001a.ntf", 1, 23463, filename_absolute=1
@@ -5493,10 +5579,9 @@ def test_nitf_online_3():
 
 def test_nitf_online_4():
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://download.osgeo.org/gdal/data/nitf/cadrg/001zc013.on1", "001zc013.on1"
-    ):
-        pytest.skip()
+    )
 
     # check that the RPF attribute metadata was carried through.
     ds = gdal.Open("tmp/cache/001zc013.on1")
@@ -5522,10 +5607,9 @@ def test_nitf_online_4():
 
 def test_nitf_online_5():
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://download.osgeo.org/gdal/data/nitf/cadrg/overview.ovr", "overview.ovr"
-    ):
-        pytest.skip()
+    )
 
     tst = gdaltest.GDALTest(
         "NITF", "tmp/cache/overview.ovr", 1, 60699, filename_absolute=1
@@ -5540,10 +5624,9 @@ def test_nitf_online_5():
 
 def test_nitf_online_6():
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://download.osgeo.org/gdal/data/nitf/nitf2.0/U_4001b.ntf", "U_4001b.ntf"
-    ):
-        pytest.skip()
+    )
 
     tst = gdaltest.GDALTest(
         "NITF", "tmp/cache/U_4001b.ntf", 1, 60030, filename_absolute=1
@@ -5559,12 +5642,11 @@ def test_nitf_online_6():
 def test_nitf_online_7():
 
     for filename in ["ns3228b.nsf", "i_3228c.ntf", "ns3228d.nsf", "i_3228e.ntf"]:
-        if not gdaltest.download_file(
+        gdaltest.download_or_skip(
             "http://www.gwg.nga.mil/ntb/baseline/software/testfile/Nitfv2_1/"
             + filename,
             filename,
-        ):
-            pytest.skip()
+        )
 
         ds = gdal.Open("tmp/cache/" + filename)
         assert ds.RasterCount == 6
@@ -5596,11 +5678,10 @@ def test_nitf_online_7():
 
 def test_nitf_online_8():
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://www.gwg.nga.mil/ntb/baseline/software/testfile/Nitfv2_1/ns3301j.nsf",
         "ns3301j.nsf",
-    ):
-        pytest.skip()
+    )
 
     tst = gdaltest.GDALTest(
         "NITF", "tmp/cache/ns3301j.nsf", 1, 56861, filename_absolute=1
@@ -5615,11 +5696,10 @@ def test_nitf_online_8():
 
 def test_nitf_online_9():
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://www.gwg.nga.mil/ntb/baseline/software/testfile/Nitfv2_1/ns3304a.nsf",
         "ns3304a.nsf",
-    ):
-        pytest.skip()
+    )
 
     tst = gdaltest.GDALTest(
         "NITF", "tmp/cache/ns3304a.nsf", 1, 32419, filename_absolute=1
@@ -5634,11 +5714,10 @@ def test_nitf_online_9():
 
 def test_nitf_online_10():
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://www.gwg.nga.mil/ntb/baseline/software/testfile/Nitfv2_1/ns3119b.nsf",
         "ns3119b.nsf",
-    ):
-        pytest.skip()
+    )
 
     # Shut up the warning about missing image segment
     gdal.PushErrorHandler("CPLQuietErrorHandler")
@@ -5688,10 +5767,9 @@ def test_nitf_online_10():
 
 def test_nitf_online_11():
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://download.osgeo.org/gdal/data/nitf/nitf2.0/U_1122a.ntf", "U_1122a.ntf"
-    ):
-        pytest.skip()
+    )
 
     ds = gdal.Open("tmp/cache/U_1122a.ntf")
 
@@ -5722,10 +5800,9 @@ def test_nitf_online_11():
 
 def test_nitf_online_12():
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://download.osgeo.org/gdal/data/nitf/bugs/i_3430a.ntf", "i_3430a.ntf"
-    ):
-        pytest.skip()
+    )
 
     tst = gdaltest.GDALTest(
         "NITF", "tmp/cache/i_3430a.ntf", 1, 38647, filename_absolute=1
@@ -5740,10 +5817,9 @@ def test_nitf_online_12():
 
 def test_nitf_online_13():
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://download.osgeo.org/gdal/data/nitf/u_3054a.ntf", "u_3054a.ntf"
-    ):
-        pytest.skip()
+    )
 
     # Shut up the warning about missing image segment
     ds = gdal.Open("NITF_IM:2:tmp/cache/u_3054a.ntf")
@@ -5790,10 +5866,9 @@ def test_nitf_online_13():
 
 def test_nitf_online_14(not_jpeg_9b):
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://download.osgeo.org/gdal/data/nitf/nitf2.0/U_4020h.ntf", "U_4020h.ntf"
-    ):
-        pytest.skip()
+    )
 
     try:
         os.remove("tmp/cache/U_4020h.ntf.aux.xml")
@@ -5822,12 +5897,14 @@ def test_nitf_online_14(not_jpeg_9b):
 # Test opening a IC=C8 NITF file with the various JPEG2000 drivers
 
 
+@pytest.mark.parametrize(
+    "driver_to_test", ["JP2ECW", "JP2MrSID", "JP2KAK", "JP2OpenJPEG"]
+)
 def nitf_online_15(driver_to_test, expected_cs=1054):
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://www.gwg.nga.mil/ntb/baseline/software/testfile/Jpeg2000/p0_01/p0_01a.ntf",
         "p0_01a.ntf",
-    ):
-        pytest.skip()
+    )
 
     jp2_drv = gdal.GetDriverByName(driver_to_test)
 
@@ -5844,37 +5921,19 @@ def nitf_online_15(driver_to_test, expected_cs=1054):
         gdaltest.reregister_all_jpeg2000_drivers()
 
 
-def test_nitf_online_15_jp2ecw():
-    nitf_online_15("JP2ECW")
-
-
-def test_nitf_online_15_jp2mrsid():
-    nitf_online_15("JP2MrSID")
-
-
-def test_nitf_online_15_jp2kak():
-    nitf_online_15("JP2KAK")
-
-
-def test_nitf_online_15_jasper():
-    nitf_online_15("JPEG2000")
-
-
-def test_nitf_online_15_openjpeg():
-    nitf_online_15("JP2OpenJPEG")
-
-
 ###############################################################################
 # Test opening a IC=C8 NITF file which has 256-entry palette/LUT in both JP2 Header and image Subheader
 # We expect RGB expansion from some JPEG2000 driver
 
 
+@pytest.mark.parametrize(
+    "driver_to_test", ["JP2ECW", "JP2MrSID", "JP2KAK", "JP2OpenJPEG"]
+)
 def nitf_online_16(driver_to_test):
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://www.gwg.nga.mil/ntb/baseline/software/testfile/Jpeg2000/jp2_09/file9_jp2_2places.ntf",
         "file9_jp2_2places.ntf",
-    ):
-        pytest.skip()
+    )
 
     jp2_drv = gdal.GetDriverByName(driver_to_test)
 
@@ -5904,37 +5963,19 @@ def nitf_online_16(driver_to_test):
         gdaltest.reregister_all_jpeg2000_drivers()
 
 
-def test_nitf_online_16_jp2ecw():
-    nitf_online_16("JP2ECW")
-
-
-def test_nitf_online_16_jp2mrsid():
-    nitf_online_16("JP2MrSID")
-
-
-def test_nitf_online_16_jp2kak():
-    nitf_online_16("JP2KAK")
-
-
-def test_nitf_online_16_jasper():
-    nitf_online_16("JPEG2000")
-
-
-def test_nitf_online_16_openjpeg():
-    nitf_online_16("JP2OpenJPEG")
-
-
 ###############################################################################
 # Test opening a IC=C8 NITF file which has 256-entry/LUT in Image Subheader, JP2 header completely removed
 # We don't expect RGB expansion from the JPEG2000 driver
 
 
+@pytest.mark.parametrize(
+    "driver_to_test", ["JP2ECW", "JP2MrSID", "JP2KAK", "JP2OpenJPEG"]
+)
 def nitf_online_17(driver_to_test):
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://www.gwg.nga.mil/ntb/baseline/software/testfile/Jpeg2000/jp2_09/file9_j2c.ntf",
         "file9_j2c.ntf",
-    ):
-        pytest.skip()
+    )
 
     jp2_drv = gdal.GetDriverByName(driver_to_test)
 
@@ -5958,35 +5999,14 @@ def nitf_online_17(driver_to_test):
     gdaltest.reregister_all_jpeg2000_drivers()
 
 
-def test_nitf_online_17_jp2ecw():
-    nitf_online_17("JP2ECW")
-
-
-def test_nitf_online_17_jp2mrsid():
-    nitf_online_17("JP2MrSID")
-
-
-def test_nitf_online_17_jp2kak():
-    nitf_online_17("JP2KAK")
-
-
-def test_nitf_online_17_jasper():
-    nitf_online_17("JPEG2000")
-
-
-def test_nitf_online_17_openjpeg():
-    nitf_online_17("JP2OpenJPEG")
-
-
 ###############################################################################
 # Test polar stereographic CADRG tile.
 
 
 def test_nitf_online_18():
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://download.osgeo.org/gdal/data/nitf/bugs/bug3337.ntf", "bug3337.ntf"
-    ):
-        pytest.skip()
+    )
 
     ds = gdal.Open("tmp/cache/bug3337.ntf")
 
@@ -6035,10 +6055,9 @@ def test_nitf_online_18():
 
 def test_nitf_online_19():
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://download.osgeo.org/gdal/data/nitf/0000M033.GN3", "0000M033.GN3"
-    ):
-        pytest.skip()
+    )
 
     tst = gdaltest.GDALTest(
         "NITF", "tmp/cache/0000M033.GN3", 1, 38928, filename_absolute=1
@@ -6064,10 +6083,9 @@ def test_nitf_online_19():
 
 def test_nitf_online_20():
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://download.osgeo.org/gdal/data/nitf/0000M033.GN3", "0000M033.GN3"
-    ):
-        pytest.skip()
+    )
 
     # check that the RPF attribute metadata was carried through.
     # Special case where the reported size of the attribute subsection is
@@ -6088,11 +6106,10 @@ def test_nitf_online_20():
 
 def test_nitf_online_21():
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://www.gwg.nga.mil/ntb/baseline/software/testfile/Nitfv2_1/ns3321a.nsf",
         "ns3321a.nsf",
-    ):
-        pytest.skip()
+    )
 
     ds = gdal.Open("tmp/cache/ns3321a.nsf")
     md = ds.GetMetadata()
@@ -6109,11 +6126,10 @@ def test_nitf_online_21():
 
 def test_nitf_online_22():
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://www.gwg.nga.mil/ntb/baseline/software/testfile/Nitfv1_1/U_0001C.NTF",
         "U_0001C.NTF",
-    ):
-        pytest.skip()
+    )
 
     ds = gdal.Open("NITF_IM:1:tmp/cache/U_0001C.NTF")
     md = ds.GetMetadata()
@@ -6210,10 +6226,9 @@ def test_nitf_online_22():
 
 def test_nitf_online_23():
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://download.osgeo.org/gdal/data/nitf/nitf2.0/U_3058b.ntf", "U_3058b.ntf"
-    ):
-        pytest.skip()
+    )
 
     tst = gdaltest.GDALTest(
         "NITF", "tmp/cache/U_3058b.ntf", 1, 44748, filename_absolute=1
@@ -6228,10 +6243,9 @@ def test_nitf_online_23():
 
 def test_nitf_online_24():
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://www.falconview.org/trac/FalconView/downloads/17", "ECRG_Sample.zip"
-    ):
-        pytest.skip()
+    )
 
     try:
         os.stat("tmp/cache/ECRG_Sample.zip")
@@ -6264,11 +6278,10 @@ def test_nitf_online_24():
 
 def test_nitf_online_25():
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://www.gwg.nga.mil/ntb/baseline/docs/HRE_spec/Case1_HRE10G324642N1170747W_Uxx.hr5",
         "Case1_HRE10G324642N1170747W_Uxx.hr5",
-    ):
-        pytest.skip()
+    )
 
     tst = gdaltest.GDALTest(
         "NITF",

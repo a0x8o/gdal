@@ -420,10 +420,8 @@ def test_ogr2ogr_lib_19():
 # Test preservation of source geometry field name
 
 
+@pytest.mark.require_driver("GPKG")
 def test_ogr2ogr_lib_20():
-
-    if ogr.GetDriverByName("GPKG") is None:
-        pytest.skip()
 
     src_ds = gdal.GetDriverByName("Memory").Create("", 0, 0, 0)
     lyr = src_ds.CreateLayer("layer", geom_type=ogr.wkbNone)
@@ -480,13 +478,9 @@ def test_ogr2ogr_lib_21():
 ###############################################################################
 
 
+@pytest.mark.require_driver("CSV")
+@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
 def test_ogr2ogr_clipsrc_wkt_no_dst_geom():
-
-    if not ogrtest.have_geos():
-        pytest.skip()
-
-    if gdal.GetDriverByName("CSV") is None:
-        pytest.skip("CSV driver is missing")
 
     tmpfilename = "/vsimem/out.csv"
     wkt = "POLYGON ((479461 4764494,479461 4764196,480012 4764196,480012 4764494,479461 4764494))"
@@ -645,10 +639,8 @@ def test_ogr2ogr_lib_convert_to_linear_promote_to_multi(geometryType):
 # Test -makevalid
 
 
+@pytest.mark.require_driver("CSV")
 def test_ogr2ogr_lib_makevalid():
-
-    if gdal.GetDriverByName("CSV") is None:
-        pytest.skip("CSV driver is missing")
 
     # Check if MakeValid() is available
     g = ogr.CreateGeometryFromWkt("POLYGON ((0 0,10 10,0 10,10 0,0 0))")
@@ -898,10 +890,8 @@ def test_ogr2ogr_t_coord_epoch():
 # Test laundering of geometry column name when outputting to PostgreSQL (#6261)
 
 
+@pytest.mark.require_driver("PGDump")
 def test_ogr2ogr_launder_geometry_column_name():
-
-    if gdal.GetDriverByName("PGDump") is None:
-        pytest.skip("PGDump driver not available")
 
     srcDS = gdal.GetDriverByName("Memory").Create("", 0, 0, 0, gdal.GDT_Unknown)
     lyr = srcDS.CreateLayer("test", geom_type=ogr.wkbNone)
@@ -997,10 +987,8 @@ def test_ogr2ogr_upsert():
 # Test -t_srs to a driver that automatically reprojects to WGS 84
 
 
+@pytest.mark.require_driver("GeoJSONSeq")
 def test_ogr2ogr_lib_t_srs_ignored():
-
-    if gdal.GetDriverByName("GeoJSONSeq") is None:
-        pytest.skip("GeoJSONSeq driver is not available")
 
     srcDS = gdal.GetDriverByName("Memory").Create("", 0, 0, 0, gdal.GDT_Unknown)
     srs = osr.SpatialReference()
@@ -1039,13 +1027,11 @@ def test_ogr2ogr_lib_t_srs_ignored():
 # Test spatSRS
 
 
+@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
 def test_ogr2ogr_lib_spat_srs_projected():
 
     # Check that we densify spatial filter geometry when not expressed in
     # the layer CRS
-
-    if not ogrtest.have_geos():
-        pytest.skip("GEOS is not available")
 
     srcDS = gdal.GetDriverByName("Memory").Create("", 0, 0, 0, gdal.GDT_Unknown)
     srs = osr.SpatialReference()
@@ -1076,13 +1062,11 @@ def test_ogr2ogr_lib_spat_srs_projected():
 # Test spatSRS
 
 
+@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
 def test_ogr2ogr_lib_spat_srs_geographic():
 
     # Check that we densify spatial filter geometry when not expressed in
     # the layer CRS
-
-    if not ogrtest.have_geos():
-        pytest.skip("GEOS is not available")
 
     srcDS = gdal.GetDriverByName("Memory").Create("", 0, 0, 0, gdal.GDT_Unknown)
     srs = osr.SpatialReference()
@@ -1106,9 +1090,7 @@ def test_ogr2ogr_lib_spat_srs_geographic():
 # Test -clipsrc with a clip datasource
 
 
-@pytest.mark.skipif(
-    ogr.GetDriverByName("GPKG") is None, reason="GPKG driver not available"
-)
+@pytest.mark.require_driver("GPKG")
 @pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS is not available")
 def test_ogr2ogr_lib_clipsrc_datasource():
 
@@ -1187,10 +1169,8 @@ def test_ogr2ogr_lib_clipsrc_datasource():
 # Test -clipsrc and intersection being of a lower dimensionality
 
 
+@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
 def test_ogr2ogr_lib_clipsrc_discard_lower_dimensionality():
-
-    if not ogrtest.have_geos():
-        pytest.skip("GEOS is not available")
 
     srcDS = gdal.GetDriverByName("Memory").Create("", 0, 0, 0, gdal.GDT_Unknown)
     srs = osr.SpatialReference()
@@ -1211,9 +1191,7 @@ def test_ogr2ogr_lib_clipsrc_discard_lower_dimensionality():
 # Test -clipdst with a clip datasource
 
 
-@pytest.mark.skipif(
-    ogr.GetDriverByName("GPKG") is None, reason="GPKG driver not available"
-)
+@pytest.mark.require_driver("GPKG")
 @pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS is not available")
 def test_ogr2ogr_lib_clipdst_datasource():
 
@@ -1292,10 +1270,8 @@ def test_ogr2ogr_lib_clipdst_datasource():
 # Test -clipdst and intersection being of a lower dimensionality
 
 
+@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
 def test_ogr2ogr_lib_clipdst_discard_lower_dimensionality():
-
-    if not ogrtest.have_geos():
-        pytest.skip("GEOS is not available")
 
     srcDS = gdal.GetDriverByName("Memory").Create("", 0, 0, 0, gdal.GDT_Unknown)
     srs = osr.SpatialReference()
@@ -1389,10 +1365,8 @@ def test_ogr2ogr_lib_explodecollections():
 # Test converting a layer with a fid string to GPKG
 
 
+@pytest.mark.require_driver("GPKG")
 def test_ogr2ogr_lib_fid_string_to_gpkg():
-
-    if ogr.GetDriverByName("GPKG") is None:
-        pytest.skip("GPKG driver not available")
 
     srcDS = gdal.GetDriverByName("Memory").Create("", 0, 0, 0, gdal.GDT_Unknown)
     srcLayer = srcDS.CreateLayer("test")
@@ -1477,9 +1451,7 @@ def test_ogr2ogr_lib_simplify():
 # Test using transactionSize
 
 
-@pytest.mark.skipif(
-    ogr.GetDriverByName("GPKG") is None, reason="GPKG driver not available"
-)
+@pytest.mark.require_driver("GPKG")
 @pytest.mark.parametrize("transaction_size", [0, 10, "unlimited"])
 def test_ogr2ogr_lib_transaction_size(transaction_size):
 
@@ -1502,3 +1474,79 @@ def test_ogr2ogr_lib_transaction_size(transaction_size):
     finally:
         ds = None
         gdal.Unlink("/vsimem/out.gpkg")
+
+
+###############################################################################
+# Test -dateTimeTo
+
+
+def test_ogr2ogr_lib_dateTimeTo():
+
+    src_ds = gdal.GetDriverByName("Memory").Create("", 0, 0, 0, gdal.GDT_Unknown)
+    src_lyr = src_ds.CreateLayer("layer")
+    src_lyr.CreateField(ogr.FieldDefn("dt", ogr.OFTDateTime))
+    src_lyr.CreateField(ogr.FieldDefn("int", ogr.OFTInteger))
+    f = ogr.Feature(src_lyr.GetLayerDefn())
+    f["dt"] = "2023/02/01 02:34:56.789+0315"
+    f["int"] = 1
+    src_lyr.CreateFeature(f)
+    f = ogr.Feature(src_lyr.GetLayerDefn())
+    f["dt"] = "2023/02/01 01:34:56.789+0300"
+    src_lyr.CreateFeature(f)
+    f = ogr.Feature(src_lyr.GetLayerDefn())
+    f["dt"] = "2023/02/01 00:34:56.789"
+    src_lyr.CreateFeature(f)
+    f = ogr.Feature(src_lyr.GetLayerDefn())
+    src_lyr.CreateFeature(f)
+
+    with gdaltest.error_handler():
+        with pytest.raises(Exception):
+            gdal.VectorTranslate("", src_ds, options="-f Memory -dateTimeTo")
+        with pytest.raises(Exception):
+            gdal.VectorTranslate("", src_ds, options="-f Memory -dateTimeTo foo")
+        with pytest.raises(Exception):
+            gdal.VectorTranslate("", src_ds, options="-f Memory -dateTimeTo UTCx")
+        with pytest.raises(Exception):
+            gdal.VectorTranslate("", src_ds, options="-f Memory -dateTimeTo UTCx12")
+        with pytest.raises(Exception):
+            gdal.VectorTranslate("", src_ds, options="-f Memory -dateTimeTo UTC+15")
+        with pytest.raises(Exception):
+            gdal.VectorTranslate("", src_ds, options="-f Memory -dateTimeTo UTC+12:")
+        with pytest.raises(Exception):
+            gdal.VectorTranslate("", src_ds, options="-f Memory -dateTimeTo UTC+12:3")
+        with pytest.raises(Exception):
+            gdal.VectorTranslate("", src_ds, options="-f Memory -dateTimeTo UTC+12:34")
+        with pytest.raises(Exception):
+            gdal.VectorTranslate("", src_ds, options="-f Memory -dateTimeTo UTC+12:345")
+
+    dst_ds = gdal.VectorTranslate("", src_ds, options="-f Memory -dateTimeTo UTC+03:00")
+    dst_lyr = dst_ds.GetLayer(0)
+    f = dst_lyr.GetNextFeature()
+    assert f["dt"] == "2023/02/01 02:19:56.789+03"
+    assert f["int"] == 1
+    f = dst_lyr.GetNextFeature()
+    assert f["dt"] == "2023/02/01 01:34:56.789+03"
+    f = dst_lyr.GetNextFeature()
+    assert f["dt"] == "2023/02/01 00:34:56.789"
+    f = dst_lyr.GetNextFeature()
+    assert not f.IsFieldSet("dt")
+
+    dst_ds = gdal.VectorTranslate("", src_ds, options="-f Memory -dateTimeTo UTC")
+    dst_lyr = dst_ds.GetLayer(0)
+    f = dst_lyr.GetNextFeature()
+    assert f["dt"] == "2023/01/31 23:19:56.789+00"
+
+    dst_ds = gdal.VectorTranslate("", src_ds, options="-f Memory -dateTimeTo UTC-13:15")
+    dst_lyr = dst_ds.GetLayer(0)
+    f = dst_lyr.GetNextFeature()
+    assert f["dt"] == "2023/01/31 10:04:56.789-1315"
+
+    dst_ds = gdal.VectorTranslate("", src_ds, options="-f Memory -dateTimeTo UTC-13:30")
+    dst_lyr = dst_ds.GetLayer(0)
+    f = dst_lyr.GetNextFeature()
+    assert f["dt"] == "2023/01/31 09:49:56.789-1330"
+
+    dst_ds = gdal.VectorTranslate("", src_ds, options="-f Memory -dateTimeTo UTC-13:45")
+    dst_lyr = dst_ds.GetLayer(0)
+    f = dst_lyr.GetNextFeature()
+    assert f["dt"] == "2023/01/31 09:34:56.789-1345"

@@ -37,6 +37,7 @@
 #include "ogr_feature.h"
 #include "ogrsf_frmts.h"
 #include "ogr_geometry.h"
+#include "commonutils.h"
 
 #include <set>
 
@@ -396,6 +397,179 @@ static void ReportFieldDomain(CPLString &osRet, CPLJSONObject &oDomains,
                 Concat(osRet, psOptions->bStdoutOutput, "  Glob: %s\n",
                        poGlobFieldDomain->GetGlob().c_str());
             break;
+        }
+    }
+}
+
+/************************************************************************/
+/*                       ReportRelationships()                          */
+/************************************************************************/
+
+static void ReportRelationships(CPLString &osRet, CPLJSONObject &oRoot,
+                                const GDALVectorInfoOptions *psOptions,
+                                const GDALDataset *poDS)
+{
+    const bool bJson = psOptions->eFormat == FORMAT_JSON;
+    CPLJSONObject oRelationships;
+    if (bJson)
+        oRoot.Add("relationships", oRelationships);
+
+    const auto aosRelationshipNames = poDS->GetRelationshipNames();
+    for (const std::string &osRelationshipName : aosRelationshipNames)
+    {
+        const auto poRelationship = poDS->GetRelationship(osRelationshipName);
+        if (!poRelationship)
+            continue;
+
+        const char *pszType = "";
+        switch (poRelationship->GetType())
+        {
+            case GRT_COMPOSITE:
+                pszType = "Composite";
+                break;
+            case GRT_ASSOCIATION:
+                pszType = "Association";
+                break;
+            case GRT_AGGREGATION:
+                pszType = "Aggregation";
+                break;
+        }
+
+        const char *pszCardinality = "";
+        switch (poRelationship->GetCardinality())
+        {
+            case GRC_ONE_TO_ONE:
+                pszCardinality = "OneToOne";
+                break;
+            case GRC_ONE_TO_MANY:
+                pszCardinality = "OneToMany";
+                break;
+            case GRC_MANY_TO_ONE:
+                pszCardinality = "ManyToOne";
+                break;
+            case GRC_MANY_TO_MANY:
+                pszCardinality = "ManyToMany";
+                break;
+        }
+
+        const auto &aosLeftTableFields = poRelationship->GetLeftTableFields();
+        const auto &aosRightTableFields = poRelationship->GetRightTableFields();
+        const auto &osMappingTableName = poRelationship->GetMappingTableName();
+        const auto &aosLeftMappingTableFields =
+            poRelationship->GetLeftMappingTableFields();
+        const auto &aosRightMappingTableFields =
+            poRelationship->GetRightMappingTableFields();
+
+        if (bJson)
+        {
+            CPLJSONObject oRelationship;
+            oRelationships.Add(osRelationshipName, oRelationship);
+
+            oRelationship.Add("type", pszType);
+            oRelationship.Add("related_table_type",
+                              poRelationship->GetRelatedTableType());
+            oRelationship.Add("cardinality", pszCardinality);
+            oRelationship.Add("left_table_name",
+                              poRelationship->GetLeftTableName());
+            oRelationship.Add("right_table_name",
+                              poRelationship->GetRightTableName());
+
+            CPLJSONArray oLeftTableFields;
+            oRelationship.Add("left_table_fields", oLeftTableFields);
+            for (const auto &osName : aosLeftTableFields)
+                oLeftTableFields.Add(osName);
+
+            CPLJSONArray oRightTableFields;
+            oRelationship.Add("right_table_fields", oRightTableFields);
+            for (const auto &osName : aosRightTableFields)
+                oRightTableFields.Add(osName);
+
+            if (!osMappingTableName.empty())
+            {
+                oRelationship.Add("mapping_table_name", osMappingTableName);
+
+                CPLJSONArray oLeftMappingTableFields;
+                oRelationship.Add("left_mapping_table_fields",
+                                  oLeftMappingTableFields);
+                for (const auto &osName : aosLeftMappingTableFields)
+                    oLeftMappingTableFields.Add(osName);
+
+                CPLJSONArray oRightMappingTableFields;
+                oRelationship.Add("right_mapping_table_fields",
+                                  oRightMappingTableFields);
+                for (const auto &osName : aosRightMappingTableFields)
+                    oRightMappingTableFields.Add(osName);
+            }
+
+            oRelationship.Add("forward_path_label",
+                              poRelationship->GetForwardPathLabel());
+            oRelationship.Add("backward_path_label",
+                              poRelationship->GetBackwardPathLabel());
+        }
+        else
+        {
+            const auto ConcatStringList =
+                [&osRet, psOptions](const std::vector<std::string> &aosList)
+            {
+                bool bFirstName = true;
+                for (const auto &osName : aosList)
+                {
+                    if (!bFirstName)
+                        Concat(osRet, psOptions->bStdoutOutput, ", ");
+                    bFirstName = false;
+                    Concat(osRet, psOptions->bStdoutOutput, "%s",
+                           osName.c_str());
+                }
+                Concat(osRet, psOptions->bStdoutOutput, "\n");
+            };
+
+            if (!psOptions->bAllLayers)
+            {
+                Concat(osRet, psOptions->bStdoutOutput,
+                       "Relationship: %s (%s, %s, %s)\n",
+                       osRelationshipName.c_str(), pszType,
+                       poRelationship->GetLeftTableName().c_str(),
+                       poRelationship->GetRightTableName().c_str());
+                continue;
+            }
+            Concat(osRet, psOptions->bStdoutOutput, "\nRelationship: %s\n",
+                   osRelationshipName.c_str());
+            Concat(osRet, psOptions->bStdoutOutput, "  Type: %s\n", pszType);
+            Concat(osRet, psOptions->bStdoutOutput,
+                   "  Related table type: %s\n",
+                   poRelationship->GetRelatedTableType().c_str());
+            Concat(osRet, psOptions->bStdoutOutput, "  Cardinality: %s\n",
+                   pszCardinality);
+            Concat(osRet, psOptions->bStdoutOutput, "  Left table name: %s\n",
+                   poRelationship->GetLeftTableName().c_str());
+            Concat(osRet, psOptions->bStdoutOutput, "  Right table name: %s\n",
+                   poRelationship->GetRightTableName().c_str());
+            Concat(osRet, psOptions->bStdoutOutput, "  Left table fields: ");
+            ConcatStringList(aosLeftTableFields);
+            Concat(osRet, psOptions->bStdoutOutput, "  Right table fields: ");
+            ConcatStringList(aosRightTableFields);
+
+            if (!osMappingTableName.empty())
+            {
+                Concat(osRet, psOptions->bStdoutOutput,
+                       "  Mapping table name: %s\n",
+                       osMappingTableName.c_str());
+
+                Concat(osRet, psOptions->bStdoutOutput,
+                       "  Left mapping table fields: ");
+                ConcatStringList(aosLeftMappingTableFields);
+
+                Concat(osRet, psOptions->bStdoutOutput,
+                       "  Right mapping table fields: ");
+                ConcatStringList(aosRightMappingTableFields);
+            }
+
+            Concat(osRet, psOptions->bStdoutOutput,
+                   "  Forward path label: %s\n",
+                   poRelationship->GetForwardPathLabel().c_str());
+            Concat(osRet, psOptions->bStdoutOutput,
+                   "  Backward path label: %s\n",
+                   poRelationship->GetBackwardPathLabel().c_str());
         }
     }
 }
@@ -1670,6 +1844,11 @@ char *GDALVectorInfo(GDALDatasetH hDataset,
         }
     }
 
+    if (!papszLayers)
+    {
+        ReportRelationships(osRet, oRoot, psOptions, poDS);
+    }
+
     if (bJson)
     {
         osRet.clear();
@@ -1684,69 +1863,6 @@ char *GDALVectorInfo(GDALDatasetH hDataset,
     }
 
     return VSI_STRDUP_VERBOSE(osRet);
-}
-
-/************************************************************************/
-/*                             RemoveBOM()                              */
-/************************************************************************/
-
-/* Remove potential UTF-8 BOM from data (must be NUL terminated) */
-static void RemoveBOM(GByte *pabyData)
-{
-    if (pabyData[0] == 0xEF && pabyData[1] == 0xBB && pabyData[2] == 0xBF)
-    {
-        memmove(pabyData, pabyData + 3,
-                strlen(reinterpret_cast<char *>(pabyData) + 3) + 1);
-    }
-}
-
-/************************************************************************/
-/*                        RemoveSQLComments()                           */
-/************************************************************************/
-
-static std::string RemoveSQLComments(const std::string &osInput)
-{
-    char **papszLines =
-        CSLTokenizeStringComplex(osInput.c_str(), "\r\n", FALSE, FALSE);
-    std::string osSQL;
-    for (char **papszIter = papszLines; papszIter && *papszIter; ++papszIter)
-    {
-        const char *pszLine = *papszIter;
-        char chQuote = 0;
-        int i = 0;
-        for (; pszLine[i] != '\0'; ++i)
-        {
-            if (chQuote)
-            {
-                if (pszLine[i] == chQuote)
-                {
-                    if (pszLine[i + 1] == chQuote)
-                    {
-                        i++;
-                    }
-                    else
-                    {
-                        chQuote = 0;
-                    }
-                }
-            }
-            else if (pszLine[i] == '\'' || pszLine[i] == '"')
-            {
-                chQuote = pszLine[i];
-            }
-            else if (pszLine[i] == '-' && pszLine[i + 1] == '-')
-            {
-                break;
-            }
-        }
-        if (i > 0)
-        {
-            osSQL.append(pszLine, i);
-        }
-        osSQL += ' ';
-    }
-    CSLDestroy(papszLines);
-    return osSQL;
 }
 
 /************************************************************************/
@@ -1856,7 +1972,7 @@ GDALVectorInfoOptionsNew(char **papszArgv,
                 VSIIngestFile(nullptr, papszArgv[iArg] + 1, &pabyRet, nullptr,
                               1024 * 1024))
             {
-                RemoveBOM(pabyRet);
+                GDALRemoveBOM(pabyRet);
                 psOptions->osWHERE = reinterpret_cast<char *>(pabyRet);
                 VSIFree(pabyRet);
             }
@@ -1874,10 +1990,11 @@ GDALVectorInfoOptionsNew(char **papszArgv,
                 VSIIngestFile(nullptr, papszArgv[iArg] + 1, &pabyRet, nullptr,
                               1024 * 1024))
             {
-                RemoveBOM(pabyRet);
+                GDALRemoveBOM(pabyRet);
+                char *pszSQLStatement = reinterpret_cast<char *>(pabyRet);
                 psOptions->osSQLStatement =
-                    RemoveSQLComments(reinterpret_cast<char *>(pabyRet));
-                VSIFree(pabyRet);
+                    GDALRemoveSQLComments(pszSQLStatement);
+                VSIFree(pszSQLStatement);
             }
             else
             {

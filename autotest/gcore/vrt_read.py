@@ -1450,6 +1450,25 @@ def test_vrt_protocol():
     geotransform = ds.GetGeoTransform()
     assert geotransform == (0.0, 1.0, 0.0, 10.0, 0.0, -0.5)
 
+    # test #7282
+    ds = gdal.Open("vrt://data/byte_with_ovr.tif?ovr=0")
+    assert ds.RasterXSize == 10
+
+    ds = gdal.Open("vrt://data/int32.tif?a_scale=2")
+    assert ds.GetRasterBand(1).GetScale() == 2.0
+
+    ds = gdal.Open("vrt://data/int32.tif?a_offset=-132")
+    assert ds.GetRasterBand(1).GetOffset() == -132.0
+
+    ds = gdal.Open("vrt://data/float32.tif?ot=Int32")
+    assert ds.GetRasterBand(1).DataType == gdal.GDT_Int32
+
+
+@pytest.mark.require_driver("BMP")
+def test_vrt_protocol_expand_option():
+    ds = gdal.Open("vrt://data/8bit_pal.bmp?expand=rgb")
+    assert ds.GetRasterBand(1).GetRasterColorInterpretation() == gdal.GCI_RedBand
+
 
 def test_vrt_source_no_dstrect():
 

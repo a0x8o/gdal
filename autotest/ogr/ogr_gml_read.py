@@ -668,10 +668,7 @@ def test_ogr_gml_14():
 
     files = ["xlink1.gml", "xlink2.gml", "expected1.gml", "expected2.gml"]
     for f in files:
-        if not gdaltest.download_file(
-            "http://download.osgeo.org/gdal/data/gml/" + f, f
-        ):
-            pytest.skip()
+        gdaltest.download_or_skip("http://download.osgeo.org/gdal/data/gml/" + f, f)
 
     gdal.SetConfigOption("GML_SKIP_RESOLVE_ELEMS", "NONE")
     gdal.SetConfigOption("GML_SAVE_RESOLVED_TO", "tmp/cache/xlink1resolved.gml")
@@ -786,6 +783,37 @@ def test_gml_read_compound_crs_lat_long():
     # check the first feature
     feat = lyr.GetNextFeature()
     assert not ogrtest.check_feature_geometry(feat, wkt), "Wrong geometry"
+
+
+###############################################################################
+# Read CityGML Lod2 with xlink:href in the gml:Solid
+
+
+def test_ogr_gml_city_gml_lod2_with_xlink_href():
+
+    if not gdaltest.have_gml_reader:
+        pytest.skip()
+
+    gdal.Unlink("data/gml/citygml_lod2_713_5322.gfs")
+    gdal.ErrorReset()
+    ds = ogr.Open("data/gml/citygml_lod2_713_5322.xml")
+    lyr = ds.GetLayer(0)
+    assert gdal.GetLastErrorMsg() == ""
+    assert lyr.GetSpatialRef().IsProjected()
+    assert lyr.GetGeomType() == ogr.wkbPolyhedralSurfaceZ
+
+    feat = lyr.GetNextFeature()
+
+    # print(feat.GetGeometryRef().ExportToIsoWkt())
+    wkt = "POLYHEDRALSURFACE Z (((713235.347 5322980.429 584.22,713235.909 5322980.781 584.22,713237.154 5322981.561 584.22,713237.154 5322981.561 587.655,713235.909 5322980.781 588.03,713235.347 5322980.429 587.86,713235.347 5322980.429 584.22)),((713236.374 5322982.678 587.658,713237.154 5322981.561 587.655,713237.154 5322981.561 584.22,713236.374 5322982.678 584.22,713234.768 5322984.981 584.22,713234.768 5322984.981 587.666,713236.374 5322982.678 587.658)),((713234.612 5322981.452 584.22,713235.347 5322980.429 584.22,713235.347 5322980.429 587.86,713234.612 5322981.452 587.853,713234.612 5322981.452 588.21,713234.585 5322981.49 588.21,713234.585 5322981.49 584.22,713234.612 5322981.452 584.22)),((713229.269 5322983.856 587.663,713231.399 5322985.337 588.33,713233.571 5322986.847 587.65,713235.231 5322988.002 587.13,713235.231 5322988.002 584.22,713233.571 5322986.847 584.22,713231.399 5322985.337 584.22,713229.269 5322983.856 584.22,713229.269 5322983.856 587.663)),((713235.231 5322988.002 584.22,713235.231 5322988.002 587.13,713236.493 5322986.18 587.126,713236.493 5322986.18 584.22,713235.231 5322988.002 584.22)),((713232.071 5322979.751 584.22,713232.071 5322979.751 587.663,713229.269 5322983.856 587.663,713229.269 5322983.856 584.22,713232.071 5322979.751 584.22)),((713235.909 5322980.781 584.22,713235.347 5322980.429 584.22,713234.612 5322981.452 584.22,713234.585 5322981.49 584.22,713234.205 5322981.227 584.22,713232.071 5322979.751 584.22,713229.269 5322983.856 584.22,713231.399 5322985.337 584.22,713233.571 5322986.847 584.22,713235.231 5322988.002 584.22,713236.493 5322986.18 584.22,713234.82 5322985.017 584.22,713234.768 5322984.981 584.22,713236.374 5322982.678 584.22,713237.154 5322981.561 584.22,713235.909 5322980.781 584.22)),((713232.071 5322979.751 584.22,713234.205 5322981.227 584.22,713234.585 5322981.49 584.22,713234.585 5322981.49 588.21,713234.205 5322981.227 588.33,713232.071 5322979.751 587.663,713232.071 5322979.751 584.22)),((713235.181 5322981.849 588.032,713234.612 5322981.452 588.21,713234.612 5322981.452 587.853,713235.181 5322981.849 588.032)),((713235.347 5322980.429 587.86,713235.909 5322980.781 588.03,713235.181 5322981.849 588.032,713234.612 5322981.452 587.853,713235.347 5322980.429 587.86)),((713234.768 5322984.981 584.22,713234.82 5322985.017 584.22,713236.493 5322986.18 584.22,713236.493 5322986.18 587.126,713234.82 5322985.017 587.65,713234.768 5322984.981 587.666,713234.768 5322984.981 584.22)),((713234.205 5322981.227 588.33,713234.585 5322981.49 588.21,713234.612 5322981.452 588.21,713235.181 5322981.849 588.032,713235.909 5322980.781 588.03,713237.154 5322981.561 587.655,713236.374 5322982.678 587.658,713234.768 5322984.981 587.666,713234.82 5322985.017 587.65,713236.493 5322986.18 587.126,713235.231 5322988.002 587.13,713233.571 5322986.847 587.65,713231.399 5322985.337 588.33,713234.205 5322981.227 588.33)),((713232.071 5322979.751 587.663,713234.205 5322981.227 588.33,713231.399 5322985.337 588.33,713229.269 5322983.856 587.663,713232.071 5322979.751 587.663)))"
+    assert not ogrtest.check_feature_geometry(feat, wkt), "Wrong geometry"
+
+    feat = lyr.GetNextFeature()
+    assert not feat.GetGeometryRef().IsEmpty()
+
+    ds = None
+
+    gdal.Unlink("data/gml/citygml_lod2_713_5322.gfs")
 
 
 ###############################################################################
@@ -1467,15 +1495,11 @@ def test_ogr_gml_34():
 # Test GML_SKIP_RESOLVE_ELEMS=HUGE (#4380)
 
 
+@pytest.mark.require_driver("SQLite")
+@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
 def test_ogr_gml_35():
 
     if not gdaltest.have_gml_reader:
-        pytest.skip()
-
-    if ogr.GetDriverByName("SQLite") is None:
-        pytest.skip()
-
-    if not ogrtest.have_geos():
         pytest.skip()
 
     try:
@@ -1577,19 +1601,12 @@ def test_ogr_gml_37():
 
 
 ###############################################################################
-# Test new GMLTopoSurface interpretation (#3934) with HUGE xlink resolver
+# Test new GMLTopoSurface interpretation (#3934) with xlink resolver
 
 
-def test_ogr_gml_38(resolver="HUGE"):
+def internal_ogr_gml_38(resolver):
 
     if not gdaltest.have_gml_reader:
-        pytest.skip()
-
-    if resolver == "HUGE":
-        if ogr.GetDriverByName("SQLite") is None:
-            pytest.skip()
-
-    if not ogrtest.have_geos():
         pytest.skip()
 
     try:
@@ -1629,11 +1646,22 @@ def test_ogr_gml_38(resolver="HUGE"):
 
 
 ###############################################################################
+# Test new GMLTopoSurface interpretation (#3934) with HUGE xlink resolver
+
+
+@pytest.mark.require_driver("SQLite")
+@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
+def test_ogr_gml_resolver_huge():
+    return internal_ogr_gml_38("HUGE")
+
+
+###############################################################################
 # Test new GMLTopoSurface interpretation (#3934) with standard xlink resolver
 
 
-def test_ogr_gml_39():
-    return test_ogr_gml_38("NONE")
+@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
+def test_ogr_gml_resolver_none():
+    return internal_ogr_gml_38("NONE")
 
 
 ###############################################################################
@@ -1668,10 +1696,9 @@ def test_ogr_gml_41():
     if not gdaltest.have_gml_reader:
         pytest.skip()
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://schemas.opengis.net/SCHEMAS_OPENGIS_NET.zip", "SCHEMAS_OPENGIS_NET.zip"
-    ):
-        pytest.skip()
+    )
 
     ds = ogr.Open("data/gml/expected_gml_gml3.gml")
 
@@ -3888,12 +3915,10 @@ version="1.0.0">
 # Test we are robust to content of XML elements bigger than 2 GB
 
 
+@pytest.mark.slow()
 def test_ogr_gml_76():
 
     if not gdaltest.have_gml_reader:
-        pytest.skip()
-
-    if not gdaltest.run_slow_tests():
         pytest.skip()
 
     with gdaltest.error_handler():

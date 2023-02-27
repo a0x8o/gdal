@@ -3332,6 +3332,7 @@ def test_ogr_sqlite_43():
 # Test reading/writing StringList, etc..
 
 
+@pytest.mark.require_driver("CSV")
 def test_ogr_sqlite_44():
 
     if gdaltest.sl_ds is None:

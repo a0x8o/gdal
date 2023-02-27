@@ -726,16 +726,11 @@ def test_netcdf_16():
 # check support for netcdf-4 - make sure hdf5 is not read by netcdf driver
 
 
+@pytest.mark.require_driver("HDF5")
+@pytest.mark.require_driver("HDF5Image")
 def test_netcdf_17():
 
     ifile = "data/hdf5/groups.h5"
-
-    # skip test if Hdf5 is not enabled
-    if (
-        gdal.GetDriverByName("HDF5") is None
-        and gdal.GetDriverByName("HDF5Image") is None
-    ):
-        pytest.skip()
 
     if gdaltest.netcdf_drv_has_nc4:
 
@@ -819,12 +814,10 @@ def test_netcdf_20():
 ###############################################################################
 # check support for writing large file with DEFLATE compression
 # if chunking is not defined properly within the netcdf driver, this test can take 1h
+@pytest.mark.slow()
 def test_netcdf_21():
 
     if not gdaltest.netcdf_drv_has_nc4:
-        pytest.skip()
-
-    if not gdaltest.run_slow_tests():
         pytest.skip()
 
     bigfile = "tmp/cache/utm-big.tif"
@@ -887,14 +880,9 @@ def test_netcdf_22():
 # check support for hdf4 - make sure  hdf4 file is not read by netcdf driver
 
 
+@pytest.mark.require_driver("HDF4")
+@pytest.mark.require_driver("HDF4Image")
 def test_netcdf_23():
-
-    # skip test if Hdf4 is not enabled in GDAL
-    if (
-        gdal.GetDriverByName("HDF4") is None
-        and gdal.GetDriverByName("HDF4Image") is None
-    ):
-        pytest.skip()
 
     ifile = "data/hdf4/hdifftst2.hdf"
 
@@ -1318,6 +1306,7 @@ def test_netcdf_33():
 # if chunking is not supported within the netcdf driver, this test can take very long
 
 
+@pytest.mark.slow()
 def test_netcdf_34():
 
     filename = "utm-big-chunks.nc"
@@ -1327,18 +1316,14 @@ def test_netcdf_34():
     if not gdaltest.netcdf_drv_has_nc4:
         pytest.skip()
 
-    if not gdaltest.run_slow_tests():
-        pytest.skip()
-
     try:
         from multiprocessing import Process
     except ImportError:
         pytest.skip("from multiprocessing import Process failed")
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://download.osgeo.org/gdal/data/netcdf/" + filename, filename
-    ):
-        pytest.skip()
+    )
 
     sys.stdout.write(".")
     sys.stdout.flush()
@@ -3472,10 +3457,9 @@ def test_netcdf_open_empty_double_attr():
 # Test writing and reading a file with huge block size
 
 
+@pytest.mark.slow()
 def test_netcdf_huge_block_size():
 
-    if not gdaltest.run_slow_tests():
-        pytest.skip()
     if sys.maxsize < 2**32:
         pytest.skip("Test not available on 32 bit")
 
@@ -6271,6 +6255,20 @@ def test_netcdf_read_lon_lat_indexed_irregularly_spaced():
         "Y_BAND": "1",
         "Y_DATASET": 'NETCDF:"data/netcdf/GLMELT_4X5.OCN.nc":lat',
     }
+
+
+###############################################################################
+# Test opening a dataset with invalid min_valid/max_valid attributes,
+# which are scaled instead of being in the raw data type
+
+
+def test_netcdf_read_invalid_valid_min_valid_max():
+
+    gdal.ErrorReset()
+    with gdaltest.error_handler():
+        ds = gdal.Open("data/netcdf/invalid_valid_min_valid_max.nc")
+    assert gdal.GetLastErrorType() == gdal.CE_Warning
+    assert struct.unpack("i" * 4, ds.ReadRaster()) == (-9999, 0, 1, 2)
 
 
 def test_clean_tmp():

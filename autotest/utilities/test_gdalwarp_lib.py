@@ -242,12 +242,12 @@ def test_gdalwarp_lib_11():
 
     ref_ds = gdal.Open("ref_data/testgdalwarp11.tif")
     maxdiff = gdaltest.compare_ds(ds, ref_ds, verbose=0)
-    ref_ds = None
 
     if maxdiff > 1:
         gdaltest.compare_ds(ds, ref_ds, verbose=1)
         pytest.fail("Image too different from reference")
 
+    ref_ds = None
     ds = None
 
 
@@ -268,12 +268,12 @@ def test_gdalwarp_lib_12():
 
     ref_ds = gdal.Open("ref_data/testgdalwarp12.tif")
     maxdiff = gdaltest.compare_ds(ds, ref_ds, verbose=0)
-    ref_ds = None
 
     if maxdiff > 1:
         gdaltest.compare_ds(ds, ref_ds, verbose=1)
         pytest.fail("Image too different from reference")
 
+    ref_ds = None
     ds = None
 
 
@@ -294,12 +294,12 @@ def test_gdalwarp_lib_13():
 
     ref_ds = gdal.Open("ref_data/testgdalwarp13.tif")
     maxdiff = gdaltest.compare_ds(ds, ref_ds, verbose=0)
-    ref_ds = None
 
     if maxdiff > 1:
         gdaltest.compare_ds(ds, ref_ds, verbose=1)
         pytest.fail("Image too different from reference")
 
+    ref_ds = None
     ds = None
 
 
@@ -320,12 +320,12 @@ def test_gdalwarp_lib_14():
 
     ref_ds = gdal.Open("ref_data/testgdalwarp14.tif")
     maxdiff = gdaltest.compare_ds(ds, ref_ds, verbose=0)
-    ref_ds = None
 
     if maxdiff > 1:
         gdaltest.compare_ds(ds, ref_ds, verbose=1)
         pytest.fail("Image too different from reference")
 
+    ref_ds = None
     ds = None
 
 
@@ -446,10 +446,8 @@ def test_gdalwarp_lib_19():
 # Test cutline from OGR datasource.
 
 
+@pytest.mark.require_driver("CSV")
 def test_gdalwarp_lib_21():
-
-    if gdal.GetDriverByName("CSV") is None:
-        pytest.skip("CSV driver is missing")
 
     ds = gdal.Warp(
         "",
@@ -509,10 +507,8 @@ def test_gdalwarp_lib_cutline_larger_source_dataset(options):
 # Test cutline with ALL_TOUCHED enabled.
 
 
+@pytest.mark.require_driver("CSV")
 def test_gdalwarp_lib_23():
-
-    if gdal.GetDriverByName("CSV") is None:
-        pytest.skip("CSV driver is missing")
 
     ds = gdal.Warp(
         "",
@@ -612,10 +608,8 @@ def test_gdalwarp_lib_45():
 # Test -crop_to_cutline
 
 
+@pytest.mark.require_driver("CSV")
 def test_gdalwarp_lib_46():
-
-    if gdal.GetDriverByName("CSV") is None:
-        pytest.skip("CSV driver is missing")
 
     ds = gdal.Warp(
         "",
@@ -749,6 +743,58 @@ def test_gdalwarp_lib_cutline_all_touched_single_pixel():
     expected_gt = (2.15, 0.001, 0.0, 48.151, 0.0, -0.001)
     assert max([abs(got_gt[i] - expected_gt[i]) for i in range(6)]) <= 1e-8, got_gt
     assert ds.RasterXSize == 1 and ds.RasterYSize == 1
+
+    gdal.Unlink(cutlineDSName)
+
+
+###############################################################################
+# Test -crop_to_cutline where the geometry is very close to pixel boundaries
+# (#7226)s
+
+
+@pytest.mark.require_driver("CSV")
+def test_gdalwarp_lib_crop_to_cutline_slightly_shifted_wrt_pixel_boundaries():
+
+    cutlineDSName = (
+        "/vsimem/test_gdalwarp_lib_crop_to_cutline_close_to_pixel_boundaries.json"
+    )
+    cutline_ds = ogr.GetDriverByName("GeoJSON").CreateDataSource(cutlineDSName)
+    srs = osr.SpatialReference()
+    srs.ImportFromEPSG(26711)
+    cutline_lyr = cutline_ds.CreateLayer("cutline", srs=srs)
+    f = ogr.Feature(cutline_lyr.GetLayerDefn())
+    f.SetGeometry(
+        ogr.CreateGeometryFromWkt(
+            "POLYGON((440720.001 3751320.001,440720.001 3750120.001,441920.001 3750120.001,441920.001 3751320.001,440720.001 3751320.001))"
+        )
+    )
+    cutline_lyr.CreateFeature(f)
+    f = None
+    cutline_lyr = None
+    cutline_ds = None
+
+    src_ds = gdal.Open("../gcore/data/byte.tif")
+    ds = gdal.Warp(
+        "", src_ds, format="MEM", cutlineDSName=cutlineDSName, cropToCutline=True
+    )
+    assert ds.RasterXSize == src_ds.RasterXSize
+    assert ds.RasterYSize == src_ds.RasterYSize
+    assert ds.GetGeoTransform() == src_ds.GetGeoTransform()
+    assert ds.GetRasterBand(1).Checksum() == src_ds.GetRasterBand(1).Checksum()
+
+    src_ds = gdal.Open("../gcore/data/byte.tif")
+    ds = gdal.Warp(
+        "",
+        src_ds,
+        format="MEM",
+        cutlineDSName=cutlineDSName,
+        cropToCutline=True,
+        warpOptions=["CUTLINE_ALL_TOUCHED=YES"],
+    )
+    assert ds.RasterXSize == src_ds.RasterXSize
+    assert ds.RasterYSize == src_ds.RasterYSize
+    assert ds.GetGeoTransform() == src_ds.GetGeoTransform()
+    assert ds.GetRasterBand(1).Checksum() == src_ds.GetRasterBand(1).Checksum()
 
     gdal.Unlink(cutlineDSName)
 
@@ -923,10 +969,8 @@ def test_gdalwarp_lib_110():
 # Test cutline SQL
 
 
+@pytest.mark.require_driver("CSV")
 def test_gdalwarp_lib_111():
-
-    if gdal.GetDriverByName("CSV") is None:
-        pytest.skip("CSV driver is missing")
 
     ds = gdal.Warp(
         "",
@@ -1651,10 +1695,8 @@ def test_gdalwarp_lib_134():
 # Test vertical datum shift
 
 
+@pytest.mark.require_driver("GTX")
 def test_gdalwarp_lib_135():
-
-    if gdal.GetDriverByName("GTX") is None:
-        pytest.skip("GTX driver is missing")
 
     src_ds = gdal.GetDriverByName("MEM").Create("", 1, 1)
     src_ds.SetGeoTransform([500000, 1, 0, 4000000, 0, -1])

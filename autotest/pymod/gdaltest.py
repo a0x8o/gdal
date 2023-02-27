@@ -30,6 +30,9 @@
 ###############################################################################
 
 import contextlib
+import functools
+import inspect
+import io
 import math
 import os
 import os.path
@@ -59,8 +62,6 @@ skip_counter = 0
 failure_summary = []
 
 reason = None
-count_skipped_tests_download = 0
-count_skipped_tests_slow = 0
 start_time = None
 end_time = None
 
@@ -1253,6 +1254,27 @@ def download_file(
             return False
 
 
+# Attempt to download file using `download_file`; skip test in case of failure
+def download_or_skip(url, *args, **kwargs):
+    msg = io.StringIO()
+    with contextlib.redirect_stdout(msg):
+        success = download_file(url, *args, **kwargs)
+
+    if not success:
+        testfn = inspect.stack()[1]
+
+        call_site = (
+            f"{testfn.function} ({os.path.basename(testfn.filename)}:{testfn.lineno})"
+        )
+
+        if download_test_data():
+            problem = f"Failed to download {url} : {msg.getvalue()}"
+        else:
+            problem = "GDAL_DOWNLOAD_TEST_DATA is not set to YES"
+
+        pytest.skip(f"{call_site} {problem}")
+
+
 ###############################################################################
 # GDAL data type to python struct format
 def gdal_data_type_to_python_struct_format(datatype):
@@ -1522,35 +1544,15 @@ def neginf():
 ###############################################################################
 # Has the user requested to download test data
 def download_test_data():
-    global count_skipped_tests_download
     val = gdal.GetConfigOption("GDAL_DOWNLOAD_TEST_DATA", None)
-    if val != "yes" and val != "YES":
-
-        if count_skipped_tests_download == 0:
-            print(
-                "As GDAL_DOWNLOAD_TEST_DATA environment variable is not defined or set to NO, some tests relying on data to downloaded from the Web will be skipped"
-            )
-        count_skipped_tests_download = count_skipped_tests_download + 1
-
-        return False
-    return True
+    return val == "yes" or val == "YES"
 
 
 ###############################################################################
 # Has the user requested to run the slow tests
 def run_slow_tests():
-    global count_skipped_tests_slow
     val = gdal.GetConfigOption("GDAL_RUN_SLOW_TESTS", None)
-    if val != "yes" and val != "YES":
-
-        if count_skipped_tests_slow == 0:
-            print(
-                'As GDAL_RUN_SLOW_TESTS environment variable is not defined or set to NO, some "slow" tests will be skipped'
-            )
-        count_skipped_tests_slow = count_skipped_tests_slow + 1
-
-        return False
-    return True
+    return val == "yes" or val == "YES"
 
 
 ###############################################################################
@@ -1579,6 +1581,31 @@ def skip_on_travis():
         post_reason("Test skipped on Travis")
         return True
     return False
+
+
+###############################################################################
+# Decorator to skip a test if specified creation option is not available
+
+
+def require_creation_option(driver, option):
+
+    drv = gdal.GetDriverByName(driver)
+
+    def decorator(func):
+        @pytest.mark.skipif(
+            drv is None or option not in drv.GetMetadata()["DMD_CREATIONOPTIONLIST"],
+            reason=f"{driver} creation option {option} not supported in this build",
+        )
+        @pytest.mark.skipif(
+            drv is None, reason=f"{driver} driver is not included in this build"
+        )
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
 
 
 ###############################################################################

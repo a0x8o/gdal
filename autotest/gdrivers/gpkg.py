@@ -1360,9 +1360,8 @@ def test_gpkg_14():
     ds.GetRasterBand(2).WriteRaster(0, 0, 256, 256, data)
 
     # "Flush" into partial tile database, but not in definitive database
-    oldSize = gdal.GetCacheMax()
-    gdal.SetCacheMax(0)
-    gdal.SetCacheMax(oldSize)
+    with gdaltest.SetCacheMax(0):
+        pass
 
     sql_lyr = ds.ExecuteSQL("SELECT * FROM tmp")
     fc = sql_lyr.GetFeatureCount()
@@ -2559,15 +2558,13 @@ def test_gpkg_27():
 
     gdal.Unlink("/vsimem/tmp.gpkg")
 
-    oldSize = gdal.GetCacheMax()
-    gdal.SetCacheMax(0)
-    src_ds = gdal.Open("data/small_world.tif")
-    out_ds = gdaltest.gpkg_dr.CreateCopy(
-        "/vsimem/tmp.gpkg",
-        src_ds,
-        options=["TILE_FORMAT=PNG", "BLOCKXSIZE=200", "BLOCKYSIZE=200"],
-    )
-    gdal.SetCacheMax(oldSize)
+    with gdaltest.SetCacheMax(0):
+        src_ds = gdal.Open("data/small_world.tif")
+        out_ds = gdaltest.gpkg_dr.CreateCopy(
+            "/vsimem/tmp.gpkg",
+            src_ds,
+            options=["TILE_FORMAT=PNG", "BLOCKXSIZE=200", "BLOCKYSIZE=200"],
+        )
 
     expected_cs = [src_ds.GetRasterBand(i + 1).Checksum() for i in range(3)]
     got_cs = [out_ds.GetRasterBand(i + 1).Checksum() for i in range(3)]
@@ -2606,9 +2603,8 @@ def test_gpkg_28():
 
     out_ds.GetRasterBand(1).WriteRaster(0, 0, 400, 200, data[0])
     # Force the block to go through IWriteBlock()
-    oldSize = gdal.GetCacheMax()
-    gdal.SetCacheMax(0)
-    gdal.SetCacheMax(oldSize)
+    with gdaltest.SetCacheMax(0):
+        pass
     # Read (another, but could be any) band
     out_ds.GetRasterBand(2).ReadRaster(0, 0, 400, 200)
     # Write remaining bands 2 and 3
@@ -2653,9 +2649,8 @@ def test_gpkg_29(x=0):
 
     out_ds.GetRasterBand(1).WriteRaster(0, 0, 200, 200, left[0])
     # Force the block to go through IWriteBlock()
-    oldSize = gdal.GetCacheMax()
-    gdal.SetCacheMax(0)
-    gdal.SetCacheMax(oldSize)
+    with gdaltest.SetCacheMax(0):
+        pass
     out_ds.GetRasterBand(2).ReadRaster(x, 0, 200, 200)
     for b in range(2):
         out_ds.GetRasterBand(b + 2).WriteRaster(0, 0, 200, 200, left[b + 1])
@@ -2858,13 +2853,9 @@ def test_gpkg_35():
     ds = gdal.Open("/vsimem/tmp.gpkg", gdal.GA_Update)
     ds.WriteRaster(256, 0, 256, height, white_data)
 
-    oldSize = gdal.GetCacheMax()
     # + 2 * 128 > + 2 * sizeof(GDALRasterBlock). Cf gdalrasterblock.cpp:GetEffectiveBlockSize()
-    gdal.SetCacheMax((256 * 256 + 2 * 128) * 4)
-
-    got_data = ds.ReadRaster(0, 0, 256, height)
-
-    gdal.SetCacheMax(oldSize)
+    with gdaltest.SetCacheMax((256 * 256 + 2 * 128) * 4):
+        got_data = ds.ReadRaster(0, 0, 256, height)
 
     assert got_data == expected_data
 
@@ -3033,7 +3024,11 @@ def test_gpkg_39():
     ds = None
 
     # From a AREA_OR_POINT=Point dataset
-    gdal.Translate("/vsimem/gpkg_39.gpkg", "data/n43.dt0", format="GPKG")
+    src_ds2 = gdal.GetDriverByName("MEM").Create("", 2, 2, 1, gdal.GDT_Int16)
+    src_ds2.SetGeoTransform([2, 1, 0, 49, 0, -1])
+    src_ds2.SetMetadataItem("AREA_OR_POINT", "Point")
+    src_ds2.GetRasterBand(1).SetUnitType("m")
+    gdal.Translate("/vsimem/gpkg_39.gpkg", src_ds2, format="GPKG")
     ds = gdal.Open("/vsimem/gpkg_39.gpkg")
     assert ds.GetMetadataItem("AREA_OR_POINT") == "Point", ds.GetMetadata()
     assert ds.GetRasterBand(1).GetUnitType() == "m"
@@ -3966,11 +3961,10 @@ def test_gpkg_wkt2():
 # Test reading a 50000x25000 block uint16
 
 
+@pytest.mark.slow()
 def test_gpkg_50000_25000_uint16():
 
     if gdaltest.gpkg_dr is None:
-        pytest.skip()
-    if not gdaltest.run_slow_tests():
         pytest.skip()
     if sys.maxsize < 2**32:
         pytest.skip("Test not available on 32 bit")
@@ -3999,11 +3993,10 @@ def test_gpkg_50000_25000_uint16():
 # Test reading a 50000x50000 block uint16
 
 
+@pytest.mark.slow()
 def test_gpkg_50000_50000_uint16():
 
     if gdaltest.gpkg_dr is None:
-        pytest.skip()
-    if not gdaltest.run_slow_tests():
         pytest.skip()
     if sys.maxsize < 2**32:
         pytest.skip("Test not available on 32 bit")
@@ -4127,7 +4120,7 @@ def test_gpkg_flushing_not_all_bands(tile_format):
         drv_req = [drv_req]
     for drv in drv_req:
         if gdal.GetDriverByName(drv) is None:
-            pytest.skip()
+            pytest.skip(f"Driver {drv} is missing")
 
     out_filename = "/vsimem/test.gpkg"
     ds = gdal.GetDriverByName("GPKG").Create(

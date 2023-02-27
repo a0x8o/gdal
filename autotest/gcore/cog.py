@@ -291,12 +291,8 @@ def test_cog_creation_of_overviews():
 # Test creation of overviews with a different compression method
 
 
+@gdaltest.require_creation_option("COG", "JPEG")
 def test_cog_creation_of_overviews_with_compression():
-
-    if "<Value>JPEG</Value>" not in gdal.GetDriverByName("COG").GetMetadataItem(
-        "DMD_CREATIONOPTIONLIST"
-    ):
-        pytest.skip("JPEG support missing")
 
     directory = "/vsimem/test_cog_creation_of_overviews_with_compression"
     filename = directory + "/cog.tif"
@@ -387,12 +383,8 @@ def test_cog_creation_of_overviews_with_mask():
 # Test full world reprojection to WebMercator
 
 
+@gdaltest.require_creation_option("COG", "JPEG")
 def test_cog_small_world_to_web_mercator():
-
-    if "<Value>JPEG</Value>" not in gdal.GetDriverByName("COG").GetMetadataItem(
-        "DMD_CREATIONOPTIONLIST"
-    ):
-        pytest.skip("JPEG support missing")
 
     tab = [0]
 
@@ -934,12 +926,8 @@ def test_cog_sparse():
 # Test SPARSE_OK=YES with mask
 
 
+@gdaltest.require_creation_option("COG", "JPEG")
 def test_cog_sparse_mask():
-
-    if "<Value>JPEG</Value>" not in gdal.GetDriverByName("COG").GetMetadataItem(
-        "DMD_CREATIONOPTIONLIST"
-    ):
-        pytest.skip("JPEG support missing")
 
     filename = "/vsimem/cog.tif"
     src_ds = gdal.GetDriverByName("MEM").Create("", 512, 512, 4)
@@ -1033,12 +1021,8 @@ def test_cog_sparse_mask():
 # Test SPARSE_OK=YES with imagery at 0 and mask at 255
 
 
+@gdaltest.require_creation_option("COG", "JPEG")
 def test_cog_sparse_imagery_0_mask_255():
-
-    if "<Value>JPEG</Value>" not in gdal.GetDriverByName("COG").GetMetadataItem(
-        "DMD_CREATIONOPTIONLIST"
-    ):
-        pytest.skip("JPEG support missing")
 
     filename = "/vsimem/cog.tif"
     src_ds = gdal.GetDriverByName("MEM").Create("", 512, 512, 4)
@@ -1093,12 +1077,8 @@ def test_cog_sparse_imagery_0_mask_255():
 # Test SPARSE_OK=YES with imagery at 0 or 255 and mask at 255
 
 
+@gdaltest.require_creation_option("COG", "JPEG")
 def test_cog_sparse_imagery_0_or_255_mask_255():
-
-    if "<Value>JPEG</Value>" not in gdal.GetDriverByName("COG").GetMetadataItem(
-        "DMD_CREATIONOPTIONLIST"
-    ):
-        pytest.skip("JPEG support missing")
 
     filename = "/vsimem/cog.tif"
     src_ds = gdal.GetDriverByName("MEM").Create("", 512, 512, 4)
@@ -1167,12 +1147,8 @@ def test_cog_sparse_imagery_0_or_255_mask_255():
 # Test SPARSE_OK=YES with imagery and mask at 0
 
 
+@gdaltest.require_creation_option("COG", "JPEG")
 def test_cog_sparse_imagery_mask_0():
-
-    if "<Value>JPEG</Value>" not in gdal.GetDriverByName("COG").GetMetadataItem(
-        "DMD_CREATIONOPTIONLIST"
-    ):
-        pytest.skip("JPEG support missing")
 
     filename = "/vsimem/cog.tif"
     src_ds = gdal.GetDriverByName("MEM").Create("", 512, 512, 4)
@@ -1531,12 +1507,10 @@ def test_cog_odd_overview_size_and_msk():
 # Test turning on lossy WEBP compression if OVERVIEW_QUALITY < 100 specified
 
 
+@gdaltest.require_creation_option("COG", "WEBP")
 def test_cog_webp_overview_turn_on_lossy_if_webp_level():
 
     tmpfilename = "/vsimem/test_cog_webp_overview_turn_on_lossy_if_webp_level.tif"
-    md = gdal.GetDriverByName("COG").GetMetadata()
-    if md["DMD_CREATIONOPTIONLIST"].find("WEBP") == -1:
-        pytest.skip()
     if gdal.GetDriverByName("WEBP") is None:
         pytest.skip()
 
@@ -1557,6 +1531,36 @@ def test_cog_webp_overview_turn_on_lossy_if_webp_level():
         .GetMetadataItem("COMPRESSION_REVERSIBILITY", "IMAGE_STRUCTURE")
         == "LOSSY"
     )
+    ds = None
+
+    gdal.Unlink(tmpfilename)
+
+
+###############################################################################
+# Test lossless WEBP compression
+
+
+@gdaltest.require_creation_option("COG", "WEBP")
+def test_cog_webp_lossless_webp():
+
+    tmpfilename = "/vsimem/test_cog_webp_lossless_webp.tif"
+    if gdal.GetDriverByName("WEBP") is None:
+        pytest.skip()
+
+    src_ds = gdal.Open("../gdrivers/data/small_world.tif")
+    gdal.ErrorReset()
+    gdal.Translate(
+        tmpfilename,
+        src_ds,
+        options="-of COG -co COMPRESS=WEBP -co QUALITY=100",
+    )
+    assert gdal.GetLastErrorMsg() == ""
+
+    ds = gdal.Open(tmpfilename)
+    assert (
+        ds.GetMetadataItem("COMPRESSION_REVERSIBILITY", "IMAGE_STRUCTURE") == "LOSSLESS"
+    )
+    assert ds.GetRasterBand(1).Checksum() == src_ds.GetRasterBand(1).Checksum()
     ds = None
 
     gdal.Unlink(tmpfilename)
@@ -1611,3 +1615,70 @@ def test_cog_overview_count_existing():
     assert ds.GetRasterBand(1).GetOverview(0).Checksum() == 0
     ds = None
     gdal.Unlink(tmpfilename)
+
+
+###############################################################################
+# Test JPEGXL compression with alpha
+
+
+@gdaltest.require_creation_option("COG", "JXL")
+def test_cog_write_jpegxl_alpha():
+
+    src_ds = gdal.Open("data/stefan_full_rgba.tif")
+    filename = "/vsimem/test_tiff_write_jpegxl_alpha_distance_zero.tif"
+
+    gdal.GetDriverByName("GTiff").CreateCopy(
+        filename,
+        src_ds,
+        options=[
+            "COMPRESS=JXL",
+            "JXL_LOSSLESS=NO",
+            "TILED=YES",
+            "BLOCKSIZE=512",
+            "BLOCKYSIZE=512",
+        ],
+    )
+    ds = gdal.Open(filename)
+    ref_checksum = [ds.GetRasterBand(i + 1).Checksum() for i in range(4)]
+    ds = None
+
+    gdal.Unlink(filename)
+
+    drv = gdal.GetDriverByName("COG")
+    drv.CreateCopy(
+        filename,
+        src_ds,
+        options=["COMPRESS=JXL", "JXL_LOSSLESS=NO"],
+    )
+    ds = gdal.Open(filename)
+    assert [ds.GetRasterBand(i + 1).Checksum() for i in range(4)] == ref_checksum
+    ds = None
+
+    gdal.Unlink(filename)
+
+
+###############################################################################
+# Test JXL_ALPHA_DISTANCE creation option
+
+
+@gdaltest.require_creation_option(
+    "COG", "JXL_ALPHA_DISTANCE"
+)  # "libjxl > 0.8.1 required"
+def test_cog_write_jpegxl_alpha_distance_zero():
+
+    drv = gdal.GetDriverByName("COG")
+
+    src_ds = gdal.Open("data/stefan_full_rgba.tif")
+    filename = "/vsimem/test_tiff_write_jpegxl_alpha_distance_zero.tif"
+    drv.CreateCopy(
+        filename,
+        src_ds,
+        options=["COMPRESS=JXL", "JXL_LOSSLESS=NO", "JXL_ALPHA_DISTANCE=0"],
+    )
+    ds = gdal.Open(filename)
+    assert float(ds.GetMetadataItem("JXL_ALPHA_DISTANCE", "IMAGE_STRUCTURE")) == 0
+    assert ds.GetRasterBand(1).Checksum() != src_ds.GetRasterBand(1).Checksum()
+    assert ds.GetRasterBand(4).Checksum() == src_ds.GetRasterBand(4).Checksum()
+    ds = None
+
+    gdal.Unlink(filename)

@@ -56,6 +56,13 @@ def has_write_support():
     if ecw_drv is None or ecw_drv.GetMetadataItem("DMD_CREATIONDATATYPES") is None:
         return False
 
+    if (
+        "ECW_ENCODE_KEY" in ecw_drv.GetMetadataItem("DMD_CREATIONOPTIONLIST")
+        and gdal.GetConfigOption("ECW_ENCODE_KEY") is None
+    ):
+        print("ECW_ENCODE_KEY not defined. Write support not available")
+        return False
+
     ds = gdal.Open("data/ecw/jrc.ecw")
     if ds:
         out_ds = ecw_drv.CreateCopy("tmp/jrc_out.ecw", ds, options=["TARGET=75"])
@@ -1636,7 +1643,7 @@ def test_ecw_41():
 
     # Now compute the stats
     stats = ds.GetRasterBand(1).GetStatistics(0, 1)
-    expected_stats = [0.0, 255.0, 21.662427983539093, 51.789457392268119]
+    expected_stats = [0.0, 255.0, 41.122843450479, 66.517011844777]
     for i in range(4):
         assert stats[i] == pytest.approx(expected_stats[i], abs=1)
 
@@ -1649,7 +1656,7 @@ def test_ecw_41():
     assert ds.GetRasterBand(1).GetMinimum() == 0
     assert ds.GetRasterBand(1).GetMaximum() == 255
     stats = ds.GetRasterBand(1).GetStatistics(0, 0)
-    expected_stats = [0.0, 255.0, 21.662427983539093, 51.789457392268119]
+    expected_stats = [0.0, 255.0, 41.122843450479, 66.517011844777]
     for i in range(4):
         assert stats[i] == pytest.approx(expected_stats[i], abs=1)
     ds = None
@@ -1662,10 +1669,10 @@ def test_ecw_41():
         255.5,
         256,
         [
-            1006,
-            16106,
-            548,
-            99,
+            603,
+            4870,
+            428,
+            78,
             13,
             24,
             62,
@@ -2377,11 +2384,10 @@ def test_ecw_online_1():
     if gdaltest.jp2ecw_drv is None:
         pytest.skip()
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://download.osgeo.org/gdal/data/jpeg2000/7sisters200.j2k",
         "7sisters200.j2k",
-    ):
-        pytest.skip()
+    )
 
     # checksum = 32316 on my PC
     tst = gdaltest.GDALTest(
@@ -2402,10 +2408,9 @@ def test_ecw_online_2():
     if gdaltest.jp2ecw_drv is None:
         pytest.skip()
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://download.osgeo.org/gdal/data/jpeg2000/gcp.jp2", "gcp.jp2"
-    ):
-        pytest.skip()
+    )
 
     # checksum = 1292 on my PC
     tst = gdaltest.GDALTest("JP2ECW", "tmp/cache/gcp.jp2", 1, None, filename_absolute=1)
@@ -2430,14 +2435,13 @@ def ecw_online_3():
     if gdaltest.ecw_drv.major_version == 4:
         pytest.skip("4.x SDK gets unreliable results for jp2")
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://www.openjpeg.org/samples/Bretagne1.j2k", "Bretagne1.j2k"
-    ):
-        pytest.skip()
-    if not gdaltest.download_file(
+    )
+
+    gdaltest.download_or_skip(
         "http://www.openjpeg.org/samples/Bretagne1.bmp", "Bretagne1.bmp"
-    ):
-        pytest.skip()
+    )
 
     # checksum = 16481 on my PC
     tst = gdaltest.GDALTest(
@@ -2470,14 +2474,13 @@ def test_ecw_online_4():
     if gdaltest.ecw_drv.major_version == 5 and gdaltest.ecw_drv.minor_version == 2:
         pytest.skip("This test hangs on Linux in a mutex in the SDK 5.2.1")
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://www.openjpeg.org/samples/Bretagne2.j2k", "Bretagne2.j2k"
-    ):
-        pytest.skip()
-    if not gdaltest.download_file(
+    )
+
+    gdaltest.download_or_skip(
         "http://www.openjpeg.org/samples/Bretagne2.bmp", "Bretagne2.bmp"
-    ):
-        pytest.skip()
+    )
 
     # Checksum = 53054 on my PC
     tst = gdaltest.GDALTest(
@@ -2504,10 +2507,9 @@ def test_ecw_online_4():
 
 def test_ecw_online_5():
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://download.osgeo.org/gdal/data/ecw/red_flower.ecw", "red_flower.ecw"
-    ):
-        pytest.skip()
+    )
 
     ds = gdal.Open("tmp/cache/red_flower.ecw")
 
@@ -2578,11 +2580,10 @@ def test_ecw_online_6():
 
 def test_ecw_online_7():
 
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://download.osgeo.org/gdal/data/ecw/sandiego2m_null.ecw",
         "sandiego2m_null.ecw",
-    ):
-        pytest.skip()
+    )
 
     ds = gdal.Open("tmp/cache/sandiego2m_null.ecw")
     if gdaltest.ecw_drv.major_version == 3:

@@ -1249,6 +1249,14 @@ const char *OGRSpatialReference::GetAttrValue(const char *pszNodeName,
         {
             return GetAttrValue("METHOD", iAttr);
         }
+        else if (d->m_bNodesWKT2 && EQUAL(pszNodeName, "PROJCS|PROJECTION"))
+        {
+            return GetAttrValue("PROJCRS|METHOD", iAttr);
+        }
+        else if (d->m_bNodesWKT2 && EQUAL(pszNodeName, "PROJCS"))
+        {
+            return GetAttrValue("PROJCRS", iAttr);
+        }
         return nullptr;
     }
 
@@ -1908,6 +1916,7 @@ OGRErr OGRSpatialReference::importFromWkt(const char **ppszInput,
 {
     if (!ppszInput || !*ppszInput)
         return OGRERR_FAILURE;
+
     if (strlen(*ppszInput) > 100 * 1000 &&
         CPLTestBool(CPLGetConfigOption("OSR_IMPORT_FROM_WKT_LIMIT", "YES")))
     {
@@ -3710,6 +3719,10 @@ OGRErr OGRSpatialReference::SetFromUserInput(const char *pszDefinition)
 OGRErr OGRSpatialReference::SetFromUserInput(const char *pszDefinition,
                                              CSLConstList papszOptions)
 {
+    // Skip leading white space
+    while (isspace(*pszDefinition))
+        pszDefinition++;
+
     if (STARTS_WITH_CI(pszDefinition, "ESRI::"))
     {
         pszDefinition += 6;
@@ -3903,6 +3916,18 @@ OGRErr OGRSpatialReference::SetFromUserInput(const char *pszDefinition,
     if (EQUAL(pszDefinition, "osgb:BNG"))
     {
         return importFromEPSG(27700);
+    }
+
+    // Used by German CityGML files
+    if (EQUAL(pszDefinition, "urn:adv:crs:ETRS89_UTM32*DE_DHHN92_NH"))
+    {
+        // "ETRS89 / UTM Zone 32N + DHHN92 height"
+        return SetFromUserInput("EPSG:25832+5783");
+    }
+    else if (EQUAL(pszDefinition, "urn:adv:crs:ETRS89_UTM32*DE_DHHN2016_NH"))
+    {
+        // "ETRS89 / UTM Zone 32N + DHHN2016 height"
+        return SetFromUserInput("EPSG:25832+7837");
     }
 
     // Deal with IGNF:xxx, ESRI:xxx, etc from the PROJ database

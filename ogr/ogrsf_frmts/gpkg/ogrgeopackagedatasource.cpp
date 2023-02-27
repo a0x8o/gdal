@@ -1683,6 +1683,8 @@ int GDALGeoPackageDataset::Open(GDALOpenInfo *poOpenInfo,
                 const char *pszM = oResult->GetValue(6, i);
                 bool bIsInGpkgContents =
                     CPL_TO_BOOL(oResult->GetValueAsInteger(11, i));
+                if (!bIsInGpkgContents)
+                    m_bNonSpatialTablesNonRegisteredInGpkgContentsFound = true;
                 const char *pszObjectType = oResult->GetValue(12, i);
                 if (pszObjectType == nullptr ||
                     !(EQUAL(pszObjectType, "table") ||
@@ -6454,7 +6456,10 @@ OGRLayer *GDALGeoPackageDataset::ICreateLayer(const char *pszLayerName,
     if (eGType == wkbNone)
     {
         const char *pszASpatialVariant = CSLFetchNameValueDef(
-            papszOptions, "ASPATIAL_VARIANT", "GPKG_ATTRIBUTES");
+            papszOptions, "ASPATIAL_VARIANT",
+            m_bNonSpatialTablesNonRegisteredInGpkgContentsFound
+                ? "NOT_REGISTERED"
+                : "GPKG_ATTRIBUTES");
         GPKGASpatialVariant eASpatialVariant = GPKG_ATTRIBUTES;
         if (EQUAL(pszASpatialVariant, "GPKG_ATTRIBUTES"))
             eASpatialVariant = GPKG_ATTRIBUTES;
@@ -7785,6 +7790,11 @@ static void OGRGeoPackageSetSRID(sqlite3_context *pContext, int /* argc */,
         size_t nBLOBDestLen = 0;
         GByte *pabyDestBLOB =
             GPkgGeometryFromOGR(poGeom, nDestSRID, &nBLOBDestLen);
+        if (!pabyDestBLOB)
+        {
+            sqlite3_result_null(pContext);
+            return;
+        }
         sqlite3_result_blob(pContext, pabyDestBLOB,
                             static_cast<int>(nBLOBDestLen), VSIFree);
         return;
@@ -7846,6 +7856,11 @@ static void OGRGeoPackageSTMakeValid(sqlite3_context *pContext, int argc,
     size_t nBLOBDestLen = 0;
     GByte *pabyDestBLOB =
         GPkgGeometryFromOGR(poValid.get(), sHeader.iSrsId, &nBLOBDestLen);
+    if (!pabyDestBLOB)
+    {
+        sqlite3_result_null(pContext);
+        return;
+    }
     sqlite3_result_blob(pContext, pabyDestBLOB, static_cast<int>(nBLOBDestLen),
                         VSIFree);
 }
@@ -8023,17 +8038,20 @@ void OGRGeoPackageTransform(sqlite3_context *pContext, int argc,
         poCT = poDS->m_poLastCachedCT.get();
     }
 
-    OGRGeometry *poGeom = GPkgGeometryToOGR(pabyBLOB, nBLOBLen, nullptr);
+    auto poGeom = std::unique_ptr<OGRGeometry>(
+        GPkgGeometryToOGR(pabyBLOB, nBLOBLen, nullptr));
     if (poGeom == nullptr)
     {
         // Try also spatialite geometry blobs
-        if (OGRSQLiteImportSpatiaLiteGeometry(pabyBLOB, nBLOBLen, &poGeom) !=
-            OGRERR_NONE)
+        OGRGeometry *poGeomSpatialite = nullptr;
+        if (OGRSQLiteImportSpatiaLiteGeometry(pabyBLOB, nBLOBLen,
+                                              &poGeomSpatialite) != OGRERR_NONE)
         {
             CPLError(CE_Failure, CPLE_AppDefined, "Invalid geometry");
             sqlite3_result_blob(pContext, nullptr, 0, nullptr);
             return;
         }
+        poGeom.reset(poGeomSpatialite);
     }
 
     if (poGeom->transform(poCT) != OGRERR_NONE)
@@ -8043,11 +8061,15 @@ void OGRGeoPackageTransform(sqlite3_context *pContext, int argc,
     }
 
     size_t nBLOBDestLen = 0;
-    GByte *pabyDestBLOB = GPkgGeometryFromOGR(poGeom, nDestSRID, &nBLOBDestLen);
+    GByte *pabyDestBLOB =
+        GPkgGeometryFromOGR(poGeom.get(), nDestSRID, &nBLOBDestLen);
+    if (!pabyDestBLOB)
+    {
+        sqlite3_result_null(pContext);
+        return;
+    }
     sqlite3_result_blob(pContext, pabyDestBLOB, static_cast<int>(nBLOBDestLen),
                         VSIFree);
-
-    delete poGeom;
 }
 
 /************************************************************************/

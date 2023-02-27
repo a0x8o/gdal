@@ -32,6 +32,7 @@
 #include "vrtdataset.h"
 
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <cstddef>
 #include <cstdio>
@@ -1336,6 +1337,7 @@ CPLErr VRTSourcedRasterBand::ComputeStatistics(int bApproxOK, double *pdfMin,
                 {
                     auto poSimpleSource =
                         cpl::down_cast<VRTSimpleSource *>(papoSources[i]);
+                    assert(poSimpleSource);
                     auto poSimpleSourceBand = poSimpleSource->GetRasterBand();
                     auto poSourceDataset = poSimpleSourceBand->GetDataset();
                     if (poSourceDataset == nullptr)
@@ -1379,7 +1381,9 @@ CPLErr VRTSourcedRasterBand::ComputeStatistics(int bApproxOK, double *pdfMin,
         {
             auto poSimpleSource =
                 static_cast<VRTSimpleSource *>(papoSources[i]);
+            assert(poSimpleSource);
             auto poSimpleSourceBand = poSimpleSource->GetRasterBand();
+            assert(poSimpleSourceBand);
             sContext.nTotalPixelsOfSources +=
                 static_cast<uint64_t>(poSimpleSourceBand->GetXSize()) *
                 poSimpleSourceBand->GetYSize();
@@ -1395,7 +1399,9 @@ CPLErr VRTSourcedRasterBand::ComputeStatistics(int bApproxOK, double *pdfMin,
             {
                 auto poSimpleSource =
                     static_cast<VRTSimpleSource *>(papoSources[i]);
+                assert(poSimpleSource);
                 auto poSimpleSourceBand = poSimpleSource->GetRasterBand();
+                assert(poSimpleSourceBand);
                 asJobs[i].psContext = &sContext;
                 asJobs[i].poRasterBand = poSimpleSourceBand;
                 if (!poQueue->SubmitJob(JobRunner, &asJobs[i]))
@@ -1422,7 +1428,9 @@ CPLErr VRTSourcedRasterBand::ComputeStatistics(int bApproxOK, double *pdfMin,
             {
                 auto poSimpleSource =
                     static_cast<VRTSimpleSource *>(papoSources[i]);
+                assert(poSimpleSource);
                 auto poSimpleSourceBand = poSimpleSource->GetRasterBand();
+                assert(poSimpleSourceBand);
                 Job sJob;
                 sJob.psContext = &sContext;
                 sJob.poRasterBand = poSimpleSourceBand;

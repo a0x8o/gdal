@@ -33,7 +33,7 @@ import os
 import gdaltest
 import pytest
 
-from osgeo import gdal
+pytestmark = pytest.mark.require_driver("RIK")
 
 ###############################################################################
 # Test a RIK map
@@ -42,14 +42,10 @@ from osgeo import gdal
 
 def test_rik_online_1():
 
-    if gdal.GetDriverByName("RIK") is None:
-        pytest.skip()
-
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://www.lantmateriet.se/upload/filer/kartor/programvaror/sverige500_swe99.zip",
         "sverige500_swe99.zip",
-    ):
-        pytest.skip()
+    )
 
     try:
         os.stat("tmp/cache/sverige500_swe99.rik")
@@ -77,13 +73,9 @@ def test_rik_online_1():
 
 def test_rik_online_2():
 
-    if gdal.GetDriverByName("RIK") is None:
-        pytest.skip()
-
-    if not gdaltest.download_file(
+    gdaltest.download_or_skip(
         "http://trac.osgeo.org/gdal/raw-attachment/ticket/3674/ab-del.rik", "ab-del.rik"
-    ):
-        pytest.skip()
+    )
 
     tst = gdaltest.GDALTest(
         "RIK", "tmp/cache/ab-del.rik", 1, 44974, filename_absolute=1

@@ -171,15 +171,13 @@ def test_mask_4():
 # masks built for them.
 
 
+@gdaltest.require_creation_option(
+    "GTiff", "BigTIFF"
+)  # This crashes with libtiff 3.8.2, so skip it
 def test_mask_5():
 
     if gdal.GetDriverByName("PNM") is None:
         pytest.skip("PNM driver missing")
-
-    # This crashes with libtiff 3.8.2, so skip it
-    md = gdal.GetDriverByName("GTiff").GetMetadata()
-    if md["DMD_CREATIONOPTIONLIST"].find("BigTIFF") == -1:
-        pytest.skip()
 
     ds = gdal.Open("tmp/mask_4.ppm", gdal.GA_Update)
 
@@ -465,12 +463,8 @@ def test_mask_13():
 # Test creation of internal TIFF mask band
 
 
+@gdaltest.require_creation_option("GTiff", "JPEG")
 def test_mask_14():
-
-    if "<Value>JPEG</Value>" not in gdal.GetDriverByName("GTIFF").GetMetadataItem(
-        "DMD_CREATIONOPTIONLIST"
-    ):
-        pytest.skip("JPEG support missing")
 
     src_ds = gdal.Open("data/byte.tif")
 
@@ -527,13 +521,12 @@ def test_mask_14():
     assert cs == 400, "Got wrong checksum for the mask (3)"
 
     # Test fix for #5884
-    old_val = gdal.GetCacheMax()
-    gdal.SetCacheMax(0)
-    with gdaltest.config_option("GDAL_TIFF_INTERNAL_MASK", "YES"):
-        out_ds = drv.CreateCopy(
-            "/vsimem/byte_with_mask.tif", ds, options=["COMPRESS=JPEG"]
-        )
-    gdal.SetCacheMax(old_val)
+    with gdaltest.SetCacheMax(0):
+        with gdaltest.config_option("GDAL_TIFF_INTERNAL_MASK", "YES"):
+            out_ds = drv.CreateCopy(
+                "/vsimem/byte_with_mask.tif", ds, options=["COMPRESS=JPEG"]
+            )
+
     assert out_ds.GetRasterBand(1).Checksum() != 0
     cs = ds.GetRasterBand(1).GetMaskBand().Checksum()
     assert cs == 400, "Got wrong checksum for the mask (4)"
@@ -809,26 +802,22 @@ def test_mask_22():
 # internal mask (#3800)
 
 
+@gdaltest.require_creation_option("GTiff", "JPEG")
 def test_mask_23():
 
     drv = gdal.GetDriverByName("GTiff")
-    md = drv.GetMetadata()
-    if md["DMD_CREATIONOPTIONLIST"].find("JPEG") == -1:
-        pytest.skip()
 
     src_ds = drv.Create(
         "tmp/mask_23_src.tif", 3000, 2000, 3, options=["TILED=YES", "SPARSE_OK=YES"]
     )
     src_ds.CreateMaskBand(gdal.GMF_PER_DATASET)
 
-    old_val = gdal.GetCacheMax()
-    gdal.SetCacheMax(15000000)
     gdal.ErrorReset()
-    with gdaltest.config_option("GDAL_TIFF_INTERNAL_MASK", "YES"):
-        ds = drv.CreateCopy(
-            "tmp/mask_23_dst.tif", src_ds, options=["TILED=YES", "COMPRESS=JPEG"]
-        )
-    gdal.SetCacheMax(old_val)
+    with gdaltest.SetCacheMax(15000000):
+        with gdaltest.config_option("GDAL_TIFF_INTERNAL_MASK", "YES"):
+            ds = drv.CreateCopy(
+                "tmp/mask_23_dst.tif", src_ds, options=["TILED=YES", "COMPRESS=JPEG"]
+            )
 
     del ds
     error_msg = gdal.GetLastErrorMsg()
