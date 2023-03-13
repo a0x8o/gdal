@@ -44,7 +44,8 @@ From the build directory you can now configure CMake, build and install the bina
     The ``--prefix /installation/prefix`` option of CMake (>= 3.14) is supported since GDAL 3.7.0,
     but note that contrary to setting the CMAKE_INSTALL_PREFIX at configuration time,
     it will not result in the GDAL_DATA path to be hardcoded into the libgdal binary,
-    and is thus not recommended.
+    and is thus not recommended. It is also not supported on Windows multi-configuration
+    generator (such as VisualStudio).
 
 `
 On Windows, one may need to specify generator:
@@ -2104,11 +2105,6 @@ Python bindings options
     Whether Python bindings should be built. It is ON by default, but only
     effective if a Python installation is found.
 
-.. option:: SWIG_REGENERATE_PYTHON:BOOL=ON/OFF
-
-    Whether to refresh the generated SWIG Python bindings. It is OFF by default.
-    Setting it to ON is needed if modifying the SWIG interface files.
-
 A nominal Python installation should comprise the Python runtime (>= 3.6) and
 the setuptools module.
 numpy and its header and development library are also strongly recommended.
@@ -2149,19 +2145,19 @@ the ``install`` CMake target.
 
     This option can be specified to a directory name, to override the
     ``CMAKE_INSTALL_PREFIX`` option.
-    It is used to set the value of the ``--prefix`` option of ``python setup.py install``.
+    It is used to set the value of the ``--prefix`` option of ``python3 setup.py install``.
 
 .. option:: GDAL_PYTHON_INSTALL_LAYOUT
 
     This option can be specified to set the value of the ``--install-layout``
-    option of ``python setup.py install``. The install layout is by default set to
+    option of ``python3 setup.py install``. The install layout is by default set to
     ``deb`` when it is detected that the Python installation looks for
     the ``site-packages`` subdirectory. Otherwise it is unspecified.
 
 .. option:: GDAL_PYTHON_INSTALL_LIB
 
     This option can be specified to set the value of the ``--install-lib``
-    option of ``python setup.py install``. It is only taken into account on
+    option of ``python3 setup.py install``. It is only taken into account on
     MacOS systems, when the Python installation is a framework.
 
 Java bindings options
