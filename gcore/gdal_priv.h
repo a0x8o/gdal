@@ -393,6 +393,7 @@ class CPL_DLL GDALDataset : public GDALMajorObject
 
     void RasterInitialize(int, int);
     void SetBand(int, GDALRasterBand *);
+    void SetBand(int nNewBand, std::unique_ptr<GDALRasterBand> poBand);
 
     GDALDefaultOverviews oOvManager{};
 
@@ -2806,6 +2807,9 @@ class CPL_DLL GDALMDArray : virtual public GDALAbstractMDArray,
 
     bool SetNoDataValue(uint64_t nNoData);
 
+    virtual bool Resize(const std::vector<GUInt64> &anNewDimSizes,
+                        CSLConstList papszOptions);
+
     virtual double GetOffset(bool *pbHasOffset = nullptr,
                              GDALDataType *peStorageType = nullptr) const;
 
@@ -3112,6 +3116,8 @@ class CPL_DLL GDALDimensionWeakIndexingVar : public GDALDimension
 
     bool SetIndexingVariable(
         std::shared_ptr<GDALMDArray> poIndexingVariable) override;
+
+    void SetSize(GUInt64 nNewSize);
 };
 //! @endcond
 

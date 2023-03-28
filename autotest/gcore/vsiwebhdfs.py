@@ -37,6 +37,8 @@ import webserver
 
 from osgeo import gdal
 
+pytestmark = pytest.mark.require_curl()
+
 
 def open_for_read(uri):
     """
@@ -64,9 +66,6 @@ def test_vsiwebhdfs_start_webserver():
 
     gdaltest.webserver_process = None
     gdaltest.webserver_port = 0
-
-    if not gdaltest.built_against_curl():
-        pytest.skip()
 
     (gdaltest.webserver_process, gdaltest.webserver_port) = webserver.launch(
         handler=webserver.DispatcherHttpHandler
@@ -251,6 +250,7 @@ def test_vsiwebhdfs_readdir():
 # Test write
 
 
+@gdaltest.disable_exceptions()
 def test_vsiwebhdfs_write():
 
     if gdaltest.webserver_port == 0:
@@ -436,6 +436,7 @@ def test_vsiwebhdfs_write():
 # Test Unlink()
 
 
+@gdaltest.disable_exceptions()
 def test_vsiwebhdfs_unlink():
 
     if gdaltest.webserver_port == 0:
@@ -494,6 +495,7 @@ def test_vsiwebhdfs_unlink():
 # Test Mkdir() / Rmdir()
 
 
+@gdaltest.disable_exceptions()
 def test_vsiwebhdfs_mkdir_rmdir():
 
     if gdaltest.webserver_port == 0:
@@ -582,9 +584,6 @@ def test_vsiwebhdfs_stop_webserver():
 
 
 def test_vsiwebhdfs_extra_1():
-
-    if not gdaltest.built_against_curl():
-        pytest.skip()
 
     webhdfs_url = gdal.GetConfigOption("WEBHDFS_URL")
     if webhdfs_url is None:

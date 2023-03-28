@@ -30,6 +30,9 @@
 ###############################################################################
 
 
+import gdaltest
+import pytest
+
 from osgeo import gdal, ogr
 
 ###############################################################################
@@ -43,25 +46,20 @@ def test_ogr_style_styletable():
     style_table.AddStyle(
         "style1_normal", 'SYMBOL(id:"http://style1_normal",c:#67452301)'
     )
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ret = style_table.SaveStyleTable("/nonexistingdir/nonexistingfile")
-    gdal.PopErrorHandler()
-    assert ret == 0
+    with pytest.raises(Exception):
+        style_table.SaveStyleTable("/nonexistingdir/nonexistingfile")
     assert style_table.SaveStyleTable("/vsimem/out.txt") == 1
     style_table = None
 
     style_table = ogr.StyleTable()
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ret = style_table.LoadStyleTable("/nonexistent")
-    gdal.PopErrorHandler()
-    assert ret == 0
+    with pytest.raises(Exception):
+        style_table.LoadStyleTable("/nonexistent")
     assert style_table.LoadStyleTable("/vsimem/out.txt") == 1
 
     gdal.Unlink("/vsimem/out.txt")
 
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ret = style_table.Find("non_existing_style")
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        ret = style_table.Find("non_existing_style")
     assert ret is None
 
     assert (
@@ -102,7 +100,3 @@ def test_ogr_style_styletable():
     assert style == 'SYMBOL(id:"http://style1_normal",c:#67452301)'
 
     ds = None
-
-
-###############################################################################
-# Build tests runner

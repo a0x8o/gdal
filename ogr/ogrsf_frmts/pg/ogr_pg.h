@@ -130,7 +130,7 @@ class OGRPGGeomFieldDefn final : public OGRGeomFieldDefn
     {
     }
 
-    virtual OGRSpatialReference *GetSpatialRef() const override;
+    virtual const OGRSpatialReference *GetSpatialRef() const override;
 
     void UnsetLayer()
     {
@@ -191,7 +191,6 @@ class OGRPGLayer CPL_NON_FINAL : public OGRLayer
     int nCursorPage = 0;
     GIntBig iNextShapeId = 0;
 
-    static char *GByteArrayToBYTEA(const GByte *pabyData, size_t nLen);
     static char *GeometryToBYTEA(const OGRGeometry *, int nPostGISMajor,
                                  int nPostGISMinor);
     static GByte *BYTEAToGByteArray(const char *pszBytea, int *pnLength);
@@ -600,6 +599,8 @@ class OGRPGDataSource final : public OGRDataSource
     int bHasLoadTables = false;
     CPLString osActiveSchema{};
     int bListAllTables = false;
+    bool m_bSkipViews = false;
+
     void LoadTables();
 
     CPLString osDebugLastTransactionCommand{};
@@ -615,7 +616,6 @@ class OGRPGDataSource final : public OGRDataSource
 
     int bUseBinaryCursor = false;
     int bBinaryTimeFormatIsInt8 = false;
-    int bUseEscapeStringSyntax = false;
 
     bool m_bHasGeometryColumns = false;
     bool m_bHasSpatialRefSys = false;

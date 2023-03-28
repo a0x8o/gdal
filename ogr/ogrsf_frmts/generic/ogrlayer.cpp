@@ -763,7 +763,8 @@ OGRErr OGRLayer::IUpdateFeature(OGRFeature *poFeature, int nUpdatedFieldsCount,
     if (!TestCapability(OLCRandomWrite))
         return OGRERR_UNSUPPORTED_OPERATION;
 
-    auto poFeatureExisting = GetFeature(poFeature->GetFID());
+    auto poFeatureExisting =
+        std::unique_ptr<OGRFeature>(GetFeature(poFeature->GetFID()));
     if (!poFeatureExisting)
         return OGRERR_NON_EXISTING_FEATURE;
 
@@ -783,7 +784,7 @@ OGRErr OGRLayer::IUpdateFeature(OGRFeature *poFeature, int nUpdatedFieldsCount,
     {
         poFeatureExisting->SetStyleString(poFeature->GetStyleString());
     }
-    return ISetFeature(poFeatureExisting);
+    return ISetFeature(poFeatureExisting.get());
 }
 
 /************************************************************************/
@@ -1224,7 +1225,8 @@ int OGRLayer::FindFieldIndex(const char *pszFieldName,
 OGRSpatialReference *OGRLayer::GetSpatialRef()
 {
     if (GetLayerDefn()->GetGeomFieldCount() > 0)
-        return GetLayerDefn()->GetGeomFieldDefn(0)->GetSpatialRef();
+        return const_cast<OGRSpatialReference *>(
+            GetLayerDefn()->GetGeomFieldDefn(0)->GetSpatialRef());
     else
         return nullptr;
 }

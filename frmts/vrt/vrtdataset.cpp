@@ -954,15 +954,55 @@ GDALDataset *VRTDataset::OpenVRTProtocol(const char *pszSpec)
         osQueryString = osFilename.substr(nPosQuotationMark + 1);
         osFilename.resize(nPosQuotationMark);
     }
-    auto poSrcDS = GDALDataset::Open(
-        osFilename, GDAL_OF_RASTER | GDAL_OF_SHARED, nullptr, nullptr, nullptr);
+
+    // Parse query string, get args required for initial Open()
+    CPLStringList aosTokens0(CSLTokenizeString2(osQueryString, "&", 0));
+    CPLStringList aosAllowedDrivers;
+    int iRemoveOpt = -1;  // not allowed to have multiple &if=drv1&if=drv2
+    for (int i = 0; i < aosTokens0.size(); i++)
+    {
+        char *pszKey = nullptr;
+        const char *pszValue = CPLParseNameValue(aosTokens0[i], &pszKey);
+        if (pszKey)
+        {
+            if (EQUAL(pszKey, "if"))
+            {
+                if (iRemoveOpt > -1)
+                {
+                    CPLError(CE_Failure, CPLE_IllegalArg,
+                             "Invalid vrt:// 'if' format, must not occur "
+                             "multiple times (use comma separated list)\n");
+                    CPLFree(pszKey);
+                    return nullptr;
+                }
+                aosAllowedDrivers = CSLTokenizeString2(pszValue, ",", 0);
+                iRemoveOpt =
+                    i;  // we must avoid finding this 'if' option again below
+            }
+            CPLFree(pszKey);
+        }
+    }
+    CPLStringList aosTokens;
+    for (int i = 0; i < aosTokens0.size(); i++)
+    {
+        if (i != iRemoveOpt)
+        {
+            aosTokens.AddString(aosTokens0[i]);
+        }
+        else
+        {
+            CPLDebug("VRT", "Removed 'if' arg at position: %i\n", iRemoveOpt);
+        }
+    }
+
+    auto poSrcDS =
+        GDALDataset::Open(osFilename, GDAL_OF_RASTER | GDAL_OF_SHARED,
+                          aosAllowedDrivers.List(), nullptr, nullptr);
     if (poSrcDS == nullptr)
     {
         return nullptr;
     }
 
-    // Parse query string
-    CPLStringList aosTokens(CSLTokenizeString2(osQueryString, "&", 0));
     std::vector<int> anBands;
 
     CPLStringList argv;
@@ -1081,6 +1121,36 @@ GDALDataset *VRTDataset::OpenVRTProtocol(const char *pszSpec)
                 {
                     argv.AddString(aosGCP[j]);
                 }
+            }
+            else if (EQUAL(pszKey, "scale") || STARTS_WITH_CI(pszKey, "scale_"))
+            {
+                argv.AddString(CPLSPrintf("-%s", pszKey));
+                CPLStringList aosScaleParams(
+                    CSLTokenizeString2(pszValue, ",", 0));
+                if (!(aosScaleParams.size() == 2) &&
+                    !(aosScaleParams.size() == 4))
+                {
+                    CPLError(CE_Failure, CPLE_IllegalArg,
+                             "Invalid value for explicit scale or scale_bn: "
+                             "%s\n  need 2, or 4 "
+                             "numbers, comma separated: "
+                             "'scale=src_min,src_max[,dst_min,dst_max]'"
+                             "'scale_bn=src_min,src_max[,dst_min,dst_max]'",
+                             pszValue);
+                    poSrcDS->ReleaseRef();
+                    CPLFree(pszKey);
+                    return nullptr;
+                }
+                for (int j = 0; j < aosScaleParams.size(); j++)
+                {
+                    argv.AddString(aosScaleParams[j]);
+                }
+            }
+            else if (EQUAL(pszKey, "exponent") ||
+                     STARTS_WITH_CI(pszKey, "exponent_"))
+            {
+                argv.AddString(CPLSPrintf("-%s", pszKey));
+                argv.AddString(pszValue);
             }
             else
             {

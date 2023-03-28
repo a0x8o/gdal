@@ -189,8 +189,10 @@ def startup_and_cleanup():
         pass
 
     if hasattr(gdaltest, "ecw_38_fname"):
-        gdal.Unlink(gdaltest.ecw_38_fname)
-        gdal.Unlink(gdaltest.ecw_38_fname + ".aux.xml")
+        if gdal.VSIStatL(gdaltest.ecw_38_fname) is not None:
+            gdal.Unlink(gdaltest.ecw_38_fname)
+        if gdal.VSIStatL(gdaltest.ecw_38_fname + ".aux.xml") is not None:
+            gdal.Unlink(gdaltest.ecw_38_fname + ".aux.xml")
 
     try:
         os.remove("tmp/stefan_full_rgba_ecwv3_meta.ecw")
@@ -247,7 +249,8 @@ def test_ecw_4():
 
     src_ds = gdal.Open("data/ecw/jrc.ecw")
     gdaltest.ecw_drv.CreateCopy("tmp/jrc_out.ecw", src_ds, options=["TARGET=75"])
-    gdal.Unlink("tmp/jrc_out.ecw.aux.xml")
+    if os.path.exists("tmp/jrc_out.ecw.aux.xml"):
+        gdal.Unlink("tmp/jrc_out.ecw.aux.xml")
 
     ds = gdal.Open("tmp/jrc_out.ecw")
     version = ds.GetMetadataItem("VERSION")
@@ -1568,7 +1571,8 @@ def test_ecw_39():
 
 def test_ecw_40():
 
-    ds = gdal.Open("data/ecw/stefan_full_rgba_ecwv3_meta.ecw")
+    with gdaltest.disable_exceptions():
+        ds = gdal.Open("data/ecw/stefan_full_rgba_ecwv3_meta.ecw")
     if ds is None:
         if gdaltest.ecw_drv.major_version < 5:
             if gdal.GetLastErrorMsg().find("requires ECW SDK 5.0") >= 0:
@@ -2359,6 +2363,7 @@ def test_ecw_49():
 # Test reading UInt32 file
 
 
+@gdaltest.disable_exceptions()
 def test_ecw_read_uint32_jpeg2000():
 
     ds = gdal.OpenEx("data/jpeg2000/uint32_2x2_lossless_nbits_20.j2k", gdal.OF_RASTER)
@@ -2543,21 +2548,11 @@ def test_ecw_online_5():
 # and in particular the .ecw extension, to make the ECW driver happy
 
 
+@pytest.mark.require_driver("HTTP")
 def test_ecw_online_6():
-
-    drv = gdal.GetDriverByName("HTTP")
-    if drv is None:
-        pytest.skip()
-
-    dods_drv = gdal.GetDriverByName("DODS")
-    if dods_drv is not None:
-        dods_drv.Deregister()
 
     url = "http://download.osgeo.org/gdal/data/ecw/spif83.ecw"
     ds = gdal.Open(url)
-
-    if dods_drv is not None:
-        dods_drv.Register()
 
     if ds is None:
         # The ECW driver (3.3) doesn't manage to open in /vsimem, thus fallbacks

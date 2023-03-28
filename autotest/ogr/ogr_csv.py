@@ -38,6 +38,13 @@ from osgeo import gdal, ogr, osr
 pytestmark = pytest.mark.require_driver("CSV")
 
 ###############################################################################
+@pytest.fixture(autouse=True, scope="module")
+def module_disable_exceptions():
+    with gdaltest.disable_exceptions():
+        yield
+
+
+###############################################################################
 
 
 @pytest.fixture(autouse=True, scope="module")
@@ -46,16 +53,14 @@ def startup_and_cleanup():
     yield
 
     try:
-        gdal.PushErrorHandler("CPLQuietErrorHandler")
-        ogr.GetDriverByName("CSV").DeleteDataSource("tmp/csvwrk")
-        gdal.PopErrorHandler()
+        with gdaltest.error_handler():
+            ogr.GetDriverByName("CSV").DeleteDataSource("tmp/csvwrk")
     except Exception:
         pass
 
     try:
-        gdal.PushErrorHandler("CPLQuietErrorHandler")
-        ogr.GetDriverByName("CSV").DeleteDataSource("tmp/ogr_csv_29")
-        gdal.PopErrorHandler()
+        with gdaltest.error_handler():
+            ogr.GetDriverByName("CSV").DeleteDataSource("tmp/ogr_csv_29")
     except Exception:
         pass
 
@@ -164,9 +169,8 @@ def test_ogr_csv_3():
     #######################################################
     # Ensure any old copy of our working datasource is cleaned up
     try:
-        gdal.PushErrorHandler("CPLQuietErrorHandler")
-        ogr.GetDriverByName("CSV").DeleteDataSource("tmp/csvwrk")
-        gdal.PopErrorHandler()
+        with gdaltest.error_handler():
+            ogr.GetDriverByName("CSV").DeleteDataSource("tmp/csvwrk")
     except Exception:
         pass
 
@@ -183,9 +187,8 @@ def test_ogr_csv_3():
         # Check that we cannot add a new field now
         assert csv_lyr1.TestCapability(ogr.OLCCreateField) == 0
         field_defn = ogr.FieldDefn("dummy", ogr.OFTString)
-        gdal.PushErrorHandler("CPLQuietErrorHandler")
-        ret = csv_lyr1.CreateField(field_defn)
-        gdal.PopErrorHandler()
+        with gdaltest.error_handler():
+            ret = csv_lyr1.CreateField(field_defn)
         assert ret != 0
 
     # Verify the some attributes read properly.
@@ -470,9 +473,8 @@ def test_ogr_csv_12():
     # Setup Schema
     for i in range(srclyr.GetLayerDefn().GetFieldCount()):
         field_defn = srclyr.GetLayerDefn().GetFieldDefn(i)
-        gdal.PushErrorHandler("CPLQuietErrorHandler")
-        csv_lyr2.CreateField(field_defn)
-        gdal.PopErrorHandler()
+        with gdaltest.error_handler():
+            csv_lyr2.CreateField(field_defn)
 
     #######################################################
     # Recopy source layer into destination layer
@@ -1520,9 +1522,8 @@ def test_ogr_csv_32():
         )
         lyr = ds.GetLayer(0)
         gdal.ErrorReset()
-        gdal.PushErrorHandler("CPLQuietErrorHandler")
-        lyr.GetFeature(fid)
-        gdal.PopErrorHandler()
+        with gdaltest.error_handler():
+            lyr.GetFeature(fid)
         if gdal.GetLastErrorType() != gdal.CE_Warning:
             f.DumpReadable()
             pytest.fail(fid)

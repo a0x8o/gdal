@@ -411,7 +411,8 @@ def test_ogr_geojson_10():
             if dstname:
                 dstname = dstname[len("/vsigzip/") :]
                 gdal.Unlink(dstname)
-                gdal.Unlink(dstname + ".properties")
+                if gdal.VSIStatL(dstname + ".properties") is not None:
+                    gdal.Unlink(dstname + ".properties")
 
 
 ###############################################################################
@@ -483,6 +484,7 @@ def test_ogr_geojson_13():
 # Test reading & writing various degenerated geometries
 
 
+@gdaltest.disable_exceptions()
 def test_ogr_geojson_14():
 
     with gdaltest.error_handler():
@@ -574,9 +576,8 @@ def test_ogr_geojson_20():
         gdal.VSIFWriteL(data, 1, len(data), f)
         gdal.VSIFCloseL(f)
 
-        gdal.PushErrorHandler("CPLQuietErrorHandler")
-        ds = ogr.Open("/vsimem/testgj")
-        gdal.PopErrorHandler()
+        with gdaltest.error_handler():
+            ds = ogr.Open("/vsimem/testgj")
         if ds is None:
             print(gj)
             print(data.decode("LATIN1"))
@@ -843,20 +844,19 @@ def test_ogr_geojson_26():
 
 def test_ogr_geojson_27():
 
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    # Warning 1: Integer values probably ranging out of 64bit integer range
-    # have been found. Will be clamped to INT64_MIN/INT64_MAX
-    ds = ogr.Open(
-        """{"type": "FeatureCollection", "features":[
-{"type": "Feature",
- "geometry": {"type":"Point","coordinates":[1,2]},
- "properties": { "intvalue" : 1 }},
-{"type": "Feature",
- "geometry": {"type":"Point","coordinates":[3,4]},
- "properties": { "intvalue" : 12345678901231234567890123 }},
- ]}"""
-    )
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        # Warning 1: Integer values probably ranging out of 64bit integer range
+        # have been found. Will be clamped to INT64_MIN/INT64_MAX
+        ds = ogr.Open(
+            """{"type": "FeatureCollection", "features":[
+    {"type": "Feature",
+     "geometry": {"type":"Point","coordinates":[1,2]},
+     "properties": { "intvalue" : 1 }},
+    {"type": "Feature",
+     "geometry": {"type":"Point","coordinates":[3,4]},
+     "properties": { "intvalue" : 12345678901231234567890123 }},
+     ]}"""
+        )
     assert ds is not None, "Failed to open datasource"
 
     lyr = ds.GetLayerByName("OGRGeoJSON")
@@ -890,71 +890,68 @@ def test_ogr_geojson_35():
     feat.SetGeometry(geom)
     lyr.CreateFeature(feat)
 
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
+    with gdaltest.error_handler():
+        feat = ogr.Feature(lyr.GetLayerDefn())
+        feat.SetFID(2)
+        geom = ogr.Geometry(ogr.wkbPoint)
+        geom.AddPoint(-1.7e308 * 2, 1.7e308 * 2, 1.7e308 * 2)  # evaluates to -inf, inf
+        feat.SetGeometry(geom)
+        lyr.CreateFeature(feat)
 
-    feat = ogr.Feature(lyr.GetLayerDefn())
-    feat.SetFID(2)
-    geom = ogr.Geometry(ogr.wkbPoint)
-    geom.AddPoint(-1.7e308 * 2, 1.7e308 * 2, 1.7e308 * 2)  # evaluates to -inf, inf
-    feat.SetGeometry(geom)
-    lyr.CreateFeature(feat)
+        feat = ogr.Feature(lyr.GetLayerDefn())
+        feat.SetFID(3)
+        geom = ogr.Geometry(ogr.wkbLineString)
+        geom.AddPoint_2D(0, 0)
+        geom.AddPoint_2D(-1.7e308 * 2, 1.7e308 * 2)  # evaluates to -inf, inf
+        feat.SetGeometry(geom)
+        lyr.CreateFeature(feat)
 
-    feat = ogr.Feature(lyr.GetLayerDefn())
-    feat.SetFID(3)
-    geom = ogr.Geometry(ogr.wkbLineString)
-    geom.AddPoint_2D(0, 0)
-    geom.AddPoint_2D(-1.7e308 * 2, 1.7e308 * 2)  # evaluates to -inf, inf
-    feat.SetGeometry(geom)
-    lyr.CreateFeature(feat)
+        feat = ogr.Feature(lyr.GetLayerDefn())
+        feat.SetFID(4)
+        geom = ogr.Geometry(ogr.wkbPolygon)
+        geom2 = ogr.Geometry(ogr.wkbLinearRing)
+        geom2.AddPoint_2D(0, 0)
+        geom2.AddPoint_2D(-1.7e308 * 2, 1.7e308 * 2)  # evaluates to -inf, inf
+        geom.AddGeometry(geom2)
+        feat.SetGeometry(geom)
+        lyr.CreateFeature(feat)
 
-    feat = ogr.Feature(lyr.GetLayerDefn())
-    feat.SetFID(4)
-    geom = ogr.Geometry(ogr.wkbPolygon)
-    geom2 = ogr.Geometry(ogr.wkbLinearRing)
-    geom2.AddPoint_2D(0, 0)
-    geom2.AddPoint_2D(-1.7e308 * 2, 1.7e308 * 2)  # evaluates to -inf, inf
-    geom.AddGeometry(geom2)
-    feat.SetGeometry(geom)
-    lyr.CreateFeature(feat)
+        feat = ogr.Feature(lyr.GetLayerDefn())
+        feat.SetFID(5)
+        geom = ogr.Geometry(ogr.wkbMultiPoint)
+        geom2 = ogr.Geometry(ogr.wkbPoint)
+        geom2.AddPoint_2D(0, 0)
+        geom2 = ogr.Geometry(ogr.wkbPoint)
+        geom2.AddPoint_2D(-1.7e308 * 2, 1.7e308 * 2)  # evaluates to -inf, inf
+        geom.AddGeometry(geom2)
+        feat.SetGeometry(geom)
+        lyr.CreateFeature(feat)
 
-    feat = ogr.Feature(lyr.GetLayerDefn())
-    feat.SetFID(5)
-    geom = ogr.Geometry(ogr.wkbMultiPoint)
-    geom2 = ogr.Geometry(ogr.wkbPoint)
-    geom2.AddPoint_2D(0, 0)
-    geom2 = ogr.Geometry(ogr.wkbPoint)
-    geom2.AddPoint_2D(-1.7e308 * 2, 1.7e308 * 2)  # evaluates to -inf, inf
-    geom.AddGeometry(geom2)
-    feat.SetGeometry(geom)
-    lyr.CreateFeature(feat)
+        feat = ogr.Feature(lyr.GetLayerDefn())
+        feat.SetFID(6)
+        geom = ogr.Geometry(ogr.wkbMultiLineString)
+        geom2 = ogr.Geometry(ogr.wkbLineString)
+        geom2.AddPoint_2D(0, 0)
+        geom2 = ogr.Geometry(ogr.wkbLineString)
+        geom2.AddPoint_2D(-1.7e308 * 2, 1.7e308 * 2)  # evaluates to -inf, inf
+        geom.AddGeometry(geom2)
+        feat.SetGeometry(geom)
+        lyr.CreateFeature(feat)
 
-    feat = ogr.Feature(lyr.GetLayerDefn())
-    feat.SetFID(6)
-    geom = ogr.Geometry(ogr.wkbMultiLineString)
-    geom2 = ogr.Geometry(ogr.wkbLineString)
-    geom2.AddPoint_2D(0, 0)
-    geom2 = ogr.Geometry(ogr.wkbLineString)
-    geom2.AddPoint_2D(-1.7e308 * 2, 1.7e308 * 2)  # evaluates to -inf, inf
-    geom.AddGeometry(geom2)
-    feat.SetGeometry(geom)
-    lyr.CreateFeature(feat)
-
-    feat = ogr.Feature(lyr.GetLayerDefn())
-    feat.SetFID(7)
-    geom = ogr.Geometry(ogr.wkbMultiPolygon)
-    geom2 = ogr.Geometry(ogr.wkbPolygon)
-    geom3 = ogr.Geometry(ogr.wkbLinearRing)
-    geom3.AddPoint_2D(0, 0)
-    geom2.AddGeometry(geom3)
-    geom2 = ogr.Geometry(ogr.wkbPolygon)
-    geom3 = ogr.Geometry(ogr.wkbLinearRing)
-    geom3.AddPoint_2D(-1.7e308 * 2, 1.7e308 * 2)  # evaluates to -inf, inf
-    geom2.AddGeometry(geom3)
-    geom.AddGeometry(geom2)
-    feat.SetGeometry(geom)
-    lyr.CreateFeature(feat)
-
-    gdal.PopErrorHandler()
+        feat = ogr.Feature(lyr.GetLayerDefn())
+        feat.SetFID(7)
+        geom = ogr.Geometry(ogr.wkbMultiPolygon)
+        geom2 = ogr.Geometry(ogr.wkbPolygon)
+        geom3 = ogr.Geometry(ogr.wkbLinearRing)
+        geom3.AddPoint_2D(0, 0)
+        geom2.AddGeometry(geom3)
+        geom2 = ogr.Geometry(ogr.wkbPolygon)
+        geom3 = ogr.Geometry(ogr.wkbLinearRing)
+        geom3.AddPoint_2D(-1.7e308 * 2, 1.7e308 * 2)  # evaluates to -inf, inf
+        geom2.AddGeometry(geom3)
+        geom.AddGeometry(geom2)
+        feat.SetGeometry(geom)
+        lyr.CreateFeature(feat)
 
     ds = None
 
@@ -1143,6 +1140,7 @@ def test_ogr_geojson_38():
 # Test id top-object level
 
 
+@gdaltest.disable_exceptions()
 def test_ogr_geojson_39():
 
     ds = ogr.Open(
@@ -1461,7 +1459,7 @@ def test_ogr_geojson_43():
 
 def test_ogr_geojson_44():
 
-    with gdaltest.error_handler():
+    with pytest.raises(Exception):
         ogr.Open("""{"type": "FeatureCollection", "features":[ null ]}""")
 
 
@@ -1643,6 +1641,7 @@ def test_ogr_geojson_46():
 # Test update support
 
 
+@gdaltest.disable_exceptions()
 def test_ogr_geojson_47():
 
     # ERROR 6: Update from inline definition not supported
@@ -2238,10 +2237,8 @@ def test_ogr_geojson_55():
 # Test RFC 7946 (that require geos)
 
 
+@pytest.mark.require_geos
 def test_ogr_geojson_56():
-
-    if not ogrtest.have_geos():
-        pytest.skip()
 
     # Test offsetting longitudes beyond antimeridian
     gdal.VectorTranslate(
@@ -2435,10 +2432,8 @@ def test_ogr_geojson_56():
 # Test RFC 7946 and reprojection
 
 
+@pytest.mark.require_geos
 def test_ogr_geojson_57():
-
-    if not ogrtest.have_geos():
-        pytest.skip()
 
     # Standard case: EPSG:32662: WGS 84 / Plate Carre
     src_ds = gdal.GetDriverByName("Memory").Create("", 0, 0, 0)
@@ -2912,15 +2907,13 @@ def test_ogr_geojson_61():
         "/vsimem/ogr_geojson_61.json",
         """{ "type": "FeatureCollection", "features": [""",
     )
-    with gdaltest.error_handler():
+    with pytest.raises(Exception):
         ds = gdal.OpenEx("/vsimem/ogr_geojson_61.json")
-    assert ds is None
     gdal.Unlink("/vsimem/ogr_geojson_61.json")
 
     # Invalid single geometry
-    with gdaltest.error_handler():
+    with pytest.raises(Exception):
         ds = gdal.OpenEx("""{ "type": "Point", "x" : { "coordinates" : null } } """)
-    assert ds is None
 
     # Empty property name
     gdal.FileFromMemBuffer(
@@ -3400,6 +3393,7 @@ def test_ogr_geojson_id_field_and_id_type():
 ###############################################################################
 
 
+@gdaltest.disable_exceptions()
 def test_ogr_geojson_geom_export_failure():
 
     g = ogr.CreateGeometryFromWkt("POINT EMPTY")
@@ -3526,10 +3520,8 @@ def test_ogr_geojson_read_fields_with_different_case():
 # Test bugfix for https://github.com/OSGeo/gdal/issues/1068
 
 
+@pytest.mark.require_geos
 def test_ogr_geojson_clip_geometries_rfc7946():
-
-    if not ogrtest.have_geos():
-        pytest.skip()
 
     tmpfilename = "/vsimem/out.json"
     gdal.VectorTranslate(
@@ -4061,6 +4053,7 @@ def test_ogr_geojson_write_rfc7946_from_3D_crs():
 # Test effect of OGR_GEOJSON_MAX_OBJ_SIZE
 
 
+@gdaltest.disable_exceptions()
 def test_ogr_geojson_feature_large():
 
     filename = "/vsimem/test_ogr_geojson_feature_large.json"
@@ -4082,10 +4075,8 @@ def test_ogr_geojson_feature_large():
 # Test reading http:// resource
 
 
+@pytest.mark.require_curl()
 def test_ogr_geojson_read_from_http():
-
-    if not gdaltest.built_against_curl():
-        pytest.skip()
 
     import webserver
 
@@ -4180,6 +4171,7 @@ def test_ogr_geojson_ids_0_1_null_unset(read_from_file):
 # and others none, and a conflicting id
 
 
+@gdaltest.disable_exceptions()
 @pytest.mark.parametrize("read_from_file", [True, False])
 def test_ogr_geojson_ids_0_1_null_1_null(read_from_file):
 

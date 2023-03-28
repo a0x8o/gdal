@@ -30,6 +30,7 @@
 ###############################################################################
 
 
+import gdaltest
 import pytest
 from ogr.ogr_sql_sqlite import require_ogr_sql_sqlite  # noqa
 
@@ -37,6 +38,13 @@ from osgeo import gdal, ogr, osr
 
 require_ogr_sql_sqlite
 # to make pyflakes happy
+
+###############################################################################
+@pytest.fixture(autouse=True, scope="module")
+def module_disable_exceptions():
+    with gdaltest.disable_exceptions():
+        yield
+
 
 ###############################################################################
 # Test OGRGeomFieldDefn class
@@ -77,9 +85,8 @@ def test_ogr_rfc41_1():
 
     # Test setting invalid value
     old_val = gfld_defn.GetType()
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    gfld_defn.SetType(-3)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        gfld_defn.SetType(-3)
     assert gfld_defn.GetType() == old_val
 
     gfld_defn = None
@@ -130,9 +137,8 @@ def test_ogr_rfc41_2():
 
     # Test setting invalid value
     old_val = feature_defn.GetGeomType()
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    feature_defn.SetGeomType(-3)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        feature_defn.SetGeomType(-3)
     assert feature_defn.GetGeomType() == old_val
 
     # Test SetIgnored() / IsIgnored()
@@ -144,9 +150,8 @@ def test_ogr_rfc41_2():
 
     # Test wrong index values for GetGeomFieldDefn()
     for idx in [-1, 1]:
-        gdal.PushErrorHandler("CPLQuietErrorHandler")
-        ret = feature_defn.GetGeomFieldDefn(idx)
-        gdal.PopErrorHandler()
+        with gdaltest.error_handler():
+            ret = feature_defn.GetGeomFieldDefn(idx)
         assert ret is None
 
     # Test GetGeomFieldIndex()
@@ -297,9 +302,8 @@ def test_ogr_rfc41_4():
     assert got_extent == (10.0, 11.0, 10.0, 11.0)
     # Test invalid geometry field index
     gdal.ErrorReset()
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    got_extent = lyr.GetExtent(geom_field=2)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        got_extent = lyr.GetExtent(geom_field=2)
     assert gdal.GetLastErrorMsg() != ""
 
     # Test SetSpatialFilter()
@@ -321,9 +325,8 @@ def test_ogr_rfc41_4():
     assert feat is not None
     # Test invalid spatial filter index
     gdal.ErrorReset()
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    lyr.SetSpatialFilterRect(2, 0, 0, 0, 0)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        lyr.SetSpatialFilterRect(2, 0, 0, 0, 0)
     assert gdal.GetLastErrorMsg() != ""
 
     lyr.SetSpatialFilter(None)
@@ -584,9 +587,8 @@ def test_ogr_rfc41_6():
 
     for (sql, error_msg) in wrong_sql_list:
         gdal.ErrorReset()
-        gdal.PushErrorHandler("CPLQuietErrorHandler")
-        sql_lyr = ds.ExecuteSQL(sql)
-        gdal.PopErrorHandler()
+        with gdaltest.error_handler():
+            sql_lyr = ds.ExecuteSQL(sql)
         assert (
             gdal.GetLastErrorMsg().find(error_msg) == 0
         ), "For %s, expected error %s, got %s" % (
@@ -610,9 +612,8 @@ def test_ogr_rfc41_6():
         "SELECT * FROM poly WHERE geomfield IN( 'a' )",
     ]:
         gdal.ErrorReset()
-        gdal.PushErrorHandler("CPLQuietErrorHandler")
-        sql_lyr = ds.ExecuteSQL(sql)
-        gdal.PopErrorHandler()
+        with gdaltest.error_handler():
+            sql_lyr = ds.ExecuteSQL(sql)
         assert (
             gdal.GetLastErrorMsg().find("Cannot use geometry field in this operation")
             == 0
@@ -679,16 +680,14 @@ def test_ogr_rfc41_6():
 
     # Test invalid spatial filter index
     gdal.ErrorReset()
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    sql_lyr.SetSpatialFilterRect(2, 0, 0, 0, 0)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        sql_lyr.SetSpatialFilterRect(2, 0, 0, 0, 0)
     assert gdal.GetLastErrorMsg() != ""
 
     # Test invalid geometry field index
     gdal.ErrorReset()
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    sql_lyr.GetExtent(geom_field=2)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        sql_lyr.GetExtent(geom_field=2)
     assert gdal.GetLastErrorMsg() != ""
 
     ds.ReleaseResultSet(sql_lyr)

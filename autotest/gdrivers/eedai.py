@@ -343,9 +343,6 @@ def test_eedai_gce_credentials():
     gdaltest.webserver_process = None
     gdaltest.webserver_port = 0
 
-    if not gdaltest.built_against_curl():
-        pytest.skip()
-
     (gdaltest.webserver_process, gdaltest.webserver_port) = webserver.launch(
         handler=webserver.DispatcherHttpHandler
     )
@@ -595,7 +592,8 @@ def test_eedai_cleanup():
     )
 
     gdal.Unlink("/vsimem/ee/projects/earthengine-public/assets/image")
-    gdal.RmdirRecursive("/vsimem/ee/")
+    with gdaltest.disable_exceptions():
+        gdal.RmdirRecursive("/vsimem/ee/")
 
 
 ###############################################################################

@@ -394,14 +394,16 @@ static bool COGGetWarpingCharacteristics(
         const double dfOriY =
             bInvertAxis ? tmList[0].mTopLeftX : tmList[0].mTopLeftY;
         const double dfTileExtent = dfRes * nBlockSize;
+        constexpr double TOLERANCE_IN_PIXEL = 0.499;
+        const double dfEps = TOLERANCE_IN_PIXEL * dfRes;
         int nTLTileX = static_cast<int>(
-            std::floor((dfMinX - dfOriX) / dfTileExtent + 1e-10));
+            std::floor((dfMinX - dfOriX + dfEps) / dfTileExtent));
         int nTLTileY = static_cast<int>(
-            std::floor((dfOriY - dfMaxY) / dfTileExtent + 1e-10));
+            std::floor((dfOriY - dfMaxY + dfEps) / dfTileExtent));
         int nBRTileX = static_cast<int>(
-            std::ceil((dfMaxX - dfOriX) / dfTileExtent - 1e-10));
+            std::ceil((dfMaxX - dfOriX - dfEps) / dfTileExtent));
         int nBRTileY = static_cast<int>(
-            std::ceil((dfOriY - dfMinY) / dfTileExtent - 1e-10));
+            std::ceil((dfOriY - dfMinY - dfEps) / dfTileExtent));
 
         nAlignedLevels =
             std::min(std::min(10, atoi(CSLFetchNameValueDef(
@@ -660,6 +662,14 @@ static std::unique_ptr<GDALDataset> CreateReprojectedDS(
                                   pScaledProgress);
     CPLString osTmpFile(GetTmpFilename(pszDstFilename, "warped.tif.tmp"));
     auto hSrcDS = GDALDataset::ToHandle(poSrcDS);
+
+    std::unique_ptr<CPLConfigOptionSetter> poWarpThreadSetter;
+    if (pszNumThreads)
+    {
+        poWarpThreadSetter.reset(new CPLConfigOptionSetter(
+            "GDAL_NUM_THREADS", pszNumThreads, false));
+    }
+
     auto hRet = GDALWarp(osTmpFile, nullptr, 1, &hSrcDS, psOptions, nullptr);
     GDALWarpAppOptionsFree(psOptions);
     CPLDebug("COG", "Reprojecting source dataset: end");

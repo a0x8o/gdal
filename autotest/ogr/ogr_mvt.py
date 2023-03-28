@@ -159,7 +159,7 @@ def test_ogr_mvt_limit_cases():
     f = lyr.GetFeature(1)
     assert f["mvt_id"] == 1
 
-    with gdaltest.error_handler():
+    with pytest.raises(Exception):
         f = lyr.GetFeature(6)
         assert f["b"] == 1
 
@@ -352,7 +352,7 @@ def test_ogr_mvt_point_polygon():
 
 def test_ogr_mvt_point_polygon_clip():
 
-    if not ogrtest.have_geos() or gdal.GetConfigOption("OGR_MVT_CLIP") is not None:
+    if not (ogrtest.have_geos() or gdal.GetConfigOption("OGR_MVT_CLIP") is not None):
         pytest.skip()
 
     ds = ogr.Open("data/mvt/point_polygon/1")
@@ -632,8 +632,8 @@ def test_ogr_mvt_mbtiles_test_ogrsf():
 @pytest.mark.require_driver("MBTILES")
 def test_ogr_mvt_mbtiles_open_vector_in_raster_mode():
 
-    ds = gdal.OpenEx("data/mvt/datatypes.mbtiles", gdal.OF_RASTER)
-    assert ds is None
+    with pytest.raises(Exception):
+        gdal.OpenEx("data/mvt/datatypes.mbtiles", gdal.OF_RASTER)
 
 
 ###############################################################################
@@ -679,15 +679,18 @@ def test_ogr_mvt_polygon_larger_than_header():
 
 def test_ogr_mvt_errors():
 
-    assert ogr.Open("MVT:/i_do_not/exist") is None
+    with pytest.raises(Exception):
+        assert ogr.Open("MVT:/i_do_not/exist") is None
 
     # Cannot detect Z in directory name
-    assert ogr.Open("MVT:data") is None
+    with pytest.raises(Exception):
+        assert ogr.Open("MVT:data") is None
 
     # Invalid Z
     gdal.Mkdir("/vsimem/33", 0)
 
-    assert ogr.Open("MVT:/vsimem/33") is None
+    with pytest.raises(Exception):
+        assert ogr.Open("MVT:/vsimem/33") is None
 
     gdal.Rmdir("/vsimem/33")
 
@@ -744,21 +747,19 @@ def test_ogr_mvt_errors():
     gdal.VSIFSeekL(f, 20 * 1024 * 1024, 0)
     gdal.VSIFWriteL(" ", 1, 1, f)
     gdal.VSIFCloseL(f)
-    ds = ogr.Open(tmpfilename)
+    with pytest.raises(Exception):
+        ogr.Open(tmpfilename)
     gdal.Unlink(tmpfilename)
-    assert ds is None
 
 
 ###############################################################################
 
 
+@pytest.mark.require_curl()
 def test_ogr_mvt_http_start():
 
     gdaltest.webserver_process = None
     gdaltest.webserver_port = 0
-
-    if not gdaltest.built_against_curl():
-        pytest.skip()
 
     (gdaltest.webserver_process, gdaltest.webserver_port) = webserver.launch(
         handler=webserver.DispatcherHttpHandler
@@ -770,6 +771,7 @@ def test_ogr_mvt_http_start():
 ###############################################################################
 
 
+@pytest.mark.require_curl()
 def test_ogr_mvt_http():
 
     if gdaltest.webserver_port == 0:
@@ -809,11 +811,8 @@ def test_ogr_mvt_http():
     handler.add("GET", "/linestring.json", 404, {})
     handler.add("GET", "/linestring/0/0/0.pbf", 404, {})
     with webserver.install_http_handler(handler):
-        with gdaltest.error_handler():
-            ds = ogr.Open(
-                "MVT:http://127.0.0.1:%d/linestring/0" % gdaltest.webserver_port
-            )
-        assert ds is None
+        with pytest.raises(Exception):
+            ogr.Open("MVT:http://127.0.0.1:%d/linestring/0" % gdaltest.webserver_port)
 
     # No metadata file, but tiles
     handler = webserver.SequentialHandler()
@@ -853,8 +852,8 @@ def test_ogr_mvt_http():
     with webserver.install_http_handler(handler):
         ds = ogr.Open("MVT:http://127.0.0.1:%d/linestring/0" % gdaltest.webserver_port)
         lyr = ds.GetLayer(0)
-        f = lyr.GetNextFeature()
-        assert f is None
+        with pytest.raises(Exception):
+            lyr.GetNextFeature()
 
     # No metadata.json file, but a linestring.json and no tiles
     handler = webserver.SequentialHandler()
@@ -871,8 +870,8 @@ def test_ogr_mvt_http():
     with webserver.install_http_handler(handler):
         ds = ogr.Open("MVT:http://127.0.0.1:%d/linestring/0" % gdaltest.webserver_port)
         lyr = ds.GetLayer(0)
-        f = lyr.GetNextFeature()
-        assert f is None
+        with pytest.raises(Exception):
+            lyr.GetNextFeature()
 
     # Open pbf file
     handler = webserver.SequentialHandler()
@@ -895,6 +894,7 @@ def test_ogr_mvt_http():
 ###############################################################################
 
 
+@pytest.mark.require_curl()
 def test_ogr_mvt_http_stop():
 
     if gdaltest.webserver_port == 0:
@@ -907,7 +907,7 @@ def test_ogr_mvt_http_stop():
 
 
 @pytest.mark.require_driver("SQLite")
-@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
+@pytest.mark.require_geos
 def test_ogr_mvt_write_one_layer():
 
     src_ds = gdal.GetDriverByName("Memory").Create("", 0, 0, 0, gdal.GDT_Unknown)
@@ -928,14 +928,12 @@ def test_ogr_mvt_write_one_layer():
     assert out_ds is not None
 
     # Cannot create directory
-    with gdaltest.error_handler():
-        out_ds = gdal.VectorTranslate("/i_dont/exist/outmvt", src_ds, format="MVT")
-    assert out_ds is None
+    with pytest.raises(Exception):
+        gdal.VectorTranslate("/i_dont/exist/outmvt", src_ds, format="MVT")
 
     # Directory already exists
-    with gdaltest.error_handler():
-        out_ds = gdal.VectorTranslate("/vsimem/outmvt", src_ds, format="MVT")
-    assert out_ds is None
+    with pytest.raises(Exception):
+        gdal.VectorTranslate("/vsimem/outmvt", src_ds, format="MVT")
 
     gdal.RmdirRecursive("/vsimem/outmvt")
 
@@ -1271,7 +1269,7 @@ def test_ogr_mvt_write_one_layer():
 
 
 @pytest.mark.require_driver("SQLite")
-@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
+@pytest.mark.require_geos
 def test_ogr_mvt_write_conf():
 
     src_ds = gdal.GetDriverByName("Memory").Create("", 0, 0, 0, gdal.GDT_Unknown)
@@ -1369,7 +1367,7 @@ def test_ogr_mvt_write_conf():
 
 
 @pytest.mark.require_driver("SQLite")
-@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
+@pytest.mark.require_geos
 def test_ogr_mvt_write_mbtiles():
 
     src_ds = gdal.GetDriverByName("Memory").Create("", 0, 0, 0, gdal.GDT_Unknown)
@@ -1404,7 +1402,7 @@ def test_ogr_mvt_write_mbtiles():
 
 
 @pytest.mark.require_driver("SQLite")
-@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
+@pytest.mark.require_geos
 def test_ogr_mvt_write_limitations_max_size():
 
     src_ds = gdal.GetDriverByName("Memory").Create("", 0, 0, 0, gdal.GDT_Unknown)
@@ -1465,7 +1463,7 @@ def test_ogr_mvt_write_limitations_max_size():
 
 
 @pytest.mark.require_driver("SQLite")
-@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
+@pytest.mark.require_geos
 def test_ogr_mvt_write_polygon_repaired():
 
     src_ds = gdal.GetDriverByName("Memory").Create("", 0, 0, 0, gdal.GDT_Unknown)
@@ -1561,7 +1559,7 @@ def test_ogr_mvt_write_polygon_repaired():
 
 
 @pytest.mark.require_driver("SQLite")
-@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
+@pytest.mark.require_geos
 def test_ogr_mvt_write_conflicting_innner_ring():
 
     src_ds = gdal.GetDriverByName("Memory").Create("", 0, 0, 0, gdal.GDT_Unknown)
@@ -1603,7 +1601,7 @@ def test_ogr_mvt_write_conflicting_innner_ring():
 
 
 @pytest.mark.require_driver("SQLite")
-@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
+@pytest.mark.require_geos
 def test_ogr_mvt_write_limitations_max_size_polygon():
 
     src_ds = gdal.GetDriverByName("Memory").Create("", 0, 0, 0, gdal.GDT_Unknown)
@@ -1649,7 +1647,7 @@ def test_ogr_mvt_write_limitations_max_size_polygon():
 
 
 @pytest.mark.require_driver("SQLite")
-@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
+@pytest.mark.require_geos
 def test_ogr_mvt_write_limitations_max_features():
 
     src_ds = gdal.GetDriverByName("Memory").Create("", 0, 0, 0, gdal.GDT_Unknown)
@@ -1702,7 +1700,7 @@ def test_ogr_mvt_write_limitations_max_features():
 
 
 @pytest.mark.require_driver("SQLite")
-@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
+@pytest.mark.require_geos
 def test_ogr_mvt_write_custom_tiling_scheme():
 
     src_ds = gdal.GetDriverByName("Memory").Create("", 0, 0, 0, gdal.GDT_Unknown)
@@ -1745,11 +1743,13 @@ def test_ogr_mvt_write_custom_tiling_scheme():
 
 
 @pytest.mark.require_driver("SQLite")
-@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
+@pytest.mark.require_geos
+@gdaltest.disable_exceptions()
 def test_ogr_mvt_write_errors():
 
     # Raster creation attempt
-    gdal.RmdirRecursive("/vsimem/foo")
+    if gdal.VSIStatL("/vsimem/foo") is not None:
+        gdal.RmdirRecursive("/vsimem/foo")
     with gdaltest.error_handler():
         ds = gdal.GetDriverByName("MVT").Create("/vsimem/foo", 1, 1)
     assert ds is None
@@ -1910,7 +1910,7 @@ def test_ogr_mvt_write_errors():
 
 
 @pytest.mark.require_driver("SQLite")
-@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
+@pytest.mark.require_geos
 def test_ogr_mvt_write_reuse_temp_db():
 
     src_ds = gdal.GetDriverByName("Memory").Create("", 0, 0, 0, gdal.GDT_Unknown)

@@ -779,16 +779,15 @@ int OGRPGDataSource::Open(const char *pszNewName, int bUpdate, int bTestOpen,
               hResult); /* Test if safe PQclear has not been broken */
 
     /* -------------------------------------------------------------------- */
-    /*      Test if standard_conforming_strings is recognized               */
+    /*      Set standard_conforming_strings=ON                              */
     /* -------------------------------------------------------------------- */
 
-    hResult = OGRPG_PQexec(hPGConn, "SHOW standard_conforming_strings");
-    if (hResult && PQresultStatus(hResult) == PGRES_TUPLES_OK &&
-        PQntuples(hResult) == 1)
+    hResult = OGRPG_PQexec(hPGConn, "SET standard_conforming_strings = ON");
+    if (!(hResult && PQresultStatus(hResult) == PGRES_COMMAND_OK))
     {
-        /* Whatever the value is, it means that we can use the E'' */
-        /* syntax */
-        bUseEscapeStringSyntax = TRUE;
+        CPLError(CE_Failure, CPLE_AppDefined, "%s", PQerrorMessage(hPGConn));
+        OGRPGClearResult(hResult);
+        return FALSE;
     }
     OGRPGClearResult(hResult);
 
@@ -964,6 +963,10 @@ int OGRPGDataSource::Open(const char *pszNewName, int bUpdate, int bTestOpen,
         CSLFetchNameValueDef(papszOpenOptions, "LIST_ALL_TABLES",
                              CPLGetConfigOption("PG_LIST_ALL_TABLES", "NO")));
 
+    m_bSkipViews = CPLTestBool(
+        CSLFetchNameValueDef(papszOpenOptions, "SKIP_VIEWS",
+                             CPLGetConfigOption("PG_SKIP_VIEWS", "NO")));
+
     return TRUE;
 }
 
@@ -1049,10 +1052,7 @@ void OGRPGDataSource::LoadTables()
     /*      Get a list of available tables if they have not been            */
     /*      specified through the TABLES connection string param           */
     /* -------------------------------------------------------------------- */
-    const char *pszAllowedRelations =
-        CPLTestBool(CPLGetConfigOption("PG_SKIP_VIEWS", "NO"))
-            ? "'r'"
-            : "'r','v','m','f'";
+    const char *pszAllowedRelations = m_bSkipViews ? "'r'" : "'r','v','m','f'";
 
     hSetTables = CPLHashSetNew(OGRPGHashTableEntry, OGRPGEqualTableEntry,
                                OGRPGFreeTableEntry);

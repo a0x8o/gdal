@@ -444,12 +444,11 @@ def test_gdalbuildvrt_lib_bandList():
 
     # If no explicit band list, we require all sources to have the same
     # number of bands
-    with gdaltest.error_handler():
-        gdal.ErrorReset()
+    with gdaltest.disable_exceptions(), gdaltest.error_handler():
         assert gdal.BuildVRT("", [src_ds, src2_ds]) is not None
         assert gdal.GetLastErrorType() != 0
 
-    with gdaltest.error_handler():
+    with gdaltest.disable_exceptions(), gdaltest.error_handler():
         gdal.ErrorReset()
         assert gdal.BuildVRT("", [src2_ds, src_ds]) is not None
         assert gdal.GetLastErrorType() != 0
@@ -539,7 +538,7 @@ def test_gdalbuildvrt_lib_warnings_and_custom_error_handler():
 
     err_handler = GdalErrorHandler()
     with gdaltest.error_handler(err_handler.handler):
-        with gdaltest.enable_exceptions():
+        with gdal.ExceptionMgr():
             vrt_ds = gdal.BuildVRT("", [ds_one_band, ds_two_band])
     assert vrt_ds
     assert not err_handler.got_failure
@@ -547,7 +546,7 @@ def test_gdalbuildvrt_lib_warnings_and_custom_error_handler():
 
     err_handler = GdalErrorHandler()
     with gdaltest.error_handler(err_handler.handler):
-        with gdaltest.enable_exceptions():
+        with gdal.ExceptionMgr():
             vrt_ds = gdal.BuildVRT("", [ds_two_band, ds_one_band])
     assert vrt_ds
     assert not err_handler.got_failure
@@ -557,7 +556,7 @@ def test_gdalbuildvrt_lib_warnings_and_custom_error_handler():
 ###############################################################################
 def test_gdalbuildvrt_lib_strict_mode():
 
-    with gdaltest.enable_exceptions():
+    with gdal.ExceptionMgr():
         with gdaltest.error_handler():
             assert (
                 gdal.BuildVRT(
@@ -566,7 +565,7 @@ def test_gdalbuildvrt_lib_strict_mode():
                 is not None
             )
 
-    with gdaltest.enable_exceptions():
+    with gdal.ExceptionMgr():
         with pytest.raises(Exception):
             gdal.BuildVRT(
                 "", ["../gcore/data/byte.tif", "i_dont_exist.tif"], strict=True
@@ -635,5 +634,30 @@ def test_gdalbuildvrt_lib_addAlpha(num_bands_1, num_bands_2, drv_name):
             b"\xff" if num_bands_1 == 3 else b"\x04"
         ) + (b"\xff" if num_bands_2 == 3 else b"\x04")
     finally:
-        gdal.Unlink(fname1)
-        gdal.Unlink(fname2)
+        if gdal.VSIStatL(fname1) is not None:
+            gdal.Unlink(fname1)
+        if gdal.VSIStatL(fname2) is not None:
+            gdal.Unlink(fname2)
+
+
+###############################################################################
+
+
+def test_gdalbuildvrt_lib_stable_average():
+    """Tests that averaging resolution is stable. Cf https://github.com/OSGeo/gdal/issues/7502"""
+
+    gt = (
+        -5570.248248450553,
+        3.0004031511048237,
+        0.0,
+        5570.248248450553,
+        0.0,
+        -3.0004031511048237,
+    )
+    ds = gdal.GetDriverByName("MEM").Create("", 1, 1, 1, gdal.GDT_Float32)
+    ds.SetGeoTransform(gt)
+
+    vrt_ds = gdal.BuildVRT("", [ds] * 1000, separate=False)
+    vrt_gt = vrt_ds.GetGeoTransform()
+
+    assert vrt_gt == gt

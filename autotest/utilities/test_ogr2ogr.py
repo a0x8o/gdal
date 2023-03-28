@@ -539,7 +539,7 @@ def test_ogr2ogr_17(ogr2ogr_path):
 # Test -wrapdateline
 
 
-@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
+@pytest.mark.require_geos
 def test_ogr2ogr_18(ogr2ogr_path):
 
     try:
@@ -605,7 +605,7 @@ def test_ogr2ogr_18(ogr2ogr_path):
 # at line of constant easting.
 
 
-@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
+@pytest.mark.require_geos
 def test_ogr2ogr_polygon_splitting(ogr2ogr_path):
 
     try:
@@ -660,7 +660,7 @@ def test_ogr2ogr_polygon_splitting(ogr2ogr_path):
 # Test -clipsrc
 
 
-@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
+@pytest.mark.require_geos
 def test_ogr2ogr_19(ogr2ogr_path):
 
     try:
@@ -864,7 +864,7 @@ def test_ogr2ogr_23(ogr2ogr_path):
 # Test -clipsrc with WKT geometry (#3530)
 
 
-@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
+@pytest.mark.require_geos
 def test_ogr2ogr_24(ogr2ogr_path):
 
     try:
@@ -898,7 +898,7 @@ def test_ogr2ogr_24(ogr2ogr_path):
 
 
 @pytest.mark.require_driver("CSV")
-@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
+@pytest.mark.require_geos
 def test_ogr2ogr_25(ogr2ogr_path):
 
     try:
@@ -939,7 +939,7 @@ def test_ogr2ogr_25(ogr2ogr_path):
 # Test -clipdst with WKT geometry (#3530)
 
 
-@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
+@pytest.mark.require_geos
 def test_ogr2ogr_26(ogr2ogr_path):
 
     try:
@@ -973,7 +973,7 @@ def test_ogr2ogr_26(ogr2ogr_path):
 
 
 @pytest.mark.require_driver("CSV")
-@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
+@pytest.mark.require_geos
 def test_ogr2ogr_27(ogr2ogr_path):
 
     try:
@@ -1072,7 +1072,7 @@ def test_ogr2ogr_28(ogr2ogr_path):
 # Test -wrapdateline on polygons
 
 
-@pytest.mark.skipif(not ogrtest.have_geos(), reason="GEOS missing")
+@pytest.mark.require_geos
 def test_ogr2ogr_29(ogr2ogr_path):
 
     for i in range(2):
@@ -1148,9 +1148,10 @@ def test_ogr2ogr_29(ogr2ogr_path):
 
 def test_ogr2ogr_30(ogr2ogr_path):
 
-    ds = ogr.Open("../ogr/data/gml/testlistfields.gml")
+    with gdaltest.disable_exceptions():
+        ds = ogr.Open("../ogr/data/gml/testlistfields.gml")
     if ds is None:
-        pytest.skip()
+        pytest.skip("GML reader not available")
     ds = None
 
     gdaltest.runexternal(
@@ -1696,8 +1697,11 @@ def test_ogr2ogr_44(ogr2ogr_path):
     except (OSError, AttributeError):
         pass
 
-    gdal.Unlink("tmp/test_ogr2ogr_44.gml")
-    gdal.Unlink("tmp/test_ogr2ogr_44.xsd")
+    if os.path.exists("tmp/test_ogr2ogr_44.gml"):
+        gdal.Unlink("tmp/test_ogr2ogr_44.gml")
+
+    if os.path.exists("tmp/test_ogr2ogr_44.xsd"):
+        gdal.Unlink("tmp/test_ogr2ogr_44.xsd")
 
     ds = ogr.GetDriverByName("ESRI Shapefile").CreateDataSource(
         "tmp/test_ogr2ogr_44_src.shp"
@@ -1757,8 +1761,11 @@ def test_ogr2ogr_45(ogr2ogr_path):
     except (OSError, AttributeError):
         pass
 
-    gdal.Unlink("tmp/test_ogr2ogr_45.gml")
-    gdal.Unlink("tmp/test_ogr2ogr_45.xsd")
+    if os.path.exists("tmp/test_ogr2ogr_45.gml"):
+        gdal.Unlink("tmp/test_ogr2ogr_45.gml")
+
+    if os.path.exists("tmp/test_ogr2ogr_45.xsd"):
+        gdal.Unlink("tmp/test_ogr2ogr_45.xsd")
 
     ds = ogr.GetDriverByName("ESRI Shapefile").CreateDataSource(
         "tmp/test_ogr2ogr_45_src.shp"
@@ -1818,8 +1825,11 @@ def test_ogr2ogr_46(ogr2ogr_path):
     except (OSError, AttributeError):
         pass
 
-    gdal.Unlink("tmp/test_ogr2ogr_46.gml")
-    gdal.Unlink("tmp/test_ogr2ogr_46.xsd")
+    if os.path.exists("tmp/test_ogr2ogr_46.gml"):
+        gdal.Unlink("tmp/test_ogr2ogr_46.gml")
+
+    if os.path.exists("tmp/test_ogr2ogr_46.xsd"):
+        gdal.Unlink("tmp/test_ogr2ogr_46.xsd")
 
     ds = ogr.GetDriverByName("ESRI Shapefile").CreateDataSource(
         "tmp/test_ogr2ogr_46_src.shp"
@@ -1870,6 +1880,7 @@ def test_ogr2ogr_46(ogr2ogr_path):
 # Test reprojection with features with different SRS
 
 
+@pytest.mark.require_driver("GML")
 def test_ogr2ogr_47(ogr2ogr_path):
 
     f = open("tmp/test_ogr2ogr_47_src.gml", "wt")
@@ -1897,14 +1908,14 @@ def test_ogr2ogr_47(ogr2ogr_path):
     )
     f.close()
 
-    gdal.Unlink("tmp/test_ogr2ogr_47_src.gfs")
+    if os.path.exists("tmp/test_ogr2ogr_47_src.gfs"):
+        gdal.Unlink("tmp/test_ogr2ogr_47_src.gfs")
 
-    ds = ogr.Open("tmp/test_ogr2ogr_47_src.gml")
-
-    if ds is None:
+    try:
+        ogr.Open("tmp/test_ogr2ogr_47_src.gml")
+    except Exception:
         os.unlink("tmp/test_ogr2ogr_47_src.gml")
-        pytest.skip()
-    ds = None
+        pytest.skip("GML reader not available")
 
     gdaltest.runexternal(
         ogr2ogr_path
@@ -2466,8 +2477,11 @@ def test_ogr2ogr_56(ogr2ogr_path):
     f.close()
 
     assert (
-        """ALTER TABLE "public"."test_ogr2ogr_56" ADD COLUMN "myid"" """ not in content
-        and """INSERT INTO "public"."test_ogr2ogr_56" ("wkb_geometry" , "myid" , "str", "wkt") VALUES ('010100000000000000000000000000000000000000', 10, 'aaa', 'POINT(0 0)');"""
+        """ALTER TABLE "public"."test_ogr2ogr_56" ADD COLUMN "myid" INT"""
+        not in content
+    )
+    assert (
+        """INSERT INTO "public"."test_ogr2ogr_56" ("myid", "wkb_geometry", "str", "wkt") VALUES (10, '010100000000000000000000000000000000000000', 'aaa', 'POINT(0 0)');"""
         in content
     )
 
@@ -2518,9 +2532,11 @@ def test_ogr2ogr_57(ogr2ogr_path):
     f.close()
 
     assert (
-        """CREATE TABLE "public"."test_ogr2ogr_57" ( "id" SERIAL, CONSTRAINT "test_ogr2ogr_57_pk" PRIMARY KEY ("id") )"""
+        """ALTER TABLE "public"."test_ogr2ogr_57" ADD COLUMN "id" SERIAL CONSTRAINT "test_ogr2ogr_57_pk" PRIMARY KEY;"""
         in content
-        and """INSERT INTO "public"."test_ogr2ogr_57" ("wkt" , "id" , "str") VALUES ('010100000000000000000000000000000000000000', 10, 'a')"""
+    )
+    assert (
+        """INSERT INTO "public"."test_ogr2ogr_57" ("id", "wkt", "str") VALUES (10, '010100000000000000000000000000000000000000', 'a');"""
         in content
     )
 
@@ -2537,9 +2553,11 @@ def test_ogr2ogr_57(ogr2ogr_path):
     f.close()
 
     assert (
-        """CREATE TABLE "public"."test_ogr2ogr_57" ( "ogc_fid" SERIAL, CONSTRAINT "test_ogr2ogr_57_pk" PRIMARY KEY ("ogc_fid") )"""
+        """ALTER TABLE "public"."test_ogr2ogr_57" ADD COLUMN "ogc_fid" SERIAL CONSTRAINT "test_ogr2ogr_57_pk" PRIMARY KEY;"""
         in content
-        and """INSERT INTO "public"."test_ogr2ogr_57" ("wkt" , "str") VALUES ('010100000000000000000000000000000000000000', 'a')"""
+    )
+    assert (
+        """INSERT INTO "public"."test_ogr2ogr_57" ("wkt", "str") VALUES ('010100000000000000000000000000000000000000', 'a');"""
         in content
     )
 

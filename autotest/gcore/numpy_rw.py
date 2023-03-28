@@ -39,6 +39,13 @@ numpy = pytest.importorskip("numpy")
 gdal_array = pytest.importorskip("osgeo.gdal_array")
 
 ###############################################################################
+@pytest.fixture(autouse=True, scope="module")
+def module_disable_exceptions():
+    with gdaltest.disable_exceptions():
+        yield
+
+
+###############################################################################
 # verify that we can load the deprecated gdalnumeric module
 
 
@@ -727,7 +734,7 @@ def test_numpy_rw_failure_in_readasarray():
     assert ds is not None
 
     exception_raised = False
-    with gdaltest.enable_exceptions():
+    with gdal.ExceptionMgr():
         try:
             ds.ReadAsArray()
         except RuntimeError:
@@ -735,7 +742,7 @@ def test_numpy_rw_failure_in_readasarray():
     assert exception_raised
 
     exception_raised = False
-    with gdaltest.enable_exceptions():
+    with gdal.ExceptionMgr():
         try:
             ds.GetRasterBand(1).ReadAsArray()
         except RuntimeError:

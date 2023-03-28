@@ -323,7 +323,7 @@ class OGROpenFileGDBGeomFieldDefn : public OGRGeomFieldDefn
         m_poLayer = nullptr;
     }
 
-    virtual OGRSpatialReference *GetSpatialRef() const override
+    virtual const OGRSpatialReference *GetSpatialRef() const override
     {
         if (poSRS)
             return poSRS;
@@ -545,6 +545,11 @@ class OGROpenFileGDBDataSource final : public OGRDataSource
     virtual OGRErr StartTransaction(int bForce) override;
     virtual OGRErr CommitTransaction() override;
     virtual OGRErr RollbackTransaction() override;
+
+    const CPLStringList &GetSubdatasets() const
+    {
+        return m_aosSubdatasets;
+    }
 
     CPLErr GetGeoTransform(double *padfGeoTransform) override;
     const OGRSpatialReference *GetSpatialRef() const override;

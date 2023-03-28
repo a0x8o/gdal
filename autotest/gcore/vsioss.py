@@ -37,6 +37,8 @@ import webserver
 
 from osgeo import gdal
 
+pytestmark = pytest.mark.require_curl()
+
 
 def open_for_read(uri):
     """
@@ -72,9 +74,6 @@ def test_visoss_init():
 
 def test_visoss_1():
 
-    if not gdaltest.built_against_curl():
-        pytest.skip()
-
     # Missing OSS_SECRET_ACCESS_KEY
     gdal.ErrorReset()
     with gdaltest.error_handler():
@@ -98,9 +97,6 @@ def test_visoss_1():
 
 
 def test_visoss_real_test():
-
-    if not gdaltest.built_against_curl():
-        pytest.skip()
 
     if gdaltest.skip_on_travis():
         pytest.skip()
@@ -129,9 +125,6 @@ def test_visoss_start_webserver():
 
     gdaltest.webserver_process = None
     gdaltest.webserver_port = 0
-
-    if not gdaltest.built_against_curl():
-        pytest.skip()
 
     (gdaltest.webserver_process, gdaltest.webserver_port) = webserver.launch(
         handler=webserver.DispatcherHttpHandler
@@ -177,6 +170,7 @@ def get_oss_fake_bucket_resource_method(request):
 # Test with a fake OSS server
 
 
+@gdaltest.disable_exceptions()
 def test_visoss_2():
 
     if gdaltest.webserver_port == 0:
@@ -634,6 +628,7 @@ def test_visoss_3():
 # Test simple PUT support with a fake OSS server
 
 
+@gdaltest.disable_exceptions()
 def test_visoss_4():
 
     if gdaltest.webserver_port == 0:
@@ -762,6 +757,7 @@ def test_visoss_4():
 # Test simple DELETE support with a fake OSS server
 
 
+@gdaltest.disable_exceptions()
 def test_visoss_5():
 
     if gdaltest.webserver_port == 0:
@@ -815,6 +811,7 @@ def test_visoss_5():
 # Test multipart upload with a fake OSS server
 
 
+@gdaltest.disable_exceptions()
 def test_visoss_6():
 
     if gdaltest.webserver_port == 0:
@@ -1096,6 +1093,7 @@ def test_visoss_6():
 # Test Mkdir() / Rmdir()
 
 
+@gdaltest.disable_exceptions()
 def test_visoss_7():
 
     if gdaltest.webserver_port == 0:
@@ -1227,9 +1225,6 @@ def test_visoss_stop_webserver():
 
 
 def test_visoss_extra_1():
-
-    if not gdaltest.built_against_curl():
-        pytest.skip()
 
     # Either a bucket name or bucket/filename
     OSS_RESOURCE = gdal.GetConfigOption("OSS_RESOURCE")

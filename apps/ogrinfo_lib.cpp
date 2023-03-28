@@ -861,7 +861,8 @@ static void ReportOnLayer(CPLString &osRet, CPLJSONObject oLayer,
                         oBbox.Add(oExt.MaxY);
                         oGeometryField.Add("extent", oBbox);
                     }
-                    OGRSpatialReference *poSRS = poGFldDefn->GetSpatialRef();
+                    const OGRSpatialReference *poSRS =
+                        poGFldDefn->GetSpatialRef();
                     if (poSRS)
                     {
                         CPLJSONObject oCRS;
@@ -874,21 +875,22 @@ static void ReportOnLayer(CPLString &osRet, CPLJSONObject oLayer,
                             CPLFree(pszWKT);
                         }
 
-                        char *pszProjJson = nullptr;
-                        CPLPushErrorHandler(
-                            CPLQuietErrorHandler);  // PROJJSON requires PROJ
-                                                    // >= 6.2
-                        CPL_IGNORE_RET_VAL(
-                            poSRS->exportToPROJJSON(&pszProjJson, nullptr));
-                        CPLPopErrorHandler();
-                        if (pszProjJson)
                         {
-                            CPLJSONDocument oDoc;
-                            if (oDoc.LoadMemory(pszProjJson))
+                            char *pszProjJson = nullptr;
+                            // PROJJSON requires PROJ >= 6.2
+                            CPLErrorHandlerPusher oPusher(CPLQuietErrorHandler);
+                            CPLErrorStateBackuper oCPLErrorHandlerPusher;
+                            CPL_IGNORE_RET_VAL(
+                                poSRS->exportToPROJJSON(&pszProjJson, nullptr));
+                            if (pszProjJson)
                             {
-                                oCRS.Add("projjson", oDoc.GetRoot());
+                                CPLJSONDocument oDoc;
+                                if (oDoc.LoadMemory(pszProjJson))
+                                {
+                                    oCRS.Add("projjson", oDoc.GetRoot());
+                                }
+                                CPLFree(pszProjJson);
                             }
-                            CPLFree(pszProjJson);
                         }
 
                         const auto &anAxes =
@@ -1064,7 +1066,7 @@ static void ReportOnLayer(CPLString &osRet, CPLJSONObject oLayer,
             {
                 OGRGeomFieldDefn *poGFldDefn =
                     poLayer->GetLayerDefn()->GetGeomFieldDefn(iGeom);
-                OGRSpatialReference *poSRS = poGFldDefn->GetSpatialRef();
+                const OGRSpatialReference *poSRS = poGFldDefn->GetSpatialRef();
                 char *pszWKT = nullptr;
                 if (poSRS == nullptr)
                 {
@@ -1209,9 +1211,17 @@ static void ReportOnLayer(CPLString &osRet, CPLJSONObject oLayer,
         if (!psOptions->bSuperQuiet)
         {
             CPLJSONArray oFeatures;
-            const int nFields = poLayer->GetLayerDefn()->GetFieldCount();
+            const bool bDisplayFields =
+                CPLTestBool(psOptions->aosOptions.FetchNameValueDef(
+                    "DISPLAY_FIELDS", "YES"));
+            const int nFields =
+                bDisplayFields ? poLayer->GetLayerDefn()->GetFieldCount() : 0;
+            const bool bDisplayGeometry =
+                CPLTestBool(psOptions->aosOptions.FetchNameValueDef(
+                    "DISPLAY_GEOMETRY", "YES"));
             const int nGeomFields =
-                poLayer->GetLayerDefn()->GetGeomFieldCount();
+                bDisplayGeometry ? poLayer->GetLayerDefn()->GetGeomFieldCount()
+                                 : 0;
             if (bJson)
                 oLayer.Add("features", oFeatures);
             for (auto &poFeature : poLayer)
@@ -1256,8 +1266,10 @@ static void ReportOnLayer(CPLString &osRet, CPLJSONObject oLayer,
                             oProperties.Add(poFDefn->GetNameRef(),
                                             poFeature->GetFieldAsDouble(i));
                         }
-                        else if (eType == OFTString || eType == OFTDate ||
-                                 eType == OFTTime || eType == OFTDateTime)
+                        else if ((eType == OFTString &&
+                                  poFDefn->GetSubType() != OFSTJSON) ||
+                                 eType == OFTDate || eType == OFTTime ||
+                                 eType == OFTDateTime)
                         {
                             oProperties.Add(poFDefn->GetNameRef(),
                                             poFeature->GetFieldAsString(i));
@@ -1268,10 +1280,26 @@ static void ReportOnLayer(CPLString &osRet, CPLJSONObject oLayer,
                                 poFeature->GetFieldAsSerializedJSon(i);
                             if (pszSerialized)
                             {
-                                CPLJSONDocument oDoc;
-                                if (oDoc.LoadMemory(pszSerialized))
+                                const auto eStrType =
+                                    CPLGetValueType(pszSerialized);
+                                if (eStrType == CPL_VALUE_INTEGER)
+                                {
+                                    oProperties.Add(
+                                        poFDefn->GetNameRef(),
+                                        CPLAtoGIntBig(pszSerialized));
+                                }
+                                else if (eStrType == CPL_VALUE_REAL)
+                                {
                                     oProperties.Add(poFDefn->GetNameRef(),
-                                                    oDoc.GetRoot());
+                                                    CPLAtof(pszSerialized));
+                                }
+                                else
+                                {
+                                    CPLJSONDocument oDoc;
+                                    if (oDoc.LoadMemory(pszSerialized))
+                                        oProperties.Add(poFDefn->GetNameRef(),
+                                                        oDoc.GetRoot());
+                                }
                                 CPLFree(pszSerialized);
                             }
                         }

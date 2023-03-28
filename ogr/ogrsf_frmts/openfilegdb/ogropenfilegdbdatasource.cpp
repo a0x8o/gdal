@@ -491,12 +491,7 @@ bool OGROpenFileGDBDataSource::Open(const GDALOpenInfo *poOpenInfo)
         else if (m_aosSubdatasets.size() == 2)
         {
             // If there is a single raster dataset, open it right away.
-            GDALOpenInfo oOpenInfo(
-                m_aosSubdatasets.FetchNameValue("SUBDATASET_1_NAME"),
-                poOpenInfo->nOpenFlags);
-            bool bRet = Open(&oOpenInfo);
-            SetDescription(poOpenInfo->pszFilename);
-            return bRet;
+            return true;
         }
     }
     // If opening in vector-only mode, return false if there are no vector
@@ -2028,54 +2023,116 @@ OGROpenFileGDBDataSource::BuildSRS(const CPLXMLNode *psInfo)
     const int nWKID =
         atoi(CPLGetXMLValue(psInfo, "SpatialReference.WKID", "0"));
     // The concept of LatestWKID is explained in
-    // http://resources.arcgis.com/en/help/arcgis-rest-api/index.html#//02r3000000n1000000
+    // https://support.esri.com/en/technical-article/000013950
     int nLatestWKID =
         atoi(CPLGetXMLValue(psInfo, "SpatialReference.LatestWKID", "0"));
 
-    OGRSpatialReference *poSRS = nullptr;
+    std::unique_ptr<OGRSpatialReference, OGRSpatialReferenceReleaser> poSRS;
     if (nWKID > 0 || nLatestWKID > 0)
     {
-        int bSuccess = FALSE;
-        poSRS = new OGRSpatialReference();
+        const auto ImportFromCode =
+            [](OGRSpatialReference &oSRS, int nLatestCode, int nCode)
+        {
+            bool bSuccess = false;
+            CPLPushErrorHandler(CPLQuietErrorHandler);
+            // Try first with nLatestWKID as there is a higher chance it is a
+            // EPSG code and not an ESRI one.
+            if (nLatestCode > 0)
+            {
+                if (nLatestCode > 32767)
+                {
+                    if (oSRS.SetFromUserInput(
+                            CPLSPrintf("ESRI:%d", nLatestCode)) == OGRERR_NONE)
+                    {
+                        bSuccess = true;
+                    }
+                }
+                else if (oSRS.importFromEPSG(nLatestCode) == OGRERR_NONE)
+                {
+                    bSuccess = true;
+                }
+                if (!bSuccess)
+                {
+                    CPLDebug("OpenFileGDB", "Cannot import SRID %d",
+                             nLatestCode);
+                }
+            }
+            if (!bSuccess && nCode > 0)
+            {
+                if (nCode > 32767)
+                {
+                    if (oSRS.SetFromUserInput(CPLSPrintf("ESRI:%d", nCode)) ==
+                        OGRERR_NONE)
+                    {
+                        bSuccess = true;
+                    }
+                }
+                else if (oSRS.importFromEPSG(nCode) == OGRERR_NONE)
+                {
+                    bSuccess = true;
+                }
+                if (!bSuccess)
+                {
+                    CPLDebug("OpenFileGDB", "Cannot import SRID %d", nCode);
+                }
+            }
+            CPLPopErrorHandler();
+            CPLErrorReset();
+            return bSuccess;
+        };
+
+        poSRS =
+            std::unique_ptr<OGRSpatialReference, OGRSpatialReferenceReleaser>(
+                new OGRSpatialReference());
         poSRS->SetAxisMappingStrategy(OAMS_TRADITIONAL_GIS_ORDER);
-        CPLPushErrorHandler(CPLQuietErrorHandler);
-        // Try first with nLatestWKID as there is a higher chance it is a
-        // EPSG code and not an ESRI one.
-        if (nLatestWKID > 0)
+        if (!ImportFromCode(*poSRS.get(), nLatestWKID, nWKID))
         {
-            if (poSRS->importFromEPSG(nLatestWKID) == OGRERR_NONE)
+            poSRS.reset();
+        }
+        else
+        {
+            const int nLatestVCSWKID = atoi(
+                CPLGetXMLValue(psInfo, "SpatialReference.LatestVCSWKID", "0"));
+            const int nVCSWKID =
+                atoi(CPLGetXMLValue(psInfo, "SpatialReference.VCSWKID", "0"));
+            if (nVCSWKID > 0 || nLatestVCSWKID > 0)
             {
-                bSuccess = TRUE;
-            }
-            else
-            {
-                CPLDebug("OpenFileGDB", "Cannot import SRID %d", nLatestWKID);
+                auto poVertSRS = std::unique_ptr<OGRSpatialReference,
+                                                 OGRSpatialReferenceReleaser>(
+                    new OGRSpatialReference());
+                if (ImportFromCode(*poVertSRS.get(), nLatestVCSWKID, nVCSWKID))
+                {
+                    auto poCompoundSRS =
+                        std::unique_ptr<OGRSpatialReference,
+                                        OGRSpatialReferenceReleaser>(
+                            new OGRSpatialReference());
+                    if (poCompoundSRS->SetCompoundCS(
+                            std::string(poSRS->GetName())
+                                .append(" + ")
+                                .append(poVertSRS->GetName())
+                                .c_str(),
+                            poSRS.get(), poVertSRS.get()) == OGRERR_NONE)
+                    {
+                        poCompoundSRS->SetAxisMappingStrategy(
+                            OAMS_TRADITIONAL_GIS_ORDER);
+                        poSRS = std::move(poCompoundSRS);
+                    }
+                }
+                if (!poSRS->IsCompound() &&
+                    !(pszWKT != nullptr && pszWKT[0] != '{'))
+                {
+                    poSRS.reset();
+                }
             }
         }
-        if (!bSuccess && nWKID > 0)
-        {
-            if (poSRS->importFromEPSG(nWKID) == OGRERR_NONE)
-            {
-                bSuccess = TRUE;
-            }
-            else
-            {
-                CPLDebug("OpenFileGDB", "Cannot import SRID %d", nWKID);
-            }
-        }
-        if (!bSuccess)
-        {
-            delete poSRS;
-            poSRS = nullptr;
-        }
-        CPLPopErrorHandler();
-        CPLErrorReset();
     }
-    if (poSRS == nullptr && pszWKT != nullptr && pszWKT[0] != '{')
+    if (pszWKT != nullptr && pszWKT[0] != '{' &&
+        (poSRS == nullptr ||
+         (strstr(pszWKT, "VERTCS") && !poSRS->IsCompound())))
     {
-        poSRS = BuildSRS(pszWKT);
+        poSRS.reset(BuildSRS(pszWKT));
     }
-    return poSRS;
+    return poSRS.release();
 }
 
 /************************************************************************/

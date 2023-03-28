@@ -30,9 +30,9 @@
 import math
 import os
 import struct
+import sys
 
 import gdaltest
-import ogrtest
 import pytest
 
 from osgeo import gdal, ogr, osr
@@ -164,10 +164,11 @@ def test_ogr_basic_5():
 # Test opening a dataset with an empty string and a non existing dataset
 def test_ogr_basic_6():
 
-    # Put inside try/except for OG python bindings
-    assert ogr.Open("") is None
+    with pytest.raises(Exception):
+        assert ogr.Open("") is None
 
-    assert ogr.Open("non_existing") is None
+    with pytest.raises(Exception):
+        assert ogr.Open("non_existing") is None
 
 
 ###############################################################################
@@ -445,27 +446,6 @@ def test_ogr_basic_10():
 
 
 ###############################################################################
-# Test double call to UseExceptions() (#5704)
-
-
-def test_ogr_basic_11():
-
-    if not ogrtest.have_geos():
-        pytest.skip()
-
-    used_exceptions_before = ogr.GetUseExceptions()
-    for _ in range(2):
-        ogr.UseExceptions()
-        geom = ogr.CreateGeometryFromWkt(
-            "POLYGON ((-65 0, -30 -30, -30 0, -65 -30, -65 0))"
-        )
-        with gdaltest.error_handler():
-            geom.IsValid()
-    if used_exceptions_before == 0:
-        ogr.DontUseExceptions()
-
-
-###############################################################################
 # Test OFSTBoolean, OFSTInt16 and OFSTFloat32
 
 
@@ -483,9 +463,8 @@ def test_ogr_basic_12():
     f.SetField("fld", 0)
     f.SetField("fld", 1)
     gdal.ErrorReset()
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    f.SetField("fld", 2)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        f.SetField("fld", 2)
     assert gdal.GetLastErrorMsg() != ""
     assert isinstance(f.GetField("fld"), bool)
     assert f.GetField("fld") == True
@@ -493,17 +472,15 @@ def test_ogr_basic_12():
     f.SetField("fld", "0")
     f.SetField("fld", "1")
     gdal.ErrorReset()
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    f.SetField("fld", "2")
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        f.SetField("fld", "2")
     assert gdal.GetLastErrorMsg() != ""
     assert f.GetField("fld") == True
 
     gdal.ErrorReset()
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    field_def = ogr.FieldDefn("fld", ogr.OFTString)
-    field_def.SetSubType(ogr.OFSTBoolean)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        field_def = ogr.FieldDefn("fld", ogr.OFTString)
+        field_def.SetSubType(ogr.OFSTBoolean)
     assert gdal.GetLastErrorMsg() != ""
     assert field_def.GetSubType() == ogr.OFSTNone
 
@@ -517,9 +494,8 @@ def test_ogr_basic_12():
     f = ogr.Feature(feat_def)
     f.SetFieldIntegerList(0, [False, True])
     gdal.ErrorReset()
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    f.SetFieldIntegerList(0, [0, 1, 2, 1])
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        f.SetFieldIntegerList(0, [0, 1, 2, 1])
     assert gdal.GetLastErrorMsg() != ""
     for x in f.GetField("fld"):
         assert isinstance(x, bool)
@@ -537,23 +513,20 @@ def test_ogr_basic_12():
     f.SetField("fld", -32768)
     f.SetField("fld", 32767)
     gdal.ErrorReset()
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    f.SetField("fld", -32769)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        f.SetField("fld", -32769)
     assert gdal.GetLastErrorMsg() != ""
     assert f.GetField("fld") == -32768
     gdal.ErrorReset()
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    f.SetField("fld", 32768)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        f.SetField("fld", 32768)
     assert gdal.GetLastErrorMsg() != ""
     assert f.GetField("fld") == 32767
 
     gdal.ErrorReset()
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    field_def = ogr.FieldDefn("fld", ogr.OFTString)
-    field_def.SetSubType(ogr.OFSTInt16)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        field_def = ogr.FieldDefn("fld", ogr.OFTString)
+        field_def.SetSubType(ogr.OFSTInt16)
     assert gdal.GetLastErrorMsg() != ""
     assert field_def.GetSubType() == ogr.OFSTNone
 
@@ -571,19 +544,17 @@ def test_ogr_basic_12():
         f.SetField("fld", "1.23")
         assert gdal.GetLastErrorMsg() == ""
         gdal.ErrorReset()
-        gdal.PushErrorHandler("CPLQuietErrorHandler")
-        f.SetField("fld", 1.230000000001)
-        gdal.PopErrorHandler()
+        with gdaltest.error_handler():
+            f.SetField("fld", 1.230000000001)
         assert gdal.GetLastErrorMsg() != ""
         if f.GetField("fld") == pytest.approx(1.23, abs=1e-8):
             f.DumpReadable()
             pytest.fail()
 
     gdal.ErrorReset()
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    field_def = ogr.FieldDefn("fld", ogr.OFSTFloat32)
-    field_def.SetSubType(ogr.OFSTInt16)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        field_def = ogr.FieldDefn("fld", ogr.OFSTFloat32)
+        field_def.SetSubType(ogr.OFSTInt16)
     assert gdal.GetLastErrorMsg() != ""
     assert field_def.GetSubType() == ogr.OFSTNone
 
@@ -634,12 +605,14 @@ def test_ogr_basic_13():
 
 def test_ogr_basic_14():
 
-    os.mkdir("tmp/ogr_basic_14")
+    if not os.path.exists("tmp/ogr_basic_14"):
+        os.mkdir("tmp/ogr_basic_14")
     os.chdir("tmp/ogr_basic_14")
-    ds = ogr.Open(".")
-    os.chdir("../..")
-
-    assert ds is None
+    try:
+        with pytest.raises(Exception):
+            ogr.Open(".")
+    finally:
+        os.chdir("../..")
 
     os.rmdir("tmp/ogr_basic_14")
 
@@ -653,24 +626,12 @@ def test_ogr_basic_15():
     ds = ogr.Open("data/poly.shp")
     lyr = ds.GetLayer(0)
 
-    used_exceptions_before = ogr.GetUseExceptions()
-    ogr.UseExceptions()
-    try:
-        lyr.CreateFeature(ogr.Feature(lyr.GetLayerDefn()))
-    except RuntimeError as e:
-        ok = (
-            str(e).find(
-                "CreateFeature : unsupported operation on a read-only datasource"
-            )
-            >= 0
-        )
-        assert ok, "Got: %s" + str(e)
-        return
-    finally:
-        if used_exceptions_before == 0:
-            ogr.DontUseExceptions()
-
-    pytest.fail("Expected exception")
+    with gdal.ExceptionMgr(useExceptions=True):
+        with pytest.raises(
+            Exception,
+            match=r".*CreateFeature : unsupported operation on a read-only datasource.*",
+        ):
+            lyr.CreateFeature(ogr.Feature(lyr.GetLayerDefn()))
 
 
 ###############################################################################
@@ -906,14 +867,27 @@ def test_ogr_basic_get_geometry_types():
 
 
 ###############################################################################
-# Test ogr.enable_exceptions()
+# Test ogr.ExceptionMgr()
 
 
 def test_ogr_exceptions():
 
     with pytest.raises(Exception):
-        with ogr.enable_exceptions():
+        with ogr.ExceptionMgr():
             ogr.CreateGeometryFromWkt("invalid")
+
+
+def test_ogr_basic_test_future_warning_exceptions():
+
+    python_exe = sys.executable
+    cmd = '%s -c "from osgeo import ogr; ' % python_exe + (
+        "ogr.Open('data/poly.shp');" ' " '
+    )
+    try:
+        (_, err) = gdaltest.runexternal_out_and_err(cmd, encoding="UTF-8")
+    except Exception as e:
+        pytest.skip("got exception %s" % str(e))
+    assert "FutureWarning: Neither ogr.UseExceptions()" in err
 
 
 ###############################################################################

@@ -39,6 +39,13 @@ from osgeo import gdal, ogr, osr
 pytestmark = pytest.mark.require_driver("OGR_VRT")
 
 ###############################################################################
+@pytest.fixture(autouse=True, scope="module")
+def module_disable_exceptions():
+    with gdaltest.disable_exceptions():
+        yield
+
+
+###############################################################################
 # Open VRT datasource.
 
 
@@ -399,10 +406,9 @@ def test_ogr_vrt_11():
 
     # The x and y fields are considered as string by default, so spatial
     # filter cannot be turned into attribute filter
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    vrt_lyr.SetSpatialFilterRect(0, 40, 10, 49.5)
-    ret = vrt_lyr.GetFeatureCount()
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        vrt_lyr.SetSpatialFilterRect(0, 40, 10, 49.5)
+        ret = vrt_lyr.GetFeatureCount()
     assert gdal.GetLastErrorMsg().find("not declared as numeric fields") != -1
     assert ret == 1
 
@@ -522,12 +528,11 @@ def test_ogr_vrt_14():
     if gdaltest.vrt_ds is None:
         pytest.skip()
 
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    try:
-        ogr.GetDriverByName("ESRI Shapefile").DeleteDataSource("tmp/test.shp")
-    except AttributeError:
-        pass
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        try:
+            ogr.GetDriverByName("ESRI Shapefile").DeleteDataSource("tmp/test.shp")
+        except AttributeError:
+            pass
 
     shp_ds = ogr.GetDriverByName("ESRI Shapefile").CreateDataSource("tmp/test.shp")
     shp_lyr = shp_ds.CreateLayer("test")
@@ -864,12 +869,11 @@ def test_ogr_vrt_20():
     if gdaltest.vrt_ds is None:
         pytest.skip()
 
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    try:
-        ogr.GetDriverByName("ESRI Shapefile").DeleteDataSource("tmp/test.shp")
-    except AttributeError:
-        pass
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        try:
+            ogr.GetDriverByName("ESRI Shapefile").DeleteDataSource("tmp/test.shp")
+        except AttributeError:
+            pass
 
     shp_ds = ogr.GetDriverByName("ESRI Shapefile").CreateDataSource("tmp/test.shp")
     shp_lyr = shp_ds.CreateLayer("test")
@@ -1072,12 +1076,11 @@ def ogr_vrt_21_internal():
 
 
 def test_ogr_vrt_21():
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    try:
-        ret = ogr_vrt_21_internal()
-    except Exception:
-        ret = "fail"
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        try:
+            ret = ogr_vrt_21_internal()
+        except Exception:
+            ret = "fail"
     return ret
 
 
@@ -1236,10 +1239,9 @@ def test_ogr_vrt_23(shared_ds_flag=""):
     assert ds is not None
 
     gdal.ErrorReset()
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ds.GetLayer(0).GetLayerDefn()
-    ds.GetLayer(0).GetFeatureCount()
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        ds.GetLayer(0).GetLayerDefn()
+        ds.GetLayer(0).GetFeatureCount()
     assert gdal.GetLastErrorMsg() != "", "error expected !"
 
     gdal.Unlink("/vsimem/rec1.vrt")
@@ -1273,10 +1275,9 @@ def test_ogr_vrt_24():
     assert ds is not None
 
     gdal.ErrorReset()
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ds.GetLayer(0).GetLayerDefn()
-    ds.GetLayer(0).GetFeatureCount()
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        ds.GetLayer(0).GetLayerDefn()
+        ds.GetLayer(0).GetFeatureCount()
     assert gdal.GetLastErrorMsg() != "", "error expected !"
 
     gdal.Unlink("/vsimem/rec1.vrt")
@@ -1440,29 +1441,25 @@ def test_ogr_vrt_28():
 
     for i in range(ds.GetLayerCount()):
         gdal.ErrorReset()
-        gdal.PushErrorHandler("CPLQuietErrorHandler")
-        lyr = ds.GetLayer(i)
-        lyr.GetNextFeature()
-        gdal.PopErrorHandler()
+        with gdaltest.error_handler():
+            lyr = ds.GetLayer(i)
+            lyr.GetNextFeature()
         assert (
             gdal.GetLastErrorMsg() != ""
         ), "expected failure for layer %d of datasource %s" % (i, ds.GetName())
 
     ds = None
 
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ogr.Open("<OGRVRTDataSource><OGRVRTLayer/></OGRVRTDataSource>")
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        ogr.Open("<OGRVRTDataSource><OGRVRTLayer/></OGRVRTDataSource>")
     assert gdal.GetLastErrorMsg() != "", "expected error message on datasource opening"
 
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ds = ogr.Open("data/vrt/invalid2.vrt")
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        ds = ogr.Open("data/vrt/invalid2.vrt")
     assert gdal.GetLastErrorMsg() != "", "expected error message on datasource opening"
 
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ds = ogr.Open("data/vrt/invalid3.vrt")
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        ds = ogr.Open("data/vrt/invalid3.vrt")
     assert gdal.GetLastErrorMsg() != "", "expected error message on datasource opening"
 
 
@@ -1496,78 +1493,73 @@ def test_ogr_vrt_29():
     ds = None
 
     # Invalid source layer
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ogr.Open(
-        """<OGRVRTDataSource>
-    <OGRVRTWarpedLayer>
-        <OGRVRTLayer name="ogr_vrt_29">
-            <SrcDataSource>tmp/non_existing.shp</SrcDataSource>
-        </OGRVRTLayer>
-        <TargetSRS>EPSG:32631</TargetSRS>
-    </OGRVRTWarpedLayer>
-</OGRVRTDataSource>"""
-    )
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        ogr.Open(
+            """<OGRVRTDataSource>
+        <OGRVRTWarpedLayer>
+            <OGRVRTLayer name="ogr_vrt_29">
+                <SrcDataSource>tmp/non_existing.shp</SrcDataSource>
+            </OGRVRTLayer>
+            <TargetSRS>EPSG:32631</TargetSRS>
+        </OGRVRTWarpedLayer>
+    </OGRVRTDataSource>"""
+        )
     assert gdal.GetLastErrorMsg() != ""
 
     # Non-spatial layer
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ogr.Open(
-        """<OGRVRTDataSource>
-    <OGRVRTWarpedLayer>
-        <OGRVRTLayer name="flat">
-            <SrcDataSource>data/flat.dbf</SrcDataSource>
-        </OGRVRTLayer>
-        <TargetSRS>EPSG:32631</TargetSRS>
-    </OGRVRTWarpedLayer>
-</OGRVRTDataSource>"""
-    )
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        ogr.Open(
+            """<OGRVRTDataSource>
+        <OGRVRTWarpedLayer>
+            <OGRVRTLayer name="flat">
+                <SrcDataSource>data/flat.dbf</SrcDataSource>
+            </OGRVRTLayer>
+            <TargetSRS>EPSG:32631</TargetSRS>
+        </OGRVRTWarpedLayer>
+    </OGRVRTDataSource>"""
+        )
     assert gdal.GetLastErrorMsg() != ""
 
     # Missing TargetSRS
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ogr.Open(
-        """<OGRVRTDataSource>
-    <OGRVRTWarpedLayer>
-        <OGRVRTLayer name="ogr_vrt_29">
-            <SrcDataSource>tmp/ogr_vrt_29.shp</SrcDataSource>
-        </OGRVRTLayer>
-    </OGRVRTWarpedLayer>
-</OGRVRTDataSource>"""
-    )
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        ogr.Open(
+            """<OGRVRTDataSource>
+        <OGRVRTWarpedLayer>
+            <OGRVRTLayer name="ogr_vrt_29">
+                <SrcDataSource>tmp/ogr_vrt_29.shp</SrcDataSource>
+            </OGRVRTLayer>
+        </OGRVRTWarpedLayer>
+    </OGRVRTDataSource>"""
+        )
     assert gdal.GetLastErrorMsg() != ""
 
     # Invalid TargetSRS
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ogr.Open(
-        """<OGRVRTDataSource>
-    <OGRVRTWarpedLayer>
-        <OGRVRTLayer name="ogr_vrt_29">
-            <SrcDataSource>tmp/ogr_vrt_29.shp</SrcDataSource>
-        </OGRVRTLayer>
-        <TargetSRS>foo</TargetSRS>
-    </OGRVRTWarpedLayer>
-</OGRVRTDataSource>"""
-    )
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        ogr.Open(
+            """<OGRVRTDataSource>
+        <OGRVRTWarpedLayer>
+            <OGRVRTLayer name="ogr_vrt_29">
+                <SrcDataSource>tmp/ogr_vrt_29.shp</SrcDataSource>
+            </OGRVRTLayer>
+            <TargetSRS>foo</TargetSRS>
+        </OGRVRTWarpedLayer>
+    </OGRVRTDataSource>"""
+        )
     assert gdal.GetLastErrorMsg() != ""
 
     # Invalid SrcSRS
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ogr.Open(
-        """<OGRVRTDataSource>
-    <OGRVRTWarpedLayer>
-        <OGRVRTLayer name="ogr_vrt_29">
-            <SrcDataSource>tmp/ogr_vrt_29.shp</SrcDataSource>
-        </OGRVRTLayer>
-        <SrcSRS>foo</SrcSRS>
-        <TargetSRS>EPSG:32631</TargetSRS>
-    </OGRVRTWarpedLayer>
-</OGRVRTDataSource>"""
-    )
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        ogr.Open(
+            """<OGRVRTDataSource>
+        <OGRVRTWarpedLayer>
+            <OGRVRTLayer name="ogr_vrt_29">
+                <SrcDataSource>tmp/ogr_vrt_29.shp</SrcDataSource>
+            </OGRVRTLayer>
+            <SrcSRS>foo</SrcSRS>
+            <TargetSRS>EPSG:32631</TargetSRS>
+        </OGRVRTWarpedLayer>
+    </OGRVRTDataSource>"""
+        )
     assert gdal.GetLastErrorMsg() != ""
 
     # TargetSRS == source SRS
@@ -1683,24 +1675,21 @@ def test_ogr_vrt_29():
     ds = ogr.Open("tmp/ogr_vrt_29.vrt")
     lyr = ds.GetLayer(0)
 
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ret = lyr.DeleteFeature(1)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        ret = lyr.DeleteFeature(1)
     assert ret != 0
 
     feat = lyr.GetNextFeature()
     feat.SetGeometry(ogr.CreateGeometryFromWkt("POINT(500000 0)"))
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ret = lyr.SetFeature(feat)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        ret = lyr.SetFeature(feat)
     assert ret != 0
     feat = None
 
     feat = ogr.Feature(lyr.GetLayerDefn())
     feat.SetGeometry(ogr.CreateGeometryFromWkt("POINT(500000 0)"))
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ret = lyr.CreateFeature(feat)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        ret = lyr.CreateFeature(feat)
     assert ret != 0
     feat = None
 
@@ -1744,17 +1733,15 @@ def test_ogr_vrt_29():
     lyr.SetAttributeFilter("id = 1000")
 
     # Reprojection will fail
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    feat = lyr.GetNextFeature()
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        feat = lyr.GetNextFeature()
     fid = feat.GetFID()
     if feat.GetGeometryRef() is not None:
         feat.DumpReadable()
         pytest.fail()
 
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    feat = lyr.GetFeature(fid)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        feat = lyr.GetFeature(fid)
     if feat.GetGeometryRef() is not None:
         feat.DumpReadable()
         pytest.fail()
@@ -1782,17 +1769,15 @@ def test_ogr_vrt_29():
 
     feat = lyr.GetNextFeature()
     feat.SetGeometry(ogr.CreateGeometryFromWkt("POINT(-180 91)"))
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ret = lyr.SetFeature(feat)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        ret = lyr.SetFeature(feat)
     assert ret != 0
     feat = None
 
     feat = ogr.Feature(lyr.GetLayerDefn())
     feat.SetGeometry(ogr.CreateGeometryFromWkt("POINT(-180 91)"))
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ret = lyr.CreateFeature(feat)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        ret = lyr.CreateFeature(feat)
     assert ret != 0
     feat = None
 
@@ -2019,9 +2004,8 @@ def test_ogr_vrt_30():
             # CreateFeature() should fail
             feat = ogr.Feature(lyr.GetLayerDefn())
             feat.SetField("id2", 12345)
-            gdal.PushErrorHandler("CPLQuietErrorHandler")
-            ret = lyr.CreateFeature(feat)
-            gdal.PopErrorHandler()
+            with gdaltest.error_handler():
+                ret = lyr.CreateFeature(feat)
             assert ret != 0, "should have failed"
             feat = None
 
@@ -2029,9 +2013,8 @@ def test_ogr_vrt_30():
             lyr.ResetReading()
             feat = lyr.GetNextFeature()
             feat.SetField("id2", 45321)
-            gdal.PushErrorHandler("CPLQuietErrorHandler")
-            ret = lyr.SetFeature(feat)
-            gdal.PopErrorHandler()
+            with gdaltest.error_handler():
+                ret = lyr.SetFeature(feat)
             assert ret != 0, "should have failed"
             feat = None
 
@@ -2180,18 +2163,16 @@ def test_ogr_vrt_30():
             feat = ogr.Feature(lyr.GetLayerDefn())
             feat.SetField("source_layer", "random_name")
             feat.SetField("id2", 12345)
-            gdal.PushErrorHandler("CPLQuietErrorHandler")
-            ret = lyr.CreateFeature(feat)
-            gdal.PopErrorHandler()
+            with gdaltest.error_handler():
+                ret = lyr.CreateFeature(feat)
             assert ret != 0, "should have failed"
             feat = None
 
             # unset source_layer name with CreateFeature()
             feat = ogr.Feature(lyr.GetLayerDefn())
             feat.SetField("id2", 12345)
-            gdal.PushErrorHandler("CPLQuietErrorHandler")
-            ret = lyr.CreateFeature(feat)
-            gdal.PopErrorHandler()
+            with gdaltest.error_handler():
+                ret = lyr.CreateFeature(feat)
             assert ret != 0, "should have failed"
             feat = None
 
@@ -2200,9 +2181,8 @@ def test_ogr_vrt_30():
             feat.SetFID(999999)
             feat.SetField("source_layer", "ogr_vrt_30_2")
             feat.SetField("id2", 12345)
-            gdal.PushErrorHandler("CPLQuietErrorHandler")
-            ret = lyr.CreateFeature(feat)
-            gdal.PopErrorHandler()
+            with gdaltest.error_handler():
+                ret = lyr.CreateFeature(feat)
             assert ret != 0, "should have failed"
             feat = None
 
@@ -2218,25 +2198,22 @@ def test_ogr_vrt_30():
 
             # invalid source_layer name with SetFeature()
             feat.SetField("source_layer", "random_name")
-            gdal.PushErrorHandler("CPLQuietErrorHandler")
-            ret = lyr.SetFeature(feat)
-            gdal.PopErrorHandler()
+            with gdaltest.error_handler():
+                ret = lyr.SetFeature(feat)
             assert ret != 0, "should have failed"
 
             # unset source_layer name with SetFeature()
             feat.UnsetField("source_layer")
-            gdal.PushErrorHandler("CPLQuietErrorHandler")
-            ret = lyr.SetFeature(feat)
-            gdal.PopErrorHandler()
+            with gdaltest.error_handler():
+                ret = lyr.SetFeature(feat)
             assert ret != 0, "should have failed"
 
             # FID unset with SetFeature()
             feat = ogr.Feature(lyr.GetLayerDefn())
             feat.SetField("source_layer", "ogr_vrt_30_2")
             feat.SetField("id2", 12345)
-            gdal.PushErrorHandler("CPLQuietErrorHandler")
-            ret = lyr.SetFeature(feat)
-            gdal.PopErrorHandler()
+            with gdaltest.error_handler():
+                ret = lyr.SetFeature(feat)
             assert ret != 0, "should have failed"
             feat = None
 
@@ -2328,10 +2305,9 @@ def test_ogr_vrt_31(shared_ds_flag=""):
     assert ds is not None
 
     gdal.ErrorReset()
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ds.GetLayer(0).GetLayerDefn()
-    ds.GetLayer(0).GetFeatureCount()
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        ds.GetLayer(0).GetLayerDefn()
+        ds.GetLayer(0).GetFeatureCount()
     assert gdal.GetLastErrorMsg() != "", "error expected !"
 
     gdal.Unlink("/vsimem/rec1.vrt")
@@ -2677,9 +2653,8 @@ def test_ogr_vrt_33():
         <TargetSRS>EPSG:32631</TargetSRS>
     </OGRVRTWarpedLayer>
 </OGRVRTDataSource>"""
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ogr.Open(ds_str)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        ogr.Open(ds_str)
     assert gdal.GetLastErrorMsg() != ""
 
     # Warped layer with explicit WarpedGeomFieldName (that is the second field)

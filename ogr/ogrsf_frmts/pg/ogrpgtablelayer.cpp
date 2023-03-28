@@ -1059,12 +1059,11 @@ CPLString OGRPGTableLayer::BuildFields()
                 osFieldList += OGRPGEscapeColumnName(
                     CPLSPrintf("EWKBBase64_%s", poGeomFieldDefn->GetNameRef()));
             }
-            else if (!CPLTestBool(CPLGetConfigOption("PG_USE_TEXT", "NO")) &&
-                     /* perhaps works also for older version, but I didn't check
+            else if (poDS->sPostGISVersion.nMajor > 1 ||
+                     (poDS->sPostGISVersion.nMajor == 1 &&
+                      poDS->sPostGISVersion.nMinor >= 1))
+            /* perhaps works also for older version, but I didn't check
                       */
-                     (poDS->sPostGISVersion.nMajor > 1 ||
-                      (poDS->sPostGISVersion.nMajor == 1 &&
-                       poDS->sPostGISVersion.nMinor >= 1)))
             {
                 /* This will return EWKB in an hex encoded form */
                 osFieldList += osEscapedGeom;
@@ -1110,17 +1109,9 @@ CPLString OGRPGTableLayer::BuildFields()
                 osFieldList += OGRPGEscapeColumnName(
                     CPLSPrintf("EWKBBase64_%s", poGeomFieldDefn->GetNameRef()));
             }
-            else if (!CPLTestBool(CPLGetConfigOption("PG_USE_TEXT", "NO")))
-            {
-                osFieldList += osEscapedGeom;
-            }
             else
             {
-                osFieldList += "ST_AsEWKT(";
                 osFieldList += osEscapedGeom;
-                osFieldList += "::geometry) AS ";
-                osFieldList += OGRPGEscapeColumnName(
-                    CPLSPrintf("AsEWKT_%s", poGeomFieldDefn->GetNameRef()));
             }
         }
         else
@@ -1364,9 +1355,9 @@ OGRErr OGRPGTableLayer::IUpdateFeature(OGRFeature *poFeature,
 
                     if (pszBytea != nullptr)
                     {
-                        if (poDS->bUseEscapeStringSyntax)
-                            osCommand += "E";
-                        osCommand = osCommand + "'" + pszBytea + "'";
+                        osCommand += "E'";
+                        osCommand += pszBytea;
+                        osCommand += '\'';
                         CPLFree(pszBytea);
                     }
                     else
@@ -1406,51 +1397,21 @@ OGRErr OGRPGTableLayer::IUpdateFeature(OGRFeature *poFeature,
                                     OGRGeometry::OGR_G_MEASURED);
             }
 
-            if (!CPLTestBool(CPLGetConfigOption("PG_USE_TEXT", "NO")))
+            if (poGeom != nullptr)
             {
-                if (poGeom != nullptr)
-                {
-                    char *pszHexEWKB =
-                        OGRGeometryToHexEWKB(poGeom, poGeomFieldDefn->nSRSId,
-                                             poDS->sPostGISVersion.nMajor,
-                                             poDS->sPostGISVersion.nMinor);
-                    if (poGeomFieldDefn->ePostgisType == GEOM_TYPE_GEOGRAPHY)
-                        osCommand +=
-                            CPLString().Printf("'%s'::GEOGRAPHY", pszHexEWKB);
-                    else
-                        osCommand +=
-                            CPLString().Printf("'%s'::GEOMETRY", pszHexEWKB);
-                    CPLFree(pszHexEWKB);
-                }
+                char *pszHexEWKB = OGRGeometryToHexEWKB(
+                    poGeom, poGeomFieldDefn->nSRSId,
+                    poDS->sPostGISVersion.nMajor, poDS->sPostGISVersion.nMinor);
+                if (poGeomFieldDefn->ePostgisType == GEOM_TYPE_GEOGRAPHY)
+                    osCommand +=
+                        CPLString().Printf("'%s'::GEOGRAPHY", pszHexEWKB);
                 else
-                    osCommand += "NULL";
+                    osCommand +=
+                        CPLString().Printf("'%s'::GEOMETRY", pszHexEWKB);
+                CPLFree(pszHexEWKB);
             }
             else
-            {
-                char *pszWKT = nullptr;
-
-                if (poGeom != nullptr)
-                    poGeom->exportToWkt(&pszWKT, wkbVariantIso);
-
-                int nSRSId = poGeomFieldDefn->nSRSId;
-                if (pszWKT != nullptr)
-                {
-                    if (poGeomFieldDefn->ePostgisType == GEOM_TYPE_GEOGRAPHY)
-                        osCommand += CPLString().Printf(
-                            "ST_GeographyFromText('SRID=%d;%s'::TEXT) ", nSRSId,
-                            pszWKT);
-                    else if (poDS->sPostGISVersion.nMajor >= 1)
-                        osCommand += CPLString().Printf(
-                            "GeomFromEWKT('SRID=%d;%s'::TEXT) ", nSRSId,
-                            pszWKT);
-                    else
-                        osCommand += CPLString().Printf(
-                            "GeometryFromText('%s'::TEXT,%d) ", pszWKT, nSRSId);
-                    CPLFree(pszWKT);
-                }
-                else
-                    osCommand += "NULL";
-            }
+                osCommand += "NULL";
         }
     }
 
@@ -1869,42 +1830,14 @@ OGRErr OGRPGTableLayer::CreateFeatureViaInsert(OGRFeature *poFeature)
 
             int nSRSId = poGeomFieldDefn->nSRSId;
 
-            if (!CPLTestBool(CPLGetConfigOption("PG_USE_TEXT", "NO")))
-            {
-                char *pszHexEWKB = OGRGeometryToHexEWKB(
-                    poGeom, nSRSId, poDS->sPostGISVersion.nMajor,
-                    poDS->sPostGISVersion.nMinor);
-                if (poGeomFieldDefn->ePostgisType == GEOM_TYPE_GEOGRAPHY)
-                    osCommand +=
-                        CPLString().Printf("'%s'::GEOGRAPHY", pszHexEWKB);
-                else
-                    osCommand +=
-                        CPLString().Printf("'%s'::GEOMETRY", pszHexEWKB);
-                CPLFree(pszHexEWKB);
-            }
+            char *pszHexEWKB = OGRGeometryToHexEWKB(
+                poGeom, nSRSId, poDS->sPostGISVersion.nMajor,
+                poDS->sPostGISVersion.nMinor);
+            if (poGeomFieldDefn->ePostgisType == GEOM_TYPE_GEOGRAPHY)
+                osCommand += CPLString().Printf("'%s'::GEOGRAPHY", pszHexEWKB);
             else
-            {
-                char *pszWKT = nullptr;
-                poGeom->exportToWkt(&pszWKT, wkbVariantIso);
-
-                if (pszWKT != nullptr)
-                {
-                    if (poGeomFieldDefn->ePostgisType == GEOM_TYPE_GEOGRAPHY)
-                        osCommand += CPLString().Printf(
-                            "ST_GeographyFromText('SRID=%d;%s'::TEXT) ", nSRSId,
-                            pszWKT);
-                    else if (poDS->sPostGISVersion.nMajor >= 1)
-                        osCommand += CPLString().Printf(
-                            "GeomFromEWKT('SRID=%d;%s'::TEXT) ", nSRSId,
-                            pszWKT);
-                    else
-                        osCommand += CPLString().Printf(
-                            "GeometryFromText('%s'::TEXT,%d) ", pszWKT, nSRSId);
-                    CPLFree(pszWKT);
-                }
-                else
-                    osCommand += "''";
-            }
+                osCommand += CPLString().Printf("'%s'::GEOMETRY", pszHexEWKB);
+            CPLFree(pszHexEWKB);
         }
         else if (!bWkbAsOid)
         {
@@ -1914,9 +1847,9 @@ OGRErr OGRPGTableLayer::CreateFeatureViaInsert(OGRFeature *poFeature)
 
             if (pszBytea != nullptr)
             {
-                if (poDS->bUseEscapeStringSyntax)
-                    osCommand += "E";
-                osCommand = osCommand + "'" + pszBytea + "'";
+                osCommand += "E'";
+                osCommand += pszBytea;
+                osCommand += '\'';
                 CPLFree(pszBytea);
             }
             else
@@ -2080,9 +2013,13 @@ OGRErr OGRPGTableLayer::CreateFeatureViaCopy(OGRFeature *poFeature)
     for (size_t i = 0; i < abFieldsToInclude.size(); i++)
         abFieldsToInclude[i] = !m_abGeneratedColumns[i];
 
-    OGRPGCommonAppendCopyFieldsExceptGeom(
-        osCommand, poFeature, pszFIDColumn, CPL_TO_BOOL(bFIDColumnInCopyFields),
-        abFieldsToInclude, OGRPGEscapeString, hPGConn);
+    if (bFIDColumnInCopyFields)
+    {
+        OGRPGCommonAppendCopyFID(osCommand, poFeature);
+    }
+    OGRPGCommonAppendCopyRegularFields(osCommand, poFeature, pszFIDColumn,
+                                       abFieldsToInclude, OGRPGEscapeString,
+                                       hPGConn);
 
     /* Add end of line marker */
     osCommand += "\n";
@@ -2464,10 +2401,10 @@ OGRErr OGRPGTableLayer::CreateGeomField(OGRGeomFieldDefn *poGeomFieldIn,
             poGeomField->SetName(CPLSPrintf(
                 "wkb_geometry%d", poFeatureDefn->GetGeomFieldCount() + 1));
     }
-    auto l_poSRS = poGeomFieldIn->GetSpatialRef();
-    if (l_poSRS)
+    const auto poSRSIn = poGeomFieldIn->GetSpatialRef();
+    if (poSRSIn)
     {
-        l_poSRS = l_poSRS->Clone();
+        auto l_poSRS = poSRSIn->Clone();
         l_poSRS->SetAxisMappingStrategy(OAMS_TRADITIONAL_GIS_ORDER);
         poGeomField->SetSpatialRef(l_poSRS);
         l_poSRS->Release();
@@ -2485,7 +2422,7 @@ OGRErr OGRPGTableLayer::CreateGeomField(OGRGeomFieldDefn *poGeomFieldIn,
         CPLFree(pszSafeName);
     }
 
-    OGRSpatialReference *poSRS = poGeomField->GetSpatialRef();
+    const OGRSpatialReference *poSRS = poGeomField->GetSpatialRef();
     int nSRSId = poDS->GetUndefinedSRID();
     if (nForcedSRSId != UNDETERMINED_SRID)
         nSRSId = nForcedSRSId;

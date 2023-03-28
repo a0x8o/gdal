@@ -31,11 +31,19 @@
 import array
 import math
 import struct
+import sys
 
 import gdaltest
 import pytest
 
 from osgeo import gdal, osr
+
+
+###############################################################################
+@pytest.fixture(autouse=True, scope="module")
+def module_disable_exceptions():
+    with gdaltest.disable_exceptions():
+        yield
 
 
 def test_mem_md_basic():
@@ -60,17 +68,17 @@ def test_mem_md_basic():
     assert not rg.GetAttribute("not existing")
     assert not rg.GetVectorLayerNames()
     assert not rg.OpenVectorLayer("not existing")
-    with gdaltest.enable_exceptions(), pytest.raises(Exception):
+    with gdal.ExceptionMgr(), pytest.raises(Exception):
         rg.OpenMDArray("not existing")
-    with gdaltest.enable_exceptions(), pytest.raises(Exception):
+    with gdal.ExceptionMgr(), pytest.raises(Exception):
         rg.OpenMDArrayFromFullname("not existing")
-    with gdaltest.enable_exceptions(), pytest.raises(Exception):
+    with gdal.ExceptionMgr(), pytest.raises(Exception):
         rg.OpenGroup("not existing")
-    with gdaltest.enable_exceptions(), pytest.raises(Exception):
+    with gdal.ExceptionMgr(), pytest.raises(Exception):
         rg.OpenGroupFromFullname("not existing")
-    with gdaltest.enable_exceptions(), pytest.raises(Exception):
+    with gdal.ExceptionMgr(), pytest.raises(Exception):
         rg.GetAttribute("not existing")
-    with gdaltest.enable_exceptions(), pytest.raises(Exception):
+    with gdal.ExceptionMgr(), pytest.raises(Exception):
         rg.OpenVectorLayer("not existing")
 
 
@@ -103,7 +111,7 @@ def test_mem_md_subgroup():
     array = rg.OpenMDArrayFromFullname("/subgroup/myarray")
     assert array is not None
     assert array.GetFullName() == "/subgroup/myarray"
-    with gdaltest.enable_exceptions(), pytest.raises(Exception):
+    with gdal.ExceptionMgr(), pytest.raises(Exception):
         array.GetAttribute("not existing")
 
     copy_ds = drv.CreateCopy("", ds)
@@ -2114,7 +2122,7 @@ def test_mem_md_array_resolvemdarray():
     b.CreateMDArray("var_c", [], gdal.ExtendedDataType.Create(gdal.GDT_Int16))
 
     assert rg.ResolveMDArray("x", "/") is None
-    with gdaltest.enable_exceptions(), pytest.raises(Exception):
+    with gdal.ExceptionMgr(), pytest.raises(Exception):
         rg.ResolveMDArray("x", "/")
 
     assert rg.ResolveMDArray("/a/var_a", "/").GetFullName() == "/a/var_a"
@@ -2348,6 +2356,215 @@ def test_mem_md_getcoordinatevariables():
     with gdaltest.error_handler():
         coordVars = ar.GetCoordinateVariables()
         assert len(coordVars) == 1
+
+
+@pytest.mark.parametrize("new_size", [[], [1, 2], [0]])
+def test_mem_md_resize_dim_wrong_new_size(new_size):
+
+    drv = gdal.GetDriverByName("MEM")
+    mem_ds = drv.CreateMultiDimensional("myds")
+    rg = mem_ds.GetRootGroup()
+    xDim = rg.CreateDimension("x", None, None, 4)
+    v = rg.CreateMDArray("v", [xDim], gdal.ExtendedDataType.Create(gdal.GDT_Float64))
+    v.Write(struct.pack("d" * 4, 1, 2, 3, 4))
+    with gdaltest.error_handler():
+        assert v.Resize(new_size) == gdal.CE_Failure
+
+
+def test_mem_md_resize_dim_wrong_too_big_allocation_before_malloc():
+
+    drv = gdal.GetDriverByName("MEM")
+    mem_ds = drv.CreateMultiDimensional("myds")
+    rg = mem_ds.GetRootGroup()
+    xDim = rg.CreateDimension("x", None, None, 4)
+    v = rg.CreateMDArray("v", [xDim], gdal.ExtendedDataType.Create(gdal.GDT_Float64))
+    v.Write(struct.pack("d" * 4, 1, 2, 3, 4))
+    with gdaltest.error_handler():
+        assert v.Resize([1 << 63]) == gdal.CE_Failure
+
+
+@pytest.mark.skipif(sys.maxsize < 2**32, reason="only on 64bit")
+def test_mem_md_resize_dim_wrong_too_big_allocation_at_malloc():
+
+    drv = gdal.GetDriverByName("MEM")
+    mem_ds = drv.CreateMultiDimensional("myds")
+    rg = mem_ds.GetRootGroup()
+    xDim = rg.CreateDimension("x", None, None, 4)
+    v = rg.CreateMDArray("v", [xDim], gdal.ExtendedDataType.Create(gdal.GDT_Float64))
+    v.Write(struct.pack("d" * 4, 1, 2, 3, 4))
+    sizeof_double = 8
+    with gdaltest.error_handler():
+        assert v.Resize([sys.maxsize // sizeof_double]) == gdal.CE_Failure
+
+
+@pytest.mark.parametrize("new_size,new_values", [(5, (1, 2, 3, 4, 0)), (3, (1, 2, 3))])
+def test_mem_md_resize_dim(new_size, new_values):
+
+    drv = gdal.GetDriverByName("MEM")
+    mem_ds = drv.CreateMultiDimensional("myds")
+    rg = mem_ds.GetRootGroup()
+    xDim = rg.CreateDimension("x", None, None, 4)
+    v = rg.CreateMDArray("v", [xDim], gdal.ExtendedDataType.Create(gdal.GDT_Float64))
+    v.Write(struct.pack("d" * 4, 1, 2, 3, 4))
+    assert v.Resize([new_size]) == gdal.CE_None
+    assert xDim.GetSize() == new_size
+    assert struct.unpack("d" * new_size, v.Read()) == new_values
+
+
+@pytest.mark.parametrize(
+    "new_size,new_values",
+    [
+        (5, (1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 0.0, 0.0)),
+        (3, (1.0, 2.0, 3.0, 4.0, 5.0, 6.0)),
+    ],
+)
+def test_mem_md_resize_first_dim(new_size, new_values):
+
+    drv = gdal.GetDriverByName("MEM")
+    mem_ds = drv.CreateMultiDimensional("myds")
+    rg = mem_ds.GetRootGroup()
+    yDim = rg.CreateDimension("y", None, None, 4)
+    xDim = rg.CreateDimension("x", None, None, 2)
+    v = rg.CreateMDArray(
+        "v", [yDim, xDim], gdal.ExtendedDataType.Create(gdal.GDT_Float64)
+    )
+    v.Write(struct.pack("d" * 8, 1, 2, 3, 4, 5, 6, 7, 8))
+    assert v.Resize([new_size, xDim.GetSize()]) == gdal.CE_None
+    assert yDim.GetSize() == new_size
+    assert xDim.GetSize() == 2
+    assert struct.unpack("d" * new_size * 2, v.Read()) == new_values
+
+
+@pytest.mark.parametrize(
+    "new_size,new_values",
+    [
+        (5, (1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 0.0, 0.0)),
+        (3, (1.0, 2.0, 3.0, 4.0, 5.0, 6.0)),
+    ],
+)
+def test_mem_md_resize_first_dim_and_other_array(new_size, new_values):
+
+    drv = gdal.GetDriverByName("MEM")
+    mem_ds = drv.CreateMultiDimensional("myds")
+    rg = mem_ds.GetRootGroup()
+    yDim = rg.CreateDimension("y", None, None, 4)
+    xDim = rg.CreateDimension("x", None, None, 2)
+    v = rg.CreateMDArray(
+        "v", [yDim, xDim], gdal.ExtendedDataType.Create(gdal.GDT_Float64)
+    )
+    v.Write(struct.pack("d" * 8, 1, 2, 3, 4, 5, 6, 7, 8))
+    v2 = rg.CreateMDArray(
+        "v2", [yDim, xDim], gdal.ExtendedDataType.Create(gdal.GDT_Float64)
+    )
+    v.Write(struct.pack("d" * 8, 1, 2, 3, 4, 5, 6, 7, 8))
+    v2.Write(struct.pack("d" * 8, 1, 2, 3, 4, 5, 6, 7, 8))
+    assert v.Resize([new_size, xDim.GetSize()]) == gdal.CE_None
+    assert yDim.GetSize() == new_size
+    assert xDim.GetSize() == 2
+    assert struct.unpack("d" * new_size * 2, v.Read()) == new_values
+    assert struct.unpack("d" * new_size * 2, v2.Read()) == new_values
+
+
+@pytest.mark.parametrize(
+    "new_size,new_values",
+    [
+        (5, (1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 0.0, 0.0)),
+        (3, (1.0, 2.0, 3.0, 4.0, 5.0, 6.0)),
+    ],
+)
+def test_mem_md_resize_arbitrary_dim(new_size, new_values):
+
+    drv = gdal.GetDriverByName("MEM")
+    mem_ds = drv.CreateMultiDimensional("myds")
+    rg = mem_ds.GetRootGroup()
+    yDim = rg.CreateDimension("y", None, None, 4)
+    xDim = rg.CreateDimension("x", None, None, 2)
+    otherDim = rg.CreateDimension("otherDim", None, None, 1)
+    v = rg.CreateMDArray(
+        "v", [otherDim, yDim, xDim], gdal.ExtendedDataType.Create(gdal.GDT_Float64)
+    )
+    v.Write(struct.pack("d" * 8, 1, 2, 3, 4, 5, 6, 7, 8))
+    v2 = rg.CreateMDArray(
+        "v2", [otherDim, yDim, xDim], gdal.ExtendedDataType.Create(gdal.GDT_Float64)
+    )
+    v.Write(struct.pack("d" * 8, 1, 2, 3, 4, 5, 6, 7, 8))
+    v2.Write(struct.pack("d" * 8, 1, 2, 3, 4, 5, 6, 7, 8))
+
+    with gdaltest.error_handler():
+        assert v.Resize([1, 1 << 63, xDim.GetSize()]) == gdal.CE_Failure
+
+    assert v.Resize([1, new_size, xDim.GetSize()]) == gdal.CE_None
+    assert otherDim.GetSize() == 1
+    assert yDim.GetSize() == new_size
+    assert xDim.GetSize() == 2
+    assert struct.unpack("d" * new_size * 2, v.Read()) == new_values
+    assert struct.unpack("d" * new_size * 2, v2.Read()) == new_values
+
+
+def test_mem_md_resize_two_dims_at_once():
+
+    drv = gdal.GetDriverByName("MEM")
+    mem_ds = drv.CreateMultiDimensional("myds")
+    rg = mem_ds.GetRootGroup()
+    yDim = rg.CreateDimension("y", None, None, 4)
+    xDim = rg.CreateDimension("x", None, None, 2)
+    v = rg.CreateMDArray(
+        "v", [yDim, xDim], gdal.ExtendedDataType.Create(gdal.GDT_Float64)
+    )
+    v.Write(struct.pack("d" * 8, 1, 2, 3, 4, 5, 6, 7, 8))
+    assert v.Resize([3, 4]) == gdal.CE_None
+    assert struct.unpack("d" * 3 * 4, v.Read()) == (
+        1.0,
+        2.0,
+        0.0,
+        0.0,
+        3.0,
+        4.0,
+        0.0,
+        0.0,
+        5.0,
+        6.0,
+        0.0,
+        0.0,
+    )
+
+
+def test_mem_md_resize_dim_referenced_twice():
+
+    drv = gdal.GetDriverByName("MEM")
+    mem_ds = drv.CreateMultiDimensional("myds")
+    rg = mem_ds.GetRootGroup()
+    xDim = rg.CreateDimension("x", None, None, 2)
+    v = rg.CreateMDArray(
+        "v", [xDim, xDim], gdal.ExtendedDataType.Create(gdal.GDT_Float64)
+    )
+    v.Write(struct.pack("d" * 4, 1, 2, 3, 4))
+    assert v.Resize([3, 3]) == gdal.CE_None
+    assert struct.unpack("d" * 3 * 3, v.Read()) == (
+        1.0,
+        2.0,
+        0.0,
+        3.0,
+        4.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+    )
+
+
+def test_mem_md_resize_dim_referenced_twice_error():
+
+    drv = gdal.GetDriverByName("MEM")
+    mem_ds = drv.CreateMultiDimensional("myds")
+    rg = mem_ds.GetRootGroup()
+    xDim = rg.CreateDimension("x", None, None, 2)
+    v = rg.CreateMDArray(
+        "v", [xDim, xDim], gdal.ExtendedDataType.Create(gdal.GDT_Float64)
+    )
+    with gdaltest.error_handler():
+        assert v.Resize([2, 3]) == gdal.CE_Failure
+        assert v.Resize([3, 2]) == gdal.CE_Failure
 
 
 def XX_test_all_forever():

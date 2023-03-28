@@ -48,6 +48,12 @@ require_ogr_sql_sqlite
 
 pytestmark = pytest.mark.usefixtures("require_ogr_sql_sqlite")
 
+###############################################################################
+@pytest.fixture(autouse=True, scope="module")
+def module_disable_exceptions():
+    with gdaltest.disable_exceptions():
+        yield
+
 
 ###############################################################################
 
@@ -75,9 +81,8 @@ def ogr_virtualogr_run_sql(sql_statement):
 
     ds = ogr.GetDriverByName("SQLite").CreateDataSource(":memory:")
     gdal.ErrorReset()
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    sql_lyr = ds.ExecuteSQL(sql_statement)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        sql_lyr = ds.ExecuteSQL(sql_statement)
     success = gdal.GetLastErrorMsg() == ""
     ds.ReleaseResultSet(sql_lyr)
     ds = None
@@ -87,9 +92,8 @@ def ogr_virtualogr_run_sql(sql_statement):
 
     ds = ogr.GetDriverByName("Memory").CreateDataSource("")
     gdal.ErrorReset()
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    sql_lyr = ds.ExecuteSQL(sql_statement, dialect="SQLITE")
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        sql_lyr = ds.ExecuteSQL(sql_statement, dialect="SQLITE")
     success = gdal.GetLastErrorMsg() == ""
     ds.ReleaseResultSet(sql_lyr)
     ds = None
@@ -206,9 +210,8 @@ def test_ogr_virtualogr_2(require_auto_load_extension):
     for i in range(ds.GetLayerCount()):
         assert ds.GetLayer(i).GetName() != "foo"
     # An error will be triggered at the time the trigger is used
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ds.ExecuteSQL("INSERT INTO regular_table (bar) VALUES ('bar')")
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        ds.ExecuteSQL("INSERT INTO regular_table (bar) VALUES ('bar')")
     did_not_get_error = gdal.GetLastErrorMsg() == ""
     ds = None
 
@@ -217,11 +220,10 @@ def test_ogr_virtualogr_2(require_auto_load_extension):
         pytest.fail("expected a failure")
 
     gdal.ErrorReset()
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    gdal.SetConfigOption("OGR_SQLITE_LIST_VIRTUAL_OGR", "YES")
-    ds = ogr.Open("/vsimem/ogr_virtualogr_2.db")
-    gdal.SetConfigOption("OGR_SQLITE_LIST_VIRTUAL_OGR", None)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        gdal.SetConfigOption("OGR_SQLITE_LIST_VIRTUAL_OGR", "YES")
+        ds = ogr.Open("/vsimem/ogr_virtualogr_2.db")
+        gdal.SetConfigOption("OGR_SQLITE_LIST_VIRTUAL_OGR", None)
     if gdal.GetLastErrorMsg() == "":
         ds = None
         gdal.Unlink("/vsimem/ogr_virtualogr_2.db")
@@ -278,9 +280,8 @@ def test_ogr_virtualogr_4(require_auto_load_extension):
     ds = ogr.GetDriverByName("SQLite").CreateDataSource("/vsimem/ogr_virtualogr_4.db")
     sql_lyr = ds.ExecuteSQL("SELECT ogr_datasource_load_layers('data/poly.shp')")
     ds.ReleaseResultSet(sql_lyr)
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    sql_lyr = ds.ExecuteSQL("SELECT ogr_datasource_load_layers('data/poly.shp')")
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        sql_lyr = ds.ExecuteSQL("SELECT ogr_datasource_load_layers('data/poly.shp')")
     ds.ReleaseResultSet(sql_lyr)
     sql_lyr = ds.ExecuteSQL("SELECT * FROM poly")
     ret = sql_lyr.GetFeatureCount()
@@ -316,16 +317,19 @@ def test_ogr_virtualogr_4(require_auto_load_extension):
 
     # Various error conditions
     ds = ogr.GetDriverByName("SQLite").CreateDataSource("/vsimem/ogr_virtualogr_4.db")
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    sql_lyr = ds.ExecuteSQL("SELECT ogr_datasource_load_layers(0)")
-    ds.ReleaseResultSet(sql_lyr)
-    sql_lyr = ds.ExecuteSQL("SELECT ogr_datasource_load_layers('foo')")
-    ds.ReleaseResultSet(sql_lyr)
-    sql_lyr = ds.ExecuteSQL("SELECT ogr_datasource_load_layers('data/poly.shp','a')")
-    ds.ReleaseResultSet(sql_lyr)
-    sql_lyr = ds.ExecuteSQL("SELECT ogr_datasource_load_layers('data/poly.shp', 0, 0)")
-    ds.ReleaseResultSet(sql_lyr)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        sql_lyr = ds.ExecuteSQL("SELECT ogr_datasource_load_layers(0)")
+        ds.ReleaseResultSet(sql_lyr)
+        sql_lyr = ds.ExecuteSQL("SELECT ogr_datasource_load_layers('foo')")
+        ds.ReleaseResultSet(sql_lyr)
+        sql_lyr = ds.ExecuteSQL(
+            "SELECT ogr_datasource_load_layers('data/poly.shp','a')"
+        )
+        ds.ReleaseResultSet(sql_lyr)
+        sql_lyr = ds.ExecuteSQL(
+            "SELECT ogr_datasource_load_layers('data/poly.shp', 0, 0)"
+        )
+        ds.ReleaseResultSet(sql_lyr)
     ds = None
     gdal.Unlink("/vsimem/ogr_virtualogr_4.db")
 
@@ -345,12 +349,11 @@ def test_ogr_virtualogr_5(require_auto_load_extension):
     gdal.VSIFCloseL(fp)
 
     ds = ogr.GetDriverByName("Memory").CreateDataSource("")
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    sql_lyr = ds.ExecuteSQL(
-        "CREATE VIRTUAL TABLE lyr2 USING VirtualOGR('/vsimem/ogr_virtualogr_5.csv')",
-        dialect="SQLITE",
-    )
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        sql_lyr = ds.ExecuteSQL(
+            "CREATE VIRTUAL TABLE lyr2 USING VirtualOGR('/vsimem/ogr_virtualogr_5.csv')",
+            dialect="SQLITE",
+        )
     assert sql_lyr is None
     ds = None
 

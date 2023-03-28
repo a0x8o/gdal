@@ -34,14 +34,7 @@ import pytest
 
 from osgeo import gdal, ogr
 
-
-###############################################################################
-@pytest.fixture(autouse=True, scope="module")
-def startup_and_cleanup():
-
-    if not ogrtest.have_geos():
-        pytest.skip()
-
+pytestmark = pytest.mark.require_geos
 
 ###############################################################################
 # Establish whether we have GEOS support integrated, testing simple Union.
@@ -405,6 +398,7 @@ def test_ogr_geos_convexhull():
 ###############################################################################
 
 
+@gdaltest.disable_exceptions()
 def test_ogr_geos_concavehull():
 
     g1 = ogr.CreateGeometryFromWkt("MULTIPOINT(0 0,0.4 0.5,0 1,1 1,0.6 0.5,1 0)")
@@ -541,7 +535,7 @@ def test_ogr_geos_isvalid_false_too_few_points():
         "POLYGON ((0 0, 10 0, 10 10, 0 10, 0 0), (2 2, 3 2, 2 2))"
     )
 
-    with ogrtest.enable_exceptions():  # fail test if exception is thrown
+    with ogr.ExceptionMgr():  # fail test if exception is thrown
         with gdaltest.error_handler():
             isvalid = g1.IsValid()
 
