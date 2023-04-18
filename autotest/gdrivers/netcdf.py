@@ -108,6 +108,8 @@ def netcdf_setup():
 
 @pytest.fixture(autouse=True, scope="module")
 def netcdf_teardown():
+    gdaltest.clean_tmp()
+
     diff = len(gdaltest.get_opened_files()) - gdaltest.count_opened_files
     assert diff == 0, "Leak of file handles: %d leaked" % diff
 
@@ -268,9 +270,8 @@ def test_netcdf_1():
 
     # We don't want to gum up the test stream output with the
     # 'Warning 1: No UNIDATA NC_GLOBAL:Conventions attribute' message.
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    tst.testOpen()
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        tst.testOpen()
 
 
 ###############################################################################
@@ -353,10 +354,9 @@ def test_netcdf_4():
 
     # We don't want to gum up the test stream output with the
     # 'Warning 1: No UNIDATA NC_GLOBAL:Conventions attribute' message.
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    # don't test for checksum (see bug #4284)
-    result = tst.testOpen(skip_checksum=True)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        # don't test for checksum (see bug #4284)
+        result = tst.testOpen(skip_checksum=True)
 
     return result
 
@@ -378,10 +378,9 @@ def test_netcdf_5():
 
     # We don't want to gum up the test stream output with the
     # 'Warning 1: No UNIDATA NC_GLOBAL:Conventions attribute' message.
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    # don't test for checksum (see bug #4284)
-    result = tst.testOpen(skip_checksum=True)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        # don't test for checksum (see bug #4284)
+        result = tst.testOpen(skip_checksum=True)
 
     return result
 
@@ -868,14 +867,13 @@ def test_netcdf_21():
 def test_netcdf_22():
 
     if not gdaltest.netcdf_drv_has_hdf4:
-        pytest.skip()
+        pytest.skip("netCDF driver does not have HDF4 support")
 
     ifile = "data/hdf4/hdifftst2.hdf"
 
     # suppress warning
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ds = gdal.Open("NETCDF:" + ifile)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        ds = gdal.Open("NETCDF:" + ifile)
 
     if ds is None:
         pytest.fail("netcdf driver did not open hdf4 file")
@@ -1070,9 +1068,8 @@ def test_netcdf_26():
 
     # test default config
     test = gdaltest.GDALTest("NETCDF", "netcdf/int16-nogeo.nc", 1, 4672)
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    test.testCreateCopy(check_gt=0, check_srs=0, check_minmax=0)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        test.testCreateCopy(check_gt=0, check_srs=0, check_minmax=0)
 
     # test WRITE_BOTTOMUP=NO
     test = gdaltest.GDALTest(
@@ -1248,9 +1245,8 @@ def test_netcdf_30():
 
     # We don't want to gum up the test stream output with the
     # 'Warning 1: No UNIDATA NC_GLOBAL:Conventions attribute' message.
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    result = tst.testOpen()
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        result = tst.testOpen()
 
     return result
 
@@ -1338,11 +1334,10 @@ def test_netcdf_34():
     tst = gdaltest.GDALTest("NetCDF", "../tmp/cache/" + filename, 1, 31621)
     # tst.testOpen()
 
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    proc = Process(target=tst.testOpen)
-    proc.start()
-    proc.join(timeout)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        proc = Process(target=tst.testOpen)
+        proc.start()
+        proc.join(timeout)
 
     # if proc is alive after timeout we must terminate it, and return fail
     # valgrind detects memory leaks when this occurs (although it should never happen)
@@ -1436,9 +1431,8 @@ def test_netcdf_37():
 
     ifile = "data/netcdf/reduce-cgcms.nc"
 
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ds = gdal.Open(ifile)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        ds = gdal.Open(ifile)
     assert ds is not None, "open failed"
 
     gt = ds.GetGeoTransform()
@@ -1467,9 +1461,8 @@ def test_netcdf_38():
 
     ifile = "data/netcdf/bug5118.nc"
 
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
-    ds = gdal.Open(ifile)
-    gdal.PopErrorHandler()
+    with gdaltest.error_handler():
+        ds = gdal.Open(ifile)
     assert ds is not None, "open failed"
 
     gt = ds.GetGeoTransform()
@@ -1805,6 +1798,10 @@ def test_netcdf_45():
     assert ds is None
 
     ds = gdal.OpenEx("data/netcdf/test_ogr_nc3.nc", gdal.OF_VECTOR)
+    lyr = ds.GetLayer(0)
+    assert lyr.GetLayerDefn().GetFieldDefn(0).GetName() == "int32"
+    assert lyr.GetLayerDefn().GetFieldDefn(0).GetAlternativeName() == ""
+    assert lyr.GetLayerDefn().GetFieldDefn(0).GetComment() == ""
 
     with gdaltest.error_handler():
         gdal.VectorTranslate(
@@ -1955,6 +1952,23 @@ def test_netcdf_49():
     assert content == expected_content
 
     gdal.Unlink("/vsimem/netcdf_49.csv")
+
+
+###############################################################################
+# Test reading a vector NetCDF file with featureType=trajectory and
+# Conventions="CF-1.8" (fix for https://github.com/OSGeo/gdal/issues/7550)
+
+
+def test_netcdf_read_trajectory():
+
+    ds = gdal.OpenEx("data/netcdf/trajectory.nc", gdal.OF_VECTOR)
+    lyr = ds.GetLayer(0)
+    f = lyr.GetNextFeature()
+    assert f["TEMP"] == 8399
+    assert f["TIME"] == pytest.approx(21877.1309026852)
+    assert f.GetGeometryRef().GetX() == pytest.approx(-0.001000000047497)
+    assert f.GetGeometryRef().GetY() == pytest.approx(64.665657043457)
+    assert f.GetGeometryRef().GetZ() == pytest.approx(4)
 
 
 ###############################################################################
@@ -2375,6 +2389,69 @@ def test_netcdf_56():
     ds = None
 
     gdal.Unlink("tmp/netcdf_56.nc")
+
+
+###############################################################################
+# Test OGR field alternative name and comment
+
+
+def test_netcdf_ogr_field_alternative_name_comment():
+
+    filename = "tmp/test_netcdf_ogr_field_alternative_name_comment.nc"
+    try:
+
+        ds = ogr.GetDriverByName("netCDF").CreateDataSource(
+            filename, options=["GEOMETRY_ENCODING=WKT"]
+        )
+        lyr = ds.CreateLayer("test")
+
+        fld_defn = ogr.FieldDefn("id", ogr.OFTInteger)
+        fld_defn.SetAlternativeName("identifier")
+        fld_defn.SetComment("this is an identifier")
+        lyr.CreateField(fld_defn)
+
+        fld_defn = ogr.FieldDefn("fld2", ogr.OFTInteger)
+        fld_defn.SetAlternativeName(
+            "not compatible of standard_name. will be put in long_name, and read back as comment"
+        )
+        lyr.CreateField(fld_defn)
+
+        fld_defn = ogr.FieldDefn("fld3", ogr.OFTInteger)
+        fld_defn.SetComment("comment of field 3")
+        lyr.CreateField(fld_defn)
+
+        fld_defn = ogr.FieldDefn("fld4", ogr.OFTInteger)
+        lyr.CreateField(fld_defn)
+
+        ds = None
+
+        ds = ogr.Open(filename)
+        lyr = ds.GetLayer(0)
+        assert lyr.GetLayerDefn().GetFieldDefn(0).GetName() == "id"
+        assert lyr.GetLayerDefn().GetFieldDefn(0).GetAlternativeName() == "identifier"
+        assert (
+            lyr.GetLayerDefn().GetFieldDefn(0).GetComment() == "this is an identifier"
+        )
+
+        assert lyr.GetLayerDefn().GetFieldDefn(1).GetName() == "fld2"
+        assert lyr.GetLayerDefn().GetFieldDefn(1).GetAlternativeName() == ""
+        assert (
+            lyr.GetLayerDefn().GetFieldDefn(1).GetComment()
+            == "not compatible of standard_name. will be put in long_name, and read back as comment"
+        )
+
+        assert lyr.GetLayerDefn().GetFieldDefn(2).GetName() == "fld3"
+        assert lyr.GetLayerDefn().GetFieldDefn(2).GetAlternativeName() == ""
+        assert lyr.GetLayerDefn().GetFieldDefn(2).GetComment() == "comment of field 3"
+
+        assert lyr.GetLayerDefn().GetFieldDefn(3).GetName() == "fld4"
+        assert lyr.GetLayerDefn().GetFieldDefn(3).GetAlternativeName() == ""
+        assert lyr.GetLayerDefn().GetFieldDefn(3).GetComment() == ""
+
+        ds = None
+
+    finally:
+        os.unlink(filename)
 
 
 ###############################################################################
@@ -6271,14 +6348,6 @@ def test_netcdf_read_invalid_valid_min_valid_max():
         ds = gdal.Open("data/netcdf/invalid_valid_min_valid_max.nc")
     assert gdal.GetLastErrorType() == gdal.CE_Warning
     assert struct.unpack("i" * 4, ds.ReadRaster()) == (-9999, 0, 1, 2)
-
-
-def test_clean_tmp():
-    # [KEEP THIS AS THE LAST TEST]
-    # i.e. please do not add any tests after this one. Put new ones above.
-    # Not actually a test, just cleans up tmp...
-    gdaltest.clean_tmp()
-    pytest.skip()
 
 
 ###############################################################################

@@ -31,7 +31,6 @@
 
 import contextlib
 import functools
-import inspect
 import io
 import math
 import os
@@ -473,9 +472,8 @@ class GDALTest(object):
 
         if interrupt_during_copy:
             if new_ds is None:
-                gdal.PushErrorHandler("CPLQuietErrorHandler")
-                self.driver.Delete(new_filename)
-                gdal.PopErrorHandler()
+                with error_handler():
+                    self.driver.Delete(new_filename)
                 return
             new_ds = None
             self.driver.Delete(new_filename)
@@ -1258,23 +1256,17 @@ def download_file(
 
 # Attempt to download file using `download_file`; skip test in case of failure
 def download_or_skip(url, *args, **kwargs):
+    __tracebackhide__ = True
+
     msg = io.StringIO()
     with contextlib.redirect_stdout(msg):
         success = download_file(url, *args, **kwargs)
 
     if not success:
-        testfn = inspect.stack()[1]
-
-        call_site = (
-            f"{testfn.function} ({os.path.basename(testfn.filename)}:{testfn.lineno})"
-        )
-
         if download_test_data():
-            problem = f"Failed to download {url} : {msg.getvalue()}"
+            pytest.skip(f"Failed to download {url} : {msg.getvalue()}")
         else:
-            problem = "GDAL_DOWNLOAD_TEST_DATA is not set to YES"
-
-        pytest.skip(f"{call_site} {problem}")
+            pytest.skip("GDAL_DOWNLOAD_TEST_DATA is not set to YES")
 
 
 ###############################################################################
