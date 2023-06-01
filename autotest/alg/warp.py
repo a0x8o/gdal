@@ -32,6 +32,7 @@
 # DEALINGS IN THE SOFTWARE.
 ###############################################################################
 
+import math
 import os
 import shutil
 import struct
@@ -855,48 +856,34 @@ def test_warp_29():
     cs_monothread = ds.GetRasterBand(1).Checksum()
     ds = None
 
-    old_val = gdal.GetConfigOption("GDAL_NUM_THREADS")
-    gdal.SetConfigOption("GDAL_NUM_THREADS", "ALL_CPUS")
-    gdal.SetConfigOption("WARP_THREAD_CHUNK_SIZE", "0")
-    ds = gdal.Open("data/white_nodata.vrt")
-    cs_multithread = ds.GetRasterBand(1).Checksum()
-    ds = None
-    gdal.SetConfigOption("GDAL_NUM_THREADS", old_val)
-    gdal.SetConfigOption("WARP_THREAD_CHUNK_SIZE", None)
+    with gdal.config_options(
+        {"GDAL_NUM_THREADS": "ALL_CPUS", "WARP_THREAD_CHUNK_SIZE": "0"}
+    ):
+        ds = gdal.Open("data/white_nodata.vrt")
+        cs_multithread = ds.GetRasterBand(1).Checksum()
+        ds = None
 
     assert cs_monothread == cs_multithread
 
-    old_val = gdal.GetConfigOption("GDAL_NUM_THREADS")
-    gdal.SetConfigOption("GDAL_NUM_THREADS", "2")
-    gdal.SetConfigOption("WARP_THREAD_CHUNK_SIZE", "0")
-    ds = gdal.Open("data/white_nodata.vrt")
-    cs_multithread = ds.GetRasterBand(1).Checksum()
-    ds = None
-    gdal.SetConfigOption("GDAL_NUM_THREADS", old_val)
-    gdal.SetConfigOption("WARP_THREAD_CHUNK_SIZE", None)
+    with gdal.config_options({"GDAL_NUM_THREADS": "2", "WARP_THREAD_CHUNK_SIZE": "0"}):
+        ds = gdal.Open("data/white_nodata.vrt")
+        cs_multithread = ds.GetRasterBand(1).Checksum()
+        ds = None
 
     assert cs_monothread == cs_multithread
 
     src_ds = gdal.Open("../gcore/data/byte.tif")
 
     ds = gdal.Open("data/byte_gcp.vrt")
-    old_val = gdal.GetConfigOption("GDAL_NUM_THREADS")
-    gdal.SetConfigOption("GDAL_NUM_THREADS", "2")
-    gdal.SetConfigOption("WARP_THREAD_CHUNK_SIZE", "0")
-    got_cs = ds.GetRasterBand(1).Checksum()
-    gdal.SetConfigOption("GDAL_NUM_THREADS", old_val)
-    gdal.SetConfigOption("WARP_THREAD_CHUNK_SIZE", None)
+    with gdal.config_options({"GDAL_NUM_THREADS": "2", "WARP_THREAD_CHUNK_SIZE": "0"}):
+        got_cs = ds.GetRasterBand(1).Checksum()
     ds = None
 
     assert got_cs == src_ds.GetRasterBand(1).Checksum()
 
     ds = gdal.Open("data/byte_tps.vrt")
-    old_val = gdal.GetConfigOption("GDAL_NUM_THREADS")
-    gdal.SetConfigOption("GDAL_NUM_THREADS", "2")
-    gdal.SetConfigOption("WARP_THREAD_CHUNK_SIZE", "0")
-    got_cs = ds.GetRasterBand(1).Checksum()
-    gdal.SetConfigOption("GDAL_NUM_THREADS", old_val)
-    gdal.SetConfigOption("WARP_THREAD_CHUNK_SIZE", None)
+    with gdal.config_options({"GDAL_NUM_THREADS": "2", "WARP_THREAD_CHUNK_SIZE": "0"}):
+        got_cs = ds.GetRasterBand(1).Checksum()
     ds = None
 
     assert got_cs == src_ds.GetRasterBand(1).Checksum()
@@ -1673,3 +1660,26 @@ def test_warp_max_downsampling_missed_edges():
 
     ds = gdal.Open("data/bug_6526_warped.vrt")
     assert ds.GetRasterBand(1).ComputeRasterMinMax() == (1, 1)
+
+
+###############################################################################
+# Test bugfix for #7733
+
+
+def test_warp_average_oversampling():
+
+    ds = gdal.Open("data/warp_average_oversampling.vrt")
+    got_data = struct.unpack("d" * (14 * 14), ds.GetRasterBand(1).ReadRaster())
+    # 4 first and last lines are all nan
+    for y in range(4):
+        for x in range(14):
+            assert math.isnan(got_data[y * 14 + x])
+            assert math.isnan(got_data[(14 - 1 - y) * 14 + x])
+
+    # Middle lines start and end with 4 nans, and with 3 at the middle
+    for y in range(6):
+        for x in range(4):
+            assert math.isnan(got_data[(y + 4) * 14 + x])
+            assert math.isnan(got_data[(y + 4) * 14 + (14 - 1 - x)])
+        for x in range(6):
+            assert got_data[(y + 4) * 14 + (x + 4)] == 3.0

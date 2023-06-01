@@ -97,12 +97,12 @@ def test_srs_write_compd_cs():
     ds.SetProjection(sr.ExportToWkt())
     ds = None
 
-    gdal.SetConfigOption("GTIFF_REPORT_COMPD_CS", "YES")
-    ds = gdal.Open("/vsimem/tiff_srs_compd_cs.tif")
-    gdal.ErrorReset()
-    wkt = ds.GetProjectionRef()
-    assert gdal.GetLastErrorMsg() == ""
-    gdal.SetConfigOption("GTIFF_REPORT_COMPD_CS", None)
+    with gdal.config_option("GTIFF_REPORT_COMPD_CS", "YES"):
+        ds = gdal.Open("/vsimem/tiff_srs_compd_cs.tif")
+        gdal.ErrorReset()
+        wkt = ds.GetProjectionRef()
+        assert gdal.GetLastErrorMsg() == ""
+
     sr2 = osr.SpatialReference()
     sr2.SetFromUserInput(wkt)
     ds = None
@@ -118,10 +118,9 @@ def test_srs_write_compd_cs():
 
 def test_srs_read_compd_cs():
 
-    gdal.SetConfigOption("GTIFF_REPORT_COMPD_CS", "YES")
-    ds = gdal.Open("data/vertcs_user_defined.tif")
-    wkt = ds.GetProjectionRef()
-    gdal.SetConfigOption("GTIFF_REPORT_COMPD_CS", None)
+    with gdal.config_option("GTIFF_REPORT_COMPD_CS", "YES"):
+        ds = gdal.Open("data/vertcs_user_defined.tif")
+        wkt = ds.GetProjectionRef()
 
     assert (
         wkt
@@ -359,22 +358,11 @@ def test_tiff_custom_datum_known_ellipsoid():
 # override to another unit (us-feet) ... (#6210)
 
 
-def test_tiff_srs_epsg_2853_with_us_feet():
+@pytest.mark.parametrize("gtiff_import_from_epsg", ("YES", "NO"))
+def test_tiff_srs_epsg_2853_with_us_feet(gtiff_import_from_epsg):
 
-    old_val = gdal.GetConfigOption("GTIFF_IMPORT_FROM_EPSG")
-    gdal.SetConfigOption("GTIFF_IMPORT_FROM_EPSG", "YES")
-    ds = gdal.Open("data/epsg_2853_with_us_feet.tif")
-    gdal.SetConfigOption("GTIFF_IMPORT_FROM_EPSG", old_val)
-    wkt = ds.GetProjectionRef()
-    assert (
-        'PARAMETER["false_easting",11482916.66' in wkt
-        and 'UNIT["us_survey_feet",0.3048006' in wkt
-        and "2853" not in wkt
-    )
-
-    gdal.SetConfigOption("GTIFF_IMPORT_FROM_EPSG", "NO")
-    ds = gdal.Open("data/epsg_2853_with_us_feet.tif")
-    gdal.SetConfigOption("GTIFF_IMPORT_FROM_EPSG", old_val)
+    with gdal.config_option("GTIFF_IMPORT_FROM_EPSG", gtiff_import_from_epsg):
+        ds = gdal.Open("data/epsg_2853_with_us_feet.tif")
     wkt = ds.GetProjectionRef()
     assert (
         'PARAMETER["false_easting",11482916.66' in wkt
@@ -1237,3 +1225,67 @@ def test_tiff_srs_projected_GTCitationGeoKey_with_underscore_and_GeogTOWGS84GeoK
     assert "+proj=tmerc" in srs.ExportToProj4()
     if osr.GetPROJVersionMajor() >= 9:  # not necessarily the minimum version
         assert srs.GetName() == "Israel 1993 / Israeli TM Grid"
+
+
+def test_tiff_srs_write_compound_with_non_epsg_vert_crs():
+
+    """Test bugfix for https://github.com/OSGeo/gdal/issues/7833"""
+
+    filename = "/vsimem/test_tiff_srs_write_compound_with_non_epsg_vert_crs.tif"
+    srs = osr.SpatialReference()
+    srs.SetFromUserInput(
+        """COMPD_CS["TestMS",
+    GEOGCS["NAD83(2011)",
+        DATUM["NAD83_National_Spatial_Reference_System_2011",
+            SPHEROID["GRS 1980",6378137,298.257222101,
+                AUTHORITY["EPSG","7019"]],
+            AUTHORITY["EPSG","1116"]],
+        PRIMEM["Greenwich",0,
+            AUTHORITY["EPSG","8901"]],
+        UNIT["degree",0.0174532925199433,
+            AUTHORITY["EPSG","9122"]],
+        AXIS["Latitude",NORTH],
+        AXIS["Longitude",EAST],
+        AUTHORITY["EPSG","6318"]],
+    VERT_CS["Mississippi_River_ERTDM_TCARI_MLLW_Riley2023",
+        VERT_DATUM["MLLW_Riley2023",2005,
+            AUTHORITY["NOAA","799"]],
+        UNIT["metre",1,
+            AUTHORITY["EPSG","9001"]],
+        AXIS["Gravity-related height",UP],
+        AUTHORITY["NOAA","800"]],
+    AUTHORITY["NOAA","2000"]]"""
+    )
+
+    ds = gdal.GetDriverByName("GTiff").Create(filename, 1, 1)
+    ds.SetSpatialRef(srs)
+    gdal.ErrorReset()
+    ds = None
+    assert gdal.GetLastErrorMsg() == ""
+
+    ds = gdal.Open(filename)
+    srs = ds.GetSpatialRef()
+    wkt = srs.ExportToWkt()
+    assert gdal.GetLastErrorMsg() == ""
+
+    gdal.Unlink(filename)
+
+    assert (
+        wkt
+        == """COMPD_CS["TestMS",GEOGCS["NAD83(2011)",DATUM["NAD83_National_Spatial_Reference_System_2011",SPHEROID["GRS 1980",6378137,298.257222101004,AUTHORITY["EPSG","7019"]],AUTHORITY["EPSG","1116"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AXIS["Latitude",NORTH],AXIS["Longitude",EAST],AUTHORITY["EPSG","6318"]],VERT_CS["Mississippi_River_ERTDM_TCARI_MLLW_Riley2023",VERT_DATUM["unknown",2005],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Up",UP]]]"""
+    )
+
+
+def test_tiff_srs_read_compound_with_VerticalCitationGeoKey_only():
+
+    """Test bugfix for https://github.com/OSGeo/gdal/issues/7833"""
+
+    ds = gdal.Open("data/gtiff/compound_with_VerticalCitationGeoKey_only.tif")
+    srs = ds.GetSpatialRef()
+    wkt = srs.ExportToWkt()
+    assert gdal.GetLastErrorMsg() == ""
+
+    assert (
+        wkt
+        == """COMPD_CS["TestMS",GEOGCS["NAD83(2011)",DATUM["NAD83_National_Spatial_Reference_System_2011",SPHEROID["GRS 1980",6378137,298.257222101004,AUTHORITY["EPSG","7019"]],AUTHORITY["EPSG","1116"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AXIS["Latitude",NORTH],AXIS["Longitude",EAST],AUTHORITY["EPSG","6318"]],VERT_CS["NAVD88 height",VERT_DATUM["North American Vertical Datum 1988",2005,AUTHORITY["EPSG","5103"]],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Up",UP]]]"""
+    )

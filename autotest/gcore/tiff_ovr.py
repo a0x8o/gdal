@@ -379,7 +379,7 @@ def test_tiff_ovr_rms_palette(both_endian):
 
 @pytest.mark.parametrize("option_name_suffix", ["", "_OVERVIEW"])
 @pytest.mark.parametrize("read_only", [True, False])
-@gdaltest.require_creation_option("GTiff", "JPEG")
+@pytest.mark.require_creation_option("GTiff", "JPEG")
 def test_tiff_ovr_9(both_endian, option_name_suffix, read_only):
 
     tiff_drv = gdal.GetDriverByName("GTiff")
@@ -437,14 +437,14 @@ def test_tiff_ovr_9(both_endian, option_name_suffix, read_only):
 # Similar to tiff_ovr_9 but with internal overviews.
 
 
-@gdaltest.require_creation_option("GTiff", "JPEG")
+@pytest.mark.require_creation_option("GTiff", "JPEG")
 def test_tiff_ovr_10(both_endian):
 
     src_ds = gdal.Open("data/rgbsmall.tif", gdal.GA_ReadOnly)
 
     assert src_ds is not None, "Failed to open test dataset."
 
-    ds = gdaltest.tiff_drv.CreateCopy(
+    ds = gdal.GetDriverByName("GTiff").CreateCopy(
         "tmp/ovr10.tif", src_ds, options=["COMPRESS=JPEG", "PHOTOMETRIC=YCBCR"]
     )
     src_ds = None
@@ -463,9 +463,8 @@ def test_tiff_ovr_10(both_endian):
     ds = None
 
     assert cs in (
-        5562,
-        5635,
-        5601,  # libjpeg 9e
+        5879,
+        6050,  # libjpeg 9e
     )
 
 
@@ -942,7 +941,7 @@ def test_tiff_ovr_25(both_endian):
 
 def test_tiff_ovr_26(both_endian):
 
-    ds = gdaltest.tiff_drv.Create("tmp/ovr26.tif", 100, 100, 1)
+    ds = gdal.GetDriverByName("GTiff").Create("tmp/ovr26.tif", 100, 100, 1)
     ds.GetRasterBand(1).Fill(1)
     ds.GetRasterBand(1).FlushCache()
     ds.BuildOverviews("NEAR", overviewlist=[2])
@@ -1595,7 +1594,7 @@ def test_tiff_ovr_42(both_endian):
 @pytest.mark.skipif(
     "SKIP_TIFF_JPEG12" in os.environ, reason="Crashes on build-windows-msys2-mingw"
 )
-@gdaltest.require_creation_option("GTiff", "JPEG")
+@pytest.mark.require_creation_option("GTiff", "JPEG")
 def test_tiff_ovr_43(both_endian):
 
     with gdaltest.config_option("CPL_ACCUM_ERROR_MSG", "ON"):
@@ -2144,7 +2143,7 @@ def test_tiff_ovr_53():
 # Test external overviews building in several steps with jpeg compression
 
 
-@gdaltest.require_creation_option("GTiff", "JPEG")
+@pytest.mark.require_creation_option("GTiff", "JPEG")
 def test_tiff_ovr_54():
 
     src_ds = gdal.Open("../gdrivers/data/small_world.tif")

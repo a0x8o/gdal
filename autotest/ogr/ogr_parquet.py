@@ -39,22 +39,49 @@ from osgeo import gdal, ogr, osr
 
 pytestmark = pytest.mark.require_driver("Parquet")
 
+PARQUET_JSON_SCHEMA = "data/parquet/schema.json"
+
+
 ###############################################################################
-# Validate against GeoParquet json schema
+# Validate a GeoParquet file
 
 
-def _validate_json_output(instance):
+def _has_validate():
+    import sys
+
+    from test_py_scripts import samples_path
 
     try:
-        from jsonschema import validate
+        import jsonschema
+
+        jsonschema.validate
     except ImportError:
-        pytest.skip("jsonschema module not available")
+        print("jsonschema module not available")
+        return False
 
-    import json
+    path = samples_path
+    if path not in sys.path:
+        sys.path.append(path)
+    try:
+        import validate_geoparquet
 
-    schema = json.loads(open("data/parquet/schema.json", "rb").read())
+        validate_geoparquet.check
+    except ImportError:
+        print("Cannot import validate_geoparquet")
+        return False
+    return True
 
-    validate(instance=instance, schema=schema)
+
+def _validate(filename, check_data=False):
+    if not _has_validate():
+        return
+
+    import validate_geoparquet
+
+    ret = validate_geoparquet.check(
+        filename, check_data=check_data, local_schema=PARQUET_JSON_SCHEMA
+    )
+    assert not ret
 
 
 ###############################################################################
@@ -700,7 +727,6 @@ def test_ogr_parquet_coordinate_epoch(epsg_code):
     assert "geometry" in j["columns"]
     if epsg_code == 4326:
         assert "crs" not in j["columns"]["geometry"]
-        _validate_json_output(j)
     else:
         assert "crs" in j["columns"]["geometry"]
         assert j["columns"]["geometry"]["crs"]["type"] == "GeographicCRS"
@@ -712,6 +738,8 @@ def test_ogr_parquet_coordinate_epoch(epsg_code):
     assert srs.GetCoordinateEpoch() == 2022.3
     lyr = None
     ds = None
+
+    _validate(outfilename)
 
     gdal.Unlink(outfilename)
 
@@ -794,14 +822,14 @@ def test_ogr_parquet_crs_identification_on_write(input_definition, expected_crs)
         assert "crs" not in j["columns"]["geometry"]
     else:
         assert "crs" in j["columns"]["geometry"]
-        if expected_crs == "4269":
-            _validate_json_output(j)
 
     srs = lyr.GetSpatialRef()
     assert srs is not None
     assert srs.GetAuthorityCode(None) == expected_crs
     lyr = None
     ds = None
+
+    _validate(outfilename)
 
     gdal.Unlink(outfilename)
 
@@ -830,13 +858,9 @@ def test_ogr_parquet_edges(edges):
     else:
         assert lyr.GetMetadataItem("EDGES") is None
 
-    geo = lyr.GetMetadataItem("geo", "_PARQUET_METADATA_")
-    assert geo is not None
-    j = json.loads(geo)
-    assert j is not None
-    _validate_json_output(j)
-
     ds = None
+
+    _validate(outfilename)
 
     gdal.Unlink(outfilename)
 
@@ -988,10 +1012,9 @@ def test_ogr_parquet_geometry_types(
         expected_geometry_types
     )
 
-    if expected_geometry_types == ["LineString Z", "MultiLineString"]:
-        _validate_json_output(j)
-
     ds = None
+
+    _validate(outfilename)
 
     gdal.Unlink(outfilename)
 
@@ -1052,9 +1075,17 @@ def test_ogr_parquet_polygon_orientation(option_value, written_wkt, expected_wkt
     else:
         assert "orientation" not in j["columns"]["geometry"]
 
-    _validate_json_output(j)
-
     ds = None
+
+    try:
+        import numpy
+
+        numpy.zeros
+
+        has_numpy = True
+    except ImportError:
+        has_numpy = False
+    _validate(outfilename, check_data=has_numpy)
 
     gdal.Unlink(outfilename)
 
@@ -1437,7 +1468,7 @@ def test_ogr_parquet_read_partitioned_geo():
 # Cf https://github.com/opengeospatial/geoparquet/discussions/110
 
 
-@gdaltest.require_proj_version(7, 2)
+@pytest.mark.require_proj(7, 2)
 def test_ogr_parquet_write_crs_without_id_in_datum_ensemble_members():
 
     outfilename = "/vsimem/out.parquet"
@@ -1499,6 +1530,7 @@ def test_ogr_parquet_arrow_stream_numpy():
         "float32",
         "float64",
         "string",
+        "large_string",
         "timestamp_ms_gmt",
         "timestamp_ms_gmt_plus_2",
         "timestamp_ms_gmt_minus_0215",
@@ -1509,6 +1541,7 @@ def test_ogr_parquet_arrow_stream_numpy():
         "date32",
         "date64",
         "binary",
+        "large_binary",
         "fixed_size_binary",
         "list_boolean",
         "list_uint8",
@@ -1543,7 +1576,13 @@ def test_ogr_parquet_arrow_stream_numpy():
     assert batches[1]["boolean"][0] == False
     assert batches[1]["boolean"][1] == True
     assert batch["uint8"][0] == 1
+    assert batches[1]["uint8"][0] == 4
     assert batch["int8"][0] == -2
+    assert batch["string"][0] == b"abcd"
+    assert batch["string"][1] == b""
+    assert batch["string"][2] == b""
+    assert batches[1]["string"][0] == b"c"
+    assert batches[1]["string"][1] == b"d"
     assert numpy.array_equal(batch["list_boolean"][0], numpy.array([]))
     assert numpy.array_equal(batch["list_boolean"][1], numpy.array([False]))
     assert numpy.array_equal(
@@ -1669,5 +1708,268 @@ def test_ogr_parquet_field_alternative_name_comment():
         assert lyr.GetLayerDefn().GetFieldDefn(0).GetComment() == "this is a field"
         lyr = None
         ds = None
+    finally:
+        gdal.Unlink(outfilename)
+
+
+###############################################################################
+# Test reading a parquet file with WKT content as WKB through ArrowArray
+# interface
+
+
+@pytest.mark.parametrize("nullable_geom", [False, True])
+@pytest.mark.parametrize("ignore_geom_field", [False, True])
+@pytest.mark.parametrize("ignore_geom_before", [False, True])
+def test_ogr_parquet_read_wkt_as_wkt_arrow_array(
+    nullable_geom, ignore_geom_field, ignore_geom_before
+):
+    pytest.importorskip("osgeo.gdal_array")
+    pytest.importorskip("numpy")
+
+    outfilename = "/vsimem/out.parquet"
+    try:
+        ds = ogr.GetDriverByName("Parquet").CreateDataSource(outfilename)
+        lyr = ds.CreateLayer(
+            "test", geom_type=ogr.wkbNone, options=["GEOMETRY_ENCODING=WKT"]
+        )
+        lyr.CreateGeomField(ogr.GeomFieldDefn("geom_before", ogr.wkbUnknown))
+        geom_fld_defn = ogr.GeomFieldDefn("my_geom", ogr.wkbUnknown)
+        geom_fld_defn.SetNullable(nullable_geom)
+        lyr.CreateGeomField(geom_fld_defn)
+        lyr.CreateGeomField(ogr.GeomFieldDefn("geom_after", ogr.wkbUnknown))
+        fld_defn = ogr.FieldDefn("fld", ogr.OFTInteger)
+        lyr.CreateField(fld_defn)
+
+        input_wkts = [
+            "MULTIPOLYGON (((0 0,0 1,1 1,0 0)))",  # benefits from optimization for single part single ring
+            "MULTIPOLYGON (((0 0,0 2,2 2,0 0)))",
+            "MULTIPOLYGON Z (((0 0 -1,0 2 -1,2 2 -1,0 0 -1)))",
+            "MULTIPOLYGON M (((0 0 -1,0 2 -1,2 2 -1,0 0 -1)))",
+            "MULTIPOLYGON ZM (((0 0 -1 -2,0 2 -1 -2,2 2 -1 -2,0 0 -1 -2)))",
+            "MULTIPOLYGON (((0 0,0 1,1 1,0 0)),((10 10,10 11,11 11,10 10)))",  # two parts
+            "MULTIPOLYGON (((0 0,0 1,1 1,0 0),(0.2 0.2,0.2 0.8,0.8 0.8,0.2 0.2)))",  # two rings
+            None,
+            "POLYGON ((0 0,0 2,2 2,0 0))",
+        ]
+        expected_wkts = []
+
+        val = 1
+        for wkt in input_wkts:
+            if wkt:
+                f = ogr.Feature(lyr.GetLayerDefn())
+                f["fld"] = val
+                val += 1
+                f.SetGeomField(0, ogr.CreateGeometryFromWkt("POINT (1 2)"))
+                f.SetGeomField(1, ogr.CreateGeometryFromWkt(wkt))
+                f.SetGeomField(2, ogr.CreateGeometryFromWkt("POINT (3 4)"))
+                lyr.CreateFeature(f)
+                expected_wkts.append(wkt)
+            elif nullable_geom:
+                f = ogr.Feature(lyr.GetLayerDefn())
+                f["fld"] = val
+                val += 1
+                f.SetGeomField(0, ogr.CreateGeometryFromWkt("POINT (1 2)"))
+                f.SetGeomField(2, ogr.CreateGeometryFromWkt("POINT (3 4)"))
+                lyr.CreateFeature(f)
+                expected_wkts.append(None)
+        ds = None
+
+        ds = ogr.Open(outfilename)
+        lyr = ds.GetLayer(0)
+
+        ignored_fields = []
+        if ignore_geom_before:
+            ignored_fields.append("geom_before")
+        if ignore_geom_field:
+            ignored_fields.append("my_geom")
+        if ignored_fields:
+            lyr.SetIgnoredFields(ignored_fields)
+
+        # Get geometry column in its raw form (WKT)
+        stream = lyr.GetArrowStreamAsNumPy(options=["USE_MASKED_ARRAYS=NO"])
+        batches = [batch for batch in stream]
+        batch = batches[0]
+        assert [x for x in batch["fld"]] == [
+            i for i in range(1, len(expected_wkts) + 1)
+        ]
+        if not ignore_geom_before:
+            assert [x.decode("ASCII") for x in batch["geom_before"]] == [
+                "POINT (1 2)"
+            ] * len(expected_wkts)
+        if ignore_geom_field:
+            assert "my_geom" not in batch.keys()
+        else:
+            assert [
+                (x.decode("ASCII") if x else None) for x in batch["my_geom"]
+            ] == expected_wkts
+        assert [x.decode("ASCII") for x in batch["geom_after"]] == [
+            "POINT (3 4)"
+        ] * len(expected_wkts)
+
+        # Force geometry column as WKB
+        stream = lyr.GetArrowStreamAsNumPy(
+            options=["USE_MASKED_ARRAYS=NO", "GEOMETRY_ENCODING=WKB"]
+        )
+        batches = [batch for batch in stream]
+        batch = batches[0]
+        assert [x for x in batch["fld"]] == [
+            i for i in range(1, len(expected_wkts) + 1)
+        ]
+        if not ignore_geom_before:
+            assert [
+                ogr.CreateGeometryFromWkb(x).ExportToIsoWkt()
+                for x in batch["geom_before"]
+            ] == ["POINT (1 2)"] * len(expected_wkts)
+        if ignore_geom_field:
+            assert "my_geom" not in batch.keys()
+        else:
+            assert [
+                (ogr.CreateGeometryFromWkb(x).ExportToIsoWkt() if x else None)
+                for x in batch["my_geom"]
+            ] == expected_wkts
+        assert [
+            ogr.CreateGeometryFromWkb(x).ExportToIsoWkt() for x in batch["geom_after"]
+        ] == ["POINT (3 4)"] * len(expected_wkts)
+
+    finally:
+        gdal.Unlink(outfilename)
+
+
+###############################################################################
+# Test reading a parquet file with WKT content as WKB through ArrowArray
+# interface
+
+
+def test_ogr_parquet_read_wkt_with_dict_as_wkt_arrow_array():
+    pytest.importorskip("osgeo.gdal_array")
+    pytest.importorskip("numpy")
+
+    ds = ogr.Open("data/parquet/wkt_with_dict.parquet")
+    lyr = ds.GetLayer(0)
+
+    stream = lyr.GetArrowStreamAsNumPy(
+        options=["USE_MASKED_ARRAYS=NO", "GEOMETRY_ENCODING=WKB"]
+    )
+    geoms = []
+    for batch in stream:
+        for wkb in batch["geometry"]:
+            if wkb:
+                geoms.append(ogr.CreateGeometryFromWkb(wkb).ExportToWkt())
+            else:
+                geoms.append(None)
+    assert geoms == ["POINT (1 2)", "POINT (3 4)", None, "POINT (7 8)", "POINT (9 10)"]
+
+
+###############################################################################
+# Check that GetArrowStream interface always returns
+# ARROW:extension:name = ogc.wkb as a field schema metadata.
+
+
+def test_ogr_parquet_check_geom_column_schema_metadata():
+    pytest.importorskip("pyarrow")
+
+    ds = ogr.Open("data/parquet/test.parquet")
+    lyr = ds.GetLayer(0)
+    stream = lyr.GetArrowStreamAsPyArrow()
+    schema = stream.schema
+    field = schema.field("geometry")
+    field_md = field.metadata
+    arrow_extension_name = field_md.get(b"ARROW:extension:name", None)
+    assert arrow_extension_name == b"ogc.wkb"
+
+
+###############################################################################
+# Check that we recognize the geometry field just from the presence of
+# a ARROW:extension:name == ogc.wkb column on it
+
+
+def test_ogr_parquet_recognize_geo_from_arrow_extension_name():
+
+    outfilename = "/vsimem/out.parquet"
+    try:
+        with gdaltest.config_options(
+            {
+                "OGR_PARQUET_WRITE_GEO": "NO",
+                "OGR_PARQUET_WRITE_ARROW_EXTENSION_NAME": "YES",
+            }
+        ):
+            ds = ogr.GetDriverByName("Parquet").CreateDataSource(outfilename)
+            lyr = ds.CreateLayer("test")
+            f = ogr.Feature(lyr.GetLayerDefn())
+            f.SetGeometryDirectly(ogr.CreateGeometryFromWkt("POINT(1 2)"))
+            lyr.CreateFeature(f)
+            f = None
+            ds = None
+
+            ds = ogr.Open(outfilename)
+            lyr = ds.GetLayer(0)
+            geo = lyr.GetMetadataItem("geo", "_PARQUET_METADATA_")
+            assert geo is None
+            assert lyr.GetGeomType() == ogr.wkbPoint
+            ds = None
+
+    finally:
+        gdal.Unlink(outfilename)
+
+
+###############################################################################
+# Check that we recognize the geometry field just from its name
+
+
+@pytest.mark.parametrize(
+    "geom_col_name,is_wkb", [("geometry", True), ("wkt_geometry", False)]
+)
+def test_ogr_parquet_recognize_geo_from_geom_possible_names(geom_col_name, is_wkb):
+
+    outfilename = "/vsimem/out.parquet"
+    try:
+        ds = ogr.GetDriverByName("Parquet").CreateDataSource(outfilename)
+        lyr = ds.CreateLayer("test", geom_type=ogr.wkbNone)
+        lyr.CreateField(ogr.FieldDefn("id", ogr.OFTInteger))
+        lyr.CreateField(
+            ogr.FieldDefn(geom_col_name, ogr.OFTBinary if is_wkb else ogr.OFTString)
+        )
+        lyr.CreateField(ogr.FieldDefn("bar", ogr.OFTString))
+        f = ogr.Feature(lyr.GetLayerDefn())
+        if is_wkb:
+            wkb = ogr.CreateGeometryFromWkt("POINT (1 2)").ExportToIsoWkb()
+            f.SetFieldBinaryFromHexString(
+                geom_col_name, "".join("%02X" % x for x in wkb)
+            )
+        else:
+            f[geom_col_name] = "POINT (1 2)"
+        lyr.CreateFeature(f)
+        f = None
+        ds = None
+
+        ds = ogr.Open(outfilename)
+        lyr = ds.GetLayer(0)
+        geo = lyr.GetMetadataItem("geo", "_PARQUET_METADATA_")
+        assert geo is None
+        assert lyr.GetGeometryColumn() == geom_col_name
+        assert lyr.GetGeomType() == ogr.wkbUnknown
+        assert lyr.GetSpatialRef() is None
+        f = lyr.GetNextFeature()
+        assert f.GetGeometryRef().ExportToIsoWkt() == "POINT (1 2)"
+        ds = None
+
+        ds = gdal.OpenEx(outfilename, open_options=["GEOM_POSSIBLE_NAMES=bar"])
+        lyr = ds.GetLayer(0)
+        assert lyr.GetGeomType() == ogr.wkbNone
+        ds = None
+
+        ds = gdal.OpenEx(
+            outfilename,
+            open_options=[
+                f"GEOM_POSSIBLE_NAMES=foo,{geom_col_name},bar",
+                "CRS=EPSG:4326",
+            ],
+        )
+        lyr = ds.GetLayer(0)
+        assert lyr.GetGeometryColumn() == geom_col_name
+        assert lyr.GetGeomType() == ogr.wkbUnknown
+        assert lyr.GetSpatialRef().GetAuthorityCode(None) == "4326"
+        ds = None
+
     finally:
         gdal.Unlink(outfilename)

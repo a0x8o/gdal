@@ -103,7 +103,7 @@ endfunction()
 # the GDAL_IMPORT_DEPENDENCIES string.
 macro (gdal_check_package name purpose)
   set(_options CONFIG CAN_DISABLE RECOMMENDED DISABLED_BY_DEFAULT ALWAYS_ON_WHEN_FOUND)
-  set(_oneValueArgs VERSION NAMES)
+  set(_oneValueArgs VERSION NAMES MINIMUM_VERSION)
   set(_multiValueArgs COMPONENTS TARGETS PATHS)
   cmake_parse_arguments(_GCP "${_options}" "${_oneValueArgs}" "${_multiValueArgs}" ${ARGN})
   string(TOUPPER ${name} key)
@@ -155,7 +155,30 @@ macro (gdal_check_package name purpose)
     endif ()
   endif ()
   if (${key}_FOUND OR ${name}_FOUND)
-    set(HAVE_${key} ON)
+    if(_GCP_MINIMUM_VERSION)
+
+      if( "${name}" STREQUAL "TileDB" AND NOT DEFINED TileDB_VERSION)
+        get_property(_dirs TARGET TileDB::tiledb_shared PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
+        foreach(_dir IN LISTS _dirs)
+          set(TILEDB_VERSION_FILENAME "${_dir}/tiledb/tiledb_version.h")
+          if(EXISTS ${TILEDB_VERSION_FILENAME})
+            file(READ ${TILEDB_VERSION_FILENAME} _tiledb_version_contents)
+            string(REGEX REPLACE "^.*TILEDB_VERSION_MAJOR +([0-9]+).*$" "\\1" TILEDB_VERSION_MAJOR "${_tiledb_version_contents}")
+            string(REGEX REPLACE "^.*TILEDB_VERSION_MINOR +([0-9]+).*$" "\\1" TILEDB_VERSION_MINOR "${_tiledb_version_contents}")
+            set(TileDB_VERSION "${TILEDB_VERSION_MAJOR}.${TILEDB_VERSION_MINOR}")
+          endif()
+        endforeach()
+      endif()
+
+      if( ${name}_VERSION VERSION_LESS ${_GCP_MINIMUM_VERSION})
+          message(WARNING "Ignoring ${name} because it is at version ${${name}_VERSION}, whereas the minimum version required is ${_GCP_MINIMUM_VERSION}")
+        set(HAVE_${key} OFF)
+      else()
+        set(HAVE_${key} ON)
+      endif()
+    else()
+      set(HAVE_${key} ON)
+    endif()
   else ()
     set(HAVE_${key} OFF)
   endif ()
@@ -554,8 +577,15 @@ if (GDAL_USE_LIBKML)
   string(APPEND GDAL_IMPORT_DEPENDENCIES "find_dependency(LibKML COMPONENTS DOM ENGINE)\n")
 endif ()
 
-# CXX is only needed for KEA driver
-gdal_check_package(HDF5 "Enable HDF5" COMPONENTS "C" "CXX" CAN_DISABLE)
+define_find_package2(KEA libkea/KEACommon.h kea;libkea)
+gdal_check_package(KEA "Enable KEA driver" CAN_DISABLE)
+
+if(HAVE_KEA)
+    # CXX is only needed for KEA driver
+    gdal_check_package(HDF5 "Enable HDF5" COMPONENTS "C" "CXX" CAN_DISABLE)
+else()
+    gdal_check_package(HDF5 "Enable HDF5" COMPONENTS "C" CAN_DISABLE)
+endif()
 
 gdal_check_package(WebP "WebP compression" CAN_DISABLE)
 gdal_check_package(FreeXL "Enable XLS driver" CAN_DISABLE)
@@ -661,9 +691,6 @@ gdal_check_package(GEOS "Geometry Engine - Open Source (GDAL core dependency)" R
 )
 gdal_check_package(HDF4 "Enable HDF4 driver" CAN_DISABLE)
 
-define_find_package2(KEA libkea/KEACommon.h kea;libkea)
-gdal_check_package(KEA "Enable KEA driver" CAN_DISABLE)
-
 gdal_check_package(ECW "Enable ECW driver" CAN_DISABLE)
 gdal_check_package(NetCDF "Enable netCDF driver" CAN_DISABLE
   NAMES netCDF
@@ -697,7 +724,8 @@ gdal_check_package(Crnlib "enable gdal_DDS driver" CAN_DISABLE)
 gdal_check_package(basisu "Enable BASISU driver" CONFIG CAN_DISABLE)
 gdal_check_package(IDB "enable ogr_IDB driver" CAN_DISABLE)
 gdal_check_package(rdb "enable RIEGL RDB library" CONFIG CAN_DISABLE)
-gdal_check_package(TileDB "enable TileDB driver" CONFIG CAN_DISABLE)
+gdal_check_package(TileDB "enable TileDB driver" CONFIG CAN_DISABLE MINIMUM_VERSION "2.7")
+
 gdal_check_package(OpenEXR "OpenEXR >=2.2" CAN_DISABLE)
 gdal_check_package(MONGOCXX "Enable MongoDBV3 driver" CAN_DISABLE)
 

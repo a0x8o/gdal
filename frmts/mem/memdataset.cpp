@@ -1369,11 +1369,44 @@ GDALDataset *MEMDataset::CreateBase(const char *pszFilename, int nXSize,
 }
 
 /************************************************************************/
+/*                        ~MEMAttributeHolder()                         */
+/************************************************************************/
+
+MEMAttributeHolder::~MEMAttributeHolder() = default;
+
+/************************************************************************/
+/*                          RenameAttribute()                           */
+/************************************************************************/
+
+bool MEMAttributeHolder::RenameAttribute(const std::string &osOldName,
+                                         const std::string &osNewName)
+{
+    if (m_oMapAttributes.find(osNewName) != m_oMapAttributes.end())
+    {
+        CPLError(CE_Failure, CPLE_AppDefined,
+                 "An attribute with same name already exists");
+        return false;
+    }
+    auto oIter = m_oMapAttributes.find(osOldName);
+    if (oIter == m_oMapAttributes.end())
+    {
+        CPLAssert(false);
+        return false;
+    }
+    auto poAttr = std::move(oIter->second);
+    m_oMapAttributes.erase(oIter);
+    m_oMapAttributes[osNewName] = std::move(poAttr);
+    return true;
+}
+
+/************************************************************************/
 /*                           GetMDArrayNames()                          */
 /************************************************************************/
 
 std::vector<std::string> MEMGroup::GetMDArrayNames(CSLConstList) const
 {
+    if (!CheckValidAndErrorOutIfNot())
+        return {};
     std::vector<std::string> names;
     for (const auto &iter : m_oMapMDArrays)
         names.push_back(iter.first);
@@ -1387,6 +1420,8 @@ std::vector<std::string> MEMGroup::GetMDArrayNames(CSLConstList) const
 std::shared_ptr<GDALMDArray> MEMGroup::OpenMDArray(const std::string &osName,
                                                    CSLConstList) const
 {
+    if (!CheckValidAndErrorOutIfNot())
+        return nullptr;
     auto oIter = m_oMapMDArrays.find(osName);
     if (oIter != m_oMapMDArrays.end())
         return oIter->second;
@@ -1399,6 +1434,8 @@ std::shared_ptr<GDALMDArray> MEMGroup::OpenMDArray(const std::string &osName,
 
 std::vector<std::string> MEMGroup::GetGroupNames(CSLConstList) const
 {
+    if (!CheckValidAndErrorOutIfNot())
+        return {};
     std::vector<std::string> names;
     for (const auto &iter : m_oMapGroups)
         names.push_back(iter.first);
@@ -1412,10 +1449,25 @@ std::vector<std::string> MEMGroup::GetGroupNames(CSLConstList) const
 std::shared_ptr<GDALGroup> MEMGroup::OpenGroup(const std::string &osName,
                                                CSLConstList) const
 {
+    if (!CheckValidAndErrorOutIfNot())
+        return nullptr;
     auto oIter = m_oMapGroups.find(osName);
     if (oIter != m_oMapGroups.end())
         return oIter->second;
     return nullptr;
+}
+
+/************************************************************************/
+/*                              Create()                                */
+/************************************************************************/
+
+/*static*/
+std::shared_ptr<MEMGroup> MEMGroup::Create(const std::string &osParentName,
+                                           const char *pszName)
+{
+    auto newGroup(std::make_shared<MEMGroup>(osParentName, pszName));
+    newGroup->m_pSelf = newGroup;
+    return newGroup;
 }
 
 /************************************************************************/
@@ -1425,6 +1477,8 @@ std::shared_ptr<GDALGroup> MEMGroup::OpenGroup(const std::string &osName,
 std::shared_ptr<GDALGroup> MEMGroup::CreateGroup(const std::string &osName,
                                                  CSLConstList /*papszOptions*/)
 {
+    if (!CheckValidAndErrorOutIfNot())
+        return nullptr;
     if (osName.empty())
     {
         CPLError(CE_Failure, CPLE_NotSupported,
@@ -1437,10 +1491,48 @@ std::shared_ptr<GDALGroup> MEMGroup::CreateGroup(const std::string &osName,
                  "A group with same name already exists");
         return nullptr;
     }
-    auto newGroup(std::make_shared<MEMGroup>(GetFullName(), osName.c_str()));
-    newGroup->SetSelf(newGroup);
+    auto newGroup = MEMGroup::Create(GetFullName(), osName.c_str());
+    newGroup->m_pParent = m_pSelf;
     m_oMapGroups[osName] = newGroup;
     return newGroup;
+}
+
+/************************************************************************/
+/*                             DeleteGroup()                            */
+/************************************************************************/
+
+bool MEMGroup::DeleteGroup(const std::string &osName,
+                           CSLConstList /*papszOptions*/)
+{
+    if (!CheckValidAndErrorOutIfNot())
+        return false;
+    auto oIter = m_oMapGroups.find(osName);
+    if (oIter == m_oMapGroups.end())
+    {
+        CPLError(CE_Failure, CPLE_AppDefined,
+                 "Group %s is not a sub-group of this group", osName.c_str());
+        return false;
+    }
+
+    oIter->second->Deleted();
+    m_oMapGroups.erase(oIter);
+    return true;
+}
+
+/************************************************************************/
+/*                       NotifyChildrenOfDeletion()                     */
+/************************************************************************/
+
+void MEMGroup::NotifyChildrenOfDeletion()
+{
+    for (const auto &oIter : m_oMapGroups)
+        oIter.second->ParentDeleted();
+    for (const auto &oIter : m_oMapMDArrays)
+        oIter.second->ParentDeleted();
+    for (const auto &oIter : m_oMapAttributes)
+        oIter.second->ParentDeleted();
+    for (const auto &oIter : m_oMapDimensions)
+        oIter.second->ParentDeleted();
 }
 
 /************************************************************************/
@@ -1452,6 +1544,8 @@ std::shared_ptr<GDALMDArray> MEMGroup::CreateMDArray(
     const std::vector<std::shared_ptr<GDALDimension>> &aoDimensions,
     const GDALExtendedDataType &oType, void *pData, CSLConstList papszOptions)
 {
+    if (!CheckValidAndErrorOutIfNot())
+        return nullptr;
     if (osName.empty())
     {
         CPLError(CE_Failure, CPLE_NotSupported,
@@ -1521,6 +1615,28 @@ std::shared_ptr<GDALMDArray> MEMGroup::CreateMDArray(
 }
 
 /************************************************************************/
+/*                           DeleteMDArray()                            */
+/************************************************************************/
+
+bool MEMGroup::DeleteMDArray(const std::string &osName,
+                             CSLConstList /*papszOptions*/)
+{
+    if (!CheckValidAndErrorOutIfNot())
+        return false;
+    auto oIter = m_oMapMDArrays.find(osName);
+    if (oIter == m_oMapMDArrays.end())
+    {
+        CPLError(CE_Failure, CPLE_AppDefined,
+                 "Array %s is not an array of this group", osName.c_str());
+        return false;
+    }
+
+    oIter->second->Deleted();
+    m_oMapMDArrays.erase(oIter);
+    return true;
+}
+
+/************************************************************************/
 /*                      MEMGroupCreateMDArray()                         */
 /************************************************************************/
 
@@ -1531,8 +1647,15 @@ std::shared_ptr<GDALMDArray> MEMGroupCreateMDArray(
     const GDALExtendedDataType &oDataType, void *pData,
     CSLConstList papszOptions)
 {
-    return dynamic_cast<MEMGroup *>(poGroup)->CreateMDArray(
-        osName, aoDimensions, oDataType, pData, papszOptions);
+    auto poMemGroup = dynamic_cast<MEMGroup *>(poGroup);
+    if (!poMemGroup)
+    {
+        CPLError(CE_Failure, CPLE_AppDefined,
+                 "MEMGroupCreateMDArray(): poGroup not of type MEMGroup");
+        return nullptr;
+    }
+    return poMemGroup->CreateMDArray(osName, aoDimensions, oDataType, pData,
+                                     papszOptions);
 }
 
 /************************************************************************/
@@ -1542,6 +1665,8 @@ std::shared_ptr<GDALMDArray> MEMGroupCreateMDArray(
 std::shared_ptr<GDALAttribute>
 MEMGroup::GetAttribute(const std::string &osName) const
 {
+    if (!CheckValidAndErrorOutIfNot())
+        return nullptr;
     auto oIter = m_oMapAttributes.find(osName);
     if (oIter != m_oMapAttributes.end())
         return oIter->second;
@@ -1555,6 +1680,8 @@ MEMGroup::GetAttribute(const std::string &osName) const
 std::vector<std::shared_ptr<GDALAttribute>>
 MEMGroup::GetAttributes(CSLConstList) const
 {
+    if (!CheckValidAndErrorOutIfNot())
+        return {};
     std::vector<std::shared_ptr<GDALAttribute>> oRes;
     for (const auto &oIter : m_oMapAttributes)
     {
@@ -1570,6 +1697,8 @@ MEMGroup::GetAttributes(CSLConstList) const
 std::vector<std::shared_ptr<GDALDimension>>
 MEMGroup::GetDimensions(CSLConstList) const
 {
+    if (!CheckValidAndErrorOutIfNot())
+        return {};
     std::vector<std::shared_ptr<GDALDimension>> oRes;
     for (const auto &oIter : m_oMapDimensions)
     {
@@ -1587,6 +1716,8 @@ MEMGroup::CreateAttribute(const std::string &osName,
                           const std::vector<GUInt64> &anDimensions,
                           const GDALExtendedDataType &oDataType, CSLConstList)
 {
+    if (!CheckValidAndErrorOutIfNot())
+        return nullptr;
     if (osName.empty())
     {
         CPLError(CE_Failure, CPLE_NotSupported,
@@ -1599,13 +1730,143 @@ MEMGroup::CreateAttribute(const std::string &osName,
                  "An attribute with same name already exists");
         return nullptr;
     }
-    auto newAttr(MEMAttribute::Create(
-        (GetFullName() == "/" ? "/" : GetFullName() + "/") + "_GLOBAL_", osName,
-        anDimensions, oDataType));
+    auto newAttr(
+        MEMAttribute::Create(m_pSelf.lock(), osName, anDimensions, oDataType));
     if (!newAttr)
         return nullptr;
     m_oMapAttributes[osName] = newAttr;
     return newAttr;
+}
+
+/************************************************************************/
+/*                         DeleteAttribute()                            */
+/************************************************************************/
+
+bool MEMGroup::DeleteAttribute(const std::string &osName,
+                               CSLConstList /*papszOptions*/)
+{
+    if (!CheckValidAndErrorOutIfNot())
+        return false;
+    auto oIter = m_oMapAttributes.find(osName);
+    if (oIter == m_oMapAttributes.end())
+    {
+        CPLError(CE_Failure, CPLE_AppDefined,
+                 "Attribute %s is not an attribute of this group",
+                 osName.c_str());
+        return false;
+    }
+
+    oIter->second->Deleted();
+    m_oMapAttributes.erase(oIter);
+    return true;
+}
+
+/************************************************************************/
+/*                              Rename()                                */
+/************************************************************************/
+
+bool MEMGroup::Rename(const std::string &osNewName)
+{
+    if (!CheckValidAndErrorOutIfNot())
+        return false;
+    if (osNewName.empty())
+    {
+        CPLError(CE_Failure, CPLE_NotSupported, "Empty name not supported");
+        return false;
+    }
+    if (m_osName == "/")
+    {
+        CPLError(CE_Failure, CPLE_NotSupported, "Cannot rename root group");
+        return false;
+    }
+    auto pParent = m_pParent.lock();
+    if (pParent)
+    {
+        if (pParent->m_oMapGroups.find(osNewName) !=
+            pParent->m_oMapGroups.end())
+        {
+            CPLError(CE_Failure, CPLE_AppDefined,
+                     "A group with same name already exists");
+            return false;
+        }
+        pParent->m_oMapGroups.erase(pParent->m_oMapGroups.find(m_osName));
+    }
+
+    BaseRename(osNewName);
+
+    if (pParent)
+    {
+        CPLAssert(m_pSelf.lock());
+        pParent->m_oMapGroups[m_osName] = m_pSelf.lock();
+    }
+
+    return true;
+}
+
+/************************************************************************/
+/*                       NotifyChildrenOfRenaming()                     */
+/************************************************************************/
+
+void MEMGroup::NotifyChildrenOfRenaming()
+{
+    for (const auto &oIter : m_oMapGroups)
+        oIter.second->ParentRenamed(m_osFullName);
+    for (const auto &oIter : m_oMapMDArrays)
+        oIter.second->ParentRenamed(m_osFullName);
+    for (const auto &oIter : m_oMapAttributes)
+        oIter.second->ParentRenamed(m_osFullName);
+    for (const auto &oIter : m_oMapDimensions)
+        oIter.second->ParentRenamed(m_osFullName);
+}
+
+/************************************************************************/
+/*                          RenameDimension()                           */
+/************************************************************************/
+
+bool MEMGroup::RenameDimension(const std::string &osOldName,
+                               const std::string &osNewName)
+{
+    if (m_oMapDimensions.find(osNewName) != m_oMapDimensions.end())
+    {
+        CPLError(CE_Failure, CPLE_AppDefined,
+                 "A dimension with same name already exists");
+        return false;
+    }
+    auto oIter = m_oMapDimensions.find(osOldName);
+    if (oIter == m_oMapDimensions.end())
+    {
+        CPLAssert(false);
+        return false;
+    }
+    auto poDim = std::move(oIter->second);
+    m_oMapDimensions.erase(oIter);
+    m_oMapDimensions[osNewName] = std::move(poDim);
+    return true;
+}
+
+/************************************************************************/
+/*                          RenameArray()                               */
+/************************************************************************/
+
+bool MEMGroup::RenameArray(const std::string &osOldName,
+                           const std::string &osNewName)
+{
+    if (m_oMapMDArrays.find(osNewName) != m_oMapMDArrays.end())
+    {
+        CPLError(CE_Failure, CPLE_AppDefined,
+                 "An array with same name already exists");
+        return false;
+    }
+    auto oIter = m_oMapMDArrays.find(osOldName);
+    if (oIter == m_oMapMDArrays.end())
+    {
+        CPLAssert(false);
+        return false;
+    }
+    auto poArray = std::move(oIter->second);
+    m_oMapMDArrays.erase(oIter);
+    m_oMapMDArrays[osNewName] = std::move(poArray);
+    return true;
 }
 
 /************************************************************************/
@@ -1965,7 +2226,7 @@ bool MEMAbstractMDArray::IRead(const GUInt64 *arrayStartIdx,
                                const GDALExtendedDataType &bufferDataType,
                                void *pDstBuffer) const
 {
-    if (!m_bValid)
+    if (!CheckValidAndErrorOutIfNot())
         return false;
 
     const auto nDims = m_aoDims.size();
@@ -2004,14 +2265,13 @@ bool MEMAbstractMDArray::IWrite(const GUInt64 *arrayStartIdx,
                                 const GDALExtendedDataType &bufferDataType,
                                 const void *pSrcBuffer)
 {
+    if (!CheckValidAndErrorOutIfNot())
+        return false;
     if (!m_bWritable)
     {
         CPLError(CE_Failure, CPLE_AppDefined, "Non updatable object");
         return false;
     }
-
-    if (!m_bValid)
-        return false;
 
     m_bModified = true;
 
@@ -2092,6 +2352,8 @@ const void *MEMMDArray::GetRawNoDataValue() const
 
 bool MEMMDArray::SetRawNoDataValue(const void *pNoData)
 {
+    if (!CheckValidAndErrorOutIfNot())
+        return false;
     if (m_pabyNoData)
     {
         m_oType.FreeDynamicMemory(&m_pabyNoData[0]);
@@ -2123,6 +2385,8 @@ bool MEMMDArray::SetRawNoDataValue(const void *pNoData)
 std::shared_ptr<GDALAttribute>
 MEMMDArray::GetAttribute(const std::string &osName) const
 {
+    if (!CheckValidAndErrorOutIfNot())
+        return nullptr;
     auto oIter = m_oMapAttributes.find(osName);
     if (oIter != m_oMapAttributes.end())
         return oIter->second;
@@ -2136,6 +2400,8 @@ MEMMDArray::GetAttribute(const std::string &osName) const
 std::vector<std::shared_ptr<GDALAttribute>>
 MEMMDArray::GetAttributes(CSLConstList) const
 {
+    if (!CheckValidAndErrorOutIfNot())
+        return {};
     std::vector<std::shared_ptr<GDALAttribute>> oRes;
     for (const auto &oIter : m_oMapAttributes)
     {
@@ -2153,6 +2419,8 @@ MEMMDArray::CreateAttribute(const std::string &osName,
                             const std::vector<GUInt64> &anDimensions,
                             const GDALExtendedDataType &oDataType, CSLConstList)
 {
+    if (!CheckValidAndErrorOutIfNot())
+        return nullptr;
     if (osName.empty())
     {
         CPLError(CE_Failure, CPLE_NotSupported,
@@ -2165,12 +2433,36 @@ MEMMDArray::CreateAttribute(const std::string &osName,
                  "An attribute with same name already exists");
         return nullptr;
     }
-    auto newAttr(
-        MEMAttribute::Create(GetFullName(), osName, anDimensions, oDataType));
+    auto poSelf = std::dynamic_pointer_cast<MEMMDArray>(m_pSelf.lock());
+    CPLAssert(poSelf);
+    auto newAttr(MEMAttribute::Create(poSelf, osName, anDimensions, oDataType));
     if (!newAttr)
         return nullptr;
     m_oMapAttributes[osName] = newAttr;
     return newAttr;
+}
+
+/************************************************************************/
+/*                         DeleteAttribute()                            */
+/************************************************************************/
+
+bool MEMMDArray::DeleteAttribute(const std::string &osName,
+                                 CSLConstList /*papszOptions*/)
+{
+    if (!CheckValidAndErrorOutIfNot())
+        return false;
+    auto oIter = m_oMapAttributes.find(osName);
+    if (oIter == m_oMapAttributes.end())
+    {
+        CPLError(CE_Failure, CPLE_AppDefined,
+                 "Attribute %s is not an attribute of this array",
+                 osName.c_str());
+        return false;
+    }
+
+    oIter->second->Deleted();
+    m_oMapAttributes.erase(oIter);
+    return true;
 }
 
 /************************************************************************/
@@ -2180,6 +2472,8 @@ MEMMDArray::CreateAttribute(const std::string &osName,
 std::vector<std::shared_ptr<GDALMDArray>>
 MEMMDArray::GetCoordinateVariables() const
 {
+    if (!CheckValidAndErrorOutIfNot())
+        return {};
     std::vector<std::shared_ptr<GDALMDArray>> ret;
     const auto poCoordinates = GetAttribute("coordinates");
     if (poCoordinates &&
@@ -2236,6 +2530,8 @@ bool MEMMDArray::Resize(const std::vector<GUInt64> &anNewDimSizes,
 bool MEMMDArray::Resize(const std::vector<GUInt64> &anNewDimSizes,
                         bool bResizeOtherArrays)
 {
+    if (!CheckValidAndErrorOutIfNot())
+        return false;
     if (!IsWritable())
     {
         CPLError(CE_Failure, CPLE_AppDefined,
@@ -2249,8 +2545,6 @@ bool MEMMDArray::Resize(const std::vector<GUInt64> &anNewDimSizes,
             "Resize() not supported on an array that does not own its memory");
         return false;
     }
-    if (!m_bValid)
-        return false;
 
     const auto nDimCount = GetDimensionCount();
     if (anNewDimSizes.size() != nDimCount)
@@ -2536,6 +2830,54 @@ bool MEMMDArray::Resize(const std::vector<GUInt64> &anNewDimSizes,
 }
 
 /************************************************************************/
+/*                              Rename()                                */
+/************************************************************************/
+
+bool MEMMDArray::Rename(const std::string &osNewName)
+{
+    if (!CheckValidAndErrorOutIfNot())
+        return false;
+    if (osNewName.empty())
+    {
+        CPLError(CE_Failure, CPLE_NotSupported, "Empty name not supported");
+        return false;
+    }
+
+    if (auto poParentGroup =
+            std::dynamic_pointer_cast<MEMGroup>(m_poGroupWeak.lock()))
+    {
+        if (!poParentGroup->RenameArray(m_osName, osNewName))
+        {
+            return false;
+        }
+    }
+
+    BaseRename(osNewName);
+
+    return true;
+}
+
+/************************************************************************/
+/*                       NotifyChildrenOfRenaming()                     */
+/************************************************************************/
+
+void MEMMDArray::NotifyChildrenOfRenaming()
+{
+    for (const auto &oIter : m_oMapAttributes)
+        oIter.second->ParentRenamed(m_osFullName);
+}
+
+/************************************************************************/
+/*                       NotifyChildrenOfDeletion()                     */
+/************************************************************************/
+
+void MEMMDArray::NotifyChildrenOfDeletion()
+{
+    for (const auto &oIter : m_oMapAttributes)
+        oIter.second->ParentDeleted();
+}
+
+/************************************************************************/
 /*                            BuildDimensions()                         */
 /************************************************************************/
 
@@ -2585,6 +2927,75 @@ MEMAttribute::Create(const std::string &osParentName, const std::string &osName,
 }
 
 /************************************************************************/
+/*                        MEMAttribute::Create()                        */
+/************************************************************************/
+
+std::shared_ptr<MEMAttribute> MEMAttribute::Create(
+    const std::shared_ptr<MEMGroup> &poParentGroup, const std::string &osName,
+    const std::vector<GUInt64> &anDimensions, const GDALExtendedDataType &oType)
+{
+    const std::string osParentName =
+        (poParentGroup && poParentGroup->GetName().empty())
+            ?
+            // Case of the ZarrAttributeGroup::m_oGroup fake group
+            poParentGroup->GetFullName()
+            : ((poParentGroup == nullptr || poParentGroup->GetFullName() == "/"
+                    ? "/"
+                    : poParentGroup->GetFullName() + "/") +
+               "_GLOBAL_");
+    auto attr(Create(osParentName, osName, anDimensions, oType));
+    if (!attr)
+        return nullptr;
+    attr->m_poParent = poParentGroup;
+    return attr;
+}
+
+/************************************************************************/
+/*                        MEMAttribute::Create()                        */
+/************************************************************************/
+
+std::shared_ptr<MEMAttribute> MEMAttribute::Create(
+    const std::shared_ptr<MEMMDArray> &poParentArray, const std::string &osName,
+    const std::vector<GUInt64> &anDimensions, const GDALExtendedDataType &oType)
+{
+    auto attr(
+        Create(poParentArray->GetFullName(), osName, anDimensions, oType));
+    if (!attr)
+        return nullptr;
+    attr->m_poParent = poParentArray;
+    return attr;
+}
+
+/************************************************************************/
+/*                              Rename()                                */
+/************************************************************************/
+
+bool MEMAttribute::Rename(const std::string &osNewName)
+{
+    if (!CheckValidAndErrorOutIfNot())
+        return false;
+    if (osNewName.empty())
+    {
+        CPLError(CE_Failure, CPLE_NotSupported, "Empty name not supported");
+        return false;
+    }
+
+    if (auto poParent = m_poParent.lock())
+    {
+        if (!poParent->RenameAttribute(m_osName, osNewName))
+        {
+            return false;
+        }
+    }
+
+    BaseRename(osNewName);
+
+    m_bModified = true;
+
+    return true;
+}
+
+/************************************************************************/
 /*                             MEMDimension()                           */
 /************************************************************************/
 
@@ -2615,6 +3026,22 @@ void MEMDimension::UnRegisterUsingArray(MEMMDArray *poArray)
 }
 
 /************************************************************************/
+/*                                Create()                              */
+/************************************************************************/
+
+/* static */
+std::shared_ptr<MEMDimension>
+MEMDimension::Create(const std::shared_ptr<MEMGroup> &poParentGroup,
+                     const std::string &osName, const std::string &osType,
+                     const std::string &osDirection, GUInt64 nSize)
+{
+    auto newDim(std::make_shared<MEMDimension>(
+        poParentGroup->GetFullName(), osName, osType, osDirection, nSize));
+    newDim->m_poParentGroup = poParentGroup;
+    return newDim;
+}
+
+/************************************************************************/
 /*                             CreateDimension()                        */
 /************************************************************************/
 
@@ -2635,10 +3062,35 @@ MEMGroup::CreateDimension(const std::string &osName, const std::string &osType,
                  "A dimension with same name already exists");
         return nullptr;
     }
-    auto newDim(std::make_shared<MEMDimension>(GetFullName(), osName, osType,
-                                               osDirection, nSize));
+    auto newDim(MEMDimension::Create(m_pSelf.lock(), osName, osType,
+                                     osDirection, nSize));
     m_oMapDimensions[osName] = newDim;
     return newDim;
+}
+
+/************************************************************************/
+/*                              Rename()                                */
+/************************************************************************/
+
+bool MEMDimension::Rename(const std::string &osNewName)
+{
+    if (osNewName.empty())
+    {
+        CPLError(CE_Failure, CPLE_NotSupported, "Empty name not supported");
+        return false;
+    }
+
+    if (auto poParentGroup = m_poParentGroup.lock())
+    {
+        if (!poParentGroup->RenameDimension(m_osName, osNewName))
+        {
+            return false;
+        }
+    }
+
+    BaseRename(osNewName);
+
+    return true;
 }
 
 /************************************************************************/
@@ -2653,8 +3105,7 @@ MEMDataset::CreateMultiDimensional(const char *pszFilename,
     auto poDS = new MEMDataset();
 
     poDS->SetDescription(pszFilename);
-    auto poRootGroup = std::make_shared<MEMGroup>(std::string(), nullptr);
-    poRootGroup->SetSelf(poRootGroup);
+    auto poRootGroup = MEMGroup::Create(std::string(), nullptr);
     poDS->m_poPrivate->m_poRootGroup = poRootGroup;
 
     return poDS;

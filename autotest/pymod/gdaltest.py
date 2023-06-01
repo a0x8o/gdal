@@ -30,8 +30,8 @@
 ###############################################################################
 
 import contextlib
-import functools
 import io
+import json
 import math
 import os
 import os.path
@@ -608,6 +608,7 @@ class GDALTest(object):
         out_bands=1,
         check_minmax=1,
         dest_open_options=None,
+        delete_output_file=True,
     ):
         self.testDriver()
 
@@ -696,7 +697,7 @@ class GDALTest(object):
         assert new_ds.FlushCache() == gdal.CE_None
         new_ds = None
 
-        if gdal.GetConfigOption("CPL_DEBUG", "OFF") != "ON":
+        if delete_output_file and gdal.GetConfigOption("CPL_DEBUG", "OFF") != "ON":
             self.driver.Delete(new_filename)
 
     def testSetGeoTransform(self):
@@ -1174,84 +1175,80 @@ def download_file(
     elif filename.startswith(base_dir + "/"):
         filename = filename[len(base_dir + "/") :]
 
-    try:
-        os.stat(base_dir + "/" + filename)
+    if os.path.exists(os.path.join(base_dir, filename)):
         return True
-    except OSError:
-        if force_download or download_test_data():
-            val = None
-            start_time = time.time()
-            try:
-                handle = gdalurlopen(url)
-                if handle is None:
-                    return False
-                if download_size == -1:
-                    try:
-                        handle_info = handle.info()
-                        download_size = int(handle_info["content-length"])
-                        print(
-                            "Downloading %s (length = %d bytes)..."
-                            % (url, download_size)
-                        )
-                    except Exception:
-                        print("Downloading %s..." % (url))
-                else:
-                    print("Downloading %d bytes from %s..." % (download_size, url))
-            except Exception:
-                return False
 
-            if download_size >= 0:
-                sys.stdout.write("Progress: ")
-            nLastTick = -1
-            val = "".encode("ascii")
-            while len(val) < download_size or download_size < 0:
-                chunk_size = 1024
-                if download_size >= 0 and len(val) + chunk_size > download_size:
-                    chunk_size = download_size - len(val)
-                try:
-                    chunk = handle.read(chunk_size)
-                except Exception:
-                    print("Did not get expected data length.")
-                    return False
-                if len(chunk) < chunk_size:
-                    if download_size < 0:
-                        break
-                    print("Did not get expected data length.")
-                    return False
-                val = val + chunk
-                if download_size >= 0:
-                    nThisTick = int(40 * len(val) / download_size)
-                    while nThisTick > nLastTick:
-                        nLastTick = nLastTick + 1
-                        if nLastTick % 4 == 0:
-                            sys.stdout.write("%d" % int((nLastTick / 4) * 10))
-                        else:
-                            sys.stdout.write(".")
-                    nLastTick = nThisTick
-                    if nThisTick == 40:
-                        sys.stdout.write(" - done.\n")
+    if not (force_download or download_test_data()):
+        return False
 
-                current_time = time.time()
-                if (
-                    max_download_duration is not None
-                    and current_time - start_time > max_download_duration
-                ):
-                    print("Download aborted due to timeout.")
-                    return False
-
-            try:
-                os.stat(base_dir)
-            except OSError:
-                os.mkdir(base_dir)
-
-            try:
-                open(base_dir + "/" + filename, "wb").write(val)
-                return True
-            except IOError:
-                print("Cannot write %s" % (filename))
-                return False
-        else:
+    val = None
+    start_time = time.time()
+    try:
+        handle = gdalurlopen(url)
+        if handle is None:
             return False
+        if download_size == -1:
+            try:
+                handle_info = handle.info()
+                download_size = int(handle_info["content-length"])
+                print("Downloading %s (length = %d bytes)..." % (url, download_size))
+            except Exception:
+                print("Downloading %s..." % (url))
+        else:
+            print("Downloading %d bytes from %s..." % (download_size, url))
+    except Exception:
+        return False
+
+    if download_size >= 0:
+        sys.stdout.write("Progress: ")
+    nLastTick = -1
+    val = "".encode("ascii")
+    while len(val) < download_size or download_size < 0:
+        chunk_size = 1024
+        if download_size >= 0 and len(val) + chunk_size > download_size:
+            chunk_size = download_size - len(val)
+        try:
+            chunk = handle.read(chunk_size)
+        except Exception:
+            print("Did not get expected data length.")
+            return False
+        val = val + chunk
+        if len(chunk) < chunk_size:
+            if download_size < 0:
+                break
+            print("Did not get expected data length.")
+            return False
+        if download_size >= 0:
+            nThisTick = int(40 * len(val) / download_size)
+            while nThisTick > nLastTick:
+                nLastTick = nLastTick + 1
+                if nLastTick % 4 == 0:
+                    sys.stdout.write("%d" % int((nLastTick / 4) * 10))
+                else:
+                    sys.stdout.write(".")
+            nLastTick = nThisTick
+            if nThisTick == 40:
+                sys.stdout.write(" - done.\n")
+
+        current_time = time.time()
+        if (
+            max_download_duration is not None
+            and current_time - start_time > max_download_duration
+        ):
+            print("Download aborted due to timeout.")
+            return False
+
+    try:
+        os.stat(base_dir)
+    except OSError:
+        os.mkdir(base_dir)
+
+    try:
+        open(base_dir + "/" + filename, "wb").write(val)
+        return True
+    except IOError:
+        print("Cannot write %s" % (filename))
+        return False
 
 
 # Attempt to download file using `download_file`; skip test in case of failure
@@ -1578,58 +1575,6 @@ def skip_on_travis():
 
 
 ###############################################################################
-# Decorator to skip a test if specified creation option is not available
-
-
-def require_creation_option(driver, option):
-
-    drv = gdal.GetDriverByName(driver)
-
-    def decorator(func):
-        @pytest.mark.skipif(
-            drv is None or option not in drv.GetMetadata()["DMD_CREATIONOPTIONLIST"],
-            reason=f"{driver} creation option {option} not supported in this build",
-        )
-        @pytest.mark.skipif(
-            drv is None, reason=f"{driver} driver is not included in this build"
-        )
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            return func(*args, **kwargs)
-
-        return wrapper
-
-    return decorator
-
-
-###############################################################################
-# Decorator to skip a test if PROJ version < (major, minor, micro)
-
-
-def require_proj_version(major, minor=0, micro=0):
-
-    from osgeo import osr
-
-    def decorator(func):
-        @pytest.mark.skipif(
-            (
-                osr.GetPROJVersionMajor(),
-                osr.GetPROJVersionMinor(),
-                osr.GetPROJVersionMicro(),
-            )
-            < (major, minor, micro),
-            reason=f"PROJ version < {major}.{minor}.{micro}",
-        )
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            return func(*args, **kwargs)
-
-        return wrapper
-
-    return decorator
-
-
-###############################################################################
 # Return True if the provided name is in TRAVIS_BRANCH or BUILD_NAME
 
 
@@ -1917,6 +1862,20 @@ def SetCacheMax(val):
 
 
 ###############################################################################
+# Temporarily enable exceptions for gdal, ogr and osr modules
+
+
+@contextlib.contextmanager
+def enable_exceptions():
+    from osgeo import ogr, osr
+
+    with gdal.ExceptionMgr(useExceptions=True), osr.ExceptionMgr(
+        useExceptions=True
+    ), ogr.ExceptionMgr(useExceptions=True):
+        yield
+
+
+###############################################################################
 # Temporarily disable exceptions for gdal, ogr and osr modules
 
 
@@ -2103,3 +2062,37 @@ def runexternal_out_and_err(cmd, check_memleak=True, encoding="ascii"):
         ret_stderr = f"{ret_stderr}\nERROR ret code = {waitcode}"
 
     return (ret_stdout, ret_stderr)
+
+
+###############################################################################
+# Validate JSON according to a JSON schema
+#
+# "jsn" should be a string or a json object
+# "schema" should be a path to file containing a JSON schema. If the
+# file is not found relative to the current working directory or GDAL_DATA,
+# the test will fail.
+def validate_json(jsn, schema):
+    __tracebackhide__ = True
+
+    try:
+        import jsonschema
+    except ImportError:
+        pytest.skip("jsonschema module not available")
+
+    if not os.path.exists(schema):
+        gdal_data = gdal.GetConfigOption("GDAL_DATA")
+
+        if gdal_data and os.path.exists(os.path.join(gdal_data, schema)):
+            schema = os.path.join(gdal_data, schema)
+        else:
+            pytest.fail(f"Could not find schema {schema}")
+
+    if isinstance(jsn, str):
+        jsn = json.loads(jsn)
+
+    schema = json.loads(open(schema, "rb").read())
+
+    try:
+        jsonschema.validate(instance=jsn, schema=schema)
+    except jsonschema.exceptions.RefResolutionError:
+        pytest.skip("Failed to resolve remote reference in JSON schema")

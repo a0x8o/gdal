@@ -7,6 +7,8 @@
 
 %feature("autodoc");
 
+%include "gdal_dataset_docs.i"
+
 %init %{
   /* gdal_python.i %init code */
   if ( GDALGetDriverCount() == 0 ) {
@@ -148,7 +150,6 @@ static void readraster_releasebuffer(CPLErr eErr,
 %}
 
 %pythoncode %{
-
 
   have_warned = 0
   def deprecation_warn(module, sub_package=None, new_module=None):
@@ -1052,6 +1053,109 @@ CPLErr ReadRaster1( double xoff, double yoff, double xsize, double ysize,
             return self._SetGCPs(gcps, wkt_or_spatial_ref)
         else:
             return self._SetGCPs2(gcps, wkt_or_spatial_ref)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        _gdal.delete_Dataset(self)
+        self.this = None
+%}
+
+%feature("shadow") ExecuteSQL %{
+def ExecuteSQL(self, statement, spatialFilter=None, dialect="", keep_ref_on_ds=False):
+    """ExecuteSQL(self, statement, spatialFilter: ogr.Geometry = None, dialect: Optional[str] = "", keep_ref_on_ds=False) -> ogr.Layer
+
+    Execute a SQL statement against the dataset
+
+    The result of a SQL query is:
+      - None (or an exception if exceptions are enabled) for statements
+        that are in error
+      - or None for statements that have no results set,
+      - or a ogr.Layer handle representing a results set from the query.
+
+    Note that this ogr.Layer is in addition to the layers in the data store
+    and must be released with ReleaseResultSet() before the data source is closed
+    (destroyed).
+
+    Starting with GDAL 3.7, this method can also be used as a context manager,
+    as a convenient way of automatically releasing the returned result layer.
+
+    For more information on the SQL dialect supported internally by OGR
+    review the OGR SQL document (:ref:`ogr_sql_sqlite_dialect`)
+    Some drivers (i.e. Oracle and PostGIS) pass the SQL directly through to the
+    underlying RDBMS.
+
+    The SQLITE dialect can also be used (:ref:`sql_sqlite_dialect`)
+
+    Parameters
+    ----------
+    statement:
+        the SQL statement to execute (e.g "SELECT * FROM layer")
+    spatialFilter:
+        a geometry which represents a spatial filter. Can be None
+    dialect:
+        allows control of the statement dialect. If set to None or empty string,
+        the OGR SQL engine will be used, except for RDBMS drivers that will
+        use their dedicated SQL engine, unless OGRSQL is explicitly passed as
+        the dialect. The SQLITE dialect can also be used.
+    keep_ref_on_ds:
+        whether the returned layer should keep a (strong) reference on
+        the current dataset. Cf example 2 for a use case.
+
+    Returns
+    -------
+    ogr.Layer:
+        a ogr.Layer containing the results of the query, that will be
+        automatically released when the context manager goes out of scope.
+
+    Examples
+    --------
+    1. Use as a context manager:
+
+    >>> with ds.ExecuteSQL("SELECT * FROM layer") as lyr:
+    ...     print(lyr.GetFeatureCount())
+
+    2. Use keep_ref_on_ds=True to return an object that keeps a reference to its dataset:
+
+    >>> def get_sql_lyr():
+    ...     return gdal.OpenEx("test.shp").ExecuteSQL("SELECT * FROM test", keep_ref_on_ds=True)
+    ...
+    ... with get_sql_lyr() as lyr:
+    ...     print(lyr.GetFeatureCount())
+    """
+
+    sql_lyr = $action(self, statement, spatialFilter, dialect)
+    if sql_lyr:
+        import weakref
+        sql_lyr._to_release = True
+        sql_lyr._dataset_weak_ref = weakref.ref(self)
+        if keep_ref_on_ds:
+            sql_lyr._dataset_strong_ref = self
+    return sql_lyr
+%}
+
+%feature("shadow") ReleaseResultSet %{
+def ReleaseResultSet(self, sql_lyr):
+    """ReleaseResultSet(self, sql_lyr: ogr.Layer)
+
+    Release ogr.Layer returned by ExecuteSQL() (when not called as an execution manager)
+
+    The sql_lyr object is invalidated after this call.
+
+    Parameters
+    ----------
+    sql_lyr:
+        ogr.Layer got with ExecuteSQL()
+    """
+
+    if sql_lyr and not hasattr(sql_lyr, "_to_release"):
+        raise Exception("This layer was not returned by ExecuteSQL() and should not be released with ReleaseResultSet()")
+    $action(self, sql_lyr)
+    # Invalidates the layer
+    if sql_lyr:
+        sql_lyr.thisown = None
+        sql_lyr.this = None
 %}
 
 }
@@ -1088,6 +1192,26 @@ CPLErr ReadRaster1( double xoff, double yoff, double xsize, double ysize,
   def __ne__(self, other):
     return not self.__eq__(other)
 %}
+}
+
+%extend GDALGroupHS {
+
+%feature("shadow") GetGroupNames %{
+def GetGroupNames(self, options = []) -> "list[str]":
+    ret = $action(self, options)
+    if ret is None:
+        ret = []
+    return ret
+%}
+
+%feature("shadow") GetMDArrayNames %{
+def GetMDArrayNames(self, options = []) -> "list[str]":
+    ret = $action(self, options)
+    if ret is None:
+        ret = []
+    return ret
+%}
+
 }
 
 %extend GDALMDArrayHS {
@@ -1190,9 +1314,8 @@ CPLErr ReadRaster1( double xoff, double yoff, double xsize, double ysize,
              ('i', 4): GDT_Int32,
              ('I', 4): GDT_UInt32,
              ('l', 4): GDT_Int32,
-             # ('l', 8): GDT_Int64,
-             # ('q', 8): GDT_Int64,
-             # ('Q', 8): GDT_UInt64,
+             ('q', 8): GDT_Int64,
+             ('Q', 8): GDT_UInt64,
              ('f', 4): GDT_Float32,
              ('d', 8): GDT_Float64
           }

@@ -1512,7 +1512,8 @@ TEST_F(test_gdal, GetRawBinaryLayout_GTIFF)
     }
 
     {
-        GDALDatasetUniquePtr poDS(GDALDataset::Open(GCORE_DATA_DIR "byte.tif"));
+        GDALDatasetUniquePtr poDS(
+            GDALDataset::Open(GCORE_DATA_DIR "uint16.tif"));
         EXPECT_TRUE(poDS != nullptr);
         GDALDataset::RawBinaryLayout sLayout;
         EXPECT_TRUE(poDS->GetRawBinaryLayout(sLayout));
@@ -1520,11 +1521,11 @@ TEST_F(test_gdal, GetRawBinaryLayout_GTIFF)
         EXPECT_EQ(static_cast<int>(sLayout.eInterleaving),
                   static_cast<int>(
                       GDALDataset::RawBinaryLayout::Interleaving::UNKNOWN));
-        EXPECT_EQ(sLayout.eDataType, GDT_Byte);
+        EXPECT_EQ(sLayout.eDataType, GDT_UInt16);
         EXPECT_TRUE(sLayout.bLittleEndianOrder);
         EXPECT_EQ(sLayout.nImageOffset, 8U);
-        EXPECT_EQ(sLayout.nPixelOffset, 1);
-        EXPECT_EQ(sLayout.nLineOffset, 20);
+        EXPECT_EQ(sLayout.nPixelOffset, 2);
+        EXPECT_EQ(sLayout.nLineOffset, 40);
         EXPECT_EQ(sLayout.nBandOffset, 0);
     }
 
@@ -1548,7 +1549,6 @@ TEST_F(test_gdal, GetRawBinaryLayout_GTIFF)
             static_cast<int>(sLayout.eInterleaving),
             static_cast<int>(GDALDataset::RawBinaryLayout::Interleaving::BIP));
         EXPECT_EQ(sLayout.eDataType, GDT_Byte);
-        EXPECT_TRUE(sLayout.bLittleEndianOrder);
         EXPECT_EQ(sLayout.nImageOffset, 278U);
         EXPECT_EQ(sLayout.nPixelOffset, 4);
         EXPECT_EQ(sLayout.nLineOffset, 162 * 4);
@@ -1573,7 +1573,6 @@ TEST_F(test_gdal, GetRawBinaryLayout_GTIFF)
             static_cast<int>(sLayout.eInterleaving),
             static_cast<int>(GDALDataset::RawBinaryLayout::Interleaving::BSQ));
         EXPECT_EQ(sLayout.eDataType, GDT_Byte);
-        EXPECT_TRUE(sLayout.bLittleEndianOrder);
         EXPECT_TRUE(sLayout.nImageOffset >= 396U);
         EXPECT_EQ(sLayout.nPixelOffset, 1);
         EXPECT_EQ(sLayout.nLineOffset, 50);
@@ -1615,7 +1614,6 @@ TEST_F(test_gdal, GetRawBinaryLayout_GTIFF)
             static_cast<int>(sLayout.eInterleaving),
             static_cast<int>(GDALDataset::RawBinaryLayout::Interleaving::BIP));
         EXPECT_EQ(sLayout.eDataType, GDT_Byte);
-        EXPECT_TRUE(sLayout.bLittleEndianOrder);
         EXPECT_TRUE(sLayout.nImageOffset >= 390U);
         EXPECT_EQ(sLayout.nPixelOffset, 3);
         EXPECT_EQ(sLayout.nLineOffset, 48 * 3);
@@ -1634,6 +1632,8 @@ TEST_F(test_gdal, GetRawBinaryLayout_GTIFF)
                                  "0",
                                  "48",
                                  "32",
+                                 "-ot",
+                                 "UInt16",
                                  "-co",
                                  "TILED=YES",
                                  "-co",
@@ -1642,6 +1642,8 @@ TEST_F(test_gdal, GetRawBinaryLayout_GTIFF)
                                  "BLOCKYSIZE=32",
                                  "-co",
                                  "INTERLEAVE=BAND",
+                                 "-co",
+                                 "ENDIANNESS=BIG",
                                  nullptr};
         auto psOptions =
             GDALTranslateOptionsNew(const_cast<char **>(options), nullptr);
@@ -1656,12 +1658,12 @@ TEST_F(test_gdal, GetRawBinaryLayout_GTIFF)
         EXPECT_EQ(
             static_cast<int>(sLayout.eInterleaving),
             static_cast<int>(GDALDataset::RawBinaryLayout::Interleaving::BSQ));
-        EXPECT_EQ(sLayout.eDataType, GDT_Byte);
-        EXPECT_TRUE(sLayout.bLittleEndianOrder);
+        EXPECT_EQ(sLayout.eDataType, GDT_UInt16);
+        EXPECT_TRUE(!sLayout.bLittleEndianOrder);
         EXPECT_TRUE(sLayout.nImageOffset >= 408U);
-        EXPECT_EQ(sLayout.nPixelOffset, 1);
-        EXPECT_EQ(sLayout.nLineOffset, 48);
-        EXPECT_EQ(sLayout.nBandOffset, 48 * 32);
+        EXPECT_EQ(sLayout.nPixelOffset, 2);
+        EXPECT_EQ(sLayout.nLineOffset, 2 * 48);
+        EXPECT_EQ(sLayout.nBandOffset, 2 * 48 * 32);
         poDS.reset();
         VSIUnlink(tmpFilename);
     }
@@ -3308,6 +3310,57 @@ TEST_F(test_gdal, jpegxl_jpeg_compatible_ReadCompressedData)
             EXPECT_EQ(pabyBuffer[nSize - 1], 0xD9);
         }
         VSIFree(pBuffer);
+    }
+}
+
+// Test GDAL_OF_SHARED flag and open options
+TEST_F(test_gdal, open_shared_open_options)
+{
+    const char *const apszOpenOptions[] = {"OVERVIEW_LEVEL=NONE", nullptr};
+    {
+        GDALDataset *poDS1 =
+            GDALDataset::Open(GCORE_DATA_DIR "rgbsmall.tif", GDAL_OF_SHARED,
+                              nullptr, apszOpenOptions);
+        GDALDataset *poDS2 =
+            GDALDataset::Open(GCORE_DATA_DIR "rgbsmall.tif", GDAL_OF_SHARED,
+                              nullptr, apszOpenOptions);
+        EXPECT_NE(poDS1, nullptr);
+        EXPECT_NE(poDS2, nullptr);
+        EXPECT_EQ(poDS1, poDS2);
+        GDALClose(poDS1);
+        GDALClose(poDS2);
+    }
+    {
+        GDALDataset *poDS1 =
+            GDALDataset::Open(GCORE_DATA_DIR "rgbsmall.tif", GDAL_OF_SHARED,
+                              nullptr, apszOpenOptions);
+        GDALDataset *poDS2 = GDALDataset::Open(
+            GCORE_DATA_DIR "rgbsmall.tif", GDAL_OF_SHARED, nullptr, nullptr);
+        GDALDataset *poDS3 =
+            GDALDataset::Open(GCORE_DATA_DIR "rgbsmall.tif", GDAL_OF_SHARED,
+                              nullptr, apszOpenOptions);
+        EXPECT_NE(poDS1, nullptr);
+        EXPECT_NE(poDS2, nullptr);
+        EXPECT_NE(poDS3, nullptr);
+        EXPECT_NE(poDS1, poDS2);
+        EXPECT_EQ(poDS1, poDS3);
+        GDALClose(poDS1);
+        GDALClose(poDS2);
+        GDALClose(poDS3);
+    }
+    {
+        GDALDataset *poDS1 = GDALDataset::Open(GCORE_DATA_DIR "rgbsmall.tif",
+                                               GDAL_OF_SHARED | GDAL_OF_UPDATE,
+                                               nullptr, apszOpenOptions);
+        // We allow to re-use a shared dataset in update mode when requesting it in read-only
+        GDALDataset *poDS2 =
+            GDALDataset::Open(GCORE_DATA_DIR "rgbsmall.tif", GDAL_OF_SHARED,
+                              nullptr, apszOpenOptions);
+        EXPECT_NE(poDS1, nullptr);
+        EXPECT_NE(poDS2, nullptr);
+        EXPECT_EQ(poDS1, poDS2);
+        GDALClose(poDS1);
+        GDALClose(poDS2);
     }
 }
 

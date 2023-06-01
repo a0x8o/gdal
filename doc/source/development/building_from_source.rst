@@ -59,7 +59,7 @@ paths to the include directory and the library:
 
 .. code-block:: bash
 
-    cmake -DSQLITE3_INCLUDE_DIR=/opt/SQLite/include -DSQLITE3_LIBRARY=/opt/SQLite/lib/libsqlite3.so ..
+    cmake -DSQLite3_INCLUDE_DIR=/opt/SQLite/include -DSQLite3_LIBRARY=/opt/SQLite/lib/libsqlite3.so ..
 
 Alternatively, a custom prefix can be specified:
 
@@ -753,6 +753,8 @@ detect the HDF5 library.
     be manually set when needed.
 
 
+.. _building_from_source_hdfs:
+
 HDFS
 ****
 
@@ -1065,6 +1067,18 @@ It is used by the internal libtiff library or the :ref:`raster.zarr` driver.
 .. option:: GDAL_USE_LIBLZMA=ON/OFF
 
     Control whether to use LibLZMA. Defaults to ON when LibLZMA is found.
+
+
+LibQB3
+******
+
+The `QB3 <https://github.com/lucianpls/QB3>`_ compression, used
+by the :ref:`raster.marfa` driver.
+
+.. option:: GDAL_USE_LIBQB3=ON/OFF
+
+    Control whether to use LibQB3. Defaults to ON when LibQB3 is found.
+
 
 
 LibXml2
@@ -1606,18 +1620,6 @@ PROJ
     ``PROJ_LIBRARY_DEBUG`` can also be specified to a similar library for
     building Debug releases.
 
-
-QB3
-*******
-
-The `QB3 <https://github.com/lucianpls/QB3>`_ compression, used
-by the :ref:`raster.marfa` driver.
-
-.. option:: GDAL_USE_QB3=ON/OFF
-
-    Control whether to use QB3. Defaults to ON when QB3 is found.
-
-
 QHULL
 *****
 
@@ -2030,6 +2032,19 @@ The following options are available to select a subset of drivers:
         The following GDAL drivers cannot be disabled: VRT, DERIVED, GTiff, COG, HFA, MEM.
         The following OGR drivers cannot be disabled: "ESRI Shapefile", "MapInfo File", OGR_VRT, Memory, KML, GeoJSON, GeoJSONSeq, ESRIJSON, TopoJSON.
 
+    .. note::
+
+        Disabling all OGR/vector drivers with -DOGR_BUILD_OPTIONAL_DRIVERS=OFF may affect
+        the ability to enable some GDAL/raster drivers that require some vector
+        drivers to be enabled (and reciprocally with some GDAL/raster drivers depending
+        on vector drivers).
+        When such dependencies are not met, a CMake error will be emitted with a hint
+        for the way to resolve the issue.
+        It is also possible to anticipate such errors by looking at files
+        :source_file:`frmts/CMakeLists.txt` for dependencies of raster drivers
+        and :source_file:`ogr/ogrsf_frmts/CMakeLists.txt` for dependencies of vector drivers.
+
+
 Example of minimal build with the JP2OpenJPEG and SVG drivers enabled::
 
     cmake .. -UGDAL_ENABLE_DRIVER_* -UOGR_ENABLE_DRIVER_* \
@@ -2077,7 +2092,6 @@ a driver:
     run of CMake does not change the activation of the plugin status of individual drivers.
     It might be needed to pass ``-UGDAL_ENABLE_DRIVER_* -UOGR_ENABLE_DRIVER_*`` to reset their state.
 
-
 Example of build with all potential drivers as plugins, except the JP2OpenJPEG one::
 
     cmake .. -UGDAL_ENABLE_DRIVER_* -UOGR_ENABLE_DRIVER_* \
@@ -2103,6 +2117,8 @@ This can be done with:
 
     Set to OFF to disable loading of GDAL plugins. Default is ON.
 
+
+.. _building-python-bindings:
 
 Python bindings options
 +++++++++++++++++++++++
@@ -2238,7 +2254,7 @@ Cross-compiling for Android
 +++++++++++++++++++++++++++
 
 First refer to https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html#cross-compiling-for-android
-and to https://github.com/OSGeo/gdal/blob/master/.github/workflows/android_cmake/start.sh for
+and to :source_file:`.github/workflows/android_cmake/start.sh` for
 an example of a build script to cross-compile from Ubuntu.
 
 

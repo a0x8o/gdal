@@ -128,6 +128,24 @@ def test_grib_grib2_read_nodata():
 
 
 ###############################################################################
+# Check nodata
+
+
+@pytest.mark.parametrize("band_nr", [1, 2])
+@pytest.mark.parametrize("call_getmetadata_before", [False, True])
+def test_grib_grib2_read_nodata_bands_with_bitmap(band_nr, call_getmetadata_before):
+
+    # File generated with the following (build in -DDEBUG mode so GRIB_WRITE_BITMAP_TEST related code is compiled)
+    # gdal_translate autotest/gcore/data/byte.tif test.grib2 --config GRIB_WRITE_BITMAP_TEST YES
+    # gdal_translate autotest/gcore/data/byte.tif test.grib2 --config GRIB_WRITE_BITMAP_TEST YES -co append_subdataset=yes
+
+    ds = gdal.Open("data/grib/two_bands_with_bitmap.grib2")
+    if call_getmetadata_before:
+        ds.GetRasterBand(band_nr).GetMetadata()
+    assert ds.GetRasterBand(band_nr).GetNoDataValue() == 9999
+
+
+###############################################################################
 # Check grib units (#3606)
 
 
@@ -2193,3 +2211,28 @@ def test_grib_grib2_laea_negative_longitudes():
     assert ds.GetGeoTransform() == pytest.approx(
         (-1158999.9595231502, 2000.0, 0.0, 903000.0029299166, 0.0, -2000.0)
     )
+
+
+# Test reading file with wrong shape of earth (#7811)
+
+
+def test_grib_grib2_wrong_earth_shape():
+
+    # Dataset generated with
+    # gdal_translate byte.tif byte_wrong_shape.grib2 -of grib
+    # with patching WriteEllipsoidAndRasterSize() to write
+    # Byte=1 (spherical sphere)
+    # Byte=255 (invalid scale)
+    # UInt32=-1 (invalid scaled radius)
+    with gdaltest.error_handler():
+        ds = gdal.Open("data/grib/byte_wrong_earth_shape.grib2")
+        assert (
+            "The GRIB file contains invalid values for the spheroid"
+            in gdal.GetLastErrorMsg()
+        )
+    assert ds.GetSpatialRef() is None
+
+    with gdaltest.config_option("GRIB_USE_DEFAULT_SPHEROID", "YES"):
+        ds = gdal.Open("data/grib/byte_wrong_earth_shape.grib2")
+        assert ds.GetSpatialRef().GetSemiMajor() == 6377563.396
+        assert ds.GetSpatialRef().GetSemiMinor() == 6377563.396

@@ -267,6 +267,11 @@ def test_osr_compd_6():
         "Unknown based on GRS80 ellipsoid using towgs84=0,0,0,0,0,0,0",
         "Unknown_based_on_GRS80_ellipsoid",
     )
+    # PROJ >= 9.2.1 returns the below
+    wkt = wkt.replace(
+        "Unknown based on GRS 1980 ellipsoid using towgs84=0,0,0,0,0,0,0",
+        "Unknown_based_on_GRS80_ellipsoid",
+    )
     wkt = wkt.replace(
         "unknown using geoidgrids=g2003conus.gtx,g2003alaska.gtx,g2003h01.gtx,g2003p01.gtx",
         "unknown",
@@ -356,7 +361,7 @@ def test_osr_compd_8():
 # Test COMPD_CS with a VERT_DATUM type = 2002 (Ellipsoid height)
 
 
-@gdaltest.require_proj_version(7, 1)
+@pytest.mark.require_proj(7, 1)
 def test_osr_compd_vert_datum_2002():
 
     sr = osr.SpatialReference()

@@ -1086,17 +1086,13 @@ def test_netcdf_27():
 
     # test default config
     test = gdaltest.GDALTest("NETCDF", "netcdf/int16-nogeo.nc", 1, 4672)
-    config_bak = gdal.GetConfigOption("GDAL_NETCDF_BOTTOMUP")
-    gdal.SetConfigOption("GDAL_NETCDF_BOTTOMUP", None)
-    test.testOpen()
-    gdal.SetConfigOption("GDAL_NETCDF_BOTTOMUP", config_bak)
+    with gdal.config_option("GDAL_NETCDF_BOTTOMUP", None):
+        test.testOpen()
 
     # test GDAL_NETCDF_BOTTOMUP=NO
     test = gdaltest.GDALTest("NETCDF", "netcdf/int16-nogeo.nc", 1, 4855)
-    config_bak = gdal.GetConfigOption("GDAL_NETCDF_BOTTOMUP")
-    gdal.SetConfigOption("GDAL_NETCDF_BOTTOMUP", "NO")
-    test.testOpen()
-    gdal.SetConfigOption("GDAL_NETCDF_BOTTOMUP", config_bak)
+    with gdal.config_option("GDAL_NETCDF_BOTTOMUP", "NO"):
+        test.testOpen()
 
 
 ###############################################################################
@@ -1282,8 +1278,6 @@ def test_netcdf_32():
 
     ifile = "data/byte.tif"
     ofile = "tmp/netcdf_32.nc"
-
-    # gdal.SetConfigOption('CPL_DEBUG', 'ON')
 
     # test basic read/write
     netcdf_test_copy(ifile, 1, 4672, ofile, ["FORMAT=NC4"])
@@ -1787,6 +1781,7 @@ def test_netcdf_44():
 # Test reading a vector NetCDF 3 file
 
 
+@pytest.mark.require_driver("CSV")
 def test_netcdf_45():
 
     # Test that a vector cannot be opened in raster-only mode
@@ -1859,6 +1854,7 @@ def test_netcdf_46():
 # Test reading a vector NetCDF 4 file
 
 
+@pytest.mark.require_driver("CSV")
 def test_netcdf_47():
 
     if not gdaltest.netcdf_drv_has_nc4:
@@ -1925,6 +1921,7 @@ def test_netcdf_48():
 # Test reading a vector NetCDF 3 file with X,Y,Z vars as float
 
 
+@pytest.mark.require_driver("CSV")
 def test_netcdf_49():
 
     with gdaltest.error_handler():
@@ -2015,6 +2012,7 @@ def test_netcdf_50():
 # Test creating a vector NetCDF 3 file with X,Y,Z fields
 
 
+@pytest.mark.require_driver("CSV")
 def test_netcdf_51():
 
     ds = gdal.OpenEx("data/netcdf/test_ogr_nc3.nc", gdal.OF_VECTOR)
@@ -2098,6 +2096,7 @@ def test_netcdf_51():
 # Test creating a vector NetCDF 3 file with X,Y,Z fields with WRITE_GDAL_TAGS=NO
 
 
+@pytest.mark.require_driver("CSV")
 def test_netcdf_51_no_gdal_tags():
 
     ds = gdal.OpenEx("data/netcdf/test_ogr_nc3.nc", gdal.OF_VECTOR)
@@ -2154,6 +2153,7 @@ def test_netcdf_51_no_gdal_tags():
 # Test creating a vector NetCDF 4 file with X,Y,Z fields
 
 
+@pytest.mark.require_driver("CSV")
 def test_netcdf_52():
 
     if not gdaltest.netcdf_drv_has_nc4:
@@ -2571,6 +2571,7 @@ def test_netcdf_59():
 # http://cfconventions.org/cf-conventions/v1.6.0/cf-conventions.html#_indexed_ragged_array_representation_of_profiles
 
 
+@pytest.mark.require_driver("CSV")
 def test_netcdf_60():
 
     # Test that a vector cannot be opened in raster-only mode
@@ -2611,6 +2612,7 @@ def test_netcdf_60():
 # Test appending to a "Indexed ragged array representation of profiles" v1.6.0 H3.5
 
 
+@pytest.mark.require_driver("CSV")
 def test_netcdf_61():
 
     shutil.copy("data/netcdf/profile.nc", "tmp/netcdf_61.nc")
@@ -2652,6 +2654,7 @@ def test_netcdf_61():
 # Test creating a "Indexed ragged array representation of profiles" v1.6.0 H3.5
 
 
+@pytest.mark.require_driver("CSV")
 def test_netcdf_62():
 
     ds = gdal.VectorTranslate(
@@ -2692,6 +2695,7 @@ def test_netcdf_62():
     gdal.Unlink("/vsimem/netcdf_62.csv")
 
 
+@pytest.mark.require_driver("CSV")
 def test_netcdf_62_ncdump_check():
 
     # get file header with ncdump (if available)
@@ -2714,6 +2718,7 @@ def test_netcdf_62_ncdump_check():
         pytest.skip()
 
 
+@pytest.mark.require_driver("CSV")
 def test_netcdf_62_cf_check():
 
     import netcdf_cf
@@ -2729,6 +2734,7 @@ def test_netcdf_62_cf_check():
 # Test creating a NC4 "Indexed ragged array representation of profiles" v1.6.0 H3.5
 
 
+@pytest.mark.require_driver("CSV")
 def test_netcdf_63():
 
     if not gdaltest.netcdf_drv_has_nc4:
@@ -2773,6 +2779,7 @@ def test_netcdf_63():
     gdal.Unlink("/vsimem/netcdf_63.csv")
 
 
+@pytest.mark.require_driver("CSV")
 def test_netcdf_63_ncdump_check():
 
     if not gdaltest.netcdf_drv_has_nc4:
@@ -2805,6 +2812,7 @@ def test_netcdf_63_ncdump_check():
 # but without a profile field.
 
 
+@pytest.mark.require_driver("CSV")
 def test_netcdf_64():
 
     gdal.VectorTranslate(
@@ -2883,6 +2891,7 @@ def test_netcdf_65():
 # from a config file
 
 
+@pytest.mark.require_driver("CSV")
 def test_netcdf_66():
 
     # First trying with no so good configs
@@ -3005,6 +3014,7 @@ def test_netcdf_66():
     gdal.Unlink("/vsimem/netcdf_66.csv")
 
 
+@pytest.mark.require_driver("CSV")
 def test_netcdf_66_ncdump_check():
 
     # get file header with ncdump (if available)
@@ -3047,18 +3057,17 @@ def test_netcdf_67():
         pytest.skip()
 
     # disable bottom-up mode to use the real file's blocks size
-    gdal.SetConfigOption("GDAL_NETCDF_BOTTOMUP", "NO")
-    # for the moment the next test using check_stat does not work, seems like
-    # the last pixel (9) of the image is not handled by stats...
-    #    tst = gdaltest.GDALTest( 'NetCDF', 'partial_block_ticket5950.nc', 1, 45 )
-    #    result = tst.testOpen( check_stat=(1, 9, 5, 2.582) )
-    # so for the moment compare the full image
-    ds = gdal.Open("data/netcdf/partial_block_ticket5950.nc", gdal.GA_ReadOnly)
-    ref = numpy.arange(1, 10).reshape((3, 3))
-    if not numpy.array_equal(ds.GetRasterBand(1).ReadAsArray(), ref):
-        pytest.fail()
-    ds = None
-    gdal.SetConfigOption("GDAL_NETCDF_BOTTOMUP", None)
+    with gdal.config_option("GDAL_NETCDF_BOTTOMUP", "NO"):
+        # for the moment the next test using check_stat does not work, seems like
+        # the last pixel (9) of the image is not handled by stats...
+        #    tst = gdaltest.GDALTest( 'NetCDF', 'partial_block_ticket5950.nc', 1, 45 )
+        #    result = tst.testOpen( check_stat=(1, 9, 5, 2.582) )
+        # so for the moment compare the full image
+        ds = gdal.Open("data/netcdf/partial_block_ticket5950.nc", gdal.GA_ReadOnly)
+        ref = numpy.arange(1, 10).reshape((3, 3))
+        if not numpy.array_equal(ds.GetRasterBand(1).ReadAsArray(), ref):
+            pytest.fail()
+        ds = None
 
 
 ###############################################################################
@@ -3307,7 +3316,7 @@ def test_netcdf_81():
 # Write netCDF file in rotated_pole projection
 
 
-@gdaltest.require_proj_version(7, 1)
+@pytest.mark.require_proj(7, 1)
 def test_netcdf_write_rotated_pole_from_method_proj():
 
     ds = gdal.GetDriverByName("netCDF").Create("tmp/rotated_pole.nc", 2, 2)
@@ -3340,7 +3349,7 @@ def test_netcdf_write_rotated_pole_from_method_proj():
 # Write netCDF file in rotated_pole projection
 
 
-@gdaltest.require_proj_version(8, 2)
+@pytest.mark.require_proj(8, 2)
 def test_netcdf_write_rotated_pole_from_method_netcdf_cf():
 
     expected_wkt = """GEOGCRS["Rotated_pole",BASEGEOGCRS["unknown",DATUM["unnamed",ELLIPSOID["Spheroid",6367470,594.313048347956,LENGTHUNIT["metre",1,ID["EPSG",9001]]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]]],DERIVINGCONVERSION["Pole rotation (netCDF CF convention)",METHOD["Pole rotation (netCDF CF convention)"],PARAMETER["Grid north pole latitude (netCDF CF convention)",39.25,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],PARAMETER["Grid north pole longitude (netCDF CF convention)",-162,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],PARAMETER["North pole grid longitude (netCDF CF convention)",0,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]]],CS[ellipsoidal,2],AXIS["latitude",north,ORDER[1],ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],AXIS["longitude",east,ORDER[2],ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]]]"""
@@ -3363,7 +3372,7 @@ def test_netcdf_write_rotated_pole_from_method_netcdf_cf():
 # Write netCDF file in rotated_pole projection
 
 
-@gdaltest.require_proj_version(7, 0)
+@pytest.mark.require_proj(7, 0)
 def test_netcdf_write_rotated_pole_from_method_grib():
 
     ds = gdal.GetDriverByName("netCDF").Create("tmp/rotated_pole.nc", 2, 2)
@@ -3395,6 +3404,7 @@ def test_netcdf_write_rotated_pole_from_method_grib():
 # 1D variable, several corresponding variables)
 
 
+@pytest.mark.require_driver("CSV")
 def test_netcdf_82():
 
     with gdaltest.error_handler():
@@ -5785,7 +5795,7 @@ def test_netcdf_metadata_sentinel5():
     ds = gdal.OpenEx("data/netcdf/fake_ISO_METADATA.nc", gdal.OF_MULTIDIM_RASTER)
     assert ds is not None
     rg = ds.GetRootGroup()
-    assert rg.GetGroupNames() is None
+    assert len(rg.GetGroupNames()) == 0
     assert "ISO_METADATA" in [attr.GetName() for attr in rg.GetAttributes()]
     attr = rg.GetAttribute("ISO_METADATA")
     assert attr is not None

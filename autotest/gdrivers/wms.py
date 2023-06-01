@@ -112,12 +112,9 @@ def wms_4():
     if gdaltest.wms_ds is None or not gdaltest.wms_srv1_ok:
         pytest.skip()
 
-    gdal.SetConfigOption("CPL_ACCUM_ERROR_MSG", "ON")
-
-    with gdaltest.error_handler():
+    with gdal.config_option("CPL_ACCUM_ERROR_MSG", "ON"), gdaltest.error_handler():
         cs = gdaltest.wms_ds.GetRasterBand(1).Checksum(0, 0, 100, 100)
 
-    gdal.SetConfigOption("CPL_ACCUM_ERROR_MSG", "OFF")
     msg = gdal.GetLastErrorMsg()
     gdal.ErrorReset()
 
@@ -863,19 +860,19 @@ def test_wms_18():
 
 def test_wms_19():
 
+    if (
+        gdaltest.gdalurlopen(
+            "http://merovingio.c2rmf.cnrs.fr/fcgi-bin/iipsrv.fcgi?FIF=globe.256x256.tif&obj=Basic-Info",
+            timeout=5,
+        )
+        is None
+    ):
+        pytest.skip("Server not reachable")
+
     ds = gdal.Open(
         "IIP:http://merovingio.c2rmf.cnrs.fr/fcgi-bin/iipsrv.fcgi?FIF=globe.256x256.tif"
     )
-
-    if ds is None:
-        if (
-            gdaltest.gdalurlopen(
-                "http://merovingio.c2rmf.cnrs.fr/fcgi-bin/iipsrv.fcgi?FIF=globe.256x256.tif&obj=Basic-Info"
-            )
-            is None
-        ):
-            pytest.skip()
-        pytest.fail("open failed.")
+    assert ds
 
     assert (
         ds.RasterXSize == 86400 and ds.RasterYSize == 43200 and ds.RasterCount == 3

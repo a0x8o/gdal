@@ -393,6 +393,11 @@ class OGRDXFFeature final : public OGRFeature
     // Additional data for ATTRIB and ATTDEF entities
     CPLString osAttributeTag;
 
+    // Store ATTRIB entities associated with an INSERT, for use when
+    // DXF_INLINE_BLOCKS is true and a block with attributes is INSERTed
+    // in another block
+    std::vector<std::unique_ptr<OGRDXFFeature>> apoAttribFeatures;
+
   public:
     explicit OGRDXFFeature(OGRFeatureDefn *poFeatureDefn);
 
@@ -425,6 +430,10 @@ class OGRDXFFeature final : public OGRFeature
     CPLString GetAttributeTag() const
     {
         return osAttributeTag;
+    }
+    const std::vector<std::unique_ptr<OGRDXFFeature>> &GetAttribFeatures() const
+    {
+        return apoAttribFeatures;
     }
 
     void SetInsertOCSCoords(const DXFTriple &oTriple)
@@ -516,7 +525,7 @@ class OGRDXFLayer final : public OGRLayer
                                      OGRDXFFeatureQueue &apoExtraFeatures,
                                      const bool bInlineNestedBlocks,
                                      const bool bMergeGeometry);
-    OGRDXFFeature *
+    static OGRDXFFeature *
     InsertBlockReference(const CPLString &osBlockName,
                          const OGRDXFInsertTransformer &oTransformer,
                          OGRDXFFeature *const poFeature);
@@ -939,7 +948,8 @@ class OGRDXFWriterDS final : public OGRDataSource
                            char **papszOptions = nullptr) override;
 
     bool CheckEntityID(const char *pszEntityID);
-    long WriteEntityID(VSILFILE *fp, long nPreferredFID = OGRNullFID);
+    bool WriteEntityID(VSILFILE *fp, long &nAssignedFID,
+                       long nPreferredFID = OGRNullFID);
 
     void UpdateExtent(OGREnvelope *psEnvelope);
 };

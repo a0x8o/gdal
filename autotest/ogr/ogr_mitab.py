@@ -1805,9 +1805,8 @@ def test_ogr_mitab_35():
         coordsys
         == 'CoordSys Earth Projection 3, 33, "m", 3, 46.5, 44, 49.00000000002, 700000, 6600000'
     )
-    gdal.SetConfigOption("MITAB_BOUNDS_FILE", "data/mitab/mitab_bounds.txt")
-    coordsys = get_coordsys_from_srs(srs)
-    gdal.SetConfigOption("MITAB_BOUNDS_FILE", None)
+    with gdal.config_option("MITAB_BOUNDS_FILE", "data/mitab/mitab_bounds.txt"):
+        coordsys = get_coordsys_from_srs(srs)
     assert (
         coordsys
         == 'CoordSys Earth Projection 3, 33, "m", 3, 46.5, 44, 49.00000000002, 700000, 6600000 Bounds (75000, 6000000) (1275000, 7200000)'
@@ -2845,11 +2844,24 @@ def test_ogr_mitab_read_write_all_data_types(ext):
 ###############################################################################
 
 
-def _test_ogr_mitab_write_etrs89_from_crs_epsg_code(srs):
+def _test_srs(srs, input_srs=None, ext="tab"):
+    """srs = srs used for writing (unless input_srs is defined) and comparing
+    output"""
 
-    filename = "/vsimem/test_ogr_mitab_write_etrs89.tab"
+    filename = "/vsimem/test_srs." + ext
     ds = ogr.GetDriverByName("MapInfo File").CreateDataSource(filename)
-    lyr = ds.CreateLayer("test", srs=srs, geom_type=ogr.wkbPoint)
+    assert srs
+    if isinstance(srs, str):
+        tmp = osr.SpatialReference()
+        tmp.SetFromUserInput(srs)
+        srs = tmp
+    if input_srs and isinstance(input_srs, str):
+        tmp = osr.SpatialReference()
+        tmp.SetFromUserInput(input_srs)
+        input_srs = tmp
+    lyr = ds.CreateLayer(
+        "test", srs=(input_srs if input_srs else srs), geom_type=ogr.wkbPoint
+    )
     lyr.CreateField(ogr.FieldDefn("foo"))
     f = ogr.Feature(lyr.GetLayerDefn())
     f.SetGeometry(ogr.CreateGeometryFromWkt("POINT(0 0)"))
@@ -2859,10 +2871,8 @@ def _test_ogr_mitab_write_etrs89_from_crs_epsg_code(srs):
 
     ds = ogr.Open(filename)
     lyr = ds.GetLayer(0)
-    ref_srs = osr.SpatialReference()
-    ref_srs.ImportFromEPSG(25832)
     got_srs = lyr.GetSpatialRef()
-    assert got_srs.IsSame(ref_srs), got_srs.ExportToWkt()
+    assert got_srs.IsSame(srs), got_srs.ExportToWkt()
     ds = None
 
     ogr.GetDriverByName("MapInfo File").DeleteDataSource(filename)
@@ -2871,11 +2881,10 @@ def _test_ogr_mitab_write_etrs89_from_crs_epsg_code(srs):
 ###############################################################################
 
 
-def test_ogr_mitab_write_etrs89_from_crs_epsg_code():
+@pytest.mark.parametrize("ext", ["tab", "mif"])
+def test_ogr_mitab_write_etrs89_from_crs_epsg_code(ext):
 
-    srs = osr.SpatialReference()
-    srs.ImportFromEPSG(25832)
-    _test_ogr_mitab_write_etrs89_from_crs_epsg_code(srs)
+    _test_srs("EPSG:25832", ext=ext)
 
 
 ###############################################################################
@@ -2886,7 +2895,7 @@ def test_ogr_mitab_write_etrs89_from_crs_wkt1():
     srs = osr.SpatialReference()
     srs.ImportFromEPSG(25832)
     srs.ImportFromWkt(srs.ExportToWkt(["FORMAT=WKT1"]))
-    _test_ogr_mitab_write_etrs89_from_crs_epsg_code(srs)
+    _test_srs(srs, "EPSG:25832")
 
 
 ###############################################################################
@@ -2897,7 +2906,7 @@ def test_ogr_mitab_write_etrs89_from_crs_wkt2():
     srs = osr.SpatialReference()
     srs.ImportFromEPSG(25832)
     srs.ImportFromWkt(srs.ExportToWkt(["FORMAT=WKT2"]))
-    _test_ogr_mitab_write_etrs89_from_crs_epsg_code(srs)
+    _test_srs(srs, "EPSG:25832")
 
 
 ###############################################################################
@@ -2928,7 +2937,7 @@ def test_ogr_mitab_write_etrs89_from_custom_wkt_geogcs_code():
         AXIS["Easting",EAST],
         AXIS["Northing",NORTH]]"""
     )
-    _test_ogr_mitab_write_etrs89_from_crs_epsg_code(srs)
+    _test_srs(srs, "EPSG:25832")
 
 
 ###############################################################################
@@ -2959,7 +2968,7 @@ def test_ogr_mitab_write_etrs89_from_custom_wkt_no_geogcs_code():
         AXIS["Easting",EAST],
         AXIS["Northing",NORTH]]"""
     )
-    _test_ogr_mitab_write_etrs89_from_crs_epsg_code(srs)
+    _test_srs(srs, "EPSG:25832")
 
 
 ###############################################################################
@@ -2998,28 +3007,7 @@ def test_ogr_mitab_point_label():
 
 def test_ogr_mitab_write_epsg_3125_philippine_reference_system_1992():
 
-    ref_srs = osr.SpatialReference()
-    ref_srs.ImportFromEPSG(3125)
-
-    filename = (
-        "/vsimem/test_ogr_mitab_write_epsg_3125_philippine_reference_system_1992.tab"
-    )
-    ds = ogr.GetDriverByName("MapInfo File").CreateDataSource(filename)
-    lyr = ds.CreateLayer("test", srs=ref_srs, geom_type=ogr.wkbPoint)
-    lyr.CreateField(ogr.FieldDefn("foo"))
-    f = ogr.Feature(lyr.GetLayerDefn())
-    f.SetGeometry(ogr.CreateGeometryFromWkt("POINT(0 0)"))
-    lyr.CreateFeature(f)
-    f = None
-    ds = None
-
-    ds = ogr.Open(filename)
-    lyr = ds.GetLayer(0)
-    got_srs = lyr.GetSpatialRef()
-    assert got_srs.IsSame(ref_srs), got_srs.ExportToWkt()
-    ds = None
-
-    ogr.GetDriverByName("MapInfo File").DeleteDataSource(filename)
+    _test_srs("EPSG:3125")
 
 
 ###############################################################################
@@ -3087,3 +3075,13 @@ def test_ogr_mitab_label_without_text():
     lyr.CreateFeature(f)
     ds = None
     ogr.GetDriverByName("MapInfo File").DeleteDataSource(filename)
+
+
+###############################################################################
+# Test fix for https://github.com/OSGeo/gdal/issues/7715
+
+
+@pytest.mark.parametrize("ext", ["tab", "mif"])
+def test_ogr_mitab_write_LCC_2SP_non_metre_unit(ext):
+
+    _test_srs("EPSG:2277", ext=ext)  # "NAD83 / Texas Central (ftUS)"

@@ -121,6 +121,7 @@ def Calc(
     user_namespace: Optional[Dict] = None,
     debug: bool = False,
     quiet: bool = False,
+    progress_callback: Optional = gdal.TermProgress_nocb,
     **input_files,
 ):
 
@@ -489,7 +490,6 @@ def Calc(
 
     # variables for displaying progress
     ProgressCt = -1
-    ProgressMk = -1
     ProgressEnd = nXBlocks * nYBlocks * allBandsCount
 
     ################################################################
@@ -544,9 +544,8 @@ def Calc(
             # loop through Y lines
             for Y in range(0, nYBlocks):
                 ProgressCt += 1
-                if 10 * ProgressCt / ProgressEnd % 10 != ProgressMk and not quiet:
-                    ProgressMk = 10 * ProgressCt / ProgressEnd % 10
-                    print("%d.." % (10 * ProgressMk), end=" ")
+                if not quiet:
+                    progress_callback(float(ProgressCt) / ProgressEnd, "", None)
 
                 # change the block size of the final piece
                 if Y == nYBlocks - 1:
@@ -666,7 +665,7 @@ def Calc(
         raise Exception("Dataset writing failed")
 
     if not quiet:
-        print("100 - Done")
+        progress_callback(1.0, "", None)
 
     return myOut
 
@@ -755,6 +754,16 @@ class GDALCalc(GDALScript):
             except argparse.ArgumentError:
                 pass
 
+    def float_or_none(self, NoDataValue: str) -> Union[float, str]:
+        if NoDataValue.lower() == "none":
+            return NoDataValue
+
+        try:
+            return float(NoDataValue)
+        except ValueError:
+            msg = f"Invalid float value for NoDataValue: {NoDataValue}"
+            raise argparse.ArgumentTypeError(msg)
+
     def get_parser(self, argv) -> GDALArgumentParser:
         parser = self.parser
         parser.add_argument(
@@ -782,7 +791,7 @@ class GDALCalc(GDALScript):
         parser.add_argument(
             "--NoDataValue",
             dest="NoDataValue",
-            type=float,
+            type=self.float_or_none,
             metavar="value",
             help="output nodata value (default datatype specific value)",
         )

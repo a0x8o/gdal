@@ -176,6 +176,10 @@ class CPL_DLL OGRSpatialReference
 
     static CPLString lookupInDict(const char *pszDictFile, const char *pszCode);
 
+    OGRErr GetWKT2ProjectionMethod(const char **ppszMethodName,
+                                   const char **ppszMethodAuthName = nullptr,
+                                   const char **ppszMethodCode = nullptr) const;
+
   public:
     explicit OGRSpatialReference(const char * = nullptr);
     OGRSpatialReference(const OGRSpatialReference &);
@@ -231,7 +235,7 @@ class CPL_DLL OGRSpatialReference
     OGRErr importFromEPSGA(int);
     OGRErr importFromESRI(char **);
     OGRErr importFromPCI(const char *, const char * = nullptr,
-                         double * = nullptr);
+                         const double * = nullptr);
 
 #define USGS_ANGLE_DECIMALDEGREES 0 /**< Angle is in decimal degrees. */
 #define USGS_ANGLE_PACKEDDMS                                                   \
@@ -977,6 +981,7 @@ struct CPL_DLL OGRCoordinateTransformationOptions
                            double dfNorthLatitudeDeg);
     bool SetDesiredAccuracy(double dfAccuracy);
     bool SetBallparkAllowed(bool bAllowBallpark);
+    bool SetOnlyBest(bool bOnlyBest);
 
     bool SetCoordinateOperation(const char *pszCT, bool bReverseCT);
     /*! @cond Doxygen_Suppress */

@@ -240,15 +240,17 @@ vsi_l_offset GRIBRasterBand::FindTrueStart(VSILFILE *fp, vsi_l_offset start)
 }
 
 /************************************************************************/
-/*                          FindPDSTemplate()                           */
+/*                      FindPDSTemplateGRIB2()                          */
 /*                                                                      */
 /*      Scan the file for the PDS template info and represent it as     */
 /*      metadata.                                                       */
 /************************************************************************/
 
-void GRIBRasterBand::FindPDSTemplate()
+void GRIBRasterBand::FindPDSTemplateGRIB2()
 
 {
+    CPLAssert(m_nGribVersion == 2);
+
     if (bLoadedPDS)
         return;
     bLoadedPDS = true;
@@ -908,7 +910,7 @@ char **GRIBRasterBand::GetMetadata(const char *pszDomain)
     if (m_nGribVersion == 2 &&
         CPLTestBool(CPLGetConfigOption("GRIB_PDS_ALL_BANDS", "ON")))
     {
-        FindPDSTemplate();
+        FindPDSTemplateGRIB2();
     }
     return GDALPamRasterBand::GetMetadata(pszDomain);
 }
@@ -923,7 +925,7 @@ const char *GRIBRasterBand::GetMetadataItem(const char *pszName,
     if (m_nGribVersion == 2 &&
         CPLTestBool(CPLGetConfigOption("GRIB_PDS_ALL_BANDS", "ON")))
     {
-        FindPDSTemplate();
+        FindPDSTemplateGRIB2();
     }
     return GDALPamRasterBand::GetMetadataItem(pszName, pszDomain);
 }
@@ -1495,7 +1497,7 @@ GDALDataset *GRIBDataset::Open(GDALOpenInfo *poOpenInfo)
             gribBand = new GRIBRasterBand(poDS, bandNr, psInv);
 
             if (psInv->GribVersion == 2)
-                gribBand->FindPDSTemplate();
+                gribBand->FindPDSTemplateGRIB2();
 
             gribBand->m_Grib_MetaData = metaData;
         }
@@ -2321,7 +2323,7 @@ GDALDataset *GRIBDataset::OpenMultiDim(GDALOpenInfo *poOpenInfo)
             // coverity[tainted_data]
             GRIBRasterBand gribBand(poDS, bandNr, psInv);
             if (psInv->GribVersion == 2)
-                gribBand.FindPDSTemplate();
+                gribBand.FindPDSTemplateGRIB2();
             osElement = psInv->element;
             osShortFstLevel = psInv->shortFstLevel;
             dfRefTime = psInv->refTime;
@@ -2459,12 +2461,45 @@ void GRIBDataset::SetGribMetaData(grib_MetaData *meta)
     }
 
     const bool bHaveEarthModel =
-        meta->gds.majEarth != 0.0 || meta->gds.minEarth != 0.0;
+        meta->gds.majEarth > 0.0 && meta->gds.minEarth > 0.0;
     // In meters.
-    const double a = bHaveEarthModel ? meta->gds.majEarth * 1.0e3 : 6377563.396;
-    const double b = bHaveEarthModel ? meta->gds.minEarth * 1.0e3 : 6356256.910;
+    const double a = bHaveEarthModel
+                         ? meta->gds.majEarth * 1.0e3
+                         : CPLAtof(CPLGetConfigOption("GRIB_DEFAULT_SEMI_MAJOR",
+                                                      "6377563.396"));
+    const double b =
+        bHaveEarthModel
+            ? meta->gds.minEarth * 1.0e3
+            : (meta->gds.f_sphere
+                   ? a
+                   : CPLAtof(CPLGetConfigOption("GRIB_DEFAULT_SEMI_MINOR",
+                                                "6356256.910")));
+    if (meta->gds.majEarth == 0 || meta->gds.minEarth == 0)
+    {
+        CPLDebug("GRIB", "No earth model. Assuming a=%f and b=%f", a, b);
+    }
+    else if (meta->gds.majEarth < 0 || meta->gds.minEarth < 0)
+    {
+        const char *pszUseDefaultSpheroid =
+            CPLGetConfigOption("GRIB_USE_DEFAULT_SPHEROID", nullptr);
+        if (!pszUseDefaultSpheroid)
+        {
+            CPLError(CE_Failure, CPLE_AppDefined,
+                     "The GRIB file contains invalid values for the spheroid. "
+                     "You may set the GRIB_USE_DEFAULT_SPHEROID configuration "
+                     "option to YES to use a default spheroid with "
+                     "a=%f and b=%f",
+                     a, b);
+            return;
+        }
+        else if (!CPLTestBool(pszUseDefaultSpheroid))
+        {
+            return;
+        }
+        CPLDebug("GRIB", "Invalid earth model. Assuming a=%f and b=%f", a, b);
+    }
 
-    if (meta->gds.f_sphere)
+    if (meta->gds.f_sphere || (a == b))
     {
         oSRS.SetGeogCS("Coordinate System imported from GRIB file", nullptr,
                        "Sphere", a, 0.0);
