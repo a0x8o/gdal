@@ -1054,10 +1054,20 @@ CPLErr ReadRaster1( double xoff, double yoff, double xsize, double ysize,
         else:
             return self._SetGCPs2(gcps, wkt_or_spatial_ref)
 
+    def _invalidate_bands(self):
+        if hasattr(self, '_band_references'):
+            for band in self._band_references:
+                band.this = None
+
+    def __del__(self):
+        self._invalidate_bands()
+
     def __enter__(self):
         return self
 
     def __exit__(self, *args):
+        self._invalidate_bands()
+
         _gdal.delete_Dataset(self)
         self.this = None
 %}
@@ -1156,6 +1166,20 @@ def ReleaseResultSet(self, sql_lyr):
     if sql_lyr:
         sql_lyr.thisown = None
         sql_lyr.this = None
+%}
+
+%feature("shadow") GetRasterBand %{
+def GetRasterBand(self, nBand):
+    band = $action(self, nBand)
+
+    if band:
+        import weakref
+
+        if not hasattr(self, '_band_references'):
+            self._band_references = weakref.WeakSet()
+        self._band_references.add(band)
+
+    return band
 %}
 
 }
@@ -2796,6 +2820,7 @@ def DEMProcessing(destName, srcDS, processing, **kwargs):
 def NearblackOptions(options=None, format=None,
          creationOptions=None, white = False, colors=None,
          maxNonBlack=None, nearDist=None, setAlpha = False, setMask = False,
+         alg=None,
          callback=None, callback_data=None):
     """Create a NearblackOptions() object that can be passed to gdal.Nearblack()
 
@@ -2819,6 +2844,8 @@ def NearblackOptions(options=None, format=None,
         adds an alpha band to the output file.
     setMask:
         adds a mask band to the output file.
+    alg:
+        "twopasses" (default), or "floodfill"
     callback:
         callback method
     callback_data:
@@ -2853,6 +2880,8 @@ def NearblackOptions(options=None, format=None,
             new_options += ['-setalpha']
         if setMask:
             new_options += ['-setmask']
+        if alg:
+            new_options += ['-alg', alg]
 
     return (GDALNearblackOptions(new_options), callback, callback_data)
 

@@ -2819,6 +2819,19 @@ class CPL_DLL GDALMDArray : virtual public GDALAbstractMDArray,
                                   const GDALExtendedDataType &bufferDataType,
                                   void *pDstBuffer) const;
 
+    bool IsStepOneContiguousRowMajorOrderedSameDataType(
+        const size_t *count, const GInt64 *arrayStep,
+        const GPtrDiff_t *bufferStride,
+        const GDALExtendedDataType &bufferDataType) const;
+
+    // Should only be called if IsStepOneContiguousRowMajorOrderedSameDataType()
+    // returns false
+    bool ReadUsingContiguousIRead(const GUInt64 *arrayStartIdx,
+                                  const size_t *count, const GInt64 *arrayStep,
+                                  const GPtrDiff_t *bufferStride,
+                                  const GDALExtendedDataType &bufferDataType,
+                                  void *pDstBuffer) const;
+
     //! @endcond
 
   public:
@@ -3713,7 +3726,7 @@ int GDALCanFileAcceptSidecarFile(const char *pszFilename);
 
 bool GDALCanReliablyUseSiblingFileList(const char *pszFilename);
 
-bool CPL_DLL GDALIsDriverDeprecatedForGDAL35StillEnabled(
+bool CPL_DLL GDALIsDriverDeprecatedForGDAL39StillEnabled(
     const char *pszDriverName, const char *pszExtraMsg = "");
 
 typedef enum

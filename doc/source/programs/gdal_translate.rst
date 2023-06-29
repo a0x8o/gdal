@@ -224,7 +224,8 @@ resampling, and rescaling pixels in the process.
 
 .. option:: -a_srs <srs_def>
 
-    Override the projection for the output file.
+    Override the projection for the output file. Can be used with
+    :option:`-a_ullr` to specify the extent in this projection.
 
     .. include:: options/srs_def.rst
 
@@ -239,13 +240,23 @@ resampling, and rescaling pixels in the process.
 
 .. option:: -a_scale <value>
 
-    Set band scaling value (no modification of pixel values is done)
+    Set band scaling value. No modification of pixel values is done.
+    Note that the :option:`-unscale` does not take into account :option:`-a_scale`.
+    You may for example specify ``-scale 0 1 <offset> <offset+scale>`` to
+    apply a (offset, scale) tuple, for the equivalent of the 2 steps:
+    ``gdal_translate input.tif tmp.vrt -a_scale scale -a_offset offset`` followed by
+    ``gdal_translate tmp.vrt output.tif -unscale``
 
     .. versionadded:: 2.3
 
-.. option:: -a_offset<value>
+.. option:: -a_offset <value>
 
-    Set band offset value (no modification of pixel values is done)
+    Set band offset value. No modification of pixel values is done.
+    Note that the :option:`-unscale` does not take into account :option:`-a_offset`.
+    You may for example specify ``-scale 0 1 <offset> <offset+scale>`` to
+    apply a (offset, scale) tuple, for the equivalent of the 2 steps:
+    ``gdal_translate input.tif tmp.vrt -a_scale scale -a_offset offset`` followed by
+    ``gdal_translate tmp.vrt output.tif -unscale``
 
     .. versionadded:: 2.3
 
@@ -367,3 +378,9 @@ To create a RGBA dataset from a RGB dataset with a mask
 
     gdal_translate withmask.tif rgba.tif -b 1 -b 2 -b 3 -b mask
 
+
+Subsetting using :option:`-projwin` and :option:`-outsize`:
+
+.. code-block:: bash
+
+   gdal_translate -projwin -20037500 10037500 0 0 -outsize 100 100 frmt_wms_googlemaps_tms.xml junk.png

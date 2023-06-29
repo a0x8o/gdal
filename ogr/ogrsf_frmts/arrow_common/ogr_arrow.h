@@ -70,9 +70,9 @@ class OGRArrowLayer CPL_NON_FINAL
             Real,
             String,
         };
-        int iField{};
-        int iArrayIdx{};
-        int nOperation{};
+        int iField = -1;      // index to a OGRFeatureDefn OGRField
+        int iArrayIdx = -1;   // index to m_poBatchColumns
+        int nOperation = -1;  // SWQ_xxxx
         Type eType{};
         OGRField sValue{};
         std::string osValue{};
@@ -85,6 +85,10 @@ class OGRArrowLayer CPL_NON_FINAL
     std::vector<Constraint> m_asAttributeFilterConstraints{};
     int m_nUseOptimizedAttributeFilter = -1;
     bool m_bSpatialFilterIntersectsLayerExtent = true;
+    bool m_bUseRecordBatchBaseImplementation = false;
+
+    // Modified by UseRecordBatchBaseImplementation()
+    mutable struct ArrowSchema m_sCachedSchema = {};
 
     bool SkipToNextFeatureDueToAttributeFilter() const;
     void ExploreExprNode(const swq_expr_node *poNode);
@@ -92,6 +96,8 @@ class OGRArrowLayer CPL_NON_FINAL
 
     static struct ArrowArray *
     CreateWKTArrayFromWKBArray(const struct ArrowArray *sourceArray);
+
+    int GetArrowSchemaInternal(struct ArrowSchema *out) const;
 
   protected:
     OGRArrowDataset *m_poArrowDS = nullptr;
@@ -179,6 +185,9 @@ class OGRArrowLayer CPL_NON_FINAL
         m_poBatchColumns = m_poBatch->columns();
     }
 
+    // Refreshes Constraint.iArrayIdx from iField. To be called by SetIgnoredFields()
+    void ComputeConstraintsArrayIdx();
+
     virtual bool GetFastExtent(int iGeomField, OGREnvelope *psExtent) const;
     static OGRErr GetExtentFromMetadata(const CPLJSONObject &oJSONDef,
                                         OGREnvelope *psExtent);
@@ -213,6 +222,9 @@ class OGRArrowLayer CPL_NON_FINAL
     void SetSpatialFilter(int iGeomField, OGRGeometry *poGeom) override;
 
     int TestCapability(const char *pszCap) override;
+
+    bool GetArrowStream(struct ArrowArrayStream *out_stream,
+                        CSLConstList papszOptions = nullptr) override;
 
     virtual std::unique_ptr<OGRFieldDomain>
     BuildDomain(const std::string &osDomainName, int iFieldIndex) const = 0;
