@@ -2985,3 +2985,66 @@ def test_rasterio_readraster_in_existing_buffer_alignment_issues(datatype):
             band.ReadBlock(0, 0, buf_obj=memoryview(bytearray([0] * (2 * 8 + 1)))[1:])
             is None
         )
+
+
+def test_rasterio_gdal_rasterio_resampling():
+
+    with gdal.Open("data/float32.tif") as ds:
+        band = ds.GetRasterBand(1)
+
+        data_avg1 = band.ReadRaster(
+            buf_xsize=4, buf_ysize=4, resample_alg=gdal.GRIORA_Average
+        )
+
+        # GDAL_RASTERIO_RESAMPLING has samme function as resample_alg argument
+        with gdal.config_option("GDAL_RASTERIO_RESAMPLING", "AVERAGE"):
+            data_avg2 = band.ReadRaster(buf_xsize=4, buf_ysize=4)
+
+        assert data_avg1 == data_avg2
+
+        # resample_alg argument takes precedence over GDAL_RASTERIO_RESAMPLING configuration option
+        with gdal.config_option("GDAL_RASTERIO_RESAMPLING", "NEAREST"):
+            data_avg3 = band.ReadRaster(
+                buf_xsize=4, buf_ysize=4, resample_alg=gdal.GRIORA_Average
+            )
+
+        assert data_avg1 == data_avg3
+
+
+###############################################################################
+# Test passing numpy.int64 values to ReadAsArray() arguments
+# cf https://github.com/OSGeo/gdal/issues/8026
+
+
+def test_rasterio_numpy_datatypes_for_xoff():
+    np = pytest.importorskip("numpy")
+
+    ds = gdal.Open("data/byte.tif")
+    assert np.array_equal(
+        ds.ReadAsArray(np.int64(1), np.int64(2), np.int64(3), np.int64(4)),
+        ds.ReadAsArray(1, 2, 3, 4),
+    )
+    assert np.array_equal(
+        ds.ReadAsArray(np.float64(1), np.float64(2), np.float64(3), np.float64(4)),
+        ds.ReadAsArray(1, 2, 3, 4),
+    )
+    assert np.array_equal(
+        ds.ReadAsArray(
+            np.float64(1.5),
+            np.float64(2.5),
+            np.float64(3.5),
+            np.float64(4.5),
+            buf_xsize=np.float64(1),
+            buf_ysize=np.float64(1),
+            resample_alg=gdal.GRIORA_Cubic,
+        ),
+        ds.ReadAsArray(
+            1.5, 2.5, 3.5, 4.5, buf_xsize=1, buf_ysize=1, resample_alg=gdal.GRIORA_Cubic
+        ),
+    )
+    assert np.array_equal(
+        ds.GetRasterBand(1).ReadAsArray(
+            np.int64(1), np.int64(2), np.int64(3), np.int64(4)
+        ),
+        ds.GetRasterBand(1).ReadAsArray(1, 2, 3, 4),
+    )

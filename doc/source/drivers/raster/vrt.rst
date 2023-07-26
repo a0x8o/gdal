@@ -890,6 +890,10 @@ GDAL provides a set of default pixel functions that can be used without writing 
      - 2
      - -
      - divide one raster band by another (``b1 / b2``)
+   * - **norm_diff**
+     - 2
+     - -
+     - computes the normalized difference between two raster bands: ``(b1 - b2)/(b1 + b2)``
    * - **exp**
      - 1
      - ``base`` (optional), ``fact`` (optional)
@@ -1775,8 +1779,17 @@ datasets.
 The shared attribute, on the SourceFilename indicates whether the
 dataset should be shared (value is 1) or not (value is 0). The default is 1.
 If several VRT datasets referring to the same underlying sources are used in a multithreaded context,
-shared should be set to 0. Alternatively, the VRT_SHARED_SOURCE configuration
-option can be set to 0 to force non-shared mode.
+shared should be set to 0. Alternatively, the :config:`VRT_SHARED_SOURCE` configuration
+option can be set to ``NO`` to force non-shared mode:
+
+-  .. config:: VRT_SHARED_SOURCE
+      :choices: YES, NO
+      :default: YES
+
+      Determines whether a VRT dataset should open its underlying sources in
+      shared mode, for ``SourceFilename`` elements that do not specify a
+      ``shared`` attribute. When the ``shared`` attribute is present this
+      configuration option is ignored.
 
 Performance considerations
 --------------------------

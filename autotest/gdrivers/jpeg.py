@@ -72,7 +72,7 @@ def test_jpeg_1():
         tst = gdaltest.GDALTest("JPEG", "jpeg/albania.jpg", 2, 34298)
     else:
         tst = gdaltest.GDALTest("JPEG", "jpeg/albania.jpg", 2, 17016)
-    return tst.testOpen()
+    tst.testOpen()
 
 
 ###############################################################################
@@ -1541,6 +1541,61 @@ def test_jpeg_read_lossless_16bit():
     with gdaltest.error_handler():
         ds = gdal.Open("data/jpeg/uint16_lossless.jpg")
         assert ds is None
+
+
+###############################################################################
+def test_jpeg_copy_mdd():
+
+    src_ds = gdal.GetDriverByName("MEM").Create("", 1, 1)
+    src_ds.SetMetadataItem("FOO", "BAR")
+    src_ds.SetMetadataItem("BAR", "BAZ", "OTHER_DOMAIN")
+    src_ds.SetMetadataItem("should_not", "be_copied", "IMAGE_STRUCTURE")
+
+    filename = "/vsimem/test_jpeg_copy_mdd.jpg"
+
+    gdal.GetDriverByName("JPEG").CreateCopy(filename, src_ds)
+    ds = gdal.Open(filename)
+    assert set(ds.GetMetadataDomainList()) == set(["", "DERIVED_SUBDATASETS"])
+    assert ds.GetMetadata_Dict() == {"FOO": "BAR"}
+    assert ds.GetMetadata_Dict("OTHER_DOMAIN") == {}
+    ds = None
+
+    gdal.GetDriverByName("JPEG").CreateCopy(
+        filename, src_ds, options=["COPY_SRC_MDD=NO"]
+    )
+    ds = gdal.Open(filename)
+    assert ds.GetMetadata_Dict() == {}
+    assert ds.GetMetadata_Dict("OTHER_DOMAIN") == {}
+    ds = None
+
+    gdal.GetDriverByName("JPEG").CreateCopy(
+        filename, src_ds, options=["COPY_SRC_MDD=YES"]
+    )
+    ds = gdal.Open(filename)
+    assert set(ds.GetMetadataDomainList()) == set(
+        ["", "DERIVED_SUBDATASETS", "OTHER_DOMAIN"]
+    )
+    assert ds.GetMetadata_Dict() == {"FOO": "BAR"}
+    assert ds.GetMetadata_Dict("OTHER_DOMAIN") == {"BAR": "BAZ"}
+    ds = None
+
+    gdal.GetDriverByName("JPEG").CreateCopy(
+        filename, src_ds, options=["SRC_MDD=OTHER_DOMAIN"]
+    )
+    ds = gdal.Open(filename)
+    assert ds.GetMetadata_Dict() == {}
+    assert ds.GetMetadata_Dict("OTHER_DOMAIN") == {"BAR": "BAZ"}
+    ds = None
+
+    gdal.GetDriverByName("JPEG").CreateCopy(
+        filename, src_ds, options=["SRC_MDD=", "SRC_MDD=OTHER_DOMAIN"]
+    )
+    ds = gdal.Open(filename)
+    assert ds.GetMetadata_Dict() == {"FOO": "BAR"}
+    assert ds.GetMetadata_Dict("OTHER_DOMAIN") == {"BAR": "BAZ"}
+    ds = None
+
+    gdal.Unlink(filename)
 
 
 ###############################################################################

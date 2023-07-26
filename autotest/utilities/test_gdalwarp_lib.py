@@ -40,6 +40,23 @@ import pytest
 
 from osgeo import gdal, ogr, osr
 
+
+@pytest.fixture(scope="module", autouse=True)
+def setup_and_cleanup():
+
+    yield
+
+    # We don't clean up when run in debug mode.
+    if gdal.GetConfigOption("CPL_DEBUG", "OFF") == "ON":
+        return
+
+    for i in range(2):
+        try:
+            os.remove("tmp/testgdalwarp" + str(i + 1) + ".tif")
+        except OSError:
+            pass
+
+
 ###############################################################################
 # Simple test
 
@@ -104,7 +121,12 @@ def test_gdalwarp_lib_4():
 # Test warping from GCPs without any explicit option
 
 
-def test_gdalwarp_lib_5():
+@pytest.fixture(scope="module")
+def testgdalwarp_gcp_tif(tmp_path_factory):
+
+    testgdalwarp_gcp_tif_fname = str(
+        tmp_path_factory.mktemp("tmp") / "testgdalwarp_gcp.tif"
+    )
 
     ds = gdal.Open("../gcore/data/byte.tif")
     gcpList = [
@@ -114,8 +136,19 @@ def test_gdalwarp_lib_5():
         gdal.GCP(440720.000, 3750120.000, 0, 0, 20),
     ]
     ds1 = gdal.Translate(
-        "tmp/testgdalwarp_gcp.tif", ds, outputSRS="EPSG:26711", GCPs=gcpList
+        testgdalwarp_gcp_tif_fname, ds, outputSRS="EPSG:26711", GCPs=gcpList
     )
+    del ds1
+
+    yield testgdalwarp_gcp_tif_fname
+
+
+def test_gdalwarp_lib_5(testgdalwarp_gcp_tif):
+
+    ds = gdal.Open("../gcore/data/byte.tif")
+
+    ds1 = gdal.Open(testgdalwarp_gcp_tif)
+
     dstDS = gdal.Warp("", ds1, format="MEM", tps=True)
 
     assert dstDS.GetRasterBand(1).Checksum() == 4672, "Bad checksum"
@@ -129,9 +162,9 @@ def test_gdalwarp_lib_5():
 # Test warping from GCPs with -tps
 
 
-def test_gdalwarp_lib_6():
+def test_gdalwarp_lib_6(testgdalwarp_gcp_tif):
 
-    ds1 = gdal.Open("tmp/testgdalwarp_gcp.tif")
+    ds1 = gdal.Open(testgdalwarp_gcp_tif)
     dstDS = gdal.Warp("", ds1, format="MEM", tps=True)
 
     assert dstDS.GetRasterBand(1).Checksum() == 4672, "Bad checksum"
@@ -149,9 +182,9 @@ def test_gdalwarp_lib_6():
 # Test -tr
 
 
-def test_gdalwarp_lib_7():
+def test_gdalwarp_lib_7(testgdalwarp_gcp_tif):
 
-    ds1 = gdal.Open("tmp/testgdalwarp_gcp.tif")
+    ds1 = gdal.Open(testgdalwarp_gcp_tif)
     dstDS = gdal.Warp("", [ds1], format="MEM", xRes=120, yRes=120)
     assert dstDS is not None
 
@@ -165,9 +198,9 @@ def test_gdalwarp_lib_7():
 # Test -ts
 
 
-def test_gdalwarp_lib_8():
+def test_gdalwarp_lib_8(testgdalwarp_gcp_tif):
 
-    ds1 = gdal.Open("tmp/testgdalwarp_gcp.tif")
+    ds1 = gdal.Open(testgdalwarp_gcp_tif)
     dstDS = gdal.Warp("", [ds1], format="MEM", width=10, height=10)
     assert dstDS is not None
 
@@ -368,10 +401,10 @@ def test_gdalwarp_lib_resampling_methods(resampleAlg, resampleAlgStr):
 # Test -dstnodata
 
 
-def test_gdalwarp_lib_15():
+def test_gdalwarp_lib_15(testgdalwarp_gcp_tif):
 
     ds = gdal.Warp(
-        "", "tmp/testgdalwarp_gcp.tif", format="MEM", dstSRS="EPSG:32610", dstNodata=1
+        "", testgdalwarp_gcp_tif, format="MEM", dstSRS="EPSG:32610", dstNodata=1
     )
 
     assert ds.GetRasterBand(1).GetNoDataValue() == 1, "Bad nodata value"
@@ -385,10 +418,10 @@ def test_gdalwarp_lib_15():
 # Test -of VRT which is a special case
 
 
-def test_gdalwarp_lib_16():
+def test_gdalwarp_lib_16(testgdalwarp_gcp_tif):
 
     ds = gdal.Warp(
-        "/vsimem/test_gdalwarp_lib_16.vrt", "tmp/testgdalwarp_gcp.tif", format="VRT"
+        "/vsimem/test_gdalwarp_lib_16.vrt", testgdalwarp_gcp_tif, format="VRT"
     )
     assert ds is not None
 
@@ -402,7 +435,7 @@ def test_gdalwarp_lib_16():
     with pytest.raises(Exception):
         gdal.Warp(
             "/i_dont/exist/test_gdalwarp_lib_16.vrt",
-            "tmp/testgdalwarp_gcp.tif",
+            testgdalwarp_gcp_tif,
             format="VRT",
         )
 
@@ -425,9 +458,9 @@ def test_gdalwarp_lib_17():
 # Test -et 0 which is a special case
 
 
-def test_gdalwarp_lib_19():
+def test_gdalwarp_lib_19(testgdalwarp_gcp_tif):
 
-    ds = gdal.Warp("", "tmp/testgdalwarp_gcp.tif", format="MEM", errorThreshold=0)
+    ds = gdal.Warp("", testgdalwarp_gcp_tif, format="MEM", errorThreshold=0)
     assert ds is not None
 
     assert ds.GetRasterBand(1).Checksum() == 4672, "Bad checksum"
@@ -454,6 +487,48 @@ def test_gdalwarp_lib_21():
     assert ds.GetRasterBand(1).Checksum() == 19139, "Bad checksum"
 
     ds = None
+
+
+###############################################################################
+# Test cutline from PostGIS (mostly to check that we open the dataset in
+# vector mode, and not in raster mode, which would cause the PostGISRaster
+# driver to be used)
+
+
+@pytest.mark.require_driver("PostgreSQL")
+@pytest.mark.skipif(
+    gdal.GetConfigOption("OGR_PG_CONNECTION_STRING", None) is None,
+    reason="OGR_PG_CONNECTION_STRING not defined",
+)
+def test_gdalwarp_lib_cutline_postgis():
+
+    postgis_ds_name = "PG:" + gdal.GetConfigOption("OGR_PG_CONNECTION_STRING", None)
+    cutline_ds = ogr.Open(postgis_ds_name, update=1)
+    srs = osr.SpatialReference()
+    srs.ImportFromEPSG(26711)
+    cutline_lyr = cutline_ds.CreateLayer("cutline", srs=srs)
+    f = ogr.Feature(cutline_lyr.GetLayerDefn())
+    f.SetGeometry(
+        ogr.CreateGeometryFromWkt(
+            "POLYGON((400000 3000000,400000 4000000,500000 4000000,500000 3000000,400000 3000000))"
+        )
+    )
+    cutline_lyr.CreateFeature(f)
+    cutline_ds = None
+
+    try:
+        ds = gdal.Warp(
+            "",
+            "../gcore/data/byte.tif",
+            format="MEM",
+            cutlineDSName=postgis_ds_name,
+            cutlineSQL="SELECT * FROM cutline",
+        )
+        assert ds is not None
+        assert ds.GetRasterBand(1).Checksum() == 4672
+    finally:
+        cutline_ds = ogr.Open(postgis_ds_name, update=1)
+        cutline_ds.ExecuteSQL("DELLAYER:cutline")
 
 
 ###############################################################################
@@ -3439,24 +3514,3 @@ def test_gdalwarp_lib_working_data_type_with_source_dataset_of_different_types()
     minval, maxval = out_ds.GetRasterBand(1).ComputeRasterMinMax()
     assert minval == 1
     assert maxval == 1
-
-
-###############################################################################
-# Cleanup
-
-
-def test_gdalwarp_lib_cleanup():
-
-    # We don't clean up when run in debug mode.
-    if gdal.GetConfigOption("CPL_DEBUG", "OFF") == "ON":
-        return
-
-    for i in range(2):
-        try:
-            os.remove("tmp/testgdalwarp" + str(i + 1) + ".tif")
-        except OSError:
-            pass
-    try:
-        os.remove("tmp/testgdalwarp_gcp.tif")
-    except OSError:
-        pass
