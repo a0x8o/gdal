@@ -67,6 +67,7 @@ RUN . /buildscripts/bh-set-envvars.sh \
        libdeflate-dev${APT_ARCH_SUFFIX} libblosc-dev${APT_ARCH_SUFFIX} liblz4-dev${APT_ARCH_SUFFIX} libbz2-dev${APT_ARCH_SUFFIX} \
        libbrotli-dev${APT_ARCH_SUFFIX} \
        libarchive-dev${APT_ARCH_SUFFIX} \
+       libaec-dev${APT_ARCH_SUFFIX}
     && rm -rf /var/lib/apt/lists/*
 
 # Build likbkea
@@ -193,12 +194,12 @@ RUN . /buildscripts/bh-set-envvars.sh \
 
 ARG WITH_PDFIUM=yes
 RUN if echo "$WITH_PDFIUM" | grep -Eiq "^(y(es)?|1|true)$"  ; then ( \
-  wget -q https://github.com/rouault/pdfium_build_gdal_3_7/releases/download/pdfium_5461_v1/install-ubuntu2004-rev5461.tar.gz \
-  && tar -xzf install-ubuntu2004-rev5461.tar.gz \
+  wget -q https://github.com/rouault/pdfium_build_gdal_3_8/releases/download/pdfium_5952_v1/install-ubuntu2004-rev5952.tar.gz \
+  && tar -xzf install-ubuntu2004-rev5952.tar.gz \
   && chown -R root:root install \
   && mv install/lib/* /usr/lib/ \
   && mv install/include/* /usr/include/ \
-  && rm -rf install-ubuntu2004-rev5461.tar.gz install \
+  && rm -rf install-ubuntu2004-rev5952.tar.gz install \
   && apt-get update -y \
   && apt-get install -y --fix-missing --no-install-recommends liblcms2-dev${APT_ARCH_SUFFIX} \
   && rm -rf /var/lib/apt/lists/* \
@@ -310,6 +311,7 @@ RUN apt-get update \
         libdeflate0 libblosc1 liblz4-1 \
         libbrotli1 \
         libarchive13 \
+        libaec0 \
         python-is-python3 \
         # pil for antialias option of gdal2tiles
         python3-pil \

@@ -1656,8 +1656,16 @@ TEST_F(test_cpl, CPLCopyTree)
     CPLString osTmpPath(CPLGetDirname(CPLGenerateTempFilename(nullptr)));
     CPLString osSrcDir(CPLFormFilename(osTmpPath, "src_dir", nullptr));
     CPLString osNewDir(CPLFormFilename(osTmpPath, "new_dir", nullptr));
-    ASSERT_TRUE(VSIMkdir(osSrcDir, 0755) == 0);
     CPLString osSrcFile(CPLFormFilename(osSrcDir, "my.bin", nullptr));
+    CPLString osNewFile(CPLFormFilename(osNewDir, "my.bin", nullptr));
+
+    // Cleanup if previous test failed
+    VSIUnlink(osNewFile);
+    VSIRmdir(osNewDir);
+    VSIUnlink(osSrcFile);
+    VSIRmdir(osSrcDir);
+
+    ASSERT_TRUE(VSIMkdir(osSrcDir, 0755) == 0);
     VSILFILE *fp = VSIFOpenL(osSrcFile, "wb");
     ASSERT_TRUE(fp != nullptr);
     VSIFCloseL(fp);
@@ -1668,7 +1676,6 @@ TEST_F(test_cpl, CPLCopyTree)
 
     ASSERT_TRUE(CPLCopyTree(osNewDir, osSrcDir) == 0);
     VSIStatBufL sStat;
-    CPLString osNewFile(CPLFormFilename(osNewDir, "my.bin", nullptr));
     ASSERT_TRUE(VSIStatL(osNewFile, &sStat) == 0);
 
     CPLPushErrorHandler(CPLQuietErrorHandler);
@@ -2631,12 +2638,16 @@ TEST_F(test_cpl, CPLJSONDocument)
         oObj.SetNull("null_field");
         ASSERT_TRUE(CPLJSONArray().GetChildren().empty());
         oObj.ToArray();
-        ASSERT_EQ(CPLJSONObject().Format(CPLJSONObject::PrettyFormat::Spaced),
-                  std::string("{ }"));
-        ASSERT_EQ(CPLJSONObject().Format(CPLJSONObject::PrettyFormat::Pretty),
-                  std::string("{\n}"));
-        ASSERT_EQ(CPLJSONObject().Format(CPLJSONObject::PrettyFormat::Plain),
-                  std::string("{}"));
+    }
+    {
+        CPLJSONObject oObj;
+        oObj.Set("foo", "bar");
+        EXPECT_STREQ(oObj.Format(CPLJSONObject::PrettyFormat::Spaced).c_str(),
+                     "{ \"foo\": \"bar\" }");
+        EXPECT_STREQ(oObj.Format(CPLJSONObject::PrettyFormat::Pretty).c_str(),
+                     "{\n  \"foo\":\"bar\"\n}");
+        EXPECT_STREQ(oObj.Format(CPLJSONObject::PrettyFormat::Plain).c_str(),
+                     "{\"foo\":\"bar\"}");
     }
     {
         CPLJSONArray oArrayConstructorString(std::string("foo"));
@@ -4746,6 +4757,63 @@ TEST_F(test_cpl, CPLSubscribeToSetConfigOption)
         CPLSetConfigOption("CPLSubscribeToSetConfigOption", nullptr);
         EXPECT_EQ(events.size(), 2U);
     }
+}
+
+TEST_F(test_cpl, VSIGetCanonicalFilename)
+{
+    std::string osTmp = CPLGenerateTempFilename(nullptr);
+    if (!CPLIsFilenameRelative(osTmp.c_str()))
+    {
+        // Get the canonical filename of the base temporary file
+        // to be able to test afterwards just the differences on the case
+        // of the extension
+        VSILFILE *fp = VSIFOpenL(osTmp.c_str(), "wb");
+        EXPECT_TRUE(fp != nullptr);
+        if (fp)
+        {
+            VSIFCloseL(fp);
+            char *pszRes = VSIGetCanonicalFilename(osTmp.c_str());
+            osTmp = pszRes;
+            CPLFree(pszRes);
+            VSIUnlink(osTmp.c_str());
+        }
+    }
+
+    std::string osLC = osTmp + ".tmp";
+    std::string osUC = osTmp + ".TMP";
+    // Create a file in lower case
+    VSILFILE *fp = VSIFOpenL(osLC.c_str(), "wb");
+    EXPECT_TRUE(fp != nullptr);
+    if (fp)
+    {
+        VSIFCloseL(fp);
+        VSIStatBufL sStat;
+        // And try to stat it in upper case
+        if (VSIStatL(osUC.c_str(), &sStat) == 0)
+        {
+            char *pszRes = VSIGetCanonicalFilename(osUC.c_str());
+            ASSERT_TRUE(pszRes);
+#if defined(_WIN32) || (defined(__MACH__) && defined(__APPLE__))
+            // On Windows or Mac, we should get the real canonical name, i.e.
+            // in lower case
+            EXPECT_STREQ(pszRes, osLC.c_str());
+#else
+            // On other operating systems, VSIGetCanonicalFilename()
+            // could not be implemented, so be laxer in the check
+            EXPECT_STREQ(CPLString(pszRes).tolower().c_str(),
+                         CPLString(osLC).tolower().c_str());
+#endif
+            CPLFree(pszRes);
+        }
+
+        {
+            char *pszRes = VSIGetCanonicalFilename(osLC.c_str());
+            ASSERT_TRUE(pszRes);
+            EXPECT_STREQ(pszRes, osLC.c_str());
+            CPLFree(pszRes);
+        }
+    }
+    VSIUnlink(osLC.c_str());
 }
 
 }  // namespace
