@@ -16,7 +16,7 @@ Synopsis
 .. code-block::
 
 
-    gdal_translate [--help-general]
+    gdal_translate [--help] [--help-general]
         [-ot {Byte/Int8/Int16/UInt16/UInt32/Int32/UInt64/Int64/Float32/Float64/
                 CInt16/CInt32/CFloat32/CFloat64}] [-strict]
         [-if format]* [-of format]
@@ -29,6 +29,7 @@ Synopsis
         [-projwin ulx uly lrx lry] [-projwin_srs srs_def]
         [-a_srs srs_def] [-a_coord_epoch <epoch>]
         [-a_ullr ulx uly lrx lry] [-a_nodata value]
+        [-a_gt gt0 gt1 gt2 gt3 gt4 gt5]
         [-a_scale value] [-a_offset value]
         [-nogcp] [-gcp pixel line easting northing [elevation]]*
         |-colorinterp{_bn} {red|green|blue|alpha|gray|undefined}]
@@ -46,6 +47,8 @@ different formats, potentially performing some operations like subsettings,
 resampling, and rescaling pixels in the process.
 
 .. program:: gdal_translate
+
+.. include:: options/help_and_help_general.rst
 
 .. include:: options/ot.rst
 
@@ -95,7 +98,7 @@ resampling, and rescaling pixels in the process.
 
     set target resolution. The values must be expressed in georeferenced units.
     Both must be positive values. This is mutually exclusive with
-    :option:`-outsize` and :option:`-a_ullr`.
+    :option:`-outsize`, :option:`-a_ullr`, and :option:`-a_gt`.
 
 .. option:: -ovr <level|AUTO|AUTO-n|NONE>
 
@@ -225,7 +228,7 @@ resampling, and rescaling pixels in the process.
 .. option:: -a_srs <srs_def>
 
     Override the projection for the output file. Can be used with
-    :option:`-a_ullr` to specify the extent in this projection.
+    :option:`-a_ullr` or :option:`-a_gt` to specify the extent in this projection.
 
     .. include:: options/srs_def.rst
 
@@ -266,6 +269,17 @@ resampling, and rescaling pixels in the process.
     georeferenced bounds to the output file, ignoring what would have been
     derived from the source file. So this does not cause reprojection to the
     specified SRS.
+    This is mutually exclusive with :option:`-a_gt`
+
+.. option:: -a_gt <gt(0)> <gt(1)> <gt(2)> <gt(3)> <gt(4)> <gt(5)>
+
+    Assign/override the geotransform :ref:`geotransforms_tut` of the output file.
+    This assigns the geotransform to the output file, ignoring what would have been
+    derived from the source file. So this does not cause reprojection to the
+    specified SRS.
+    This is mutually exclusive with :option:`-a_ullr`
+
+    .. versionadded:: 3.8
 
 .. option:: -a_nodata <value>
 

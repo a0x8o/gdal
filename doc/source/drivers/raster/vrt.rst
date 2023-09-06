@@ -922,6 +922,14 @@ GDAL provides a set of default pixel functions that can be used without writing 
      - 1
      - -
      - compute the logarithm (base 10) of the abs of a single raster band (real or complex): ``log10( abs( x ) )``
+   * - **max**
+     - >= 2
+     - ``propagateNoData`` (optional)
+     - (GDAL >= 3.8) maximum of 2 or more raster bands, ignoring by default pixels at nodata. If the optional ``propagateNoData`` parameter is set to ``true``, then if a nodata pixel is found in one of the bands, if will be propagated to the output value.
+   * - **min**
+     - >= 2
+     - ``propagateNoData`` (optional)
+     - (GDAL >= 3.8) minimum of 2 or more raster bands, ignoring by default pixels at nodata. If the optional ``propagateNoData`` parameter is set to ``true``, then if a nodata pixel is found in one of the bands, if will be propagated to the output value.
    * - **mod**
      - 1
      - -
@@ -1688,7 +1696,8 @@ For example:
 
 
 The supported options currently are ``bands``, ``a_srs``, ``a_ullr``, ``ovr``, ``expand``,
-``a_scale``, ``a_offset``, ``ot``, ``gcp``, ``if``, ``scale``, ``exponent``, and ``outsize``.
+``a_scale``, ``a_offset``, ``ot``, ``gcp``, ``if``, ``scale``, ``exponent``, ``outsize``, ``projwin``,
+``tr``, ``r``, ``srcwin``, ``a_gt`` and ``oo``.
 
 Other options may be added in the future.
 
@@ -1740,6 +1749,26 @@ a single value to be used with the ``scale`` option. The same ``exponent_bn`` sy
 target specific band/s as per (:ref:`gdal_translate`).
 
 The effect of the ``outsize`` option (added in GDAL 3.7) is to set the size of the output, in numbers `pixel,line` or in fraction `pixel%,line%` as per (:ref:`gdal_translate`).
+
+The effect of the ``projwin`` option (added in GDAL 3.8) is to select a subwindow from the source image in georeferenced
+coordinates in the same way as (:ref:`gdal_translate`). The value consists of four numeric values separated by commas, in
+the order 'xmin,ymax,xmax,ymin', these are in the native georeferenced coordinates of the source unless ``projwin_srs`` is also
+provided.
+
+The effect of the ``projwin_srs`` option (added in GDAL 3.8) is to specify the SRS in which to interpret the coordinates given with ``projwin`` in the same way as (:ref:`gdal_translate`). This option only applies if ``projwin`` is also supplied.
+
+The effect of the ``tr`` option (added in GDAL 3.8) is to set the target resolution, two positive values in georeferenced coordinates, applied in the same way as (:ref:`gdal_translate`). The value consists of two numeric values separated by commas in the order 'xres,yres'.
+
+The effect of the ``r`` option (added in GDAL 3.8) is to set the resampling algorithm used, with 'nearest' as the default. This is applied in the same way as (:ref:`gdal_translate`).
+
+The effect of the ``srcwin`` option (added in GDAL 3.8) is to select a subwindow from the source image based on pixel/line location as with (:ref:`gdal_translate`). The value consists of four integer values separated by commas, in
+the order 'xoff,yoff,xsize,ysize'.
+
+The effect of the ``a_gt`` option (added in GDAL 3.8) is to override/assign the geotransform of the output as with (:ref:`gdal_translate`). The value consists of six numeric values separated by commas, in
+the order 'gt(0),gt(1),gt(2),gt(3),gt(4),gt(5)'.
+
+The effect of the ``oo`` option (added in GDAL 3.8) is to set driver-specific dataset open options, multiple values are allowed. The value
+consists of string key value pairs with multiple pairs separated by commas e.g. ``oo=<key>=<val>`` or . ``oo=<key1>=<val1>,<key2>=<val2>,...``. This is applied in the same way as (:ref:`gdal_translate`).
 
 The options may be chained together separated by '&'. (Beware the need for quoting to protect
 the ampersand).

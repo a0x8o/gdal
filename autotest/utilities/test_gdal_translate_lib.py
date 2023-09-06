@@ -29,6 +29,7 @@
 # DEALINGS IN THE SOFTWARE.
 ###############################################################################
 
+import collections
 import os
 import shutil
 import struct
@@ -44,7 +45,7 @@ from osgeo import gdal, osr
 
 def test_gdal_translate_lib_1(tmp_path):
 
-    dst_tif = str(tmp_path / "test1.tif")
+    dst_tif = tmp_path / "test1.tif"
 
     ds = gdal.Open("../gcore/data/byte.tif")
 
@@ -347,6 +348,42 @@ def test_gdal_translate_lib_12(tmp_path):
 
 
 ###############################################################################
+# Test outputGeotransform option
+
+
+def test_gdal_translate_lib_outputGeotransform(tmp_vsimem):
+
+    dst_tif = str(tmp_vsimem / "test_gdal_translate_lib_outputGeotransform.tif")
+
+    with pytest.raises(
+        Exception, match="outputBounds and outputGeotransform are mutually exclusive"
+    ):
+        gdal.Translate(
+            dst_tif,
+            gdal.Open("../gcore/data/byte.tif"),
+            outputBounds=[440720.000, 3751320.000, 441920.000, 3750120.000],
+            outputGeotransform=[1.25, 2, 3, 4, 5, 6],
+        )
+
+    ds = gdal.Translate(
+        dst_tif,
+        gdal.Open("../gcore/data/byte.tif"),
+        outputGeotransform=[1.25, 2, 3, 4, 5, 6],
+    )
+    assert ds is not None
+
+    assert ds.GetRasterBand(1).Checksum() == 4672, "Bad checksum"
+
+    gdaltest.check_geotransform(
+        (1.25, 2, 3, 4, 5, 6),
+        ds.GetGeoTransform(),
+        1e-9,
+    )
+
+    ds = None
+
+
+###############################################################################
 # Test metadataOptions
 
 
@@ -568,7 +605,7 @@ def test_gdal_translate_lib_colorinterp():
     assert ds.GetRasterBand(3).GetColorInterpretation() == gdal.GCI_BlueBand
 
     # More bands specified than available and a unknown color interpretation
-    with gdaltest.error_handler():
+    with gdal.quiet_errors():
         ds = gdal.Translate(
             "", src_ds, options="-f MEM -colorinterp alpha,red,undefined,foo"
         )
@@ -584,7 +621,7 @@ def test_gdal_translate_lib_colorinterp():
 
     # Test invalid colorinterp_
     with pytest.raises(Exception):
-        with gdaltest.error_handler():
+        with gdal.quiet_errors():
             gdal.Translate("", src_ds, options="-f MEM -colorinterp_0 alpha")
 
     # Test colorinterp on a source mask band
@@ -924,7 +961,7 @@ def test_gdal_translate_lib_overview_level():
         src_ds.BuildOverviews("AVERAGE", [2])
         src_ds.BuildOverviews("NONE", [4])
 
-        with gdaltest.error_handler():
+        with gdal.quiet_errors():
             with pytest.raises(Exception):
                 assert gdal.Translate("", src_ds, format="MEM", overviewLevel="invalid")
 
@@ -1089,3 +1126,33 @@ def test_gdal_translate_lib_scale_and_unscale_incompatible():
             unscale=True,
             outputType=gdal.GDT_UInt16,
         )
+
+
+###############################################################################
+# Test option argument handling
+
+
+def test_gdal_translate_lib_dict_arguments():
+
+    opt = gdal.TranslateOptions(
+        "__RETURN_OPTION_LIST__",
+        creationOptions=collections.OrderedDict(
+            (("COMPRESS", "DEFLATE"), ("LEVEL", 4))
+        ),
+        metadataOptions=collections.OrderedDict(
+            (("AREA_OR_POINT", "Area"), ("TIFFTAG_XRESOLUTION", 123))
+        ),
+    )
+
+    co_idx = opt.index("-co")
+
+    assert opt[co_idx : co_idx + 4] == ["-co", "COMPRESS=DEFLATE", "-co", "LEVEL=4"]
+
+    mo_idx = opt.index("-mo")
+
+    assert opt[mo_idx : mo_idx + 4] == [
+        "-mo",
+        "AREA_OR_POINT=Area",
+        "-mo",
+        "TIFFTAG_XRESOLUTION=123",
+    ]

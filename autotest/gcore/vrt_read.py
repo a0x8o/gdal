@@ -94,7 +94,7 @@ def test_vrt_open(filename, checksum):
 def test_vrt_read_non_existing_source(filename):
 
     ds = gdal.Open(filename)
-    with gdaltest.error_handler():
+    with gdal.quiet_errors():
         cs = ds.GetRasterBand(1).Checksum()
     if ds is None:
         return
@@ -286,7 +286,7 @@ def test_vrt_read_7():
 
     gdal.FileFromMemBuffer(filename, content)
     ds = gdal.Open(filename)
-    with gdaltest.error_handler():
+    with gdal.quiet_errors():
         assert ds.GetRasterBand(1).Checksum() == -1
     gdal.Unlink(filename)
 
@@ -1096,7 +1096,7 @@ def test_vrt_read_27():
 
 def test_vrt_read_28():
 
-    with gdaltest.error_handler():
+    with gdal.quiet_errors():
         ds = gdal.Open(
             '<VRTDataset rasterXSize="1 "rasterYSize="1"><VRTRasterBand band="-2147483648"><SimpleSource></SimpleSource></VRTRasterBand></VRTDataset>'
         )
@@ -1415,13 +1415,13 @@ def test_vrt_invalid_source_band():
   </VRTRasterBand>
 </VRTDataset>"""
     ds = gdal.Open(vrt_text)
-    with gdaltest.error_handler():
+    with gdal.quiet_errors():
         assert ds.GetRasterBand(1).Checksum() == -1
 
 
 def test_vrt_protocol():
 
-    with gdaltest.error_handler():
+    with gdal.quiet_errors():
         assert not gdal.Open("vrt://")
         assert not gdal.Open("vrt://i_do_not_exist")
         assert not gdal.Open("vrt://i_do_not_exist?")
@@ -1430,7 +1430,7 @@ def test_vrt_protocol():
     assert ds.RasterCount == 1
     assert ds.GetRasterBand(1).Checksum() == 4672
 
-    with gdaltest.error_handler():
+    with gdal.quiet_errors():
         assert not gdal.Open("vrt://data/byte.tif?foo=bar")
         assert not gdal.Open("vrt://data/byte.tif?bands=foo")
         assert not gdal.Open("vrt://data/byte.tif?bands=0")
@@ -1486,6 +1486,10 @@ def test_vrt_protocol():
     ds = gdal.Open("vrt://data/float32.tif?if=AAIGrid,GTiff")
     assert ds is not None
 
+    ## separated if not allowed
+    with gdal.quiet_errors():
+        assert not gdal.Open("vrt://data/float32.tif?if=AAIGrid&if=GTiff")
+
     ## check exponent and scale
     ds = gdal.Open("vrt://data/float32.tif?scale=0,255,255,255")
     assert ds.GetRasterBand(1).Checksum() == 4873
@@ -1505,7 +1509,7 @@ def test_vrt_protocol():
     ds = gdal.Open("vrt://data/uint16_3band.vrt?exponent_2=2.2&scale_2=0,10,0,100")
     assert ds.GetRasterBand(2).Checksum() == 4455
 
-    with gdaltest.error_handler():
+    with gdal.quiet_errors():
         ds = gdal.Open("vrt://data/float32.tif?outsize=10")
         assert ds is None
 
@@ -1516,6 +1520,86 @@ def test_vrt_protocol():
     ds = gdal.Open("vrt://data/float32.tif?outsize=50%,25%")
     assert ds.GetRasterBand(1).XSize == 10
     assert ds.GetRasterBand(1).YSize == 5
+
+    with gdal.quiet_errors():
+        ds = gdal.Open("vrt://data/float32.tif?projwin=440840,441920,3750120")
+        assert ds is None
+
+    ds = gdal.Open("vrt://data/float32.tif?projwin=440840,3751080,441920,3750120")
+    assert ds.GetGeoTransform()[0] == 440840.0
+    assert ds.GetGeoTransform()[3] == 3751080.0
+    assert ds.GetRasterBand(1).XSize == 18
+    assert ds.GetRasterBand(1).YSize == 16
+
+    ## no op, simply ignored as with gdal_translate
+    ds = gdal.Open("vrt://data/float32.tif?projwin_srs=OGC:CRS84")
+    assert ds is not None
+
+    ds = gdal.Open(
+        "vrt://data/float32.tif?projwin_srs=OGC:CRS84&projwin=-117.6407,33.90027,-117.6292,33.89181"
+    )
+
+    assert ds.GetGeoTransform()[0] == 440840.0
+    assert ds.GetGeoTransform()[3] == 3751140.0
+    assert ds.GetRasterBand(1).XSize == 18
+    assert ds.GetRasterBand(1).YSize == 16
+
+    with gdal.quiet_errors():
+        ds = gdal.Open("vrt://data/float32.tif?tr=120")
+        assert ds is None
+
+    ds = gdal.Open("vrt://data/float32.tif?tr=120,240")
+
+    assert ds.GetGeoTransform()[0] == 440720.0
+    assert ds.GetGeoTransform()[1] == 120.0
+    assert ds.GetGeoTransform()[5] == -240.0
+    assert ds.GetRasterBand(1).XSize == 10
+    assert ds.GetRasterBand(1).YSize == 5
+
+    ds = gdal.Open("vrt://data/float32.tif?r=bilinear&tr=120,240")
+    assert struct.unpack("f", ds.ReadRaster(0, 0, 1, 1))[0] == pytest.approx(
+        128.95408630371094
+    )  ## check values changed via bilinear
+
+    with gdal.quiet_errors():
+        ds = gdal.Open("vrt://data/float32.tif?srcwin=0,0,3")
+        assert ds is None
+
+    ds = gdal.Open("vrt://data/float32.tif?srcwin=2,3,8,5")
+    assert ds.GetRasterBand(1).XSize == 8
+    assert ds.GetRasterBand(1).YSize == 5
+    assert struct.unpack("f", ds.ReadRaster(0, 0, 1, 1))[0] == pytest.approx(
+        123.0
+    )  ## check value is correct
+
+    with gdal.quiet_errors():
+        ds = gdal.Open("vrt://data/float32.tif?a_gt=1,0,0,0,1")
+        assert ds is None
+
+    ds = gdal.Open("vrt://data/float32.tif?a_gt=0,1,0,0,0,1")
+    gdaltest.check_geotransform(
+        (0, 1, 0, 0, 0, 1),
+        ds.GetGeoTransform(),
+        1e-9,
+    )
+
+    ## multiple open options
+    ds = gdal.Open(
+        "vrt://data/byte_with_ovr.tif?oo=GEOREF_SOURCES=TABFILE,OVERVIEW_LEVEL=0"
+    )
+    gdaltest.check_geotransform(
+        (0, 1, 0, 0, 0, 1),
+        ds.GetGeoTransform(),
+        1e-9,
+    )
+    assert ds.GetRasterBand(1).XSize == 10
+    assert ds.GetRasterBand(1).YSize == 10
+
+    ## separated oo instances not allowed
+    with gdal.quiet_errors():
+        assert not gdal.Open(
+            "vrt://data/byte_with_ovr.tif?oo=GEOREF_SOURCES=TABFILE&oo=OVERVIEW_LEVEL=0"
+        )
 
 
 @pytest.mark.require_driver("BMP")
@@ -1563,7 +1647,7 @@ def test_vrt_dataset_rasterio_recursion_detection():
     )
 
     ds = gdal.Open("/vsimem/test.vrt")
-    with gdaltest.error_handler():
+    with gdal.quiet_errors():
         ds.ReadRaster(0, 0, 20, 20, 10, 10)
     gdal.Unlink("/vsimem/test.vrt")
 
@@ -1857,7 +1941,7 @@ def test_vrt_check_dont_open_unneeded_source():
         ds = gdal.Translate("", tmpfilename, options="-of MEM -srcwin 0 0 10 10")
         assert ds is not None
 
-        with gdaltest.error_handler():
+        with gdal.quiet_errors():
             ds = gdal.Translate(
                 "", tmpfilename, options="-of MEM -srcwin 0 0 10.1 10.1"
             )
@@ -1894,7 +1978,7 @@ def test_vrt_check_dont_open_unneeded_source_with_complex_source_nodata():
         ds = gdal.Translate("", tmpfilename, options="-of MEM -srcwin 0 0 10 10")
         assert ds is not None
 
-        with gdaltest.error_handler():
+        with gdal.quiet_errors():
             ds = gdal.Translate(
                 "", tmpfilename, options="-of MEM -srcwin 0 0 10.1 10.1"
             )
@@ -2147,12 +2231,12 @@ def test_vrt_read_compute_statistics_mosaic_optimization_src_with_nodata_all():
     src_ds1.GetRasterBand(1).SetNoDataValue(10)
     src_ds2.GetRasterBand(1).SetNoDataValue(10)
 
-    with gdaltest.error_handler():
+    with gdal.quiet_errors():
         minmax = vrt_ds.GetRasterBand(1).ComputeRasterMinMax(False)
     assert math.isnan(minmax[0])
     assert math.isnan(minmax[1])
 
-    with gdaltest.error_handler():
+    with gdal.quiet_errors():
         vrt_stats = vrt_ds.GetRasterBand(1).ComputeStatistics(False)
         assert vrt_stats == [0, 0, 0, 0]
         assert vrt_ds.GetRasterBand(1).GetMetadataItem("STATISTICS_MINIMUM") is None

@@ -29,7 +29,9 @@
 # DEALINGS IN THE SOFTWARE.
 ###############################################################################
 
+import collections
 import json
+import pathlib
 import tempfile
 
 import gdaltest
@@ -318,7 +320,7 @@ def test_ogr2ogr_lib_14():
 def test_ogr2ogr_lib_15():
 
     srcDS = gdal.OpenEx("../ogr/data/poly.shp")
-    with gdaltest.error_handler():
+    with gdal.quiet_errors():
         ds = gdal.VectorTranslate("", srcDS, format="Memory", zField="foo")
     lyr = ds.GetLayer(0)
     assert lyr.GetGeomType() == ogr.wkbPolygon
@@ -1187,7 +1189,7 @@ def test_ogr2ogr_lib_clipsrc_invalid_polygon():
     clip_ds = None
 
     # Intersection of above geometry with clipSrc bounding box is a point
-    with gdaltest.error_handler():
+    with gdal.quiet_errors():
         ds = gdal.VectorTranslate("", srcDS, format="Memory", clipSrc=clip_path)
     lyr = ds.GetLayer(0)
     assert lyr.GetFeatureCount() == 1
@@ -1228,7 +1230,7 @@ def test_ogr2ogr_lib_clipsrc_3d_polygon():
     clip_layer.CreateFeature(f)
     clip_ds = None
 
-    with gdaltest.error_handler():
+    with gdal.quiet_errors():
         ds = gdal.VectorTranslate("", srcDS, format="Memory", clipSrc=clip_path)
     lyr = ds.GetLayer(0)
     assert lyr.GetFeatureCount() == 2
@@ -1555,7 +1557,7 @@ def test_ogr2ogr_lib_dateTimeTo():
     f = ogr.Feature(src_lyr.GetLayerDefn())
     src_lyr.CreateFeature(f)
 
-    with gdaltest.error_handler():
+    with gdal.quiet_errors():
         with pytest.raises(Exception):
             gdal.VectorTranslate("", src_ds, options="-f Memory -dateTimeTo")
         with pytest.raises(Exception):
@@ -1914,8 +1916,8 @@ def test_ogr2ogr_lib_valid_nlt_combinations(nlt_value):
 )
 def test_ogr2ogr_lib_geojson_output(tmp_path):
 
-    tmpfilename = str(tmp_path / "out.geojson")
-    out_ds = gdal.VectorTranslate(tmpfilename, "../ogr/data/poly.shp")
+    tmpfilename = tmp_path / "out.geojson"
+    out_ds = gdal.VectorTranslate(tmpfilename, pathlib.Path("../ogr/data/poly.shp"))
 
     # Check that the file can be read at that point. Use an external process
     # to check flushes are done correctly
@@ -1933,3 +1935,38 @@ def test_ogr2ogr_lib_geojson_output(tmp_path):
     with ogr.Open(tmpfilename) as ds:
         lyr = ds.GetLayer(0)
         assert lyr.GetFeatureCount() == 11
+
+
+###############################################################################
+# Test option argument handling
+
+
+def test_ogr2ogr_lib_dict_arguments():
+
+    opt = gdal.VectorTranslateOptions(
+        "__RETURN_OPTION_LIST__",
+        datasetCreationOptions=collections.OrderedDict(
+            (("GEOMETRY_ENCODING", "WKT"), ("FORMAT", "NC4"))
+        ),
+        layerCreationOptions=collections.OrderedDict(
+            (("RECORD_DIM_NAME", "record"), ("STRING_DEFAULT_WIDTH", 10))
+        ),
+    )
+
+    dsco_idx = opt.index("-dsco")
+
+    assert opt[dsco_idx : dsco_idx + 4] == [
+        "-dsco",
+        "GEOMETRY_ENCODING=WKT",
+        "-dsco",
+        "FORMAT=NC4",
+    ]
+
+    lco_idx = opt.index("-lco")
+
+    assert opt[lco_idx : lco_idx + 4] == [
+        "-lco",
+        "RECORD_DIM_NAME=record",
+        "-lco",
+        "STRING_DEFAULT_WIDTH=10",
+    ]
