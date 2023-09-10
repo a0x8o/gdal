@@ -1601,6 +1601,29 @@ def test_vrt_protocol():
             "vrt://data/byte_with_ovr.tif?oo=GEOREF_SOURCES=TABFILE&oo=OVERVIEW_LEVEL=0"
         )
 
+    dsn_unscale = "/vsimem/scale2.tif"
+    gdal.Translate(dsn_unscale, "vrt://data/byte.tif?a_scale=2")
+    ds = gdal.Open("vrt://" + dsn_unscale + "?unscale=true&ot=int16")
+    assert struct.unpack("h", ds.GetRasterBand(1).ReadRaster(0, 0, 1, 1))[0] == 214
+
+    ds = gdal.Open("vrt://data/minfloat.tif?scale=true")
+    assert struct.unpack("f", ds.GetRasterBand(1).ReadRaster(2, 0, 1, 1))[
+        0
+    ] == pytest.approx(255.99899291992188)
+
+    ds = gdal.Open("vrt://data/minfloat.tif?scale_2=true&bands=1,1")
+    assert struct.unpack("f", ds.GetRasterBand(2).ReadRaster(2, 0, 1, 1))[
+        0
+    ] == pytest.approx(255.99899291992188)
+    assert struct.unpack("f", ds.GetRasterBand(1).ReadRaster(2, 0, 1, 1))[
+        0
+    ] == pytest.approx(5.0)
+
+    # test that 'key=value' form is used
+    with gdal.quiet_errors():
+        assert not gdal.Open("vrt://data/minfloat.tif?scale")
+        assert not gdal.Open("vrt://data/minfloat.tif?a_ullr=0,1,1,0&unscale&")
+
 
 @pytest.mark.require_driver("BMP")
 def test_vrt_protocol_expand_option():
@@ -2094,9 +2117,14 @@ def test_vrt_read_req_coordinates_almost_integer():
 
 
 @pytest.mark.parametrize("approx_ok,use_threads", [(False, True), (True, False)])
-def test_vrt_read_compute_statistics_mosaic_optimization(approx_ok, use_threads):
+def test_vrt_read_compute_statistics_mosaic_optimization(
+    tmp_vsimem, approx_ok, use_threads
+):
 
-    src_ds = gdal.Translate("", gdal.Open("data/byte.tif"), format="MEM")
+    # To avoid using a byte.aux.xml file with existing statistics
+    src_filename = str(tmp_vsimem / "byte.tif")
+    gdal.FileFromMemBuffer(src_filename, open("data/byte.tif", "rb").read())
+    src_ds = gdal.Translate("", src_filename, format="MEM")
     src_ds1 = gdal.Translate("", src_ds, options="-of MEM -srcwin 0 0 8 20")
     src_ds2 = gdal.Translate("", src_ds, options="-of MEM -srcwin 8 0 12 20")
     vrt_ds = gdal.BuildVRT("", [src_ds1, src_ds2])
