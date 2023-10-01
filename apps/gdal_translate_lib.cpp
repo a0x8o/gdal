@@ -1296,7 +1296,12 @@ GDALDatasetH GDALTranslate(const char *pszDest, GDALDatasetH hSrcDataset,
         /*      Compute stats if required. */
         /* --------------------------------------------------------------------
          */
-        if (psOptions->bStats)
+
+        if (psOptions->bStats && EQUAL(psOptions->osFormat.c_str(), "COG"))
+        {
+            psOptions->aosCreateOptions.SetNameValue("STATISTICS", "YES");
+        }
+        else if (psOptions->bStats)
         {
             for (int i = 0; i < poSrcDS->GetRasterCount(); i++)
             {
@@ -1867,11 +1872,11 @@ GDALDatasetH GDALTranslate(const char *pszDest, GDALDatasetH hSrcDataset,
     /* -------------------------------------------------------------------- */
     if (bSpatialArrangementPreserved)
     {
-        char **papszMD = poSrcDSOri->GetMetadata("RPC");
+        char **papszMD = poSrcDS->GetMetadata("RPC");
         if (papszMD != nullptr)
             poVDS->SetMetadata(papszMD, "RPC");
 
-        papszMD = poSrcDSOri->GetMetadata("GEOLOCATION");
+        papszMD = poSrcDS->GetMetadata("GEOLOCATION");
         if (papszMD != nullptr)
             poVDS->SetMetadata(papszMD, "GEOLOCATION");
     }
@@ -2568,7 +2573,11 @@ GDALDatasetH GDALTranslate(const char *pszDest, GDALDatasetH hSrcDataset,
     /* -------------------------------------------------------------------- */
     /*      Compute stats if required.                                      */
     /* -------------------------------------------------------------------- */
-    if (psOptions->bStats)
+    if (psOptions->bStats && EQUAL(psOptions->osFormat.c_str(), "COG"))
+    {
+        psOptions->aosCreateOptions.SetNameValue("STATISTICS", "YES");
+    }
+    else if (psOptions->bStats)
     {
         for (int i = 0; i < poVDS->GetRasterCount(); i++)
         {
@@ -3070,7 +3079,7 @@ GDALTranslateOptionsNew(char **papszArgv,
             else
             {
                 psOptions->asScaleParams[nIndex].dfScaleDstMin = 0.0;
-                psOptions->asScaleParams[nIndex].dfScaleDstMax = 255.999;
+                psOptions->asScaleParams[nIndex].dfScaleDstMax = 255.0;
             }
         }
 

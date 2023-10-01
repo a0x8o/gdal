@@ -32,6 +32,7 @@
 #include "cpl_vsi.h"
 
 #include <cassert>
+#include <cinttypes>
 #include <cstdarg>
 #include <cstddef>
 #include <cstring>
@@ -506,12 +507,20 @@ int VSIRename(const char *oldpath, const char *newpath)
  * For a /vsizip/foo.zip/bar target, the options available are those of
  * CPLAddFileInZip()
  *
+ * The following copies are made fully on the target server, without local
+ * download from source and upload to target:
+ * - /vsis3/ -> /vsis3/
+ * - /vsigs/ -> /vsigs/
+ * - /vsiaz/ -> /vsiaz/
+ * - /vsiadls/ -> /vsiadls/
+ * - any of the above or /vsicurl/ -> /vsiaz/ (starting with GDAL 3.8)
+ *
  * @param pszSource Source filename. UTF-8 encoded. May be NULL if fpSource is
  * not NULL.
  * @param pszTarget Target filename.  UTF-8 encoded. Must not be NULL
  * @param fpSource File handle on the source file. May be NULL if pszSource is
  * not NULL.
- * @param nSourceSize Size of the source file. Only used for progress callback.
+ * @param nSourceSize Size of the source file. Pass -1 if unknown.
  * If set to -1, and progress callback is used, VSIStatL() will be used on
  * pszSource to retrieve the source size.
  * @param papszOptions Null terminated list of options, or NULL.
@@ -565,7 +574,8 @@ int VSICopyFile(const char *pszSource, const char *pszTarget,
  * <li> local filesystem <--> remote filesystem.</li>
  * <li> remote filesystem <--> remote filesystem (starting with GDAL 3.1).
  * Where the source and target remote filesystems are the same and one of
- * /vsis3/, /vsigs/ or /vsiaz/</li>
+ * /vsis3/, /vsigs/ or /vsiaz/. Or when the target is /vsiaz/ and the source
+ * is /vsis3/, /vsigs/, /vsiadls/ or /vsicurl/ (starting with GDAL 3.8)</li>
  * </ul>
  *
  * Similarly to rsync behavior, if the source filename ends with a slash,
@@ -1333,6 +1343,16 @@ int VSIFilesystemHandler::CopyFile(const char *pszSource, const char *pszTarget,
         }
     }
 
+    if (nSourceSize != static_cast<vsi_l_offset>(-1) && nOffset != nSourceSize)
+    {
+        CPLError(CE_Failure, CPLE_FileIO,
+                 "Copying of %s to %s failed: %" PRIu64 " bytes were copied "
+                 "whereas %" PRIu64 " were expected",
+                 pszSource, pszTarget, static_cast<uint64_t>(nOffset),
+                 static_cast<uint64_t>(nSourceSize));
+        ret = -1;
+    }
+
     if (VSIFCloseL(fpOut) != 0)
     {
         ret = -1;
@@ -1616,6 +1636,9 @@ VSIDIR *VSIFilesystemHandler::OpenDir(const char *pszPath, int nRecurseDepth,
     }
     VSIDIRGeneric *dir = new VSIDIRGeneric(this);
     dir->osRootPath = pszPath;
+    if (!dir->osRootPath.empty() &&
+        (dir->osRootPath.back() == '/' || dir->osRootPath.back() == '\\'))
+        dir->osRootPath.pop_back();
     dir->nRecurseDepth = nRecurseDepth;
     dir->papszContent = papszContent;
     dir->m_osFilterPrefix = CSLFetchNameValueDef(papszOptions, "PREFIX", "");

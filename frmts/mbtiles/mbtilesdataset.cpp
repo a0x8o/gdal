@@ -51,7 +51,8 @@
 #include <memory>
 #include <vector>
 
-static const char *const apszAllowedDrivers[] = {"JPEG", "PNG", nullptr};
+static const char *const apszAllowedDrivers[] = {"JPEG", "PNG", "WEBP",
+                                                 nullptr};
 
 #define SRS_EPSG_3857                                                          \
     "PROJCS[\"WGS 84 / Pseudo-Mercator\",GEOGCS[\"WGS "                        \
@@ -3077,20 +3078,20 @@ bool MBTilesDataset::CreateInternal(const char *pszFilename, int nXSize,
     sqlite3_exec(hDB, pszSQL, nullptr, nullptr, nullptr);
     sqlite3_free(pszSQL);
 
-    const char *pszVersion =
-        CSLFetchNameValueDef(papszOptions, "VERSION", "1.1");
+    const char *pszTF = CSLFetchNameValue(papszOptions, "TILE_FORMAT");
+    if (pszTF)
+        m_eTF = GDALGPKGMBTilesGetTileFormat(pszTF);
+
+    const char *pszVersion = CSLFetchNameValueDef(
+        papszOptions, "VERSION", (m_eTF == GPKG_TF_WEBP) ? "1.3" : "1.1");
     pszSQL = sqlite3_mprintf(
         "INSERT INTO metadata (name, value) VALUES ('version', '%q')",
         pszVersion);
     sqlite3_exec(hDB, pszSQL, nullptr, nullptr, nullptr);
     sqlite3_free(pszSQL);
 
-    const char *pszTF = CSLFetchNameValue(papszOptions, "TILE_FORMAT");
-    if (pszTF)
-        m_eTF = GDALGPKGMBTilesGetTileFormat(pszTF);
-
     const char *pszFormat = CSLFetchNameValueDef(
-        papszOptions, "FORMAT", (m_eTF == GPKG_TF_JPEG) ? "jpg" : "png");
+        papszOptions, "FORMAT", GDALMBTilesGetTileFormatName(m_eTF));
     pszSQL = sqlite3_mprintf(
         "INSERT INTO metadata (name, value) VALUES ('format', '%q')",
         pszFormat);
@@ -3694,9 +3695,10 @@ void GDALRegister_MBTiles()
     "    <Value>PNG</Value>"                                                   \
     "    <Value>PNG8</Value>"                                                  \
     "    <Value>JPEG</Value>"                                                  \
+    "    <Value>WEBP</Value>"                                                  \
     "  </Option>"                                                              \
     "  <Option name='QUALITY' scope='raster' type='int' min='1' max='100' "    \
-    "description='Quality for JPEG tiles' default='75'/>"                      \
+    "description='Quality for JPEG and WEBP tiles' default='75'/>"             \
     "  <Option name='ZLEVEL' scope='raster' type='int' min='1' max='9' "       \
     "description='DEFLATE compression level for PNG tiles' default='6'/>"      \
     "  <Option name='DITHER' scope='raster' type='boolean' "                   \
