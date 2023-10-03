@@ -7914,6 +7914,17 @@ def test_ogr_gpkg_arrow_stream_numpy(tmp_vsimem):
         ds.ReleaseResultSet(sql_lyr)
         assert fc == 0
 
+    # Test invalid filter and exceptions
+    with gdaltest.enable_exceptions():
+        lyr.SetAttributeFilter("invalid")
+        with pytest.raises(Exception, match="no such column: invalid"):
+            stream = lyr.GetArrowStreamAsNumPy()
+            [batch for batch in stream]
+
+        lyr.SetAttributeFilter("1 = 1")
+        stream = lyr.GetArrowStreamAsNumPy()
+        assert len([batch for batch in stream]) == 1
+
     ds = None
 
     ogr.GetDriverByName("GPKG").DeleteDataSource(filename)
@@ -7965,7 +7976,7 @@ def test_ogr_gpkg_arrow_stream_numpy_detailed_spatial_filter(tmp_vsimem, layer_t
     with ogrtest.spatial_filter(lyr, 6, 0, 8, 1):
         stream = lyr.GetArrowStreamAsNumPy(options=["USE_MASKED_ARRAYS=NO"])
         batches = [batch for batch in stream]
-        assert list(batches[0]["fid"]) == []
+        assert len(batches) == 0
 
     # Select POINT and MULTIPOINT
     with ogrtest.spatial_filter(lyr, 1 - eps, 2 - eps, 1 + eps, 2 + eps):
@@ -8012,7 +8023,7 @@ def test_ogr_gpkg_arrow_stream_numpy_detailed_spatial_filter(tmp_vsimem, layer_t
         stream = lyr.GetArrowStreamAsNumPy(options=["USE_MASKED_ARRAYS=NO"])
         batches = [batch for batch in stream]
         if ogrtest.have_geos():
-            assert list(batches[0]["fid"]) == []
+            assert len(batches) == 0
         else:
             assert len(batches) == 1
             assert list(batches[0]["fid"]) == [4, 5]
@@ -8022,6 +8033,33 @@ def test_ogr_gpkg_arrow_stream_numpy_detailed_spatial_filter(tmp_vsimem, layer_t
         ds.ReleaseResultSet(lyr)
 
     ds = None
+
+
+###############################################################################
+# Test reading an empty file with GetArrowStream()
+
+
+def test_ogr_gpkg_arrow_stream_empty_file():
+
+    ds = ogr.GetDriverByName("GPKG").CreateDataSource("/vsimem/test.gpkg")
+    lyr = ds.CreateLayer("test", geom_type=ogr.wkbPoint)
+    assert lyr.TestCapability(ogr.OLCFastGetArrowStream) == 1
+    stream = lyr.GetArrowStream()
+    assert stream.GetNextRecordBatch() is None
+    del stream
+
+    with gdaltest.config_option("OGR_GPKG_STREAM_BASE_IMPL", "YES"):
+        stream = lyr.GetArrowStream()
+        assert stream.GetNextRecordBatch() is None
+        del stream
+
+    with ds.ExecuteSQL("SELECT * FROM test") as lyr:
+        stream = lyr.GetArrowStream()
+        assert stream.GetNextRecordBatch() is None
+        del stream
+    ds = None
+
+    ogr.GetDriverByName("GPKG").DeleteDataSource("/vsimem/test.gpkg")
 
 
 ###############################################################################
