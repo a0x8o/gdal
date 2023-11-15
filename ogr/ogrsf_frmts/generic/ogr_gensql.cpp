@@ -34,6 +34,7 @@
 #include "ogr_api.h"
 #include "cpl_time.h"
 #include <algorithm>
+#include <limits>
 #include <vector>
 
 //! @cond Doxygen_Suppress
@@ -418,7 +419,7 @@ OGRGenSQLResultsLayer::OGRGenSQLResultsLayer(GDALDataset *poSrcDSIn,
             }
 
             auto poMyGeomFieldDefn =
-                cpl::make_unique<OGRGenSQLGeomFieldDefn>(&oGFDefn);
+                std::make_unique<OGRGenSQLGeomFieldDefn>(&oGFDefn);
             poMyGeomFieldDefn->bForceGeomType = bForceGeomType;
             poDefn->AddGeomFieldDefn(std::move(poMyGeomFieldDefn));
         }
@@ -457,7 +458,7 @@ OGRGenSQLResultsLayer::OGRGenSQLResultsLayer(GDALDataset *poSrcDSIn,
 
         panGeomFieldToSrcGeomField[poDefn->GetGeomFieldCount()] = 0;
 
-        poDefn->AddGeomFieldDefn(cpl::make_unique<OGRGenSQLGeomFieldDefn>(
+        poDefn->AddGeomFieldDefn(std::make_unique<OGRGenSQLGeomFieldDefn>(
             poSrcDefn->GetGeomFieldDefn(0)));
 
         /* Hack while drivers haven't been updated so that */
@@ -635,6 +636,7 @@ void OGRGenSQLResultsLayer::ResetReading()
 
     nNextIndexFID = psSelectInfo->offset;
     nIteratedFeatures = -1;
+    m_bEOF = false;
 }
 
 /************************************************************************/
@@ -652,10 +654,22 @@ OGRErr OGRGenSQLResultsLayer::SetNextByIndex(GIntBig nIndex)
 
     swq_select *psSelectInfo = static_cast<swq_select *>(pSelectInfo);
 
-    nIteratedFeatures = 0;
+    if (psSelectInfo->limit >= 0)
+    {
+        nIteratedFeatures = nIndex;
+        if (nIteratedFeatures >= psSelectInfo->limit)
+        {
+            return OGRERR_FAILURE;
+        }
+    }
 
     CreateOrderByIndex();
 
+    if (nIndex > std::numeric_limits<GIntBig>::max() - psSelectInfo->offset)
+    {
+        m_bEOF = true;
+        return OGRERR_FAILURE;
+    }
     if (psSelectInfo->query_mode == SWQM_SUMMARY_RECORD ||
         psSelectInfo->query_mode == SWQM_DISTINCT_LIST ||
         panFIDIndex != nullptr)
@@ -665,7 +679,10 @@ OGRErr OGRGenSQLResultsLayer::SetNextByIndex(GIntBig nIndex)
     }
     else
     {
-        return poSrcLayer->SetNextByIndex(nIndex + psSelectInfo->offset);
+        OGRErr eErr = poSrcLayer->SetNextByIndex(nIndex + psSelectInfo->offset);
+        if (eErr != OGRERR_NONE)
+            m_bEOF = true;
+        return eErr;
     }
 }
 
@@ -1038,7 +1055,8 @@ int OGRGenSQLResultsLayer::PrepareSummary()
                 {
                     if (psColDef->field_type == SWQ_DATE ||
                         psColDef->field_type == SWQ_TIME ||
-                        psColDef->field_type == SWQ_TIMESTAMP)
+                        psColDef->field_type == SWQ_TIMESTAMP ||
+                        psColDef->field_type == SWQ_STRING)
                         poSummaryFeature->SetField(iField,
                                                    oSummary.osMin.c_str());
                     else
@@ -1048,7 +1066,8 @@ int OGRGenSQLResultsLayer::PrepareSummary()
                 {
                     if (psColDef->field_type == SWQ_DATE ||
                         psColDef->field_type == SWQ_TIME ||
-                        psColDef->field_type == SWQ_TIMESTAMP)
+                        psColDef->field_type == SWQ_TIMESTAMP ||
+                        psColDef->field_type == SWQ_STRING)
                         poSummaryFeature->SetField(iField,
                                                    oSummary.osMax.c_str());
                     else
@@ -1589,6 +1608,8 @@ OGRFeature *OGRGenSQLResultsLayer::GetNextFeature()
 {
     swq_select *psSelectInfo = static_cast<swq_select *>(pSelectInfo);
 
+    if (m_bEOF)
+        return nullptr;
     if (psSelectInfo->limit >= 0 &&
         (nIteratedFeatures < 0 ? 0 : nIteratedFeatures) >= psSelectInfo->limit)
         return nullptr;

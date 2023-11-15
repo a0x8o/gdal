@@ -1937,7 +1937,12 @@ bool ENVIDataset::ReadHeader(VSILFILE *fpHdr)
         if (pszNewLine == nullptr)
             break;
 
-        if (strstr(pszNewLine, "=") == nullptr)
+        // Skip leading spaces. This may happen for example with
+        // AVIRIS datasets (https://aviris.jpl.nasa.gov/dataportal/) whose
+        // wavelength metadata starts with a leading space.
+        while (*pszNewLine == ' ')
+            ++pszNewLine;
+        if (strchr(pszNewLine, '=') == nullptr)
             continue;
 
         CPLString osWorkingLine(pszNewLine);
@@ -1956,7 +1961,7 @@ bool ENVIDataset::ReadHeader(VSILFILE *fpHdr)
                 if (osWorkingLine.size() > 10 * 1024 * 1024)
                     return false;
             } while (pszNewLine != nullptr &&
-                     strstr(pszNewLine, "}") == nullptr);
+                     strchr(pszNewLine, '}') == nullptr);
         }
 
         // Try to break input into name and value portions.  Trim whitespace.
@@ -2108,7 +2113,7 @@ ENVIDataset *ENVIDataset::Open(GDALOpenInfo *poOpenInfo, bool bFileSizeCheck)
     }
 
     // Create a corresponding GDALDataset.
-    auto poDS = cpl::make_unique<ENVIDataset>();
+    auto poDS = std::make_unique<ENVIDataset>();
     poDS->pszHDRFilename = CPLStrdup(osHdrFilename);
     poDS->fp = fpHeader;
 
@@ -2222,7 +2227,13 @@ ENVIDataset *ENVIDataset::Open(GDALOpenInfo *poOpenInfo, bool bFileSizeCheck)
                 eType = GDT_UInt32;
                 break;
 
-                // 14=Int64, 15=UInt64
+            case 14:
+                eType = GDT_Int64;
+                break;
+
+            case 15:
+                eType = GDT_UInt64;
+                break;
 
             default:
                 CPLError(CE_Failure, CPLE_AppDefined,
@@ -2398,7 +2409,7 @@ ENVIDataset *ENVIDataset::Open(GDALOpenInfo *poOpenInfo, bool bFileSizeCheck)
     // Create band information objects.
     for (int i = 0; i < nBands; i++)
     {
-        auto poBand = cpl::make_unique<ENVIRasterBand>(
+        auto poBand = std::make_unique<ENVIRasterBand>(
             poDS.get(), i + 1, poDS->fpImage, nHeaderSize + nBandOffset * i,
             nPixelOffset, nLineOffset, eType, eByteOrder);
         if (!poBand->IsValid())
@@ -2681,9 +2692,12 @@ int ENVIDataset::GetEnviType(GDALDataType eType)
         case GDT_UInt32:
             iENVIType = 13;
             break;
-
-            // 14=Int64, 15=UInt64
-
+        case GDT_Int64:
+            iENVIType = 14;
+            break;
+        case GDT_UInt64:
+            iENVIType = 15;
+            break;
         default:
             CPLError(CE_Failure, CPLE_AppDefined,
                      "Attempt to create ENVI .hdr labelled dataset with an "
@@ -2905,7 +2919,7 @@ void GDALRegister_ENVI()
     poDriver->SetMetadataItem(GDAL_DMD_HELPTOPIC, "drivers/raster/envi.html");
     poDriver->SetMetadataItem(GDAL_DMD_EXTENSION, "");
     poDriver->SetMetadataItem(GDAL_DMD_CREATIONDATATYPES,
-                              "Byte Int16 UInt16 Int32 UInt32 "
+                              "Byte Int16 UInt16 Int32 UInt32 Int64 UInt64 "
                               "Float32 Float64 CFloat32 CFloat64");
     poDriver->SetMetadataItem(
         GDAL_DMD_CREATIONOPTIONLIST,

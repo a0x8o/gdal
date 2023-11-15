@@ -107,7 +107,7 @@ class OGRMongoDBv3Dataset final : public GDALDataset
     void ReleaseResultSet(OGRLayer *poLayer) override;
 
     OGRLayer *ICreateLayer(const char *pszName,
-                           OGRSpatialReference *poSpatialRef,
+                           const OGRSpatialReference *poSpatialRef,
                            OGRwkbGeometryType eGType,
                            char **papszOptions) override;
     OGRErr DeleteLayer(int iLayer) override;
@@ -1242,7 +1242,7 @@ static void OGRMongoDBV3ReaderSetField(OGRFeature *poFeature,
 std::unique_ptr<OGRFeature>
 OGRMongoDBv3Layer::Translate(const bsoncxx::document::view &doc)
 {
-    auto poFeature = cpl::make_unique<OGRFeature>(m_poFeatureDefn);
+    auto poFeature = std::make_unique<OGRFeature>(m_poFeatureDefn);
     for (auto &&field : doc)
     {
         std::string fieldName(field.key());
@@ -2510,10 +2510,9 @@ bool OGRMongoDBv3Dataset::Open(GDALOpenInfo *poOpenInfo)
 /*                            ICreateLayer()                            */
 /************************************************************************/
 
-OGRLayer *OGRMongoDBv3Dataset::ICreateLayer(const char *pszName,
-                                            OGRSpatialReference *poSpatialRef,
-                                            OGRwkbGeometryType eGType,
-                                            char **papszOptions)
+OGRLayer *OGRMongoDBv3Dataset::ICreateLayer(
+    const char *pszName, const OGRSpatialReference *poSpatialRef,
+    OGRwkbGeometryType eGType, char **papszOptions)
 {
     if (m_osDatabase.empty())
     {
@@ -2581,7 +2580,12 @@ OGRLayer *OGRMongoDBv3Dataset::ICreateLayer(const char *pszName,
         const char *pszGeometryName =
             CSLFetchNameValueDef(papszOptions, "GEOMETRY_NAME", "geometry");
         OGRGeomFieldDefn oFieldDefn(pszGeometryName, eGType);
-        oFieldDefn.SetSpatialRef(poSpatialRef);
+        OGRSpatialReference *poSRSClone = nullptr;
+        if (poSpatialRef)
+            poSRSClone = poSpatialRef->Clone();
+        oFieldDefn.SetSpatialRef(poSRSClone);
+        if (poSRSClone)
+            poSRSClone->Release();
         poLayer->CreateGeomField(&oFieldDefn, FALSE);
     }
 

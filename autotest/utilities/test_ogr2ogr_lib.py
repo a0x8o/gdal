@@ -982,7 +982,8 @@ def test_ogr2ogr_lib_t_srs_ignored(tmp_vsimem):
     got_msg = []
 
     def my_handler(errorClass, errno, msg):
-        got_msg.append(msg)
+        if errorClass != gdal.CE_Debug:
+            got_msg.append(msg)
         return
 
     with gdaltest.error_handler(my_handler):
@@ -2061,3 +2062,306 @@ def test_ogr2ogr_lib_reprojection_curve_geometries_output_does_not_support_curve
         "POLYGON ((4.50229717432855 0.0,4.50231899745463 0.000629152087677,4.50238436052069 0.001255239123029,4.50249294510796 0.001875210984143,4.50264422224195 0.002486047337241,4.50283745496877 0.003084772349354,4.50307170194448 0.003668469184327,4.50334582201992 0.00423429421156,4.50365847979874 0.004779490858295,4.50400815214157 0.005301403038001,4.50439313558467 0.005797488089458,4.50481155463705 0.006265329163519,4.50526137091544 0.006702646997227,4.50574039307301 0.007107311017932,4.50624628747307 0.007477349723307,4.50677658955623 0.007810960286703,4.50732871584539 0.008106517341033,4.50789997653015 0.008362580898371,4.50848758856955 0.008577903366675,4.50908868924909 0.008751435629417,4.5097003501262 0.008882332158473,4.51031959129618 0.00896995513533,4.51094339590908 0.009013877560499,4.51156872486693 0.009013885335939,4.51219253162961 0.00896997831031,4.51281177705729 0.008882370281917,4.51342344421717 0.008751487959297,4.51402455308226 0.008577968884449,4.51461217505065 0.00836265832881,4.51518344721461 0.008106605177041,4.51573558630972 0.007811056818652,4.51626590227636 0.007477453072313,4.51677181136717 0.007107419172424,4.51725084873684 0.006702757852101,4.5177006804526 0.00626544056111,4.51811911486713 0.005797597861539,4.51850411329818 0.005301509047984,4.518853799963 0.004779591042816,4.51916647111912 0.004234386620641,4.51944060336679 0.003668552019331,4.51967486107274 0.00308484399799,4.51986810287894 0.002486106404952,4.52001938726475 0.001875256321243,4.52012797713514 0.001255269847082,4.52019334341276 0.000629167600675,4.52021516761635 0.0,4.52019334341276 -0.000629167600675,4.52012797713514 -0.001255269847082,4.52001938726475 -0.001875256321243,4.51986810287894 -0.002486106404952,4.51967486107274 -0.00308484399799,4.51944060336679 -0.003668552019331,4.51916647111912 -0.004234386620641,4.518853799963 -0.004779591042816,4.51850411329818 -0.005301509047984,4.51811911486713 -0.005797597861539,4.5177006804526 -0.00626544056111,4.51725084873684 -0.006702757852101,4.51677181136717 -0.007107419172424,4.51626590227636 -0.007477453072313,4.51573558630972 -0.007811056818652,4.51518344721461 -0.008106605177041,4.51461217505065 -0.00836265832881,4.51402455308226 -0.008577968884449,4.51342344421717 -0.008751487959297,4.51281177705729 -0.008882370281917,4.51219253162961 -0.00896997831031,4.51156872486693 -0.009013885335939,4.51094339590908 -0.009013877560499,4.51031959129618 -0.00896995513533,4.5097003501262 -0.008882332158473,4.50908868924909 -0.008751435629417,4.50848758856955 -0.008577903366675,4.50789997653015 -0.008362580898371,4.50732871584539 -0.008106517341033,4.50677658955623 -0.007810960286703,4.50624628747307 -0.007477349723307,4.50574039307301 -0.007107311017932,4.50526137091544 -0.006702646997227,4.50481155463705 -0.006265329163519,4.50439313558467 -0.005797488089458,4.50400815214157 -0.005301403038001,4.50365847979874 -0.004779490858295,4.50334582201992 -0.00423429421156,4.50307170194448 -0.003668469184327,4.50283745496877 -0.003084772349354,4.50264422224195 -0.002486047337241,4.50249294510796 -0.001875210984143,4.50238436052069 -0.001255239123029,4.50231899745463 -0.000629152087677,4.50229717432855 0.0))",
         1e-10,
     )
+
+
+###############################################################################
+# Test issue (#8523) when -preserve_fid was set even if -explodecollections was
+# set with a GPKG MULTI layer
+
+
+@pytest.mark.require_driver("GPKG")
+@pytest.mark.parametrize("preserveFID", (True, False))
+def test_translate_explodecollections_preserve_fid(tmp_vsimem, preserveFID):
+    """Test issue #8523 when -preserve_fid was set even if -explodecollections was set"""
+
+    with gdal.ExceptionMgr(useExceptions=True):
+
+        src = tmp_vsimem / "test_collection.gpkg"
+        dst = tmp_vsimem / "test_collection_exploded.gpkg"
+
+        ds = ogr.GetDriverByName("GPKG").CreateDataSource(src)
+        lyr = ds.CreateLayer("test_collection", None, ogr.wkbMultiPoint)
+
+        wkt_geom = "MULTIPOINT((0 0), (1 1))"
+
+        feat = ogr.Feature(lyr.GetLayerDefn())
+        feat.SetGeometryDirectly(ogr.Geometry(wkt=wkt_geom))
+
+        lyr.CreateFeature(feat)
+
+        del lyr
+        del ds
+
+        options = gdal.VectorTranslateOptions(
+            explodeCollections=True, preserveFID=preserveFID
+        )
+
+        if preserveFID:
+            with pytest.raises(
+                RuntimeError,
+                match="cannot use -preserve_fid and -explodecollections at the same time",
+            ):
+                gdal.VectorTranslate(srcDS=src, destNameOrDestDS=dst, options=options)
+
+        else:
+            ds_output = gdal.VectorTranslate(
+                srcDS=src, destNameOrDestDS=dst, options=options
+            )
+            lyr = ds_output.GetLayerByName("test_collection")
+            assert lyr.GetFeatureCount() == 2
+            del lyr
+            del ds_output
+
+
+###############################################################################
+# Test forced use of the Arrow interface
+
+
+@pytest.mark.parametrize("limit", [None, 1])
+def test_ogr2ogr_lib_OGR2OGR_USE_ARROW_API_YES(limit):
+
+    src_ds = gdal.GetDriverByName("Memory").Create("", 0, 0, 0, gdal.GDT_Unknown)
+    src_lyr = src_ds.CreateLayer("test")
+    src_lyr.CreateField(ogr.FieldDefn("str_field"))
+    fld_defn = ogr.FieldDefn("json_field")
+    fld_defn.SetSubType(ogr.OFSTJSON)
+    src_lyr.CreateField(fld_defn)
+    fld_defn = ogr.FieldDefn("field_with_alternative_name")
+    fld_defn.SetAlternativeName("alias")
+    src_lyr.CreateField(fld_defn)
+    fld_defn = ogr.FieldDefn("field_with_comment")
+    fld_defn.SetComment("my_comment")
+    src_lyr.CreateField(fld_defn)
+    fld_defn = ogr.FieldDefn("field_with_default")
+    fld_defn.SetDefault("'default_val'")
+    src_lyr.CreateField(fld_defn)
+    fld_defn = ogr.FieldDefn("field_with_width")
+    fld_defn.SetWidth(10)
+    src_lyr.CreateField(fld_defn)
+    fld_defn = ogr.FieldDefn("field_unique")
+    fld_defn.SetUnique(True)
+    src_lyr.CreateField(fld_defn)
+    fld_defn = ogr.FieldDefn("field_with_domain", ogr.OFTInteger)
+    fld_defn.SetDomainName("my_domain")
+    src_lyr.CreateField(fld_defn)
+    for i in range(2):
+        f = ogr.Feature(src_lyr.GetLayerDefn())
+        f["str_field"] = "foo%d" % i
+        f["json_field"] = '{"foo":"bar"}'
+        f["field_with_domain"] = 1 + i
+        f.SetGeometry(ogr.CreateGeometryFromWkt("POINT (%d 2)" % i))
+        src_lyr.CreateFeature(f)
+
+    assert src_ds.AddFieldDomain(
+        ogr.CreateCodedFieldDomain(
+            "my_domain",
+            "desc",
+            ogr.OFTString,
+            ogr.OFSTNone,
+            {1: "one", 2: "two", 3: None},
+        )
+    )
+
+    got_msg = []
+
+    def my_handler(errorClass, errno, msg):
+        got_msg.append(msg)
+        return
+
+    with gdaltest.error_handler(my_handler), gdaltest.config_options(
+        {"CPL_DEBUG": "ON", "OGR2OGR_USE_ARROW_API": "YES"}
+    ):
+        out_ds = gdal.VectorTranslate(
+            "",
+            src_ds,
+            format="Memory",
+            limit=limit,
+        )
+
+    assert "OGR2OGR: Using WriteArrowBatch()" in got_msg
+
+    out_lyr = out_ds.GetLayer(0)
+    assert out_lyr.GetLayerDefn().GetFieldDefn(0).GetName() == "str_field"
+    assert out_lyr.GetLayerDefn().GetFieldDefn(0).GetType() == ogr.OFTString
+    assert out_lyr.GetLayerDefn().GetFieldDefn(0).GetSubType() == ogr.OFSTNone
+    assert out_lyr.GetLayerDefn().GetFieldDefn(1).GetName() == "json_field"
+    assert out_lyr.GetLayerDefn().GetFieldDefn(1).GetType() == ogr.OFTString
+    assert out_lyr.GetLayerDefn().GetFieldDefn(1).GetSubType() == ogr.OFSTJSON
+    assert (
+        out_lyr.GetLayerDefn().GetFieldDefn(2).GetName()
+        == "field_with_alternative_name"
+    )
+    assert out_lyr.GetLayerDefn().GetFieldDefn(2).GetAlternativeName() == "alias"
+    assert out_lyr.GetLayerDefn().GetFieldDefn(3).GetName() == "field_with_comment"
+    assert out_lyr.GetLayerDefn().GetFieldDefn(3).GetComment() == "my_comment"
+    assert out_lyr.GetLayerDefn().GetFieldDefn(4).GetName() == "field_with_default"
+    assert out_lyr.GetLayerDefn().GetFieldDefn(4).GetDefault() == "'default_val'"
+    assert out_lyr.GetLayerDefn().GetFieldDefn(5).GetName() == "field_with_width"
+    assert out_lyr.GetLayerDefn().GetFieldDefn(5).GetWidth() == 10
+    assert out_lyr.GetLayerDefn().GetFieldDefn(6).GetName() == "field_unique"
+    assert out_lyr.GetLayerDefn().GetFieldDefn(6).IsUnique()
+    assert out_lyr.GetLayerDefn().GetFieldDefn(7).GetName() == "field_with_domain"
+    assert out_lyr.GetLayerDefn().GetFieldDefn(7).GetType() == ogr.OFTInteger
+    assert out_lyr.GetLayerDefn().GetFieldDefn(7).GetDomainName() == "my_domain"
+    assert out_lyr.GetFeatureCount() == (limit if limit else src_lyr.GetFeatureCount())
+
+    f = out_lyr.GetNextFeature()
+    assert f["str_field"] == "foo0"
+    assert f["json_field"] == '{"foo":"bar"}'
+    assert f["field_with_domain"] == 1
+    assert f.GetGeometryRef().ExportToIsoWkt() == "POINT (0 2)"
+
+    if not limit:
+        f = out_lyr.GetNextFeature()
+        assert f["str_field"] == "foo1"
+        assert f.GetGeometryRef().ExportToIsoWkt() == "POINT (1 2)"
+
+    # Test append
+    got_msg = []
+    with gdaltest.error_handler(my_handler), gdaltest.config_options(
+        {"CPL_DEBUG": "ON", "OGR2OGR_USE_ARROW_API": "YES"}
+    ):
+        gdal.VectorTranslate(
+            out_ds,
+            src_ds,
+            accessMode="append",
+        )
+
+    assert "OGR2OGR: Using WriteArrowBatch()" in got_msg
+
+    out_lyr = out_ds.GetLayer(0)
+    assert (
+        out_lyr.GetFeatureCount() == (limit if limit else src_lyr.GetFeatureCount()) + 2
+    )
+
+
+###############################################################################
+# Test JSON types roundtrip
+
+
+@pytest.mark.require_driver("GeoJSON")
+@pytest.mark.require_driver("GPKG")
+def test_json_types(tmp_vsimem):
+    """Test JSON types"""
+
+    def test_extended_types(lyr):
+        assert lyr.GetFeatureCount() == 1
+        f = lyr.GetNextFeature()
+
+        fd = f.GetFieldDefnRef(0)
+        assert fd.GetType() == ogr.OFTString
+        assert fd.GetSubType() == ogr.OFSTNone
+
+        fd = f.GetFieldDefnRef(1)
+        assert fd.GetType() == ogr.OFTIntegerList
+        assert fd.GetSubType() == ogr.OFSTNone
+
+        fd = f.GetFieldDefnRef(2)
+        assert fd.GetType() == ogr.OFTString
+        assert fd.GetSubType() == ogr.OFSTJSON
+
+        fd = f.GetFieldDefnRef(3)
+        assert fd.GetType() == ogr.OFTInteger
+        assert fd.GetSubType() == ogr.OFSTNone
+
+    def test_types(lyr):
+        assert lyr.GetFeatureCount() == 1
+        f = lyr.GetNextFeature()
+
+        fd = f.GetFieldDefnRef(0)
+        assert fd.GetType() == ogr.OFTString
+        assert fd.GetSubType() == ogr.OFSTNone
+
+        fd = f.GetFieldDefnRef(1)
+        assert fd.GetType() == ogr.OFTString
+        assert fd.GetSubType() == ogr.OFSTJSON
+
+        fd = f.GetFieldDefnRef(2)
+        assert fd.GetType() == ogr.OFTString
+        assert fd.GetSubType() == ogr.OFSTJSON
+
+        fd = f.GetFieldDefnRef(3)
+        assert fd.GetType() == ogr.OFTInteger
+        assert fd.GetSubType() == ogr.OFSTNone
+
+    with gdal.ExceptionMgr(useExceptions=True):
+
+        src = str(tmp_vsimem / "test_json.geojson")
+        dst = str(tmp_vsimem / "test_json.gpkg")
+
+        data = """{
+                "type": "FeatureCollection",
+                "features": [
+                    { "type": "Feature", "properties": { "str": "[5]", "int_list": [5], "map": {"foo": "bar", "baz": 5}, "int_lit": 5 }, "geometry": {"type": "Point", "coordinates": [ 1, 2 ]} }
+                ]
+            }"""
+        f = gdal.VSIFOpenL(src, "wb")
+        gdal.VSIFWriteL(data, 1, len(data), f)
+        gdal.VSIFCloseL(f)
+
+        with gdal.OpenEx(src, gdal.OF_VECTOR | gdal.OF_READONLY) as ds:
+            lyr = ds.GetLayer(0)
+            test_extended_types(lyr)
+
+        options = gdal.VectorTranslateOptions(layerName="test")
+
+        ds_output = gdal.VectorTranslate(
+            srcDS=src, destNameOrDestDS=dst, options=options
+        )
+        lyr = ds_output.GetLayerByName("test")
+
+        test_types(lyr)
+
+        # Write it back to json
+        round_trip_dst = str(tmp_vsimem / "test_json_back.geojson")
+
+        options = gdal.VectorTranslateOptions(
+            layerCreationOptions={"AUTODETECT_JSON_STRINGS": "FALSE"}
+        )
+        gdal.VectorTranslate(
+            srcDS=dst, destNameOrDestDS=round_trip_dst, options=options
+        )
+
+        with gdal.OpenEx(round_trip_dst, gdal.OF_VECTOR | gdal.OF_READONLY) as ds:
+            lyr = ds.GetLayer(0)
+            test_extended_types(lyr)
+
+
+###############################################################################
+
+
+@pytest.mark.parametrize("enable_exceptions", [True, False])
+@pytest.mark.parametrize("enable_debug", [True, False])
+@pytest.mark.require_driver("GPKG")
+def test_ogr2ogr_lib_accumulerated_errors(tmp_vsimem, enable_exceptions, enable_debug):
+
+    src_ds = gdal.GetDriverByName("Memory").Create("", 0, 0, 0, gdal.GDT_Unknown)
+    src_lyr = src_ds.CreateLayer("test")
+    f = ogr.Feature(src_lyr.GetLayerDefn())
+    f.SetFID(1)
+    src_lyr.CreateFeature(f)
+
+    out_filename = str(tmp_vsimem / "test_ogr2ogr_lib_accumulerated_errors.gpkg")
+    gdal.VectorTranslate(out_filename, src_ds)
+
+    def my_handler(errorClass, errno, msg):
+        pass
+
+    with gdaltest.error_handler(my_handler if enable_debug else None):
+        with gdaltest.config_option("CPL_DEBUG", "ON" if enable_debug else "OFF"):
+            with gdal.ExceptionMgr(useExceptions=enable_exceptions):
+                if enable_exceptions:
+                    with pytest.raises(
+                        Exception,
+                        match=r"Unable to write feature 1 from layer test\.\nMay be caused by: failed to execute insert : UNIQUE constraint failed: test\.fid",
+                    ):
+                        gdal.VectorTranslate(
+                            out_filename, src_ds, options="-preserve_fid -append"
+                        )
+                else:
+                    assert (
+                        gdal.VectorTranslate(
+                            out_filename, src_ds, options="-preserve_fid -append"
+                        )
+                        is None
+                    )

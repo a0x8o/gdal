@@ -536,7 +536,7 @@ class OGROpenFileGDBDataSource final : public OGRDataSource
     virtual int TestCapability(const char *) override;
 
     virtual OGRLayer *ICreateLayer(const char *,
-                                   OGRSpatialReference * = nullptr,
+                                   const OGRSpatialReference * = nullptr,
                                    OGRwkbGeometryType = wkbUnknown,
                                    char ** = nullptr) override;
     virtual OGRErr DeleteLayer(int) override;
@@ -715,7 +715,7 @@ class GDALOpenFileGDBRasterAttributeTable final
 
     GDALRasterAttributeTable *Clone() const override
     {
-        auto poDS = cpl::make_unique<OGROpenFileGDBDataSource>();
+        auto poDS = std::make_unique<OGROpenFileGDBDataSource>();
         GDALOpenInfo oOpenInfo(m_poDS->m_osDirName.c_str(), GA_ReadOnly);
         if (!poDS->Open(&oOpenInfo))
             return nullptr;

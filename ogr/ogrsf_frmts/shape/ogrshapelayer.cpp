@@ -217,7 +217,7 @@ OGRShapeLayer::OGRShapeLayer(OGRShapeDataSource *poDSIn,
         {
             poSRSClone->SetAxisMappingStrategy(OAMS_TRADITIONAL_GIS_ORDER);
         }
-        auto poGeomFieldDefn = cpl::make_unique<OGRShapeGeomFieldDefn>(
+        auto poGeomFieldDefn = std::make_unique<OGRShapeGeomFieldDefn>(
             pszFullName, eType, bSRSSetIn, poSRSClone);
         if (!osPrjFilename.empty())
             poGeomFieldDefn->SetPrjFilename(osPrjFilename);
@@ -3777,4 +3777,13 @@ OGRErr OGRShapeLayer::Rename(const char *pszNewName)
     poFeatureDefn->SetName(pszNewName);
 
     return OGRERR_NONE;
+}
+
+/************************************************************************/
+/*                          GetDataset()                                */
+/************************************************************************/
+
+GDALDataset *OGRShapeLayer::GetDataset()
+{
+    return poDS;
 }
