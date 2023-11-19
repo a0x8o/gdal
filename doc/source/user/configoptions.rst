@@ -573,7 +573,7 @@ Networking options
 
       .. code-block::
 
-         gdalinfo --config CPL_VSIL_CURL_ALLOWED_EXTENSIONS "".tif" /vsicurl/http://igskmncngs506.cr.usgs.gov/gmted/Global_tiles_GMTED/075darcsec/bln/W030/30N030W_20101117_gmted_bln075.tif
+         gdalinfo --config CPL_VSIL_CURL_ALLOWED_EXTENSIONS ".tif" /vsicurl/http://igskmncngs506.cr.usgs.gov/gmted/Global_tiles_GMTED/075darcsec/bln/W030/30N030W_20101117_gmted_bln075.tif
 
 -  .. config:: CPL_VSIL_CURL_CACHE_SIZE
       :choices: <bytes>
@@ -805,7 +805,7 @@ Networking options
 -  .. config:: GDAL_HTTP_MERGE_CONSECUTIVE_RANGES
       :since: 2.3
       :choices: YES, NO
-      :default: NO
+      :default: YES
 
       Only applies when :config:`GDAL_HTTP_MULTIRANGE` is YES. Defines if ranges
       of a single ReadMultiRange() request that are consecutive should be merged
