@@ -809,6 +809,7 @@ OGRFeatureDefn *OGRGeoPackageTableLayer::GetLayerDefn()
     {
         m_bFeatureDefnCompleted = true;
         ReadTableDefinition();
+        m_poFeatureDefn->Seal(/* bSealFields = */ true);
     }
     return m_poFeatureDefn;
 }
@@ -1764,7 +1765,8 @@ OGRErr OGRGeoPackageTableLayer::CreateField(const OGRFieldDefn *poField,
         }
     }
 
-    m_poFeatureDefn->AddFieldDefn(&oFieldDefn);
+    whileUnsealing(m_poFeatureDefn)->AddFieldDefn(&oFieldDefn);
+
     m_abGeneratedColumns.resize(m_poFeatureDefn->GetFieldCount());
 
     if (m_pszFidColumn != nullptr &&
@@ -1939,7 +1941,7 @@ OGRGeoPackageTableLayer::CreateGeomField(const OGRGeomFieldDefn *poGeomFieldIn,
             return err;
     }
 
-    m_poFeatureDefn->AddGeomFieldDefn(&oGeomField);
+    whileUnsealing(m_poFeatureDefn)->AddGeomFieldDefn(&oGeomField);
 
     if (!m_bDeferredCreation)
     {
@@ -5333,7 +5335,7 @@ OGRErr OGRGeoPackageTableLayer::Rename(const char *pszDstTableName)
         m_poDS->ClearCachedRelationships();
 
         SetDescription(pszDstTableName);
-        m_poFeatureDefn->SetName(pszDstTableName);
+        whileUnsealing(m_poFeatureDefn)->SetName(pszDstTableName);
     }
 
     return eErr;
@@ -5558,6 +5560,8 @@ void OGRGeoPackageTableLayer::SetCreationParameters(
         m_osDescriptionLCO = pszDescription;
         OGRLayer::SetMetadataItem("DESCRIPTION", pszDescription);
     }
+
+    m_poFeatureDefn->Seal(/* bSealFields = */ true);
 }
 
 /************************************************************************/
@@ -6313,7 +6317,9 @@ OGRErr OGRGeoPackageTableLayer::DeleteField(int iFieldToDelete)
         eErr = m_poDS->SoftCommitTransaction();
         if (eErr == OGRERR_NONE)
         {
-            eErr = m_poFeatureDefn->DeleteFieldDefn(iFieldToDelete);
+            eErr = whileUnsealing(m_poFeatureDefn)
+                       ->DeleteFieldDefn(iFieldToDelete);
+
             if (eErr == OGRERR_NONE)
             {
 #if SQLITE_VERSION_NUMBER >= 3035005L
@@ -6812,6 +6818,7 @@ OGRErr OGRGeoPackageTableLayer::AlterFieldDefn(int iFieldToAlter,
 
         if (eErr == OGRERR_NONE)
         {
+            auto oTemporaryUnsealer(poFieldDefnToAlter->GetTemporaryUnsealer());
             bool bNeedsEntryInGpkgDataColumns = false;
 
             // field type
@@ -6953,6 +6960,7 @@ OGRErr OGRGeoPackageTableLayer::AlterGeomFieldDefn(
     m_poDS->ResetReadingAllLayers();
 
     auto poGeomFieldDefn = m_poFeatureDefn->GetGeomFieldDefn(iGeomFieldToAlter);
+    auto oTemporaryUnsealer(poGeomFieldDefn->GetTemporaryUnsealer());
 
     if (nFlagsIn & ALTER_GEOM_FIELD_DEFN_TYPE_FLAG)
     {
@@ -7279,7 +7287,9 @@ OGRErr OGRGeoPackageTableLayer::ReorderFields(int *panMap)
         eErr = m_poDS->SoftCommitTransaction();
 
         if (eErr == OGRERR_NONE)
-            eErr = m_poFeatureDefn->ReorderFieldDefns(panMap);
+        {
+            eErr = whileUnsealing(m_poFeatureDefn)->ReorderFieldDefns(panMap);
+        }
 
         if (eErr == OGRERR_NONE)
         {
@@ -8004,9 +8014,13 @@ int OGRGeoPackageTableLayer::GetNextArrowArrayAsynchronous(
 
     m_bGetNextArrowArrayCalledSinceResetReading = true;
 
-    if (m_poFillArrowArray && m_poFillArrowArray->bIsFinished)
+    if (m_poFillArrowArray)
     {
-        return 0;
+        std::lock_guard<std::mutex> oLock(m_poFillArrowArray->oMutex);
+        if (m_poFillArrowArray->bIsFinished)
+        {
+            return 0;
+        }
     }
 
     auto psHelper = std::make_unique<OGRArrowArrayHelper>(
@@ -8101,6 +8115,7 @@ int OGRGeoPackageTableLayer::GetNextArrowArrayAsynchronous(
     // Wait for GetNextArrowArrayAsynchronousWorker() /
     // OGR_GPKG_FillArrowArray_Step() to have generated a result set (or an
     // error)
+    bool bIsFinished;
     {
         std::unique_lock<std::mutex> oLock(m_poFillArrowArray->oMutex);
         while (m_poFillArrowArray->nCountRows == 0 &&
@@ -8108,6 +8123,7 @@ int OGRGeoPackageTableLayer::GetNextArrowArrayAsynchronous(
         {
             m_poFillArrowArray->oCV.wait(oLock);
         }
+        bIsFinished = m_poFillArrowArray->bIsFinished;
     }
 
     if (m_poFillArrowArray->bErrorOccurred)
@@ -8118,7 +8134,7 @@ int OGRGeoPackageTableLayer::GetNextArrowArrayAsynchronous(
         m_poFillArrowArray->psHelper->ClearArray();
         return EIO;
     }
-    else if (m_poFillArrowArray->bIsFinished)
+    else if (bIsFinished)
     {
         m_oThreadNextArrowArray.join();
     }

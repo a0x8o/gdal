@@ -421,7 +421,7 @@ jobs:
       shell: pwsh
       run: |
         echo "JAVA_HOME=$env:JAVA_HOME_11_X64" >> %GITHUB_ENV%
-    - uses: conda-incubator/setup-miniconda@v2
+    - uses: conda-incubator/setup-miniconda@v3
       with:
         activate-environment: gdalenv
         miniforge-variant: Mambaforge
@@ -496,6 +496,11 @@ jobs:
     - name: Show gdal.pc
       shell: bash -l {0}
       run: cat $GITHUB_WORKSPACE/build/gdal.pc
+    - name: Test python setup.py install
+      shell: bash -l {0}
+      run: |
+        cd $GITHUB_WORKSPACE/build/swig/python
+        python setup.py install
 
   build-windows-minimum:
     runs-on: windows-2022
@@ -510,7 +515,7 @@ jobs:
         git config --global core.autocrlf false
     - name: Checkout GDAL
       uses: actions/checkout@v4
-    - uses: conda-incubator/setup-miniconda@v2
+    - uses: conda-incubator/setup-miniconda@v3
       with:
         activate-environment: gdalenv
         miniforge-variant: Mambaforge
@@ -586,6 +591,7 @@ jobs:
         cmake --version
     - name: Install dependency
       run: |
+        rm -rf /usr/local/lib/node_modules # conflicts with node@18 from brew
         brew update
         brew outdated
         brew unlink python
@@ -653,7 +659,7 @@ jobs:
         git config --global core.autocrlf false
     - name: Checkout GDAL
       uses: actions/checkout@v4
-    - uses: conda-incubator/setup-miniconda@v2
+    - uses: conda-incubator/setup-miniconda@v3
       with:
         activate-environment: gdalenv
         python-version: 3.9

@@ -3636,6 +3636,9 @@ retry:
                                     : GDAL_IDENTIFY_UNKNOWN;
         if (nIdentifyRes == FALSE)
         {
+            CSLDestroy(papszTmpOpenOptions);
+            CSLDestroy(papszTmpOpenOptionsToValidate);
+            oOpenInfo.papszOpenOptions = papszOpenOptionsCleaned;
             continue;
         }
         else if (iPass == 1 && nIdentifyRes < 0 &&
@@ -3644,6 +3647,9 @@ retry:
         {
             // Not loaded plugin
             apoSecondPassDrivers.push_back(poDriver);
+            CSLDestroy(papszTmpOpenOptions);
+            CSLDestroy(papszTmpOpenOptionsToValidate);
+            oOpenInfo.papszOpenOptions = papszOpenOptionsCleaned;
             continue;
         }
 
@@ -6476,6 +6482,36 @@ GDALDataset::ExecuteSQL(const char *pszStatement, OGRGeometry *poSpatialFilter,
                  "SQLite SQL dialect");
         return nullptr;
 #endif
+    }
+
+    if (pszDialect != nullptr && !EQUAL(pszDialect, "") &&
+        !EQUAL(pszDialect, "OGRSQL"))
+    {
+        std::string osDialectList = "'OGRSQL'";
+#ifdef SQLITE_ENABLED
+        osDialectList += ", 'SQLITE'";
+#endif
+        const char *pszDialects =
+            GetMetadataItem(GDAL_DMD_SUPPORTED_SQL_DIALECTS);
+        if (pszDialects)
+        {
+            const CPLStringList aosTokens(
+                CSLTokenizeString2(pszDialects, " ", 0));
+            for (int i = 0; i < aosTokens.size(); ++i)
+            {
+                if (!EQUAL(aosTokens[i], "OGRSQL") &&
+                    !EQUAL(aosTokens[i], "SQLITE"))
+                {
+                    osDialectList += ", '";
+                    osDialectList += aosTokens[i];
+                    osDialectList += "'";
+                }
+            }
+        }
+        CPLError(CE_Warning, CPLE_NotSupported,
+                 "Dialect '%s' is unsupported. Only supported dialects are %s. "
+                 "Defaulting to OGRSQL",
+                 pszDialect, osDialectList.c_str());
     }
 
     /* -------------------------------------------------------------------- */

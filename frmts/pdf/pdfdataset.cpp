@@ -1258,6 +1258,11 @@ static int LoadPdfiumDocumentPage(const char *pszFilename,
         }
         auto pPage = pdfium::MakeRetain<CPDF_Page>(
             poDoc->doc,
+            // coverity is confused by WrapRetain(), believing that multiple
+            // smart pointers manage the same raw pointer. Which is actually
+            // true, but a RetainPtr holds a reference counted object. It is
+            // thus safe to have several RetainPtr holding it.
+            // coverity[multiple_init_smart_ptr]
             pdfium::WrapRetain(const_cast<CPDF_Dictionary *>(pDict.Get())));
 
         poPage = new TPdfiumPageStruct;
@@ -2537,6 +2542,11 @@ GDALPDFObject *PDFDataset::GetCatalog()
         const CPDF_Dictionary *catalog = m_poDocPdfium->doc->GetRoot();
         if (catalog)
             m_poCatalogObject =
+                // coverity is confused by WrapRetain(), believing that multiple
+                // smart pointers manage the same raw pointer. Which is actually
+                // true, but a RetainPtr holds a reference counted object. It is
+                // thus safe to have several RetainPtr holding it.
+                // coverity[multiple_init_smart_ptr]
                 GDALPDFObjectPdfium::Build(pdfium::WrapRetain(catalog));
     }
 #endif  // ~ HAVE_PDFIUM
@@ -5400,6 +5410,11 @@ PDFDataset *PDFDataset::Open(GDALOpenInfo *poOpenInfo)
 #ifdef HAVE_PDFIUM
     if (bUseLib.test(PDFLIB_PDFIUM))
     {
+        // coverity is confused by WrapRetain(), believing that multiple
+        // smart pointers manage the same raw pointer. Which is actually
+        // true, but a RetainPtr holds a reference counted object. It is
+        // thus safe to have several RetainPtr holding it.
+        // coverity[multiple_init_smart_ptr]
         GDALPDFObjectPdfium *poRoot = GDALPDFObjectPdfium::Build(
             pdfium::WrapRetain(poDocPdfium->doc->GetRoot()));
         if (poRoot->GetType() == PDFObjectType_Dictionary)
