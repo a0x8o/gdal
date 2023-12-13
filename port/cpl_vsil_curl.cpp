@@ -626,10 +626,6 @@ void VSICURLInitWriteFuncStruct(WriteFuncStruct *psStruct, VSILFILE *fp,
     psStruct->pfnReadCbk = pfnReadCbk;
     psStruct->pReadCbkUserData = pReadCbkUserData;
     psStruct->bInterrupted = false;
-
-#if !CURL_AT_LEAST_VERSION(7, 54, 0)
-    psStruct->bIsProxyConnectHeader = false;
-#endif  //! CURL_AT_LEAST_VERSION(7,54,0)
 }
 
 /************************************************************************/
@@ -663,25 +659,6 @@ size_t VSICurlHandleWriteFunc(void *buffer, size_t count, size_t nmemb,
                 if (pszSpace)
                 {
                     psStruct->nHTTPCode = atoi(pszSpace + 1);
-
-#if !CURL_AT_LEAST_VERSION(7, 54, 0)
-                    // Workaround to ignore extra HTTP response headers from
-                    // proxies in older versions of curl.
-                    // CURLOPT_SUPPRESS_CONNECT_HEADERS fixes this
-                    if (psStruct->nHTTPCode >= 200 && psStruct->nHTTPCode < 300)
-                    {
-                        pszSpace = strchr(pszSpace + 1, ' ');
-                        if (pszSpace &&
-                            // This could be any string really, but we don't
-                            // have an easy way to distinguish between proxies
-                            // and upstream responses...
-                            STARTS_WITH_CI(pszSpace + 1,
-                                           "Connection established"))
-                        {
-                            psStruct->bIsProxyConnectHeader = true;
-                        }
-                    }
-#endif  //! CURL_AT_LEAST_VERSION(7,54,0)
                 }
             }
             else if (STARTS_WITH_CI(pszLine, "Content-Length: "))
@@ -723,30 +700,20 @@ size_t VSICurlHandleWriteFunc(void *buffer, size_t count, size_t nmemb,
 
             if (pszLine[0] == '\r' && pszLine[1] == '\n')
             {
-#if !CURL_AT_LEAST_VERSION(7, 54, 0)
-                if (psStruct->bIsProxyConnectHeader)
+                // Detect servers that don't support range downloading.
+                if (psStruct->nHTTPCode == 200 &&
+                    psStruct->bDetectRangeDownloadingError &&
+                    !psStruct->bMultiRange && !psStruct->bFoundContentRange &&
+                    (psStruct->nStartOffset != 0 ||
+                     psStruct->nContentLength >
+                         10 * (psStruct->nEndOffset - psStruct->nStartOffset +
+                               1)))
                 {
-                    psStruct->bIsProxyConnectHeader = false;
-                }
-                else
-#endif  //! CURL_AT_LEAST_VERSION(7,54,0)
-                {
-                    // Detect servers that don't support range downloading.
-                    if (psStruct->nHTTPCode == 200 &&
-                        psStruct->bDetectRangeDownloadingError &&
-                        !psStruct->bMultiRange &&
-                        !psStruct->bFoundContentRange &&
-                        (psStruct->nStartOffset != 0 ||
-                         psStruct->nContentLength >
-                             10 * (psStruct->nEndOffset -
-                                   psStruct->nStartOffset + 1)))
-                    {
-                        CPLError(CE_Failure, CPLE_AppDefined,
-                                 "Range downloading not supported by this "
-                                 "server!");
-                        psStruct->bError = true;
-                        return 0;
-                    }
+                    CPLError(CE_Failure, CPLE_AppDefined,
+                             "Range downloading not supported by this "
+                             "server!");
+                    psStruct->bError = true;
+                    return 0;
                 }
             }
         }
@@ -1301,16 +1268,11 @@ retry:
             }
         }
 
-#if CURL_AT_LEAST_VERSION(7, 55, 0)
         curl_off_t nSizeTmp = 0;
         const CURLcode code = curl_easy_getinfo(
             hCurlHandle, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &nSizeTmp);
         CPL_IGNORE_RET_VAL(dfSize);
         dfSize = static_cast<double>(nSizeTmp);
-#else
-        const CURLcode code = curl_easy_getinfo(
-            hCurlHandle, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &dfSize);
-#endif
         if (code == 0)
         {
             oFileProp.eExists = EXIST_YES;
@@ -1525,6 +1487,7 @@ retry:
             }
 
             oFileProp.eExists = EXIST_NO;
+            oFileProp.nHTTPCode = static_cast<int>(response_code);
             oFileProp.fileSize = 0;
         }
         else if (sWriteFuncData.pBuffer != nullptr)
@@ -1579,6 +1542,18 @@ bool VSICurlHandle::Exists(bool bSetError)
     {
         GetFileSize(bSetError);
     }
+    else if (oFileProp.eExists == EXIST_NO)
+    {
+        // If there was no VSI error thrown in the process,
+        // and we know the HTTP error code of the first request where the
+        // file could not be retrieved, fail by reporting the HTTP code.
+        if (bSetError && VSIGetLastErrorNo() == 0 && oFileProp.nHTTPCode)
+        {
+            VSIError(VSIE_HttpError, "HTTP response code: %d",
+                     oFileProp.nHTTPCode);
+        }
+    }
+
     return oFileProp.eExists == EXIST_YES;
 }
 
@@ -6238,3 +6213,5 @@ char *VSINetworkStatsGetAsSerializedJSON(CPL_UNUSED char **papszOptions)
 }
 
 #endif /* HAVE_CURL */
+
+#undef ENABLE_DEBUG

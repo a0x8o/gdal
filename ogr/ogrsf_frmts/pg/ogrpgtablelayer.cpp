@@ -2138,7 +2138,8 @@ int OGRPGTableLayer::TestCapability(const char *pszCap)
     else if (EQUAL(pszCap, OLCTransactions))
         return TRUE;
 
-    else if (EQUAL(pszCap, OLCFastGetExtent))
+    else if (EQUAL(pszCap, OLCFastGetExtent) ||
+             EQUAL(pszCap, OLCFastGetExtent3D))
     {
         OGRPGGeomFieldDefn *poGeomFieldDefn = nullptr;
         if (poFeatureDefn->GetGeomFieldCount() > 0)
@@ -3569,7 +3570,7 @@ OGRErr OGRPGTableLayer::GetExtent(int iGeomField, OGREnvelope *psExtent,
 
         /* Quiet error: ST_Estimated_Extent may return an error if statistics */
         /* have not been computed */
-        if (RunGetExtentRequest(psExtent, bForce, osCommand, TRUE) ==
+        if (RunGetExtentRequest(*psExtent, bForce, osCommand, TRUE) ==
             OGRERR_NONE)
             return OGRERR_NONE;
 
@@ -3924,3 +3925,5 @@ OGRGeometryTypeCounter *OGRPGTableLayer::GetGeometryTypes(
 
     return pasRet;
 }
+
+#undef PQexec

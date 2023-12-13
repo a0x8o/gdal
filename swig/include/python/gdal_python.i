@@ -1733,7 +1733,7 @@ def VectorInfoOptions(options=None,
         featureCount:
             whether to compute and display the feature count
         extent:
-            whether to compute and display the layer extent
+            whether to compute and display the layer extent. Can also be set to the string '3D' to request a 3D extent
         dumpFeatures:
             set to True to get the dump of all features
     """
@@ -1764,7 +1764,9 @@ def VectorInfoOptions(options=None,
             new_options += ['-wkt_format', wktFormat]
         if not featureCount:
             new_options += ['-nocount']
-        if not extent:
+        if extent in ('3d', '3D'):
+            new_options += ['-extent3D']
+        elif not extent:
             new_options += ['-noextent']
         if layers:
             new_options += ["dummy_dataset_name"]
@@ -3418,6 +3420,8 @@ def FootprintOptions(options=None,
                      maxPoints=None,
                      minRingArea=None,
                      layerName=None,
+                     locationFieldName="location",
+                     writeAbsolutePath=False,
                      layerCreationOptions=None,
                      datasetCreationOptions=None,
                      callback=None, callback_data=None):
@@ -3457,6 +3461,10 @@ def FootprintOptions(options=None,
         maximum number of points (100 by default, "unlimited" for unlimited)
     minRingArea:
         Minimum value for the area of a ring The unit of the area is in square pixels if targetCoordinateSystem equals "pixel", or otherwise in georeferenced units of the target vector dataset. This option is applied after the reprojection implied by dstSRS
+    locationFieldName:
+        Specifies the name of the field in the resulting vector dataset where the path of the input dataset will be stored. The default field name is "location". Can be set to None to disable creation of such field.
+    writeAbsolutePath:
+        Enables writing the absolute path of the input dataset. By default, the filename is written in the location field exactly as the dataset name.
     layerName:
         output layer name
     callback:
@@ -3520,6 +3528,12 @@ def FootprintOptions(options=None,
             else:
                 for opt in layerCreationOptions:
                     new_options += ['-lco', opt]
+        if locationFieldName is not None:
+            new_options += ['-location_field_name', locationFieldName]
+        else:
+            new_options += ['-no_location']
+        if writeAbsolutePath:
+            new_options += ['-write_absolute_path']
 
     if return_option_list:
         return new_options

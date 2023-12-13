@@ -222,8 +222,11 @@ class OGRPGLayer CPL_NON_FINAL : public OGRLayer
     void CloseCursor();
 
     virtual CPLString GetFromClauseForGetExtent() = 0;
-    OGRErr RunGetExtentRequest(OGREnvelope *psExtent, int bForce,
-                               CPLString osCommand, int bErrorAsDebug);
+    OGRErr RunGetExtentRequest(OGREnvelope &sExtent, int bForce,
+                               const std::string &osCommand, int bErrorAsDebug);
+    OGRErr RunGetExtent3DRequest(OGREnvelope3D &sExtent3D,
+                                 const std::string &osCommand,
+                                 int bErrorAsDebug);
     static void CreateMapFromFieldNameToIndex(PGresult *hResult,
                                               OGRFeatureDefn *poFeatureDefn,
                                               int *&panMapFieldNameToIndex,
@@ -254,6 +257,9 @@ class OGRPGLayer CPL_NON_FINAL : public OGRLayer
     }
     virtual OGRErr GetExtent(int iGeomField, OGREnvelope *psExtent,
                              int bForce) override;
+
+    OGRErr GetExtent3D(int iGeomField, OGREnvelope3D *psExtent3D,
+                       int bForce) override;
 
     virtual OGRErr StartTransaction() override;
     virtual OGRErr CommitTransaction() override;
