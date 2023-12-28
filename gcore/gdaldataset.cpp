@@ -301,7 +301,7 @@ GDALDataset::~GDALDataset()
             CPLDebug("GDAL", "GDALClose(%s, this=%p)", GetDescription(), this);
     }
 
-    if (bSuppressOnClose)
+    if (IsMarkedSuppressOnClose())
     {
         if (poDriver == nullptr ||
             // Someone issuing Create("foo.tif") on a
@@ -712,7 +712,7 @@ CPLErr GDALDataset::BlockBasedFlushCache(bool bAtClosing)
 
 {
     GDALRasterBand *poBand1 = GetRasterBand(1);
-    if (poBand1 == nullptr || (bSuppressOnClose && bAtClosing))
+    if (poBand1 == nullptr || (IsMarkedSuppressOnClose() && bAtClosing))
     {
         return GDALDataset::FlushCache(bAtClosing);
     }
@@ -1686,6 +1686,16 @@ void GDALDataset::MarkSuppressOnClose()
 }
 
 /************************************************************************/
+/*                       UnMarkSuppressOnClose()                        */
+/************************************************************************/
+
+/** Remove the flag requesting the dataset to be deleted on close. */
+void GDALDataset::UnMarkSuppressOnClose()
+{
+    bSuppressOnClose = false;
+}
+
+/************************************************************************/
 /*                        CleanupPostFileClosing()                      */
 /************************************************************************/
 
@@ -1696,7 +1706,7 @@ void GDALDataset::MarkSuppressOnClose()
  */
 void GDALDataset::CleanupPostFileClosing()
 {
-    if (bSuppressOnClose)
+    if (IsMarkedSuppressOnClose())
     {
         char **papszFileList = GetFileList();
         for (int i = 0; papszFileList && papszFileList[i]; ++i)
@@ -2589,6 +2599,10 @@ CPLErr GDALDataset::ValidateRasterIOOrAdviseReadParameters(
  * nBufXSize * nBufYSize * nBandCount words of type eBufType.  It is organized
  * in left to right,top to bottom pixel order.  Spacing is controlled by the
  * nPixelSpace, and nLineSpace parameters.
+ * Note that even with eRWFlag==GF_Write, the content of the buffer might be
+ * temporarily modified during the execution of this method (and eventually
+ * restored back to its original content), so it is not safe to use a buffer
+ * stored in a read-only section of the calling program.
  *
  * @param nBufXSize the width of the buffer image into which the desired region
  * is to be read, or from which it is to be written.

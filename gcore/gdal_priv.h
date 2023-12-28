@@ -642,6 +642,14 @@ class CPL_DLL GDALDataset : public GDALMajorObject
     void MarkAsShared();
 
     void MarkSuppressOnClose();
+    void UnMarkSuppressOnClose();
+    /** Return MarkSuppressOnClose flag.
+    * @return MarkSuppressOnClose flag.
+    */
+    bool IsMarkedSuppressOnClose()
+    {
+        return bSuppressOnClose;
+    }
 
     /** Return open options.
      * @return open options.
@@ -3870,6 +3878,8 @@ typedef CPLErr (*GDALResampleFunction)(
 
 GDALResampleFunction GDALGetResampleFunction(const char *pszResampling,
                                              int *pnRadius);
+
+std::string GDALGetNormalizedOvrResampling(const char *pszResampling);
 
 GDALDataType GDALGetOvrWorkDataType(const char *pszResampling,
                                     GDALDataType eSrcDataType);

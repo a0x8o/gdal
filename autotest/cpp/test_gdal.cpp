@@ -2533,6 +2533,32 @@ TEST_F(test_gdal, MarkSuppressOnClose)
     }
 }
 
+// Test effect of UnMarkSuppressOnClose()
+TEST_F(test_gdal, UnMarkSuppressOnClose)
+{
+    const char *pszFilename = "/vsimem/out.tif";
+    const char *const apszOptions[] = {"PROFILE=BASELINE", nullptr};
+    {
+        GDALDatasetUniquePtr poDstDS(
+            GDALDriver::FromHandle(GDALGetDriverByName("GTiff"))
+                ->Create(pszFilename, 1, 1, 1, GDT_Byte, apszOptions));
+        poDstDS->MarkSuppressOnClose();
+        poDstDS->GetRasterBand(1)->Fill(255);
+        if (poDstDS->IsMarkedSuppressOnClose())
+            poDstDS->UnMarkSuppressOnClose();
+        poDstDS->FlushCache(true);
+        // All buffers have been flushed, and our dirty block should have
+        // been written hence the checksum will not be 0
+        EXPECT_NE(GDALChecksumImage(
+                      GDALRasterBand::FromHandle(poDstDS->GetRasterBand(1)), 0,
+                      0, 1, 1),
+                  0);
+        VSIStatBufL sStat;
+        EXPECT_TRUE(VSIStatL(pszFilename, &sStat) == 0);
+        VSIUnlink(pszFilename);
+    }
+}
+
 template <class T> void TestCachedPixelAccessor()
 {
     constexpr auto eType = GDALCachedPixelAccessorGetDataType<T>::DataType;
@@ -3497,41 +3523,31 @@ TEST_F(test_gdal, drop_cache)
     CPLErrorReset();
     {
         GDALDriverManager *gdalDriverManager = GetGDALDriverManager();
-        GDALDriver *enviDriver =
-            !gdalDriverManager ? nullptr
-                               : gdalDriverManager->GetDriverByName("ENVI");
+        if (!gdalDriverManager)
+            return;
+        GDALDriver *enviDriver = gdalDriverManager->GetDriverByName("ENVI");
+        if (!enviDriver)
+            return;
         const char *enviOptions[] = {"SUFFIX=ADD", "INTERLEAVE=BIL", nullptr};
 
         const char *filename = GCORE_DATA_DIR "test_drop_cache.bil";
 
-        GDALDataset *poDS1 =
-            !enviDriver
-                ? nullptr
-                : enviDriver->Create(filename, 1, 1, 1,
-                                     GDALDataType::GDT_Float32, enviOptions);
-        if (poDS1)
-        {
-            GDALRasterBand *rasterBand =
-                !poDS1 ? nullptr : poDS1->GetRasterBand(1);
-            if (rasterBand)
-                rasterBand->Fill(1);
-            poDS1->DropCache();
-            GDALClose(poDS1);
-            poDS1 = nullptr;
-        }
+        auto poDS = std::unique_ptr<GDALDataset>(enviDriver->Create(
+            filename, 1, 1, 1, GDALDataType::GDT_Float32, enviOptions));
+        if (!poDS)
+            return;
+        poDS->GetRasterBand(1)->Fill(1);
+        poDS->DropCache();
+        poDS.reset();
 
-        GDALDataset *poDS2 =
-            GDALDataset::Open(filename, GDAL_OF_SHARED, nullptr, nullptr);
+        poDS.reset(
+            GDALDataset::Open(filename, GDAL_OF_SHARED, nullptr, nullptr));
+        if (!poDS)
+            return;
 
-        if (poDS2)
-        {
-            GDALRasterBand *rasterBand =
-                !poDS2 ? nullptr : poDS2->GetRasterBand(1);
-            EXPECT_EQ(GDALChecksumImage(rasterBand, 0, 0, 1, 1), 0);
-            poDS2->MarkSuppressOnClose();
-            GDALClose(poDS2);
-            poDS2 = nullptr;
-        }
+        EXPECT_EQ(GDALChecksumImage(poDS->GetRasterBand(1), 0, 0, 1, 1), 0);
+        poDS->MarkSuppressOnClose();
+        poDS.reset();
     }
 }
 
