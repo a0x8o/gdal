@@ -1402,7 +1402,7 @@ GDALDatasetH GDALWarp(const char *pszDest, GDALDatasetH hDstDS, int nSrcCount,
     {
         if (psOptions->osFormat.empty())
         {
-            CPLString osFormat = GetOutputDriverForRaster(pszDest);
+            const std::string osFormat = GetOutputDriverForRaster(pszDest);
             if (osFormat.empty())
             {
                 return nullptr;
@@ -5269,7 +5269,8 @@ static bool IsValidSRS(const char *pszUserInput)
 /*                             GDALWarpAppOptionsNew()                  */
 /************************************************************************/
 
-#ifndef CHECK_HAS_ENOUGH_ADDITIONAL_ARGS
+#ifndef CheckHasEnoughAdditionalArgs_defined
+#define CheckHasEnoughAdditionalArgs_defined
 static bool CheckHasEnoughAdditionalArgs(CSLConstList papszArgv, int i,
                                          int nExtraArg, int nArgc)
 {
@@ -5282,13 +5283,13 @@ static bool CheckHasEnoughAdditionalArgs(CSLConstList papszArgv, int i,
     }
     return true;
 }
+#endif
 
 #define CHECK_HAS_ENOUGH_ADDITIONAL_ARGS(nExtraArg)                            \
     if (!CheckHasEnoughAdditionalArgs(papszArgv, i, nExtraArg, nArgc))         \
     {                                                                          \
         return nullptr;                                                        \
     }
-#endif
 
 /**
  * Allocates a GDALWarpAppOptions struct.
@@ -5447,7 +5448,7 @@ GDALWarpAppOptionsNew(char **papszArgv,
                 return nullptr;
             }
             if (i < nArgc - 1 && atoi(papszArgv[i + 1]) >= 0 &&
-                isdigit(papszArgv[i + 1][0]))
+                isdigit(static_cast<unsigned char>(papszArgv[i + 1][0])))
             {
                 psOptions->aosTransformerOptions.SetNameValue(
                     "REFINE_MINIMUM_GCPS", papszArgv[++i]);
@@ -5942,3 +5943,5 @@ void GDALWarpAppOptionsSetWarpOption(GDALWarpAppOptions *psOptions,
 {
     psOptions->aosWarpOptions.SetNameValue(pszKey, pszValue);
 }
+
+#undef CHECK_HAS_ENOUGH_ADDITIONAL_ARGS

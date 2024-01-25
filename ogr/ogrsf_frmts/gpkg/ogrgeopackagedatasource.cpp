@@ -1279,7 +1279,8 @@ GDALGeoPackageDataset::GetContents()
                 oDesc.osMaxX = pszMaxX;
             if (pszMaxY)
                 oDesc.osMaxY = pszMaxY;
-            m_oMapTableToContents[CPLString(pszTableName).toupper()] = oDesc;
+            m_oMapTableToContents[CPLString(pszTableName).toupper()] =
+                std::move(oDesc);
         }
     }
 
@@ -5904,11 +5905,8 @@ bool GDALGeoPackageDataset::HasGriddedCoverageAncillaryTable()
 
 static GDALDataset *GetUnderlyingDataset(GDALDataset *poSrcDS)
 {
-    if (EQUAL(poSrcDS->GetDescription(), "") &&
-        poSrcDS->GetDriver() != nullptr &&
-        poSrcDS->GetDriver() == GDALGetDriverByName("VRT"))
+    if (auto poVRTDS = dynamic_cast<VRTDataset *>(poSrcDS))
     {
-        VRTDataset *poVRTDS = cpl::down_cast<VRTDataset *>(poSrcDS);
         auto poTmpDS = poVRTDS->GetSingleSimpleSource();
         if (poTmpDS)
             return poTmpDS;
@@ -7072,7 +7070,8 @@ OGRLayer *GDALGeoPackageDataset::ExecuteSQL(const char *pszSQLCommand,
 
     FlushMetadata();
 
-    while (*pszSQLCommand != '\0' && isspace(*pszSQLCommand))
+    while (*pszSQLCommand != '\0' &&
+           isspace(static_cast<unsigned char>(*pszSQLCommand)))
         pszSQLCommand++;
 
     CPLString osSQLCommand(pszSQLCommand);
