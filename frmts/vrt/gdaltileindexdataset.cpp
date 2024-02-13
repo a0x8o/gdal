@@ -193,7 +193,7 @@ class GDALTileIndexDataset final : public GDALPamDataset
     //! Optional GTI XML
     CPLXMLTreeCloser m_psXMLTree{nullptr};
 
-    //! Wehther the GTI XML might be modified (by SetMetadata/SetMetadataItem)
+    //! Whether the GTI XML might be modified (by SetMetadata/SetMetadataItem)
     bool m_bXMLUpdatable = false;
 
     //! Whether the GTI XML has been modified (by SetMetadata/SetMetadataItem)
@@ -326,7 +326,7 @@ class GDALTileIndexDataset final : public GDALPamDataset
     //! sources are fully covering it.
     bool NeedInitBuffer(int nBandCount, const int *panBandMap) const;
 
-    //! Nodata initialze the output buffer.
+    //! Nodata initialize the output buffer.
     void InitBuffer(void *pData, int nBufXSize, int nBufYSize,
                     GDALDataType eBufType, int nBandCount,
                     const int *panBandMap, GSpacing nPixelSpace,
@@ -2297,10 +2297,10 @@ CPLErr GDALTileIndexBand::IReadBlock(int nBlockXOff, int nBlockYOff,
     GDALRasterIOExtraArg sExtraArg;
     INIT_RASTERIO_EXTRA_ARG(sExtraArg);
 
-    return IRasterIO(GF_Read, nBlockXOff * nBlockXSize,
-                     nBlockYOff * nBlockYSize, nReadXSize, nReadYSize, pImage,
-                     nReadXSize, nReadYSize, eDataType, nPixelSize,
-                     nPixelSize * nBlockXSize, &sExtraArg);
+    return IRasterIO(
+        GF_Read, nBlockXOff * nBlockXSize, nBlockYOff * nBlockYSize, nReadXSize,
+        nReadYSize, pImage, nReadXSize, nReadYSize, eDataType, nPixelSize,
+        static_cast<GSpacing>(nPixelSize) * nBlockXSize, &sExtraArg);
 }
 
 /************************************************************************/

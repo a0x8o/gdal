@@ -38,6 +38,8 @@
 #include "ogrpgutility.h"
 #include "ogr_pgdump.h"
 
+#include <map>
+#include <optional>
 #include <vector>
 
 /* These are the OIDs for some builtin types, as returned by PQftype(). */
@@ -594,9 +596,9 @@ class OGRPGDataSource final : public OGRDataSource
 
     // We maintain a list of known SRID to reduce the number of trips to
     // the database to get SRSes.
-    int nKnownSRID = 0;
-    int *panSRID = nullptr;
-    OGRSpatialReference **papoSRS = nullptr;
+    std::map<int,
+             std::unique_ptr<OGRSpatialReference, OGRSpatialReferenceReleaser>>
+        m_oSRSCache{};
 
     OGRPGTableLayer *poLayerInCopyMode = nullptr;
 
@@ -623,6 +625,8 @@ class OGRPGDataSource final : public OGRDataSource
     OGRErr FlushSoftTransaction();
 
     OGRErr FlushCacheWithRet(bool bAtClosing);
+
+    std::optional<std::string> FindSchema(const char *pszSchemaNameIn);
 
   public:
     PGver sPostgreSQLVersion = {0, 0, 0};
@@ -653,7 +657,7 @@ class OGRPGDataSource final : public OGRDataSource
     }
 
     int FetchSRSId(const OGRSpatialReference *poSRS);
-    OGRSpatialReference *FetchSRS(int nSRSId);
+    const OGRSpatialReference *FetchSRS(int nSRSId);
     static OGRErr InitializeMetadataTables();
 
     int Open(const char *, int bUpdate, int bTestOpen, char **papszOpenOptions);
