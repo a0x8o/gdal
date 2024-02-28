@@ -94,15 +94,15 @@ pixel.  Currently it reports:
 
 - The location of the pixel in pixel/line space.
 - The result of a LocationInfo metadata query against the datasource.
-  This is implement for VRT files which will report the
+  This is implemented for VRT files which will report the
   file(s) used to satisfy requests for that pixel, and by the
-  :ref:`raster.mbtiles` driver
+  :ref:`raster.mbtiles` driver.
 - The raster pixel value of that pixel for all or a subset of the bands.
 - The unscaled pixel value if a Scale and/or Offset apply to the band.
 
 The pixel selected is requested by x/y coordinate on the command line, or read
 from stdin. More than one coordinate pair can be supplied when reading
-coordinates from stdin. By default pixel/line coordinates are expected.
+coordinates from stdin. By default integer pixel/line coordinates are expected.
 However with use of the :option:`-geoloc`, :option:`-wgs84`, or :option:`-l_srs` switches it is possible
 to specify the location in other coordinate systems.
 

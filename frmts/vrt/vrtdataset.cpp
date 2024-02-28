@@ -328,10 +328,14 @@ CPLXMLNode *VRTDataset::SerializeToXML(const char *pszVRTPathIn)
     {
     }
     CPLAssert(psLastChild);  // we have at least rasterXSize
+    bool bHasWarnedAboutRAMUsage = false;
+    size_t nAccRAMUsage = 0;
     for (int iBand = 0; iBand < nBands; iBand++)
     {
-        CPLXMLNode *psBandTree = static_cast<VRTRasterBand *>(papoBands[iBand])
-                                     ->SerializeToXML(pszVRTPathIn);
+        CPLXMLNode *psBandTree =
+            static_cast<VRTRasterBand *>(papoBands[iBand])
+                ->SerializeToXML(pszVRTPathIn, bHasWarnedAboutRAMUsage,
+                                 nAccRAMUsage);
 
         if (psBandTree != nullptr)
         {
@@ -345,7 +349,8 @@ CPLXMLNode *VRTDataset::SerializeToXML(const char *pszVRTPathIn)
     /* -------------------------------------------------------------------- */
     if (m_poMaskBand)
     {
-        CPLXMLNode *psBandTree = m_poMaskBand->SerializeToXML(pszVRTPathIn);
+        CPLXMLNode *psBandTree = m_poMaskBand->SerializeToXML(
+            pszVRTPathIn, bHasWarnedAboutRAMUsage, nAccRAMUsage);
 
         if (psBandTree != nullptr)
         {
@@ -429,7 +434,7 @@ VRTRasterBand *VRTDataset::InitBand(const char *pszSubclass, int nBand,
 /*                              XMLInit()                               */
 /************************************************************************/
 
-CPLErr VRTDataset::XMLInit(CPLXMLNode *psTree, const char *pszVRTPathIn)
+CPLErr VRTDataset::XMLInit(const CPLXMLNode *psTree, const char *pszVRTPathIn)
 
 {
     if (pszVRTPathIn != nullptr)
@@ -438,7 +443,7 @@ CPLErr VRTDataset::XMLInit(CPLXMLNode *psTree, const char *pszVRTPathIn)
     /* -------------------------------------------------------------------- */
     /*      Check for an SRS node.                                          */
     /* -------------------------------------------------------------------- */
-    CPLXMLNode *psSRSNode = CPLGetXMLNode(psTree, "SRS");
+    const CPLXMLNode *psSRSNode = CPLGetXMLNode(psTree, "SRS");
     if (psSRSNode)
     {
         if (m_poSRS)
@@ -475,11 +480,12 @@ CPLErr VRTDataset::XMLInit(CPLXMLNode *psTree, const char *pszVRTPathIn)
     /* -------------------------------------------------------------------- */
     /*      Check for a GeoTransform node.                                  */
     /* -------------------------------------------------------------------- */
-    if (strlen(CPLGetXMLValue(psTree, "GeoTransform", "")) > 0)
+    const char *pszGT = CPLGetXMLValue(psTree, "GeoTransform", "");
+    if (strlen(pszGT) > 0)
     {
-        const char *pszGT = CPLGetXMLValue(psTree, "GeoTransform", "");
-        char **papszTokens = CSLTokenizeStringComplex(pszGT, ",", FALSE, FALSE);
-        if (CSLCount(papszTokens) != 6)
+        const CPLStringList aosTokens(
+            CSLTokenizeStringComplex(pszGT, ",", FALSE, FALSE));
+        if (aosTokens.size() != 6)
         {
             CPLError(CE_Warning, CPLE_AppDefined,
                      "GeoTransform node does not have expected six values.");
@@ -487,19 +493,15 @@ CPLErr VRTDataset::XMLInit(CPLXMLNode *psTree, const char *pszVRTPathIn)
         else
         {
             for (int iTA = 0; iTA < 6; iTA++)
-                m_adfGeoTransform[iTA] = CPLAtof(papszTokens[iTA]);
+                m_adfGeoTransform[iTA] = CPLAtof(aosTokens[iTA]);
             m_bGeoTransformSet = TRUE;
         }
-
-        CSLDestroy(papszTokens);
     }
 
     /* -------------------------------------------------------------------- */
     /*      Check for GCPs.                                                 */
     /* -------------------------------------------------------------------- */
-    CPLXMLNode *psGCPList = CPLGetXMLNode(psTree, "GCPList");
-
-    if (psGCPList != nullptr)
+    if (const CPLXMLNode *psGCPList = CPLGetXMLNode(psTree, "GCPList"))
     {
         GDALDeserializeGCPListFromXML(psGCPList, &m_pasGCPList, &m_nGCPCount,
                                       &m_poGCP_SRS);
@@ -515,9 +517,9 @@ CPLErr VRTDataset::XMLInit(CPLXMLNode *psTree, const char *pszVRTPathIn)
     /* -------------------------------------------------------------------- */
 
     /* Parse dataset mask band first */
-    CPLXMLNode *psMaskBandNode = CPLGetXMLNode(psTree, "MaskBand");
+    const CPLXMLNode *psMaskBandNode = CPLGetXMLNode(psTree, "MaskBand");
 
-    CPLXMLNode *psChild = nullptr;
+    const CPLXMLNode *psChild = nullptr;
     if (psMaskBandNode)
         psChild = psMaskBandNode->psChild;
     else
@@ -576,8 +578,7 @@ CPLErr VRTDataset::XMLInit(CPLXMLNode *psTree, const char *pszVRTPathIn)
         }
     }
 
-    CPLXMLNode *psGroup = CPLGetXMLNode(psTree, "Group");
-    if (psGroup)
+    if (const CPLXMLNode *psGroup = CPLGetXMLNode(psTree, "Group"))
     {
         const char *pszName = CPLGetXMLValue(psGroup, "name", nullptr);
         if (pszName == nullptr || !EQUAL(pszName, "/"))

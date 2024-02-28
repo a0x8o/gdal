@@ -2296,6 +2296,30 @@ def test_ogr_gpkg_22(tmp_vsimem):
 
 
 ###############################################################################
+# Test creating a feature with FID 0
+
+
+def test_ogr_gpkg_create_with_fid_0(tmp_vsimem):
+
+    fname = tmp_vsimem / "test_ogr_gpkg_create_with_fid_0.gpkg"
+
+    ds = gdaltest.gpkg_dr.CreateDataSource(fname)
+    lyr = ds.CreateLayer("test")
+
+    feat = ogr.Feature(lyr.GetLayerDefn())
+    feat.SetFID(0)
+    lyr.CreateFeature(feat)
+    feat = None
+
+    ds = None
+
+    ds = ogr.Open(fname)
+    lyr = ds.GetLayerByName("test")
+    f = lyr.GetNextFeature()
+    assert f.GetFID() == 0
+
+
+###############################################################################
 # Test not nullable fields
 
 
@@ -7008,6 +7032,13 @@ def test_ogr_gpkg_relations(tmp_vsimem, tmp_path):
     assert rel.GetRightMappingTableFields() == ["related_id"]
     assert rel.GetRelatedTableType() == "attributes"
 
+    # ensure that the mapping table, which is present in gpkgext_relations but
+    # NOT gpkg_contents can be opened as a layer
+    lyr = ds.GetLayer("my_mapping_table")
+    assert lyr is not None
+    assert lyr.GetLayerDefn().GetFieldDefn(0).GetName() == "base_id"
+    assert lyr.GetLayerDefn().GetFieldDefn(1).GetName() == "related_id"
+
     lyr = ds.GetLayer("a")
     lyr.Rename("a_renamed")
     lyr.AlterFieldDefn(
@@ -7084,6 +7115,33 @@ def test_ogr_gpkg_relations(tmp_vsimem, tmp_path):
     assert rel.GetRightTableFields() == ["other_id"]
     assert rel.GetLeftMappingTableFields() == ["base_id"]
     assert rel.GetRightMappingTableFields() == ["related_id"]
+    assert rel.GetRelatedTableType() == "features"
+
+    # a one-to-many relationship defined using foreign key constraints
+    ds = gdal.OpenEx(filename, gdal.OF_VECTOR | gdal.OF_UPDATE)
+    ds.ExecuteSQL(
+        "CREATE TABLE test_relation_a(artistid INTEGER PRIMARY KEY, artistname  TEXT)"
+    )
+    ds.ExecuteSQL(
+        "CREATE TABLE test_relation_b(trackid INTEGER, trackname TEXT, trackartist INTEGER, FOREIGN KEY(trackartist) REFERENCES test_relation_a(artistid))"
+    )
+    ds = None
+
+    ds = gdal.OpenEx(filename, gdal.OF_VECTOR | gdal.OF_UPDATE)
+    assert ds.GetRelationshipNames() == [
+        "custom_type",
+        "test_relation_a_test_relation_b",
+    ]
+    assert ds.GetRelationship("custom_type") is not None
+    rel = ds.GetRelationship("test_relation_a_test_relation_b")
+    assert rel is not None
+    assert rel.GetName() == "test_relation_a_test_relation_b"
+    assert rel.GetLeftTableName() == "test_relation_a"
+    assert rel.GetRightTableName() == "test_relation_b"
+    assert rel.GetCardinality() == gdal.GRC_ONE_TO_MANY
+    assert rel.GetType() == gdal.GRT_ASSOCIATION
+    assert rel.GetLeftTableFields() == ["artistid"]
+    assert rel.GetRightTableFields() == ["trackartist"]
     assert rel.GetRelatedTableType() == "features"
 
     ds = None
@@ -7259,6 +7317,31 @@ def test_ogr_gpkg_alter_relations(tmp_vsimem, tmp_path):
         )
         == 1
     )
+
+    # validate mapping table was created
+    assert get_query_row_count("SELECT * FROM 'origin_table_dest_table'") == 0
+    # validate mapping table is present in gpkg_contents
+    assert (
+        get_query_row_count(
+            "SELECT * FROM gpkg_contents WHERE table_name='origin_table_dest_table' AND data_type='attributes'"
+        )
+        == 1
+    )
+    # force delete from gpkg_contents, and then ensure that we CAN successfully
+    # load layers which are present ONLY in gpkgext_relations but NOT
+    # gpkg_contents (i.e. datasources which follow the Related Tables specification
+    # exactly)
+    ds.ExecuteSQL(
+        "DELETE FROM gpkg_contents WHERE table_name='origin_table_dest_table'"
+    )
+
+    ds = gdal.OpenEx(filename, gdal.OF_VECTOR | gdal.OF_UPDATE)
+    # ensure that the mapping table, which is present in gpkgext_relations but
+    # NOT gpkg_contents can be opened as a layer
+    lyr = ds.GetLayer("origin_table_dest_table")
+    assert lyr is not None
+    assert lyr.GetLayerDefn().GetFieldDefn(0).GetName() == "base_id"
+    assert lyr.GetLayerDefn().GetFieldDefn(1).GetName() == "related_id"
 
     lyr = ds.CreateLayer("origin_table2", geom_type=ogr.wkbNone)
     fld_defn = ogr.FieldDefn("o_pkey", ogr.OFTInteger)

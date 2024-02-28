@@ -1567,6 +1567,7 @@ int GDALGeoPackageDataset::Open(GDALOpenInfo *poOpenInfo,
     CheckUnknownExtensions();
 
     int bRet = FALSE;
+    bool bHasGPKGExtRelations = false;
     if (poOpenInfo->nOpenFlags & GDAL_OF_VECTOR)
     {
         m_bHasGPKGGeometryColumns =
@@ -1575,6 +1576,7 @@ int GDALGeoPackageDataset::Open(GDALOpenInfo *poOpenInfo,
                           "name = 'gpkg_geometry_columns' AND "
                           "type IN ('table', 'view')",
                           nullptr) == 1;
+        bHasGPKGExtRelations = HasGpkgextRelationsTable();
     }
     if (m_bHasGPKGGeometryColumns)
     {
@@ -1614,6 +1616,18 @@ int GDALGeoPackageDataset::Open(GDALOpenInfo *poOpenInfo,
             bHasASpatialOrAttributes =
                 (oResultTable && oResultTable->RowCount() == 1);
         }
+        if (bHasGPKGExtRelations)
+        {
+            osSQL += "UNION ALL "
+                     "SELECT mapping_table_name, mapping_table_name, 0 as "
+                     "is_spatial, NULL, NULL, 0, 0, 0 AS "
+                     "xmin, 0 AS ymin, 0 AS xmax, 0 AS ymax, 0 AS "
+                     "is_in_gpkg_contents, 'table' AS object_type "
+                     "FROM gpkgext_relations WHERE "
+                     "lower(mapping_table_name) NOT IN (SELECT "
+                     "lower(table_name) FROM "
+                     "gpkg_contents)";
+        }
         if (EQUAL(pszListAllTables, "YES") ||
             (!bHasASpatialOrAttributes && EQUAL(pszListAllTables, "AUTO")))
         {
@@ -1632,6 +1646,12 @@ int GDALGeoPackageDataset::Open(GDALOpenInfo *poOpenInfo,
                 "'st_geometry_columns', 'geometry_columns') "
                 "AND lower(name) NOT IN (SELECT lower(table_name) FROM "
                 "gpkg_contents)";
+            if (bHasGPKGExtRelations)
+            {
+                osSQL += " AND lower(name) NOT IN (SELECT "
+                         "lower(mapping_table_name) FROM "
+                         "gpkgext_relations)";
+            }
         }
         const int nTableLimit = GetOGRTableLimit();
         if (nTableLimit > 0)
@@ -2018,14 +2038,24 @@ void GDALGeoPackageDataset::ClearCachedRelationships()
 
 void GDALGeoPackageDataset::LoadRelationships() const
 {
+    m_osMapRelationships.clear();
+
+    std::vector<std::string> oExcludedTables;
     if (HasGpkgextRelationsTable())
     {
         LoadRelationshipsUsingRelatedTablesExtension();
+
+        for (const auto &oRelationship : m_osMapRelationships)
+        {
+            oExcludedTables.emplace_back(
+                oRelationship.second->GetMappingTableName());
+        }
     }
-    else
-    {
-        LoadRelationshipsFromForeignKeys();
-    }
+
+    // Also load relationships defined using foreign keys (i.e. one-to-many
+    // relationships). Here we must exclude any relationships defined from the
+    // related tables extension, we don't want them included twice.
+    LoadRelationshipsFromForeignKeys(oExcludedTables);
     m_bHasPopulatedRelationships = true;
 }
 
@@ -9794,45 +9824,6 @@ bool GDALGeoPackageDataset::AddFieldDomain(
 }
 
 /************************************************************************/
-/*                        GetRelationshipNames()                        */
-/************************************************************************/
-
-std::vector<std::string> GDALGeoPackageDataset::GetRelationshipNames(
-    CPL_UNUSED CSLConstList papszOptions) const
-
-{
-    if (!m_bHasPopulatedRelationships)
-        LoadRelationships();
-
-    std::vector<std::string> oasNames;
-    oasNames.reserve(m_osMapRelationships.size());
-    for (auto it = m_osMapRelationships.begin();
-         it != m_osMapRelationships.end(); ++it)
-    {
-        oasNames.emplace_back(it->first);
-    }
-    return oasNames;
-}
-
-/************************************************************************/
-/*                        GetRelationship()                             */
-/************************************************************************/
-
-const GDALRelationship *
-GDALGeoPackageDataset::GetRelationship(const std::string &name) const
-
-{
-    if (!m_bHasPopulatedRelationships)
-        LoadRelationships();
-
-    auto it = m_osMapRelationships.find(name);
-    if (it == m_osMapRelationships.end())
-        return nullptr;
-
-    return it->second.get();
-}
-
-/************************************************************************/
 /*                          AddRelationship()                           */
 /************************************************************************/
 
@@ -9985,6 +9976,35 @@ bool GDALGeoPackageDataset::AddRelationship(
                     .c_str();
             return false;
         }
+
+        /*
+         * Strictly speaking we should NOT be inserting the mapping table into gpkg_contents.
+         * The related tables extension explicitly states that the mapping table should only be
+         * in the gpkgext_relations table and not in gpkg_contents. (See also discussion at
+         * https://github.com/opengeospatial/geopackage/issues/679).
+         *
+         * However, if we don't insert the mapping table into gpkg_contents then it is no longer
+         * visible to some clients (eg ESRI software only allows opening tables that are present
+         * in gpkg_contents). So we'll do this anyway, for maximum compatiblity and flexibility.
+         *
+         * More related discussion is at https://github.com/OSGeo/gdal/pull/9258
+         */
+        pszSQL = sqlite3_mprintf(
+            "INSERT INTO gpkg_contents "
+            "(table_name,data_type,identifier,description,last_change,srs_id) "
+            "VALUES "
+            "('%q','attributes','%q','Mapping table for relationship between "
+            "%q and %q',%s,0)",
+            osMappingTableName.c_str(), /*table_name*/
+            osMappingTableName.c_str(), /*identifier*/
+            osLeftTableName.c_str(),    /*description left table name*/
+            osRightTableName.c_str(),   /*description right table name*/
+            GDALGeoPackageDataset::GetCurrentDateEscapedSQL().c_str());
+
+        // Note -- we explicitly ignore failures here, because hey, we aren't really
+        // supposed to be adding this table to gpkg_contents anyway!
+        (void)SQLCommand(hDB, pszSQL);
+        sqlite3_free(pszSQL);
 
         pszSQL = sqlite3_mprintf(
             "CREATE INDEX \"idx_%w_base_id\" ON \"%w\" (base_id);",

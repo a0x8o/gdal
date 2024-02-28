@@ -136,7 +136,7 @@ void VRTDriver::AddSourceParser(const char *pszElementName,
 /************************************************************************/
 
 VRTSource *
-VRTDriver::ParseSource(CPLXMLNode *psSrc, const char *pszVRTPath,
+VRTDriver::ParseSource(const CPLXMLNode *psSrc, const char *pszVRTPath,
                        std::map<CPLString, GDALDataset *> &oMapSharedSources)
 
 {
@@ -555,6 +555,7 @@ void GDALRegister_VRT()
     poDriver->AddSourceParser("SimpleSource", VRTParseCoreSources);
     poDriver->AddSourceParser("ComplexSource", VRTParseCoreSources);
     poDriver->AddSourceParser("AveragedSource", VRTParseCoreSources);
+    poDriver->AddSourceParser("NoDataFromMaskSource", VRTParseCoreSources);
     poDriver->AddSourceParser("KernelFilteredSource", VRTParseFilterSources);
     poDriver->AddSourceParser("ArraySource", VRTParseArraySource);
 
