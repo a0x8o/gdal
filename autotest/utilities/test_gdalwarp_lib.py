@@ -3501,7 +3501,7 @@ def test_gdalwarp_lib_sum_preserving_multiband():
 ###############################################################################
 
 
-def test_gdalwarp_lib_sum_preserving_accross_antimeridian():
+def test_gdalwarp_lib_sum_preserving_across_antimeridian():
 
     src_ds = gdal.Translate(
         "",
@@ -4033,3 +4033,10 @@ def test_gdalwarp_lib_to_projection_without_inverse_method():
                 1218250.2778614,
             ],
         )
+
+
+def test_gdalwarp_lib_no_crash_on_none_dst():
+
+    ds1 = gdal.Open("../gcore/data/byte.tif")
+    with pytest.raises(ValueError):
+        gdal.Warp(None, ds1)

@@ -102,5 +102,11 @@ Examples
 
 To create a text file in `xyz` format from the input file `input.tif`.
 The first columns, x and y, are the coordinates of the centers of each cell.
-The remaining colums represent the first and second bands.
+The remaining columns represent the first and second bands.
 We also replace the dataset nodata values with zeros.
+
+
+Caveats
+-------
+
+gdal2xyz output values with a limited precision. Use ``gdal_translate -of XYZ`` if more precision is desired.
