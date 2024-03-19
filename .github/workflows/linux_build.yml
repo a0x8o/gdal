@@ -63,6 +63,7 @@ jobs:
             id: alpine
             container: alpine
             build_script: build.sh
+            os: ubuntu-22.04
 
           - name: Alpine, gcc 32-bit
             id: alpine_32bit
@@ -70,12 +71,14 @@ jobs:
             build_script: build.sh
             test_script: test.sh
             travis_branch: alpine_32bit
+            os: ubuntu-22.04
 
           - name: Fedora Rawhide, clang++
             id: fedora_rawhide
             travis_branch: sanitize
             container: fedora_rawhide
             build_script: build.sh
+            os: ubuntu-22.04
 
           - name: Ubuntu 22.04, gcc
             id: ubuntu_22.04
@@ -84,13 +87,16 @@ jobs:
             before_test_script: services.sh
             build_script: build.sh
             test_script: test.sh
+            os: ubuntu-22.04
 
-          - name: Ubuntu 20.04, clang ASAN
+          - name: Ubuntu 22.04, clang ASAN
             id: asan
             travis_branch: sanitize
-            container: ubuntu_20.04
+            container: ubuntu_22.04
             build_script: build.sh
             test_script: test.sh
+            # We force the host OS to be 20.04 to avoid "AddressSanitizer:DEADLYSIGNAL"
+            os: ubuntu-20.04
 
           - name: Ubuntu 20.04, gcc
             id: ubuntu_20.04
@@ -99,6 +105,7 @@ jobs:
             use_avx2: true
             build_script: build.sh
             test_script: test.sh
+            os: ubuntu-22.04
 
           - name: Ubuntu 20.04, coverage
             id: coverage
@@ -107,6 +114,7 @@ jobs:
             before_test_script: services.sh
             build_script: build.sh
             test_script: test.sh
+            os: ubuntu-22.04
 
           - name: Ubuntu 20.04, benchmarks
             id: benchmarks
@@ -114,15 +122,17 @@ jobs:
             container: ubuntu_20.04
             build_script: build.sh
             test_script: test.sh
+            os: ubuntu-22.04
 
           - name: Ubuntu 20.04, Intel compiler
             id: icc
             container: icc
             build_script: build.sh
+            os: ubuntu-22.04
 
     name: ${{ matrix.name }}
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     defaults:
       run:
@@ -143,11 +153,11 @@ jobs:
           echo "CONTAINER_NAME_FULL=${CONTAINER_REGISTRY}/${CONTAINER_REGISTRY_USER,,}/${CONTAINER_NAME}:${CONTAINER_TAG_CLEAN}"  >>${GITHUB_ENV}
 
       - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
 
       - name: Login to Docker Hub
         if: env.CONTAINER_REGISTRY == 'docker.io'
-        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        uses: docker/login-action@e92390c5fb421da1463c202d546fed0ec5c39f20 # v3.1.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}

@@ -143,6 +143,7 @@ CPLErr CPL_DLL GDALWarpCutlineMaskerEx(void *pMaskFuncArg, int nBandCount,
                                        GByte ** /* ppImageData */,
                                        int bMaskIsFloat, void *pValidityMask,
                                        int *pnValidityFlag);
+
 /*! @endcond */
 
 /************************************************************************/
@@ -488,6 +489,7 @@ void GWKThreadsEnd(void *psThreadDataIn);
 
 /*! @cond Doxygen_Suppress */
 typedef struct _GDALWarpChunk GDALWarpChunk;
+
 /*! @endcond */
 
 class CPL_DLL GDALWarpOperation
@@ -506,13 +508,6 @@ class CPL_DLL GDALWarpOperation
         bool bAll, int nStepCount, bool bTryWithCheckWithInvertProj,
         double &dfMinXOut, double &dfMinYOut, double &dfMaxXOut,
         double &dfMaxYOut, int &nSamplePoints, int &nFailedCount);
-
-    CPLErr ComputeSourceWindow(int nDstXOff, int nDstYOff, int nDstXSize,
-                               int nDstYSize, int *pnSrcXOff, int *pnSrcYOff,
-                               int *pnSrcXSize, int *pnSrcYSize,
-                               double *pdfSrcXExtraSize,
-                               double *pdfSrcYExtraSize,
-                               double *pdfSrcFillRatio);
 
     void ComputeSourceWindowStartingFromSource(int nDstXOff, int nDstYOff,
                                                int nDstXSize, int nDstYSize,
@@ -584,6 +579,18 @@ class CPL_DLL GDALWarpOperation
                               int nSrcYOff, int nSrcXSize, int nSrcYSize,
                               double dfSrcXExtraSize, double dfSrcYExtraSize,
                               double dfProgressBase, double dfProgressScale);
+
+  protected:
+    friend class VRTWarpedDataset;
+    CPLErr ComputeSourceWindow(int nDstXOff, int nDstYOff, int nDstXSize,
+                               int nDstYSize, int *pnSrcXOff, int *pnSrcYOff,
+                               int *pnSrcXSize, int *pnSrcYSize,
+                               double *pdfSrcXExtraSize,
+                               double *pdfSrcYExtraSize,
+                               double *pdfSrcFillRatio);
+
+    double GetWorkingMemoryForWindow(int nSrcXSize, int nSrcYSize,
+                                     int nDstXSize, int nDstYSize) const;
 };
 
 #endif /* def __cplusplus */

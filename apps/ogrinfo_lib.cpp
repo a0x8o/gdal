@@ -713,17 +713,16 @@ static void GDALVectorInfoReportMetadata(CPLString &osRet, CPLJSONObject &oRoot,
     /* -------------------------------------------------------------------- */
     if (bListMDD)
     {
-        char **papszMDDList = GDALGetMetadataDomainList(hObject);
-        char **papszIter = papszMDDList;
+        const CPLStringList aosMDDList(GDALGetMetadataDomainList(hObject));
 
         CPLJSONArray metadataDomains;
 
-        if (papszMDDList != nullptr && !bJson)
+        if (!aosMDDList.empty() && !bJson)
             Concat(osRet, psOptions->bStdoutOutput, "%sMetadata domains:\n",
                    pszIndent);
-        while (papszIter != nullptr && *papszIter != nullptr)
+        for (const char *pszDomain : aosMDDList)
         {
-            if (EQUAL(*papszIter, ""))
+            if (EQUAL(pszDomain, ""))
             {
                 if (bJson)
                     metadataDomains.Add("");
@@ -734,14 +733,12 @@ static void GDALVectorInfoReportMetadata(CPLString &osRet, CPLJSONObject &oRoot,
             else
             {
                 if (bJson)
-                    metadataDomains.Add(*papszIter);
+                    metadataDomains.Add(pszDomain);
                 else
                     Concat(osRet, psOptions->bStdoutOutput, "%s  %s\n",
-                           pszIndent, *papszIter);
+                           pszIndent, pszDomain);
             }
-            papszIter++;
         }
-        CSLDestroy(papszMDDList);
 
         if (bJson)
             oRoot.Add("metadataDomains", metadataDomains);
@@ -763,43 +760,33 @@ static void GDALVectorInfoReportMetadata(CPLString &osRet, CPLJSONObject &oRoot,
     /* -------------------------------------------------------------------- */
     if (papszExtraMDDomains != nullptr)
     {
-        char **papszExtraMDDomainsExpanded = nullptr;
+        CPLStringList aosExtraMDDomainsExpanded;
 
         if (EQUAL(papszExtraMDDomains[0], "all") &&
             papszExtraMDDomains[1] == nullptr)
         {
-            char **papszMDDList = GDALGetMetadataDomainList(hObject);
-            char **papszIter = papszMDDList;
-
-            while (papszIter != nullptr && *papszIter != nullptr)
+            const CPLStringList aosMDDList(GDALGetMetadataDomainList(hObject));
+            for (const char *pszDomain : aosMDDList)
             {
-                if (!EQUAL(*papszIter, "") && !EQUAL(*papszIter, "SUBDATASETS"))
+                if (!EQUAL(pszDomain, "") && !EQUAL(pszDomain, "SUBDATASETS"))
                 {
-                    papszExtraMDDomainsExpanded =
-                        CSLAddString(papszExtraMDDomainsExpanded, *papszIter);
+                    aosExtraMDDomainsExpanded.AddString(pszDomain);
                 }
-                papszIter++;
             }
-            CSLDestroy(papszMDDList);
         }
         else
         {
-            papszExtraMDDomainsExpanded = CSLDuplicate(papszExtraMDDomains);
+            aosExtraMDDomainsExpanded = CSLDuplicate(papszExtraMDDomains);
         }
 
-        for (int iMDD = 0; papszExtraMDDomainsExpanded != nullptr &&
-                           papszExtraMDDomainsExpanded[iMDD] != nullptr;
-             iMDD++)
+        for (const char *pszDomain : aosExtraMDDomainsExpanded)
         {
-            char pszDisplayedname[256];
-            snprintf(pszDisplayedname, 256, "Metadata (%s)",
-                     papszExtraMDDomainsExpanded[iMDD]);
+            const std::string osDisplayedName =
+                std::string("Metadata (").append(pszDomain).append(")");
             GDALVectorInfoPrintMetadata(osRet, oMetadata, psOptions, hObject,
-                                        papszExtraMDDomainsExpanded[iMDD],
-                                        pszDisplayedname, pszIndent);
+                                        pszDomain, osDisplayedName.c_str(),
+                                        pszIndent);
         }
-
-        CSLDestroy(papszExtraMDDomainsExpanded);
     }
     GDALVectorInfoPrintMetadata(osRet, oMetadata, psOptions, hObject,
                                 "SUBDATASETS", "Subdatasets", pszIndent);
@@ -888,7 +875,7 @@ static void ReportOnLayer(CPLString &osRet, CPLJSONObject &oLayer,
                 oLayer.Add("geometryFields", oGeometryFields);
             for (int iGeom = 0; iGeom < nGeomFieldCount; iGeom++)
             {
-                OGRGeomFieldDefn *poGFldDefn =
+                const OGRGeomFieldDefn *poGFldDefn =
                     poLayer->GetLayerDefn()->GetGeomFieldDefn(iGeom);
                 if (bJson)
                 {
@@ -1033,6 +1020,72 @@ static void ReportOnLayer(CPLString &osRet, CPLJSONObject &oLayer,
                         }
                         oGeometryField.Add("supportedSRSList",
                                            oSupportedSRSList);
+                    }
+
+                    const auto &oCoordPrec =
+                        poGFldDefn->GetCoordinatePrecision();
+                    if (oCoordPrec.dfXYResolution !=
+                        OGRGeomCoordinatePrecision::UNKNOWN)
+                    {
+                        oGeometryField.Add("xyCoordinateResolution",
+                                           oCoordPrec.dfXYResolution);
+                    }
+                    if (oCoordPrec.dfZResolution !=
+                        OGRGeomCoordinatePrecision::UNKNOWN)
+                    {
+                        oGeometryField.Add("zCoordinateResolution",
+                                           oCoordPrec.dfZResolution);
+                    }
+                    if (oCoordPrec.dfMResolution !=
+                        OGRGeomCoordinatePrecision::UNKNOWN)
+                    {
+                        oGeometryField.Add("mCoordinateResolution",
+                                           oCoordPrec.dfMResolution);
+                    }
+
+                    // For example set by OpenFileGDB driver
+                    if (!oCoordPrec.oFormatSpecificOptions.empty())
+                    {
+                        CPLJSONObject oFormatSpecificOptions;
+                        for (const auto &formatOptionsPair :
+                             oCoordPrec.oFormatSpecificOptions)
+                        {
+                            CPLJSONObject oThisFormatSpecificOptions;
+                            for (int i = 0; i < formatOptionsPair.second.size();
+                                 ++i)
+                            {
+                                char *pszKey = nullptr;
+                                const char *pszValue = CPLParseNameValue(
+                                    formatOptionsPair.second[i], &pszKey);
+                                if (pszKey && pszValue)
+                                {
+                                    const auto eValueType =
+                                        CPLGetValueType(pszValue);
+                                    if (eValueType == CPL_VALUE_INTEGER)
+                                    {
+                                        oThisFormatSpecificOptions.Add(
+                                            pszKey, CPLAtoGIntBig(pszValue));
+                                    }
+                                    else if (eValueType == CPL_VALUE_REAL)
+                                    {
+                                        oThisFormatSpecificOptions.Add(
+                                            pszKey, CPLAtof(pszValue));
+                                    }
+                                    else
+                                    {
+                                        oThisFormatSpecificOptions.Add(
+                                            pszKey, pszValue);
+                                    }
+                                }
+                                CPLFree(pszKey);
+                            }
+                            oFormatSpecificOptions.Add(
+                                formatOptionsPair.first,
+                                oThisFormatSpecificOptions);
+                        }
+                        oGeometryField.Add(
+                            "coordinatePrecisionFormatSpecificOptions",
+                            oFormatSpecificOptions);
                     }
                 }
                 else
@@ -1494,6 +1547,36 @@ static void ReportOnLayer(CPLString &osRet, CPLJSONObject &oLayer,
                         }
                     }
 
+                    const auto GetGeoJSONOptions = [poLayer](int iGeomField)
+                    {
+                        CPLStringList aosGeoJSONOptions;
+                        const auto &oCoordPrec =
+                            poLayer->GetLayerDefn()
+                                ->GetGeomFieldDefn(iGeomField)
+                                ->GetCoordinatePrecision();
+                        if (oCoordPrec.dfXYResolution !=
+                            OGRGeomCoordinatePrecision::UNKNOWN)
+                        {
+                            aosGeoJSONOptions.SetNameValue(
+                                "XY_COORD_PRECISION",
+                                CPLSPrintf("%d",
+                                           OGRGeomCoordinatePrecision::
+                                               ResolutionToPrecision(
+                                                   oCoordPrec.dfXYResolution)));
+                        }
+                        if (oCoordPrec.dfZResolution !=
+                            OGRGeomCoordinatePrecision::UNKNOWN)
+                        {
+                            aosGeoJSONOptions.SetNameValue(
+                                "Z_COORD_PRECISION",
+                                CPLSPrintf("%d",
+                                           OGRGeomCoordinatePrecision::
+                                               ResolutionToPrecision(
+                                                   oCoordPrec.dfZResolution)));
+                        }
+                        return aosGeoJSONOptions;
+                    };
+
                     if (nGeomFields == 0)
                         oFeature.SetNull("geometry");
                     else
@@ -1503,7 +1586,8 @@ static void ReportOnLayer(CPLString &osRet, CPLJSONObject &oLayer,
                             char *pszSerialized =
                                 wkbFlatten(poGeom->getGeometryType()) <=
                                         wkbGeometryCollection
-                                    ? poGeom->exportToJson()
+                                    ? poGeom->exportToJson(
+                                          GetGeoJSONOptions(0).List())
                                     : nullptr;
                             if (pszSerialized)
                             {
@@ -1535,7 +1619,8 @@ static void ReportOnLayer(CPLString &osRet, CPLJSONObject &oLayer,
                                     char *pszSerialized =
                                         wkbFlatten(poGeom->getGeometryType()) <=
                                                 wkbGeometryCollection
-                                            ? poGeom->exportToJson()
+                                            ? poGeom->exportToJson(
+                                                  GetGeoJSONOptions(i).List())
                                             : nullptr;
                                     if (pszSerialized)
                                     {
@@ -2041,15 +2126,14 @@ char *GDALVectorInfo(GDALDatasetH hDataset,
             /* --------------------------------------------------------------------
              */
 
-            for (CSLConstList papszIter = papszLayers; *papszIter != nullptr;
-                 ++papszIter)
+            for (const char *pszLayer : cpl::Iterate(papszLayers))
             {
-                OGRLayer *poLayer = poDS->GetLayerByName(*papszIter);
+                OGRLayer *poLayer = poDS->GetLayerByName(pszLayer);
 
                 if (poLayer == nullptr)
                 {
                     CPLError(CE_Failure, CPLE_AppDefined,
-                             "Couldn't fetch requested layer %s.", *papszIter);
+                             "Couldn't fetch requested layer %s.", pszLayer);
                     return nullptr;
                 }
 

@@ -164,8 +164,9 @@ class OGRFeatherWriterLayer final : public OGRArrowWriterLayer
     {
         return m_poFileWriter != nullptr;
     }
+
     virtual void CreateWriter() override;
-    virtual void CloseFileWriter() override;
+    virtual bool CloseFileWriter() override;
 
     virtual void CreateSchema() override;
     virtual void PerformStepsBeforeFinalFlushGroup() override;
@@ -179,6 +180,7 @@ class OGRFeatherWriterLayer final : public OGRArrowWriterLayer
 
     virtual bool
     IsSupportedGeometryType(OGRwkbGeometryType eGType) const override;
+
     virtual bool IsSRSRequired() const override
     {
         return true;
@@ -234,9 +236,8 @@ class OGRFeatherWriterDataset final : public GDALPamDataset
 
   protected:
     OGRLayer *ICreateLayer(const char *pszName,
-                           const OGRSpatialReference *poSpatialRef = nullptr,
-                           OGRwkbGeometryType eGType = wkbUnknown,
-                           char **papszOptions = nullptr) override;
+                           const OGRGeomFieldDefn *poGeomFieldDefn,
+                           CSLConstList papszOptions) override;
 };
 
 #endif  // OGR_FEATHER_H

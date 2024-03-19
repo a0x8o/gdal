@@ -10,6 +10,7 @@
 %include "gdal_docs.i"
 %include "gdal_band_docs.i"
 %include "gdal_dataset_docs.i"
+%include "gdal_driver_docs.i"
 
 %init %{
   /* gdal_python.i %init code */
@@ -743,12 +744,12 @@ void wrapper_VSIGetMemFileBuffer(const char *utf8_path, GByte **out, vsi_l_offse
 
 %feature("pythonappend") GetMaskBand %{
     if hasattr(self, '_parent_ds') and self._parent_ds():
-        self._parent_ds()._add_band_ref(val)
+        self._parent_ds()._add_child_ref(val)
 %}
 
 %feature("pythonappend") GetOverview %{
     if hasattr(self, '_parent_ds') and self._parent_ds():
-        self._parent_ds()._add_band_ref(val)
+        self._parent_ds()._add_child_ref(val)
 %}
 
 %feature("shadow") ComputeStatistics %{
@@ -1448,25 +1449,25 @@ CPLErr ReadRaster1( double xoff, double yoff, double xsize, double ysize,
         else:
             return self._SetGCPs2(gcps, wkt_or_spatial_ref)
 
-    def _add_band_ref(self, band):
-        if band is None:
+    def _add_child_ref(self, child):
+        if child is None:
             return
 
         import weakref
 
-        if not hasattr(self, '_band_references'):
-            self._band_references = weakref.WeakSet()
+        if not hasattr(self, '_child_references'):
+            self._child_references = weakref.WeakSet()
 
-        self._band_references.add(band)
-        band._parent_ds = weakref.ref(self)
+        self._child_references.add(child)
+        child._parent_ds = weakref.ref(self)
 
-    def _invalidate_bands(self):
-        if hasattr(self, '_band_references'):
-            for band in self._band_references:
-                band.this = None
+    def _invalidate_children(self):
+        if hasattr(self, '_child_references'):
+            for child in self._child_references:
+                child.this = None
 
     def __del__(self):
-        self._invalidate_bands()
+        self._invalidate_children()
 
     def __enter__(self):
         return self
@@ -1478,7 +1479,7 @@ CPLErr ReadRaster1( double xoff, double yoff, double xsize, double ysize,
 %feature("pythonappend") Close %{
     self.thisown = 0
     self.this = None
-    self._invalidate_bands()
+    self._invalidate_children()
     return val
 %}
 
@@ -1579,7 +1580,23 @@ def ReleaseResultSet(self, sql_lyr):
 %}
 
 %feature("pythonappend") GetRasterBand %{
-    self._add_band_ref(val)
+    self._add_child_ref(val)
+%}
+
+%feature("pythonappend") GetLayerByName %{
+    self._add_child_ref(val)
+%}
+
+%feature("pythonappend") GetLayerByIndex %{
+    self._add_child_ref(val)
+%}
+
+%feature("pythonappend") CreateLayer %{
+    self._add_child_ref(val)
+%}
+
+%feature("pythonappend") CopyLayer %{
+    self._add_child_ref(val)
 %}
 
 }
@@ -2849,6 +2866,10 @@ def VectorTranslateOptions(options=None, format=None,
          resolveDomains=False,
          skipFailures=False,
          limit=None,
+         xyRes=None,
+         zRes=None,
+         mRes=None,
+         setCoordPrecision=True,
          callback=None, callback_data=None):
     """
     Create a VectorTranslateOptions() object that can be passed to
@@ -2969,6 +2990,14 @@ def VectorTranslateOptions(options=None, format=None,
         whether to skip failures
     limit:
         maximum number of features to read per layer
+    xyRes:
+        Geometry X,Y coordinate resolution. Numeric value, or numeric value suffixed with " m", " mm" or "deg".
+    zRes:
+        Geometry Z coordinate resolution. Numeric value, or numeric value suffixed with " m" or " mm".
+    mRes:
+        Geometry M coordinate resolution. Numeric value.
+    setCoordPrecision:
+        Set to False to unset the geometry coordinate precision.
     callback:
         callback method
     callback_data:
@@ -3149,6 +3178,15 @@ def VectorTranslateOptions(options=None, format=None,
             new_options += ['-skip']
         if limit is not None:
             new_options += ['-limit', str(limit)]
+        if xyRes is not None:
+            new_options += ['-xyRes', str(xyRes)]
+        if zRes is not None:
+            new_options += ['-zRes', str(zRes)]
+        if mRes is not None:
+            new_options += ['-mRes', str(mRes)]
+        if setCoordPrecision is False:
+            new_options += ["-unsetCoordPrecision"]
+
     if callback is not None:
         new_options += ['-progress']
 

@@ -1223,15 +1223,15 @@ int OGRLIBKMLDataSource::OpenKmz(const char *pszFilename, int bUpdateIn)
         if (!poKmlLink->has_href())
             continue;
 
-        kmlengine::Href *poKmlHref = new kmlengine::Href(poKmlLink->get_href());
+        const kmlengine::Href oKmlHref(poKmlLink->get_href());
 
         /***** is the link relative? *****/
-        if (poKmlHref->IsRelativePath())
+        if (oKmlHref.IsRelativePath())
         {
             nLinks++;
 
             std::string oKml;
-            if (poKmlKmzfile->ReadFile(poKmlHref->get_path().c_str(), &oKml))
+            if (poKmlKmzfile->ReadFile(oKmlHref.get_path().c_str(), &oKml))
             {
                 /***** parse the kml into the DOM *****/
                 oKmlErrors.clear();
@@ -1241,9 +1241,8 @@ int OGRLIBKMLDataSource::OpenKmz(const char *pszFilename, int bUpdateIn)
                 {
                     CPLError(CE_Failure, CPLE_OpenFailed,
                              "ERROR parsing kml layer %s from %s :%s",
-                             poKmlHref->get_path().c_str(), pszFilename,
+                             oKmlHref.get_path().c_str(), pszFilename,
                              oKmlErrors.c_str());
-                    delete poKmlHref;
 
                     continue;
                 }
@@ -1256,26 +1255,22 @@ int OGRLIBKMLDataSource::OpenKmz(const char *pszFilename, int bUpdateIn)
                 {
                     CPLError(CE_Failure, CPLE_OpenFailed,
                              "ERROR parsing kml layer %s from %s :%s",
-                             poKmlHref->get_path().c_str(), pszFilename,
+                             oKmlHref.get_path().c_str(), pszFilename,
                              oKmlErrors.c_str());
-                    delete poKmlHref;
 
                     continue;
                 }
 
                 /***** create the layer *****/
-                AddLayer(CPLGetBasename(poKmlHref->get_path().c_str()),
+                AddLayer(CPLGetBasename(oKmlHref.get_path().c_str()),
                          wkbUnknown, nullptr, this, std::move(poKmlLyrRoot),
-                         poKmlLyrContainer, poKmlHref->get_path().c_str(),
-                         FALSE, bUpdateIn, static_cast<int>(nKmlFeatures));
+                         poKmlLyrContainer, oKmlHref.get_path().c_str(), FALSE,
+                         bUpdateIn, static_cast<int>(nKmlFeatures));
 
                 /***** check if any features are another layer *****/
                 ParseLayers(std::move(poKmlLyrContainer), true);
             }
         }
-
-        /***** cleanup *****/
-        delete poKmlHref;
     }
 
     /***** if the doc.kml has links store it so if were in update mode we can
@@ -1563,7 +1558,7 @@ static bool IsValidPhoneNumber(const char *pszPhoneNumber)
 /************************************************************************/
 
 void OGRLIBKMLDataSource::SetCommonOptions(ContainerPtr poKmlContainer,
-                                           char **papszOptions)
+                                           CSLConstList papszOptions)
 {
     const char *l_pszName = CSLFetchNameValue(papszOptions, "NAME");
     if (l_pszName != nullptr)
@@ -2027,23 +2022,18 @@ OGRErr OGRLIBKMLDataSource::DeleteLayerKmz(int iLayer)
                     /***** does the link have a href? *****/
                     if (poKmlLink->has_href())
                     {
-                        kmlengine::Href *poKmlHref =
-                            new kmlengine::Href(poKmlLink->get_href());
+                        const kmlengine::Href oKmlHref(poKmlLink->get_href());
 
                         /***** is the link relative? *****/
-                        if (poKmlHref->IsRelativePath())
+                        if (oKmlHref.IsRelativePath())
                         {
-                            const char *pszLink = poKmlHref->get_path().c_str();
-
-                            if (EQUAL(pszLink, poOgrLayer->GetFileName()))
+                            if (EQUAL(oKmlHref.get_path().c_str(),
+                                      poOgrLayer->GetFileName()))
                             {
                                 m_poKmlDocKml->DeleteFeatureAt(iKmlFeature);
-                                delete poKmlHref;
                                 break;
                             }
                         }
-
-                        delete poKmlHref;
                     }
                 }
             }
@@ -2121,7 +2111,7 @@ OGRErr OGRLIBKMLDataSource::DeleteLayer(int iLayer)
 
 OGRLIBKMLLayer *OGRLIBKMLDataSource::CreateLayerKml(
     const char *pszLayerName, const OGRSpatialReference *poSRS,
-    OGRwkbGeometryType eGType, char **papszOptions)
+    OGRwkbGeometryType eGType, CSLConstList papszOptions)
 {
     ContainerPtr poKmlLayerContainer = nullptr;
 
@@ -2167,7 +2157,7 @@ OGRLIBKMLLayer *OGRLIBKMLDataSource::CreateLayerKml(
 
 OGRLIBKMLLayer *OGRLIBKMLDataSource::CreateLayerKmz(
     const char *pszLayerName, const OGRSpatialReference *poSRS,
-    OGRwkbGeometryType eGType, char ** /* papszOptions */)
+    OGRwkbGeometryType eGType, CSLConstList /* papszOptions */)
 {
     DocumentPtr poKmlDocument = nullptr;
 
@@ -2227,10 +2217,10 @@ OGRLIBKMLLayer *OGRLIBKMLDataSource::CreateLayerKmz(
 
 ******************************************************************************/
 
-OGRLayer *OGRLIBKMLDataSource::ICreateLayer(const char *pszLayerName,
-                                            const OGRSpatialReference *poOgrSRS,
-                                            OGRwkbGeometryType eGType,
-                                            char **papszOptions)
+OGRLayer *
+OGRLIBKMLDataSource::ICreateLayer(const char *pszLayerName,
+                                  const OGRGeomFieldDefn *poGeomFieldDefn,
+                                  CSLConstList papszOptions)
 {
     if (!bUpdate)
         return nullptr;
@@ -2241,6 +2231,10 @@ OGRLayer *OGRLIBKMLDataSource::ICreateLayer(const char *pszLayerName,
                  "'doc' is an invalid layer name in a KMZ file");
         return nullptr;
     }
+
+    const auto eGType = poGeomFieldDefn ? poGeomFieldDefn->GetType() : wkbNone;
+    const auto poOgrSRS =
+        poGeomFieldDefn ? poGeomFieldDefn->GetSpatialRef() : nullptr;
 
     OGRLIBKMLLayer *poOgrLayer = nullptr;
 

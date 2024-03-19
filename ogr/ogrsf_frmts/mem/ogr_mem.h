@@ -130,10 +130,12 @@ class CPL_DLL OGRMemLayer CPL_NON_FINAL : public OGRLayer
     {
         return m_bUpdatable;
     }
+
     void SetUpdatable(bool bUpdatableIn)
     {
         m_bUpdatable = bUpdatableIn;
     }
+
     void SetAdvertizeUTF8(bool bAdvertizeUTF8In)
     {
         m_bAdvertizeUTF8 = bAdvertizeUTF8In;
@@ -148,6 +150,7 @@ class CPL_DLL OGRMemLayer CPL_NON_FINAL : public OGRLayer
     {
         return m_bUpdated;
     }
+
     void SetUpdated(bool bUpdated)
     {
         m_bUpdated = bUpdated;
@@ -190,16 +193,17 @@ class OGRMemDataSource CPL_NON_FINAL : public OGRDataSource
     {
         return pszName;
     }
+
     int GetLayerCount() override
     {
         return nLayers;
     }
+
     OGRLayer *GetLayer(int) override;
 
-    virtual OGRLayer *ICreateLayer(const char *,
-                                   const OGRSpatialReference * = nullptr,
-                                   OGRwkbGeometryType = wkbUnknown,
-                                   char ** = nullptr) override;
+    OGRLayer *ICreateLayer(const char *pszName,
+                           const OGRGeomFieldDefn *poGeomFieldDefn,
+                           CSLConstList papszOptions) override;
     OGRErr DeleteLayer(int iLayer) override;
 
     int TestCapability(const char *) override;

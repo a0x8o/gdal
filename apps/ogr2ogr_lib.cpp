@@ -443,6 +443,24 @@ struct GDALVectorTranslateOptions
 
     /*! Wished offset w.r.t UTC of dateTime */
     int nTZOffsetInSec = TZ_OFFSET_INVALID;
+
+    /*! Geometry X,Y coordinate resolution */
+    double dfXYRes = OGRGeomCoordinatePrecision::UNKNOWN;
+
+    /*! Unit of dXYRes. empty string, "m", "mm" or "deg" */
+    std::string osXYResUnit{};
+
+    /*! Geometry Z coordinate resolution */
+    double dfZRes = OGRGeomCoordinatePrecision::UNKNOWN;
+
+    /*! Unit of dfZRes. empty string, "m" or "mm" */
+    std::string osZResUnit{};
+
+    /*! Geometry M coordinate resolution */
+    double dfMRes = OGRGeomCoordinatePrecision::UNKNOWN;
+
+    /*! Whether to unset geometry coordinate precision */
+    bool bUnsetCoordPrecision = false;
 };
 
 struct TargetLayerInfo
@@ -459,14 +477,17 @@ struct TargetLayerInfo
         CPLStringList m_aosTransformOptions{};
         bool m_bCanInvalidateValidity = true;
     };
+
     std::vector<ReprojectionInfo> m_aoReprojectionInfo{};
 
     std::vector<int> m_anMap{};
+
     struct ResolvedInfo
     {
         int nSrcField;
         const OGRFieldDomain *poDomain;
     };
+
     std::map<int, ResolvedInfo> m_oMapResolved{};
     std::map<const OGRFieldDomain *, std::map<std::string, std::string>>
         m_oMapDomainToKV{};
@@ -706,6 +727,7 @@ class OGRSplitListFieldLayer : public OGRLayer
     {
         poSrcLayer->ResetReading();
     }
+
     virtual int TestCapability(const char *) override
     {
         return FALSE;
@@ -1123,6 +1145,7 @@ class GCPCoordTransformation : public OGRCoordinateTransformation
     {
         return poSRS;
     }
+
     virtual const OGRSpatialReference *GetTargetCS() const override
     {
         return poSRS;
@@ -1458,6 +1481,7 @@ class GDALVectorTranslateWrappedDataset : public GDALDataset
     {
         return static_cast<int>(m_apoLayers.size());
     }
+
     virtual OGRLayer *GetLayer(int nIdx) override;
     virtual OGRLayer *GetLayerByName(const char *pszName) override;
 
@@ -1480,10 +1504,12 @@ class GDALVectorTranslateWrappedLayer : public OGRLayerDecorator
 
   public:
     virtual ~GDALVectorTranslateWrappedLayer();
+
     virtual OGRFeatureDefn *GetLayerDefn() override
     {
         return m_poFDefn;
     }
+
     virtual OGRFeature *GetNextFeature() override;
     virtual OGRFeature *GetFeature(GIntBig nFID) override;
 
@@ -1735,6 +1761,7 @@ class OGR2OGRSpatialReferenceHolder
     OGR2OGRSpatialReferenceHolder() : m_poSRS(nullptr)
     {
     }
+
     ~OGR2OGRSpatialReferenceHolder()
     {
         if (m_poSRS)
@@ -1746,6 +1773,7 @@ class OGR2OGRSpatialReferenceHolder
         CPLAssert(m_poSRS == nullptr);
         m_poSRS = poSRS;
     }
+
     OGRSpatialReference *get()
     {
         return m_poSRS;
@@ -2005,10 +2033,9 @@ GDALVectorTranslateCreateCopy(GDALDriver *poDriver, const char *pszDest,
             }
             else
             {
-                CSLConstList papszIter = psOptions->aosLayers.List();
-                for (; *papszIter != nullptr; ++papszIter)
+                for (const char *pszLayer : psOptions->aosLayers)
                 {
-                    OGRLayer *poSrcLayer = poDS->GetLayerByName(*papszIter);
+                    OGRLayer *poSrcLayer = poDS->GetLayerByName(pszLayer);
                     if (poSrcLayer != nullptr)
                     {
                         poSrcLayer->SetAttributeFilter(
@@ -2067,12 +2094,11 @@ GDALVectorTranslateCreateCopy(GDALDriver *poDriver, const char *pszDest,
         if (EQUAL(poDriver->GetDescription(), "GMLAS"))
         {
             CPLString osLayers;
-            CSLConstList papszIter = psOptions->aosLayers.List();
-            for (; *papszIter != nullptr; ++papszIter)
+            for (const char *pszLayer : psOptions->aosLayers)
             {
                 if (!osLayers.empty())
                     osLayers += ",";
-                osLayers += *papszIter;
+                osLayers += pszLayer;
             }
             aosDSCO.SetNameValue("LAYERS", osLayers);
         }
@@ -2381,13 +2407,13 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
     /* -------------------------------------------------------------------- */
     /*      Try opening the output datasource as an existing, writable      */
     /* -------------------------------------------------------------------- */
-    std::vector<CPLString> aoDrivers;
+    std::vector<std::string> aoDrivers;
     if (poODS == nullptr && psOptions->osFormat.empty())
     {
         aoDrivers = GetOutputDriversFor(pszDest, GDAL_OF_VECTOR);
         if (!bUpdate && aoDrivers.size() == 1)
         {
-            GDALDriverH hDriver = GDALGetDriverByName(aoDrivers[0]);
+            GDALDriverH hDriver = GDALGetDriverByName(aoDrivers[0].c_str());
             const char *pszPrefix = GDALGetMetadataItem(
                 hDriver, GDAL_DMD_CONNECTION_PREFIX, nullptr);
             if (pszPrefix && STARTS_WITH_CI(pszDest, pszPrefix))
@@ -2606,26 +2632,17 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
 
         if (psOptions->bCopyMD)
         {
-            char **papszDomains = poDS->GetMetadataDomainList();
-            for (char **papszIter = papszDomains; papszIter && *papszIter;
-                 ++papszIter)
+            const CPLStringList aosDomains(poDS->GetMetadataDomainList());
+            for (const char *pszMD : aosDomains)
             {
-                char **papszMD = poDS->GetMetadata(*papszIter);
-                if (papszMD)
-                    poODS->SetMetadata(papszMD, *papszIter);
+                if (char **papszMD = poDS->GetMetadata(pszMD))
+                    poODS->SetMetadata(papszMD, pszMD);
             }
-            CSLDestroy(papszDomains);
         }
-        for (char **papszIter = psOptions->aosMetadataOptions.List();
-             papszIter && *papszIter; ++papszIter)
+        for (const auto &[pszKey, pszValue] :
+             cpl::IterateNameValue(psOptions->aosMetadataOptions))
         {
-            char *pszKey = nullptr;
-            const char *pszValue = CPLParseNameValue(*papszIter, &pszKey);
-            if (pszKey)
-            {
-                poODS->SetMetadataItem(pszKey, pszValue);
-                CPLFree(pszKey);
-            }
+            poODS->SetMetadataItem(pszKey, pszValue);
         }
 
         // When writing to GeoJSON and using -nln, set the @NAME layer
@@ -2982,15 +2999,14 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
         }
 
         // Make sure to probe all layers in case some are by default invisible
-        for (char **papszIter = psOptions->aosLayers.List();
-             papszIter && *papszIter; ++papszIter)
+        for (const char *pszLayer : psOptions->aosLayers)
         {
-            OGRLayer *poLayer = poDS->GetLayerByName(*papszIter);
+            OGRLayer *poLayer = poDS->GetLayerByName(pszLayer);
 
             if (poLayer == nullptr)
             {
                 CPLError(CE_Failure, CPLE_AppDefined,
-                         "Couldn't fetch requested layer %s!", *papszIter);
+                         "Couldn't fetch requested layer %s!", pszLayer);
                 if (hDstDS == nullptr)
                     GDALClose(poODS);
                 delete poGCPCoordTrans;
@@ -3875,6 +3891,7 @@ bool SetupTargetLayer::CanUseWriteArrowBatch(
         !m_bUnsetFieldWidth && !m_bExplodeCollections && !m_pszZField &&
         m_bExactFieldNameMatch && !m_bForceNullable && !m_bResolveDomains &&
         !m_bUnsetDefault && psOptions->nFIDToFetch == OGRNullFID &&
+        psOptions->dfXYRes == OGRGeomCoordinatePrecision::UNKNOWN &&
         !psOptions->bMakeValid)
     {
         struct ArrowArrayStream streamSrc;
@@ -4235,27 +4252,10 @@ SetupTargetLayer::Setup(OGRLayer *poSrcLayer, const char *pszNewLayerName,
             eGCreateLayerType = wkbNone;
         }
 
-        // If the source feature first geometry column is not nullable
-        // and that GEOMETRY_NULLABLE creation option is available, use it
-        // so as to be able to set the not null constraint (if the driver
-        // supports it)
-        if (eGType != wkbNone && anRequestedGeomFields.empty() &&
-            nSrcGeomFieldCount >= 1 &&
-            !poSrcFDefn->GetGeomFieldDefn(0)->IsNullable() &&
-            pszDestCreationOptions != nullptr &&
-            strstr(pszDestCreationOptions, "GEOMETRY_NULLABLE") != nullptr &&
-            CSLFetchNameValue(m_papszLCO, "GEOMETRY_NULLABLE") == nullptr &&
-            !m_bForceNullable)
-        {
-            papszLCOTemp =
-                CSLSetNameValue(papszLCOTemp, "GEOMETRY_NULLABLE", "NO");
-            CPLDebug("GDALVectorTranslate", "Using GEOMETRY_NULLABLE=NO");
-        }
+        OGRGeomCoordinatePrecision oCoordPrec;
+        std::string osGeomFieldName;
+        bool bGeomFieldNullable = true;
 
-        // Use source geometry field name as much as possible
-        if (eGType != wkbNone && pszDestCreationOptions &&
-            strstr(pszDestCreationOptions, "GEOMETRY_NAME") != nullptr &&
-            CSLFetchNameValue(m_papszLCO, "GEOMETRY_NAME") == nullptr)
         {
             int iSrcGeomField = -1;
             if (anRequestedGeomFields.empty() &&
@@ -4273,15 +4273,152 @@ SetupTargetLayer::Setup(OGRLayer *poSrcLayer, const char *pszNewLayerName,
 
             if (iSrcGeomField >= 0)
             {
-                const char *pszGFldName =
-                    poSrcFDefn->GetGeomFieldDefn(iSrcGeomField)->GetNameRef();
+                const auto poSrcGeomFieldDefn =
+                    poSrcFDefn->GetGeomFieldDefn(iSrcGeomField);
+                if (!psOptions->bUnsetCoordPrecision)
+                {
+                    oCoordPrec = poSrcGeomFieldDefn->GetCoordinatePrecision()
+                                     .ConvertToOtherSRS(
+                                         poSrcGeomFieldDefn->GetSpatialRef(),
+                                         poOutputSRS);
+                }
+
+                bGeomFieldNullable =
+                    CPL_TO_BOOL(poSrcGeomFieldDefn->IsNullable());
+
+                const char *pszGFldName = poSrcGeomFieldDefn->GetNameRef();
                 if (pszGFldName != nullptr && !EQUAL(pszGFldName, "") &&
                     poSrcFDefn->GetFieldIndex(pszGFldName) < 0)
                 {
-                    papszLCOTemp = CSLSetNameValue(
-                        papszLCOTemp, "GEOMETRY_NAME", pszGFldName);
+                    osGeomFieldName = pszGFldName;
+
+                    // Use source geometry field name as much as possible
+                    if (eGType != wkbNone && pszDestCreationOptions &&
+                        strstr(pszDestCreationOptions, "GEOMETRY_NAME") !=
+                            nullptr &&
+                        CSLFetchNameValue(m_papszLCO, "GEOMETRY_NAME") ==
+                            nullptr)
+                    {
+                        papszLCOTemp = CSLSetNameValue(
+                            papszLCOTemp, "GEOMETRY_NAME", pszGFldName);
+                    }
                 }
             }
+        }
+
+        // If the source feature first geometry column is not nullable
+        // and that GEOMETRY_NULLABLE creation option is available, use it
+        // so as to be able to set the not null constraint (if the driver
+        // supports it)
+        if (eGType != wkbNone && anRequestedGeomFields.empty() &&
+            nSrcGeomFieldCount >= 1 &&
+            !poSrcFDefn->GetGeomFieldDefn(0)->IsNullable() &&
+            pszDestCreationOptions != nullptr &&
+            strstr(pszDestCreationOptions, "GEOMETRY_NULLABLE") != nullptr &&
+            CSLFetchNameValue(m_papszLCO, "GEOMETRY_NULLABLE") == nullptr &&
+            !m_bForceNullable)
+        {
+            bGeomFieldNullable = false;
+            papszLCOTemp =
+                CSLSetNameValue(papszLCOTemp, "GEOMETRY_NULLABLE", "NO");
+            CPLDebug("GDALVectorTranslate", "Using GEOMETRY_NULLABLE=NO");
+        }
+
+        if (psOptions->dfXYRes != OGRGeomCoordinatePrecision::UNKNOWN)
+        {
+            if (m_poDstDS->GetDriver()->GetMetadataItem(
+                    GDAL_DCAP_HONOR_GEOM_COORDINATE_PRECISION) == nullptr &&
+                !OGRGeometryFactory::haveGEOS())
+            {
+                CPLError(CE_Warning, CPLE_AppDefined,
+                         "-xyRes specified, but driver does not expose the "
+                         "DCAP_HONOR_GEOM_COORDINATE_PRECISION capability, "
+                         "and this build has no GEOS support");
+            }
+
+            oCoordPrec.dfXYResolution = psOptions->dfXYRes;
+            if (!psOptions->osXYResUnit.empty())
+            {
+                if (!poOutputSRS)
+                {
+                    CSLDestroy(papszLCOTemp);
+                    CPLError(CE_Failure, CPLE_AppDefined,
+                             "Unit suffix for -xyRes cannot be used with an "
+                             "unknown destination SRS");
+                    return nullptr;
+                }
+
+                if (psOptions->osXYResUnit == "mm")
+                {
+                    oCoordPrec.dfXYResolution *= 1e-3;
+                }
+                else if (psOptions->osXYResUnit == "deg")
+                {
+                    double dfFactorDegToMeter =
+                        poOutputSRS->GetSemiMajor(nullptr) * M_PI / 180;
+                    oCoordPrec.dfXYResolution *= dfFactorDegToMeter;
+                }
+                else
+                {
+                    // Checked at argument parsing time
+                    CPLAssert(psOptions->osXYResUnit == "m");
+                }
+
+                OGRGeomCoordinatePrecision tmp;
+                tmp.SetFromMeter(poOutputSRS, oCoordPrec.dfXYResolution, 0, 0);
+                oCoordPrec.dfXYResolution = tmp.dfXYResolution;
+            }
+        }
+
+        if (psOptions->dfZRes != OGRGeomCoordinatePrecision::UNKNOWN)
+        {
+            if (m_poDstDS->GetDriver()->GetMetadataItem(
+                    GDAL_DCAP_HONOR_GEOM_COORDINATE_PRECISION) == nullptr)
+            {
+                CPLError(CE_Warning, CPLE_AppDefined,
+                         "-zRes specified, but driver does not expose the "
+                         "DCAP_HONOR_GEOM_COORDINATE_PRECISION capability");
+            }
+
+            oCoordPrec.dfZResolution = psOptions->dfZRes;
+            if (!psOptions->osZResUnit.empty())
+            {
+                if (!poOutputSRS)
+                {
+                    CSLDestroy(papszLCOTemp);
+                    CPLError(CE_Failure, CPLE_AppDefined,
+                             "Unit suffix for -zRes cannot be used with an "
+                             "unknown destination SRS");
+                    return nullptr;
+                }
+
+                if (psOptions->osZResUnit == "mm")
+                {
+                    oCoordPrec.dfZResolution *= 1e-3;
+                }
+                else
+                {
+                    // Checked at argument parsing time
+                    CPLAssert(psOptions->osZResUnit == "m");
+                }
+
+                OGRGeomCoordinatePrecision tmp;
+                tmp.SetFromMeter(poOutputSRS, 0, oCoordPrec.dfZResolution, 0);
+                oCoordPrec.dfZResolution = tmp.dfZResolution;
+            }
+        }
+
+        if (psOptions->dfMRes != OGRGeomCoordinatePrecision::UNKNOWN)
+        {
+            if (m_poDstDS->GetDriver()->GetMetadataItem(
+                    GDAL_DCAP_HONOR_GEOM_COORDINATE_PRECISION) == nullptr)
+            {
+                CPLError(CE_Warning, CPLE_AppDefined,
+                         "-mRes specified, but driver does not expose the "
+                         "DCAP_HONOR_GEOM_COORDINATE_PRECISION capability");
+            }
+
+            oCoordPrec.dfMResolution = psOptions->dfMRes;
         }
 
         // Force FID column as 64 bit if the source feature has a 64 bit FID,
@@ -4420,20 +4557,15 @@ SetupTargetLayer::Setup(OGRLayer *poSrcLayer, const char *pszNewLayerName,
             }
         }
 
-        OGRSpatialReference *poOutputSRSClone = nullptr;
-        if (poOutputSRS != nullptr)
-        {
-            poOutputSRSClone = poOutputSRS->Clone();
-        }
-        poDstLayer = m_poDstDS->CreateLayer(
-            pszNewLayerName, poOutputSRSClone,
-            static_cast<OGRwkbGeometryType>(eGCreateLayerType), papszLCOTemp);
+        OGRGeomFieldDefn oGeomFieldDefn(
+            osGeomFieldName.c_str(),
+            static_cast<OGRwkbGeometryType>(eGCreateLayerType));
+        oGeomFieldDefn.SetSpatialRef(poOutputSRS);
+        oGeomFieldDefn.SetCoordinatePrecision(oCoordPrec);
+        oGeomFieldDefn.SetNullable(bGeomFieldNullable);
+        poDstLayer = m_poDstDS->CreateLayer(pszNewLayerName, &oGeomFieldDefn,
+                                            papszLCOTemp);
         CSLDestroy(papszLCOTemp);
-
-        if (poOutputSRSClone != nullptr)
-        {
-            poOutputSRSClone->Release();
-        }
 
         if (poDstLayer == nullptr)
         {
@@ -4468,19 +4600,16 @@ SetupTargetLayer::Setup(OGRLayer *poSrcLayer, const char *pszNewLayerName,
 
         if (m_bCopyMD)
         {
-            char **papszDomains = poSrcLayer->GetMetadataDomainList();
-            for (char **papszIter = papszDomains; papszIter && *papszIter;
-                 ++papszIter)
+            const CPLStringList aosDomains(poSrcLayer->GetMetadataDomainList());
+            for (const char *pszMD : aosDomains)
             {
-                if (!EQUAL(*papszIter, "IMAGE_STRUCTURE") &&
-                    !EQUAL(*papszIter, "SUBDATASETS"))
+                if (!EQUAL(pszMD, "IMAGE_STRUCTURE") &&
+                    !EQUAL(pszMD, "SUBDATASETS"))
                 {
-                    char **papszMD = poSrcLayer->GetMetadata(*papszIter);
-                    if (papszMD)
-                        poDstLayer->SetMetadata(papszMD, *papszIter);
+                    if (char **papszMD = poSrcLayer->GetMetadata(pszMD))
+                        poDstLayer->SetMetadata(papszMD, pszMD);
                 }
             }
-            CSLDestroy(papszDomains);
         }
 
         if (anRequestedGeomFields.empty() && nSrcGeomFieldCount > 1 &&
@@ -4504,7 +4633,7 @@ SetupTargetLayer::Setup(OGRLayer *poSrcLayer, const char *pszNewLayerName,
                     poSrcFDefn->GetGeomFieldDefn(iSrcGeomField));
                 if (m_poOutputSRS != nullptr)
                 {
-                    poOutputSRSClone = m_poOutputSRS->Clone();
+                    auto poOutputSRSClone = m_poOutputSRS->Clone();
                     oGFldDefn.SetSpatialRef(poOutputSRSClone);
                     poOutputSRSClone->Release();
                 }
@@ -5539,7 +5668,8 @@ bool LayerTranslator::TranslateArrow(
         }
 
         // Limit number of features in batch if needed
-        if (psOptions->nLimit >= 0 && nCount + array.length > psOptions->nLimit)
+        if (psOptions->nLimit >= 0 &&
+            nCount + array.length >= psOptions->nLimit)
         {
             const auto nAdjustedLength = psOptions->nLimit - nCount;
             for (int i = 0; i < array.n_children; ++i)
@@ -5588,6 +5718,47 @@ bool LayerTranslator::TranslateArrow(
     }
 
     schema.release(&schema);
+
+    // Ugly hack to work around https://github.com/OSGeo/gdal/issues/9497
+    // Deleting a RecordBatchReader obtained from arrow::dataset::Scanner.ToRecordBatchReader()
+    // is a lengthy operation since all batches are read in its destructors.
+    // Here we ask to our custom I/O layer to return in error to short circuit
+    // that lengthy operation.
+    if (auto poDS = psInfo->m_poSrcLayer->GetDataset())
+    {
+        if (poDS->GetLayerCount() == 1 && poDS->GetDriver() &&
+            EQUAL(poDS->GetDriver()->GetDescription(), "PARQUET"))
+        {
+            bool bStopIO = false;
+            const char *pszArrowStopIO =
+                CPLGetConfigOption("OGR_ARROW_STOP_IO", nullptr);
+            if (pszArrowStopIO && CPLTestBool(pszArrowStopIO))
+            {
+                bStopIO = true;
+            }
+            else if (!pszArrowStopIO)
+            {
+                std::string osExePath;
+                osExePath.resize(1024);
+                if (CPLGetExecPath(osExePath.data(),
+                                   static_cast<int>(osExePath.size())))
+                {
+                    osExePath.resize(strlen(osExePath.data()));
+                    if (strcmp(CPLGetBasename(osExePath.data()), "ogr2ogr") ==
+                        0)
+                    {
+                        bStopIO = true;
+                    }
+                }
+            }
+            if (bStopIO)
+            {
+                CPLSetConfigOption("OGR_ARROW_STOP_IO", "YES");
+                CPLDebug("OGR2OGR", "Forcing interruption of Parquet I/O");
+            }
+        }
+    }
+
     stream.release(&stream);
     return bRet;
 }
@@ -5658,6 +5829,8 @@ bool LayerTranslator::Translate(
     int nFeaturesInTransaction = 0;
     GIntBig nCount = 0; /* written + failed */
     GIntBig nFeaturesWritten = 0;
+    bool bRunSetPrecisionEvaluated = false;
+    bool bRunSetPrecision = false;
 
     bool bRet = true;
     CPLErrorReset();
@@ -5936,32 +6109,29 @@ bool LayerTranslator::Translate(
 
             for (int iGeom = 0; iGeom < nDstGeomFieldCount; iGeom++)
             {
-                OGRGeometry *poDstGeometry;
+                std::unique_ptr<OGRGeometry> poDstGeometry;
 
                 if (poCollToExplode && iGeom == iGeomCollToExplode)
                 {
                     OGRGeometry *poPart = poCollToExplode->getGeometryRef(0);
                     poCollToExplode->removeGeometry(0, FALSE);
-                    poDstGeometry = poPart;
-                    assert(poDstGeometry);
+                    poDstGeometry.reset(poPart);
                 }
                 else
                 {
-                    poDstGeometry = poDstFeature->StealGeometry(iGeom);
-                    if (poDstGeometry == nullptr)
-                        continue;
+                    poDstGeometry.reset(poDstFeature->StealGeometry(iGeom));
                 }
+                if (poDstGeometry == nullptr)
+                    continue;
 
                 // poFeature hasn't been moved if iSrcZField != -1
                 // cppcheck-suppress accessMoved
                 if (iSrcZField != -1 && poFeature != nullptr)
                 {
-                    SetZ(poDstGeometry,
+                    SetZ(poDstGeometry.get(),
                          poFeature->GetFieldAsDouble(iSrcZField));
                     /* This will correct the coordinate dimension to 3 */
-                    OGRGeometry *poDupGeometry = poDstGeometry->clone();
-                    delete poDstGeometry;
-                    poDstGeometry = poDupGeometry;
+                    poDstGeometry.reset(poDstGeometry->clone());
                 }
 
                 if (m_nCoordDim == 2 || m_nCoordDim == 3)
@@ -5997,13 +6167,12 @@ bool LayerTranslator::Translate(
                 {
                     if (m_dfGeomOpParam > 0)
                     {
-                        OGRGeometry *poNewGeom =
+                        auto poNewGeom = std::unique_ptr<OGRGeometry>(
                             poDstGeometry->SimplifyPreserveTopology(
-                                m_dfGeomOpParam);
+                                m_dfGeomOpParam));
                         if (poNewGeom)
                         {
-                            delete poDstGeometry;
-                            poDstGeometry = poNewGeom;
+                            poDstGeometry = std::move(poNewGeom);
                         }
                     }
                 }
@@ -6026,13 +6195,12 @@ bool LayerTranslator::Translate(
                         if (oClipEnv.Intersects(oDstEnv))
                         {
                             poClipped.reset(
-                                poClipGeom->Intersection(poDstGeometry));
+                                poClipGeom->Intersection(poDstGeometry.get()));
                         }
                     }
 
                     if (poClipped == nullptr || poClipped->IsEmpty())
                     {
-                        delete poDstGeometry;
                         goto end_loop;
                     }
 
@@ -6050,12 +6218,10 @@ bool LayerTranslator::Translate(
                             nSrcFID, poSrcLayer->GetName(),
                             OGRToOGCGeomType(poClipped->getGeometryType()),
                             OGRToOGCGeomType(poDstGeometry->getGeometryType()));
-                        delete poDstGeometry;
                         goto end_loop;
                     }
 
-                    delete poDstGeometry;
-                    poDstGeometry = poClipped.release();
+                    poDstGeometry = std::move(poClipped);
                 }
 
                 OGRCoordinateTransformation *const poCT =
@@ -6084,8 +6250,8 @@ bool LayerTranslator::Translate(
                         {
                             OGRwkbGeometryType eTargetType = OGR_GT_GetLinear(
                                 poDstGeometry->getGeometryType());
-                            poDstGeometry = OGRGeometryFactory::forceTo(
-                                poDstGeometry, eTargetType);
+                            poDstGeometry.reset(OGRGeometryFactory::forceTo(
+                                poDstGeometry.release(), eTargetType));
                         }
                     }
                     else if (bReprojCanInvalidateValidity &&
@@ -6094,16 +6260,17 @@ bool LayerTranslator::Translate(
                                  static_cast<OGRwkbGeometryType>(eGType)) &&
                              poDstGeometry->hasCurveGeometry(TRUE))
                     {
-                        poDstGeometry = OGRGeometryFactory::forceTo(
-                            poDstGeometry,
-                            static_cast<OGRwkbGeometryType>(eGType));
+                        poDstGeometry.reset(OGRGeometryFactory::forceTo(
+                            poDstGeometry.release(),
+                            static_cast<OGRwkbGeometryType>(eGType)));
                     }
 
                     for (int iIter = 0; iIter < 2; ++iIter)
                     {
                         auto poReprojectedGeom = std::unique_ptr<OGRGeometry>(
                             OGRGeometryFactory::transformWithOptions(
-                                poDstGeometry, poCT, papszTransformOptions,
+                                poDstGeometry.get(), poCT,
+                                papszTransformOptions,
                                 m_transformWithOptionsCache));
                         if (poReprojectedGeom == nullptr)
                         {
@@ -6115,7 +6282,6 @@ bool LayerTranslator::Translate(
                                             OGRERR_NONE &&
                                         !psOptions->bSkipFailures)
                                     {
-                                        delete poDstGeometry;
                                         return false;
                                     }
                                 }
@@ -6128,7 +6294,6 @@ bool LayerTranslator::Translate(
                                      nSrcFID);
                             if (!psOptions->bSkipFailures)
                             {
-                                delete poDstGeometry;
                                 return false;
                             }
                         }
@@ -6152,7 +6317,7 @@ bool LayerTranslator::Translate(
                              eFlatType == wkbMultiCurve ||
                              eFlatType == wkbMultiSurface) &&
                             poDstGeometry->hasCurveGeometry(TRUE) &&
-                            IsValid(poDstGeometry))
+                            IsValid(poDstGeometry.get()))
                         {
                             OGRwkbGeometryType eTargetType = OGR_GT_GetLinear(
                                 poDstGeometry->getGeometryType());
@@ -6167,22 +6332,20 @@ bool LayerTranslator::Translate(
                                          "Curve geometry no longer valid after "
                                          "reprojection: transforming it into "
                                          "linear one before reprojecting");
-                                poDstGeometry = OGRGeometryFactory::forceTo(
-                                    poDstGeometry, eTargetType);
-                                poDstGeometry = OGRGeometryFactory::forceTo(
-                                    poDstGeometry, eType);
+                                poDstGeometry.reset(OGRGeometryFactory::forceTo(
+                                    poDstGeometry.release(), eTargetType));
+                                poDstGeometry.reset(OGRGeometryFactory::forceTo(
+                                    poDstGeometry.release(), eType));
                             }
                             else
                             {
-                                delete poDstGeometry;
-                                poDstGeometry = poReprojectedGeom.release();
+                                poDstGeometry = std::move(poReprojectedGeom);
                                 break;
                             }
                         }
                         else
                         {
-                            delete poDstGeometry;
-                            poDstGeometry = poReprojectedGeom.release();
+                            poDstGeometry = std::move(poReprojectedGeom);
                             break;
                         }
                     }
@@ -6200,7 +6363,6 @@ bool LayerTranslator::Translate(
                             poDstGeometry->getSpatialReference());
                         if (poClipGeom == nullptr)
                         {
-                            delete poDstGeometry;
                             goto end_loop;
                         }
 
@@ -6215,12 +6377,11 @@ bool LayerTranslator::Translate(
                         if (oClipEnv.Intersects(oDstEnv))
                         {
                             poClipped.reset(
-                                poClipGeom->Intersection(poDstGeometry));
+                                poClipGeom->Intersection(poDstGeometry.get()));
                         }
 
                         if (poClipped == nullptr || poClipped->IsEmpty())
                         {
-                            delete poDstGeometry;
                             goto end_loop;
                         }
 
@@ -6239,12 +6400,37 @@ bool LayerTranslator::Translate(
                                 OGRToOGCGeomType(poClipped->getGeometryType()),
                                 OGRToOGCGeomType(
                                     poDstGeometry->getGeometryType()));
-                            delete poDstGeometry;
                             goto end_loop;
                         }
 
-                        delete poDstGeometry;
-                        poDstGeometry = poClipped.release();
+                        poDstGeometry = std::move(poClipped);
+                    }
+
+                    if (psOptions->dfXYRes !=
+                            OGRGeomCoordinatePrecision::UNKNOWN &&
+                        OGRGeometryFactory::haveGEOS() &&
+                        !poDstGeometry->hasCurveGeometry())
+                    {
+                        // OGR_APPLY_GEOM_SET_PRECISION default value for
+                        // OGRLayer::CreateFeature() purposes, but here in the
+                        // ogr2ogr -xyRes context, we force calling SetPrecision(),
+                        // unless the user explicitly asks not to do it by
+                        // setting the config option to NO.
+                        if (!bRunSetPrecisionEvaluated)
+                        {
+                            bRunSetPrecisionEvaluated = true;
+                            bRunSetPrecision = CPLTestBool(CPLGetConfigOption(
+                                "OGR_APPLY_GEOM_SET_PRECISION", "YES"));
+                        }
+                        if (bRunSetPrecision)
+                        {
+                            auto poNewGeom = std::unique_ptr<OGRGeometry>(
+                                poDstGeometry->SetPrecision(psOptions->dfXYRes,
+                                                            /* nFlags = */ 0));
+                            if (!poNewGeom)
+                                goto end_loop;
+                            poDstGeometry = std::move(poNewGeom);
+                        }
                     }
 
                     if (m_bMakeValid)
@@ -6252,17 +6438,17 @@ bool LayerTranslator::Translate(
                         const bool bIsGeomCollection =
                             wkbFlatten(poDstGeometry->getGeometryType()) ==
                             wkbGeometryCollection;
-                        OGRGeometry *poValidGeom = poDstGeometry->MakeValid();
-                        delete poDstGeometry;
-                        poDstGeometry = poValidGeom;
-                        if (poDstGeometry == nullptr)
+                        auto poNewGeom = std::unique_ptr<OGRGeometry>(
+                            poDstGeometry->MakeValid());
+                        if (!poNewGeom)
                             goto end_loop;
+                        poDstGeometry = std::move(poNewGeom);
                         if (!bIsGeomCollection)
                         {
-                            OGRGeometry *poCleanedGeom = OGRGeometryFactory::
-                                removeLowerDimensionSubGeoms(poDstGeometry);
-                            delete poDstGeometry;
-                            poDstGeometry = poCleanedGeom;
+                            poDstGeometry.reset(
+                                OGRGeometryFactory::
+                                    removeLowerDimensionSubGeoms(
+                                        poDstGeometry.get()));
                         }
                     }
 
@@ -6272,18 +6458,19 @@ bool LayerTranslator::Translate(
                             poDstGeometry->getGeometryType();
                         eTargetType =
                             ConvertType(m_eGeomTypeConversion, eTargetType);
-                        poDstGeometry = OGRGeometryFactory::forceTo(
-                            poDstGeometry, eTargetType);
+                        poDstGeometry.reset(OGRGeometryFactory::forceTo(
+                            poDstGeometry.release(), eTargetType));
                     }
                     else if (eGType != GEOMTYPE_UNCHANGED)
                     {
-                        poDstGeometry = OGRGeometryFactory::forceTo(
-                            poDstGeometry,
-                            static_cast<OGRwkbGeometryType>(eGType));
+                        poDstGeometry.reset(OGRGeometryFactory::forceTo(
+                            poDstGeometry.release(),
+                            static_cast<OGRwkbGeometryType>(eGType)));
                     }
                 }
 
-                poDstFeature->SetGeomFieldDirectly(iGeom, poDstGeometry);
+                poDstFeature->SetGeomFieldDirectly(iGeom,
+                                                   poDstGeometry.release());
             }
 
             CPLErrorReset();
@@ -6469,6 +6656,7 @@ LayerTranslator::GetSrcClipGeom(const OGRSpatialReference *poGeomSRS)
 
 #ifndef CheckHasEnoughAdditionalArgs_defined
 #define CheckHasEnoughAdditionalArgs_defined
+
 static bool CheckHasEnoughAdditionalArgs(CSLConstList papszArgv, int i,
                                          int nExtraArg, int nArgc)
 {
@@ -7296,6 +7484,76 @@ GDALVectorTranslateOptions *GDALVectorTranslateOptionsNew(
                          "UTC(+|-)HH:MM with HH in [0,14] and MM=00,15,30,45");
                 return nullptr;
             }
+        }
+        else if (EQUAL(papszArgv[i], "-xyRes"))
+        {
+            CHECK_HAS_ENOUGH_ADDITIONAL_ARGS(1);
+            const char *pszVal = papszArgv[++i];
+
+            char *endptr = nullptr;
+            psOptions->dfXYRes = CPLStrtod(pszVal, &endptr);
+            if (!endptr)
+            {
+                CPLError(CE_Failure, CPLE_IllegalArg,
+                         "Invalid value for -xyRes. Must be of the form "
+                         "{numeric_value}[ ]?[m|mm|deg]?");
+                return nullptr;
+            }
+            if (*endptr == ' ')
+                ++endptr;
+            if (*endptr != 0 && strcmp(endptr, "m") != 0 &&
+                strcmp(endptr, "mm") != 0 && strcmp(endptr, "deg") != 0)
+            {
+                CPLError(CE_Failure, CPLE_IllegalArg,
+                         "Invalid value for -xyRes. Must be of the form "
+                         "{numeric_value}[ ]?[m|mm|deg]?");
+                return nullptr;
+            }
+            psOptions->osXYResUnit = endptr;
+        }
+        else if (EQUAL(papszArgv[i], "-zRes"))
+        {
+            CHECK_HAS_ENOUGH_ADDITIONAL_ARGS(1);
+            const char *pszVal = papszArgv[++i];
+
+            char *endptr = nullptr;
+            psOptions->dfZRes = CPLStrtod(pszVal, &endptr);
+            if (!endptr)
+            {
+                CPLError(CE_Failure, CPLE_IllegalArg,
+                         "Invalid value for -zRes. Must be of the form "
+                         "{numeric_value}[ ]?[m|mm]?");
+                return nullptr;
+            }
+            if (*endptr == ' ')
+                ++endptr;
+            if (*endptr != 0 && strcmp(endptr, "m") != 0 &&
+                strcmp(endptr, "mm") != 0 && strcmp(endptr, "deg") != 0)
+            {
+                CPLError(CE_Failure, CPLE_IllegalArg,
+                         "Invalid value for -zRes. Must be of the form "
+                         "{numeric_value}[ ]?[m|mm]?");
+                return nullptr;
+            }
+            psOptions->osZResUnit = endptr;
+        }
+        else if (EQUAL(papszArgv[i], "-mRes"))
+        {
+            CHECK_HAS_ENOUGH_ADDITIONAL_ARGS(1);
+            const char *pszVal = papszArgv[++i];
+
+            char *endptr = nullptr;
+            psOptions->dfMRes = CPLStrtod(pszVal, &endptr);
+            if (!endptr || endptr != pszVal + strlen(pszVal))
+            {
+                CPLError(CE_Failure, CPLE_IllegalArg,
+                         "Invalid value for -mRes");
+                return nullptr;
+            }
+        }
+        else if (EQUAL(papszArgv[i], "-unsetCoordPrecision"))
+        {
+            psOptions->bUnsetCoordPrecision = true;
         }
         else if (papszArgv[i][0] == '-')
         {

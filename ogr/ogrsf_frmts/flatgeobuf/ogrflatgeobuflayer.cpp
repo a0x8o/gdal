@@ -669,11 +669,13 @@ bool OGRFlatGeobufLayer::CreateFinalFile()
         if (ensureFeatureBuf(nMaxBufferSize) != OGRERR_NONE)
             return false;
         uint32_t offsetInBuffer = 0;
+
         struct BatchItem
         {
             size_t featureIdx;  // index of m_featureItems[]
             uint32_t offsetInBuffer;
         };
+
         std::vector<BatchItem> batch;
 
         const auto flushBatch = [this, &batch, &offsetInBuffer]()
@@ -2486,7 +2488,7 @@ VSILFILE *OGRFlatGeobufLayer::CreateOutputFile(const CPLString &osFilename,
 OGRFlatGeobufLayer *OGRFlatGeobufLayer::Create(
     GDALDataset *poDS, const char *pszLayerName, const char *pszFilename,
     const OGRSpatialReference *poSpatialRef, OGRwkbGeometryType eGType,
-    bool bCreateSpatialIndexAtClose, char **papszOptions)
+    bool bCreateSpatialIndexAtClose, CSLConstList papszOptions)
 {
     std::string osTempFile = GetTempFilePath(pszFilename, papszOptions);
     VSILFILE *poFpWrite =

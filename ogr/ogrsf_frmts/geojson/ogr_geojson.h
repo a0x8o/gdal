@@ -103,17 +103,25 @@ class OGRGeoJSONLayer final : public OGRMemLayer
     void SetFIDColumn(const char *pszFIDColumn);
     void AddFeature(OGRFeature *poFeature);
     void DetectGeometryType();
+
     void IncFeatureCount()
     {
         nTotalFeatureCount_++;
     }
+
     void UnsetReader()
     {
         poReader_ = nullptr;
     }
+
     void InvalidateFeatureCount()
     {
         nTotalFeatureCount_ = -1;
+    }
+
+    void SetWriteOptions(const OGRGeoJSONWriteOptions &options)
+    {
+        oWriteOptions_ = options;
     }
 
   private:
@@ -124,6 +132,9 @@ class OGRGeoJSONLayer final : public OGRMemLayer
     bool bOriginalIdModified_;
     GIntBig nTotalFeatureCount_;
     GIntBig nFeatureReadSinceReset_ = 0;
+
+    //! Write options used by ICreateFeature() in append scenarios
+    OGRGeoJSONWriteOptions oWriteOptions_;
 
     bool IngestAll();
     void TerminateAppendSession();
@@ -139,7 +150,7 @@ class OGRGeoJSONWriteLayer final : public OGRLayer
 {
   public:
     OGRGeoJSONWriteLayer(const char *pszName, OGRwkbGeometryType eGType,
-                         char **papszOptions, bool bWriteFC_BBOXIn,
+                         CSLConstList papszOptions, bool bWriteFC_BBOXIn,
                          OGRCoordinateTransformation *poCT,
                          OGRGeoJSONDataSource *poDS);
     ~OGRGeoJSONWriteLayer();
@@ -151,6 +162,7 @@ class OGRGeoJSONWriteLayer final : public OGRLayer
     {
         return poFeatureDefn_;
     }
+
     OGRSpatialReference *GetSpatialRef() override
     {
         return nullptr;
@@ -159,14 +171,17 @@ class OGRGeoJSONWriteLayer final : public OGRLayer
     void ResetReading() override
     {
     }
+
     OGRFeature *GetNextFeature() override
     {
         return nullptr;
     }
+
     OGRErr ICreateFeature(OGRFeature *poFeature) override;
     OGRErr CreateField(const OGRFieldDefn *poField, int bApproxOK) override;
     int TestCapability(const char *pszCap) override;
     OGRErr GetExtent(OGREnvelope *psExtent, int bForce) override;
+
     OGRErr GetExtent(int iGeomField, OGREnvelope *psExtent, int bForce) override
     {
         return iGeomField == 0
@@ -190,7 +205,6 @@ class OGRGeoJSONWriteLayer final : public OGRLayer
     bool bWriteFC_BBOX;
     OGREnvelope3D sEnvelopeLayer;
 
-    int nCoordPrecision_;
     int nSignificantFigures_;
 
     bool bRFC7946_;
@@ -224,9 +238,8 @@ class OGRGeoJSONDataSource final : public OGRDataSource
     int GetLayerCount() override;
     OGRLayer *GetLayer(int nLayer) override;
     OGRLayer *ICreateLayer(const char *pszName,
-                           const OGRSpatialReference *poSRS = nullptr,
-                           OGRwkbGeometryType eGType = wkbUnknown,
-                           char **papszOptions = nullptr) override;
+                           const OGRGeomFieldDefn *poGeomFieldDefn,
+                           CSLConstList papszOptions) override;
     int TestCapability(const char *pszCap) override;
 
     void AddLayer(OGRGeoJSONLayer *poLayer);
@@ -235,6 +248,7 @@ class OGRGeoJSONDataSource final : public OGRDataSource
     // OGRGeoJSONDataSource Interface
     //
     int Create(const char *pszName, char **papszOptions);
+
     VSILFILE *GetOutputFile() const
     {
         return fpOut_;
@@ -260,18 +274,22 @@ class OGRGeoJSONDataSource final : public OGRDataSource
     {
         return bFpOutputIsSeekable_;
     }
+
     int GetBBOXInsertLocation() const
     {
         return nBBOXInsertLocation_;
     }
+
     int HasOtherPages() const
     {
         return bOtherPages_;
     }
+
     bool IsUpdatable() const
     {
         return bUpdatable_;
     }
+
     const CPLString &GetJSonFlavor() const
     {
         return osJSonFlavor_;

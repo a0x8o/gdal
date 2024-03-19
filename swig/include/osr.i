@@ -927,9 +927,21 @@ public:
     return OSRSetWellKnownGeogCS( self, name );
   }
 
-  OGRErr SetFromUserInput( const char *name ) {
-    return OSRSetFromUserInput( self, name );
+#ifdef SWIGCSHARP
+  OGRErr SetFromUserInput( const char *name) {
+    return OSRSetFromUserInputEx( self, name, NULL );
   }
+  OGRErr SetFromUserInput( const char *name, char** options ) {
+    return OSRSetFromUserInputEx( self, name, options );
+  }
+#else
+#ifndef SWIGJAVA
+  %feature( "kwargs" ) SetFromUserInput;
+#endif
+  OGRErr SetFromUserInput( const char *name, char** options = NULL ) {
+    return OSRSetFromUserInputEx( self, name, options );
+  }
+#endif
 
   OGRErr CopyGeogCSFrom( OSRSpatialReferenceShadow *rhs ) {
     return OSRCopyGeogCSFrom( self, rhs );
@@ -1118,7 +1130,12 @@ public:
     return OSRExportToMICoordSys( self, argout );
   }
 
-%apply (char **dict) { char ** };
+#if defined(SWIGPYTHON) || defined(SWIGJAVA)
+%apply (char **dictAndCSLDestroy) { char ** };
+#else
+// We'd also need a dictAndCSLDestroy for other languages!
+%apply (char **) { char ** };
+#endif
 %apply (char **options) { char **options };
   char** ExportToCF1( char **options = NULL ) {
     char** ret = NULL;

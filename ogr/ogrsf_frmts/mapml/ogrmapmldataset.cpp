@@ -70,6 +70,7 @@ class OGRMapMLReaderDataset final : public GDALPamDataset
     {
         return static_cast<int>(m_apoLayers.size());
     }
+
     OGRLayer *GetLayer(int idx) override;
 
     static int Identify(GDALOpenInfo *poOpenInfo);
@@ -103,6 +104,7 @@ class OGRMapMLReaderLayer final
     {
         return m_poFeatureDefn;
     }
+
     void ResetReading() override;
     DEFINE_GET_NEXT_FEATURE_THROUGH_RAW(OGRMapMLReaderLayer)
     int TestCapability(const char *pszCap) override;
@@ -139,11 +141,12 @@ class OGRMapMLWriterDataset final : public GDALPamDataset
     {
         return static_cast<int>(m_apoLayers.size());
     }
+
     OGRLayer *GetLayer(int idx) override;
 
-    OGRLayer *ICreateLayer(const char *, const OGRSpatialReference * = nullptr,
-                           OGRwkbGeometryType = wkbUnknown,
-                           char ** = nullptr) override;
+    OGRLayer *ICreateLayer(const char *pszName,
+                           const OGRGeomFieldDefn *poGeomFieldDefn,
+                           CSLConstList papszOptions) override;
 
     int TestCapability(const char *) override;
 
@@ -180,13 +183,16 @@ class OGRMapMLWriterLayer final : public OGRLayer
     {
         return m_poFeatureDefn;
     }
+
     void ResetReading() override
     {
     }
+
     OGRFeature *GetNextFeature() override
     {
         return nullptr;
     }
+
     OGRErr CreateField(const OGRFieldDefn *poFieldDefn, int) override;
     OGRErr ICreateFeature(OGRFeature *poFeature) override;
     int TestCapability(const char *) override;
@@ -977,11 +983,14 @@ int OGRMapMLWriterDataset::TestCapability(const char *pszCap)
 /*                           ICreateLayer()                             */
 /************************************************************************/
 
-OGRLayer *OGRMapMLWriterDataset::ICreateLayer(
-    const char *pszLayerName, const OGRSpatialReference *poSRSIn,
-    OGRwkbGeometryType, char ** /* papszOptions */)
+OGRLayer *
+OGRMapMLWriterDataset::ICreateLayer(const char *pszLayerName,
+                                    const OGRGeomFieldDefn *poGeomFieldDefn,
+                                    CSLConstList /*papszOptions*/)
 {
     OGRSpatialReference oSRS_WGS84;
+    const auto poSRSIn =
+        poGeomFieldDefn ? poGeomFieldDefn->GetSpatialRef() : nullptr;
     const OGRSpatialReference *poSRS = poSRSIn;
     if (poSRS == nullptr)
     {

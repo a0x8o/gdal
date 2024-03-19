@@ -190,9 +190,8 @@ static std::string
 GDALSharedDatasetConcatenateOpenOptions(CSLConstList papszOpenOptions)
 {
     std::string osStr;
-    for (CSLConstList papszIter = papszOpenOptions; papszIter && *papszIter;
-         ++papszIter)
-        osStr += *papszIter;
+    for (const char *pszOption : cpl::Iterate(papszOpenOptions))
+        osStr += pszOption;
     return osStr;
 }
 
@@ -264,6 +263,7 @@ GDALDataset::GDALDataset(int bForceCachedIOIn)
       m_poPrivate(new(std::nothrow) GDALDataset::Private)
 {
 }
+
 //! @endcond
 
 /************************************************************************/
@@ -771,6 +771,7 @@ void GDALDataset::RasterInitialize(int nXSize, int nYSize)
     nRasterXSize = nXSize;
     nRasterYSize = nYSize;
 }
+
 //! @endcond
 
 /************************************************************************/
@@ -894,6 +895,7 @@ void GDALDataset::SetBand(int nNewBand, GDALRasterBand *poBand)
     poBand->nRasterYSize = nRasterYSize;
     poBand->eAccess = eAccess;  // Default access to be same as dataset.
 }
+
 //! @endcond
 
 /************************************************************************/
@@ -912,6 +914,7 @@ void GDALDataset::SetBand(int nNewBand, std::unique_ptr<GDALRasterBand> poBand)
 {
     SetBand(nNewBand, poBand.release());
 }
+
 //! @endcond
 
 /************************************************************************/
@@ -2105,18 +2108,10 @@ CPLErr GDALDataset::BuildOverviews(const char *pszResampling, int nOverviews,
     // At time of writing, all overview generation options are actually
     // expected to be passed as configuration options.
     std::vector<std::unique_ptr<CPLConfigOptionSetter>> apoConfigOptionSetter;
-    for (CSLConstList papszIter = papszOptions; papszIter && *papszIter;
-         ++papszIter)
+    for (const auto &[pszKey, pszValue] : cpl::IterateNameValue(papszOptions))
     {
-        char *pszKey = nullptr;
-        const char *pszValue = CPLParseNameValue(*papszIter, &pszKey);
-        if (pszKey && pszValue)
-        {
-            apoConfigOptionSetter.emplace_back(
-                std::make_unique<CPLConfigOptionSetter>(pszKey, pszValue,
-                                                        false));
-        }
-        CPLFree(pszKey);
+        apoConfigOptionSetter.emplace_back(
+            std::make_unique<CPLConfigOptionSetter>(pszKey, pszValue, false));
     }
 
     const CPLErr eErr =
@@ -2206,6 +2201,7 @@ CPLErr GDALDataset::IBuildOverviews(const char *pszResampling, int nOverviews,
         return CE_Failure;
     }
 }
+
 //! @endcond
 
 /************************************************************************/
@@ -2394,6 +2390,7 @@ CPLErr GDALDataset::IRasterIO(GDALRWFlag eRWFlag, int nXOff, int nYOff,
                              panBandMap, nPixelSpace, nLineSpace, nBandSpace,
                              psExtraArg);
 }
+
 //! @endcond
 
 /************************************************************************/
@@ -2457,6 +2454,7 @@ CPLErr GDALDataset::BandBasedRasterIO(GDALRWFlag eRWFlag, int nXOff, int nYOff,
 
     return eErr;
 }
+
 //! @endcond
 
 /************************************************************************/
@@ -2534,6 +2532,7 @@ CPLErr GDALDataset::ValidateRasterIOOrAdviseReadParameters(
 
     return eErr;
 }
+
 //! @endcond
 
 /************************************************************************/
@@ -2860,6 +2859,7 @@ CPLErr CPL_STDCALL GDALDatasetRasterIOEx(
                           panBandMap, nPixelSpace, nLineSpace, nBandSpace,
                           psExtraArg);
 }
+
 /************************************************************************/
 /*                          GetOpenDatasets()                           */
 /************************************************************************/
@@ -3133,6 +3133,7 @@ static GDALAntiRecursionStruct &GetAntiRecursionOpen()
 }
 #else
 static thread_local GDALAntiRecursionStruct g_tls_antiRecursion;
+
 static GDALAntiRecursionStruct &GetAntiRecursionOpen()
 {
     return g_tls_antiRecursion;
@@ -3167,6 +3168,7 @@ GDALAntiRecursionGuard::~GDALAntiRecursionGuard()
         --m_psAntiRecursionStruct->m_oMapDepth[m_osIdentifier];
     }
 }
+
 //! @endcond
 
 /************************************************************************/
@@ -3244,15 +3246,12 @@ char **GDALDataset::GetFileList()
     if (oOvManager.HaveMaskFile())
     {
         auto iter = aosDatasetList.insert(datasetCtxt).first;
-        char **papszMskList = oOvManager.poMaskDS->GetFileList();
-        char **papszIter = papszMskList;
-        while (papszIter && *papszIter)
+        for (const char *pszFile :
+             CPLStringList(oOvManager.poMaskDS->GetFileList()))
         {
-            if (CSLFindString(papszList, *papszIter) < 0)
-                papszList = CSLAddString(papszList, *papszIter);
-            ++papszIter;
+            if (CSLFindString(papszList, pszFile) < 0)
+                papszList = CSLAddString(papszList, pszFile);
         }
-        CSLDestroy(papszMskList);
         aosDatasetList.erase(iter);
     }
 
@@ -3594,9 +3593,8 @@ GDALDatasetH CPL_STDCALL GDALOpenEx(const char *pszFilename,
     }
 
     std::string osAllowedDrivers;
-    for (CSLConstList papszIter = papszAllowedDrivers; papszIter && *papszIter;
-         ++papszIter)
-        osAllowedDrivers += *papszIter;
+    for (const char *pszDriverName : cpl::Iterate(papszAllowedDrivers))
+        osAllowedDrivers += pszDriverName;
     auto dsCtxt = GDALAntiRecursionStruct::DatasetContext(
         std::string(pszFilename), nOpenFlags, osAllowedDrivers);
     if (sAntiRecursion.aosDatasetNamesWithFlags.find(dsCtxt) !=
@@ -4944,7 +4942,70 @@ specific.
 OGRLayer *GDALDataset::CreateLayer(const char *pszName,
                                    const OGRSpatialReference *poSpatialRef,
                                    OGRwkbGeometryType eGType,
-                                   char **papszOptions)
+                                   CSLConstList papszOptions)
+
+{
+    if (eGType == wkbNone)
+    {
+        return CreateLayer(pszName, nullptr, papszOptions);
+    }
+    else
+    {
+        OGRGeomFieldDefn oGeomFieldDefn("", eGType);
+        oGeomFieldDefn.SetSpatialRef(poSpatialRef);
+        return CreateLayer(pszName, &oGeomFieldDefn, papszOptions);
+    }
+}
+
+/**
+\brief This method attempts to create a new layer on the dataset with the
+indicated name and geometry field definition.
+
+When poGeomFieldDefn is not null, most drivers should honor
+poGeomFieldDefn->GetType() and poGeomFieldDefn->GetSpatialRef().
+Drivers that honor poGeomFieldDefn->GetCoordinatePrecision() will declare the
+GDAL_DCAP_HONOR_GEOM_COORDINATE_PRECISION capability. Drivers may honor
+poGeomFieldDefn->GetNameRef() and poGeomFieldDefn->IsNullable(), but there are
+very few currently.
+
+Note that even if a geometry coordinate precision is set and a driver honors the
+GDAL_DCAP_HONOR_GEOM_COORDINATE_PRECISION capability, geometries passed to
+OGRLayer::CreateFeature() and OGRLayer::SetFeature() are assumed to be compatible
+with the coordinate precision. That is they are assumed to be valid once their
+coordinates are rounded to it. If it might not be the case, the user may set
+the OGR_APPLY_GEOM_SET_PRECISION configuration option before calling CreateFeature()
+or SetFeature() to force the OGRGeometry::SetPrecision() method to be called on
+the passed geometries.
+
+The papszOptions argument
+can be used to control driver specific creation options. These options are
+normally documented in the format specific documentation.
+This function will try to validate the creation option list passed to the
+driver with the GDALValidateCreationOptions() method. This check can be
+disabled by defining the configuration option GDAL_VALIDATE_CREATION_OPTIONS set
+to NO.
+
+Drivers should extend the ICreateLayer() method and not
+CreateLayer(). CreateLayer() adds validation of layer creation options, before
+delegating the actual work to ICreateLayer().
+
+This method is the same as the C function GDALDatasetCreateLayerFromGeomFieldDefn().
+
+@param pszName the name for the new layer.  This should ideally not
+match any existing layer on the datasource.
+@param poGeomFieldDefn the geometry field definition to use for the new layer,
+or NULL if there is no geometry field.
+@param papszOptions a StringList of name=value options.  Options are driver
+specific.
+
+@return NULL is returned on failure, or a new OGRLayer handle on success.
+@since 3.9
+
+*/
+
+OGRLayer *GDALDataset::CreateLayer(const char *pszName,
+                                   const OGRGeomFieldDefn *poGeomFieldDefn,
+                                   CSLConstList papszOptions)
 
 {
     if (CPLTestBool(
@@ -4953,13 +5014,23 @@ OGRLayer *GDALDataset::CreateLayer(const char *pszName,
         ValidateLayerCreationOptions(papszOptions);
     }
 
-    if (OGR_GT_IsNonLinear(eGType) && !TestCapability(ODsCCurveGeometries))
+    OGRLayer *poLayer;
+    if (poGeomFieldDefn)
     {
-        eGType = OGR_GT_GetLinear(eGType);
-    }
+        OGRGeomFieldDefn oGeomFieldDefn(poGeomFieldDefn);
+        if (OGR_GT_IsNonLinear(poGeomFieldDefn->GetType()) &&
+            !TestCapability(ODsCCurveGeometries))
+        {
+            oGeomFieldDefn.SetType(
+                OGR_GT_GetLinear(poGeomFieldDefn->GetType()));
+        }
 
-    OGRLayer *poLayer =
-        ICreateLayer(pszName, poSpatialRef, eGType, papszOptions);
+        poLayer = ICreateLayer(pszName, &oGeomFieldDefn, papszOptions);
+    }
+    else
+    {
+        poLayer = ICreateLayer(pszName, nullptr, papszOptions);
+    }
 #ifdef DEBUG
     if (poLayer != nullptr && OGR_GT_IsNonLinear(poLayer->GetGeomType()) &&
         !poLayer->TestCapability(OLCCurveGeometries))
@@ -4972,6 +5043,26 @@ OGRLayer *GDALDataset::CreateLayer(const char *pszName,
 
     return poLayer;
 }
+
+//! @cond Doxygen_Suppress
+
+// Technical override to avoid ambiguous choice between the old and new
+// new CreateLayer() signatures.
+OGRLayer *GDALDataset::CreateLayer(const char *pszName)
+{
+    OGRGeomFieldDefn oGeomFieldDefn("", wkbUnknown);
+    return CreateLayer(pszName, &oGeomFieldDefn, nullptr);
+}
+
+// Technical override to avoid ambiguous choice between the old and new
+// new CreateLayer() signatures.
+OGRLayer *GDALDataset::CreateLayer(const char *pszName, std::nullptr_t)
+{
+    OGRGeomFieldDefn oGeomFieldDefn("", wkbUnknown);
+    return CreateLayer(pszName, &oGeomFieldDefn, nullptr);
+}
+
+//!@endcond
 
 /************************************************************************/
 /*                         GDALDatasetCreateLayer()                     */
@@ -5056,6 +5147,73 @@ OGRLayerH GDALDatasetCreateLayer(GDALDatasetH hDS, const char *pszName,
                                  const_cast<char **>(papszOptions), hLayer);
 #endif
 
+    return hLayer;
+}
+
+/************************************************************************/
+/*                 GDALDatasetCreateLayerFromGeomFieldDefn()            */
+/************************************************************************/
+
+/**
+\brief This function attempts to create a new layer on the dataset with the
+indicated name and geometry field.
+
+When poGeomFieldDefn is not null, most drivers should honor
+poGeomFieldDefn->GetType() and poGeomFieldDefn->GetSpatialRef().
+Drivers that honor poGeomFieldDefn->GetCoordinatePrecision() will declare the
+GDAL_DCAP_HONOR_GEOM_COORDINATE_PRECISION capability. Drivers may honor
+poGeomFieldDefn->GetNameRef() and poGeomFieldDefn->IsNullable(), but there are
+very few currently.
+
+Note that even if a geometry coordinate precision is set and a driver honors the
+GDAL_DCAP_HONOR_GEOM_COORDINATE_PRECISION capability, geometries passed to
+OGRLayer::CreateFeature() and OGRLayer::SetFeature() are assumed to be compatible
+with the coordinate precision. That is they are assumed to be valid once their
+coordinates are rounded to it. If it might not be the case, the user may set
+the OGR_APPLY_GEOM_SET_PRECISION configuration option before calling CreateFeature()
+or SetFeature() to force the OGRGeometry::SetPrecision() method to be called on
+the passed geometries.
+
+The papszOptions argument can be used to control driver specific creation
+options.  These options are normally documented in the format specific
+documentation.
+
+This method is the same as the C++ method GDALDataset::CreateLayer().
+
+@param hDS the dataset handle
+@param pszName the name for the new layer.  This should ideally not
+match any existing layer on the datasource.
+@param hGeomFieldDefn the geometry field definition. May be NULL to indicate
+a non-spatial file (or if adding geometry fields later with OGR_L_CreateGeomField()
+for drivers supporting that interface).
+@param papszOptions a StringList of name=value options.  Options are driver
+specific.
+
+@return NULL is returned on failure, or a new OGRLayer handle on success.
+
+@since GDAL 3.9
+
+*/
+
+OGRLayerH
+GDALDatasetCreateLayerFromGeomFieldDefn(GDALDatasetH hDS, const char *pszName,
+                                        OGRGeomFieldDefnH hGeomFieldDefn,
+                                        CSLConstList papszOptions)
+
+{
+    VALIDATE_POINTER1(hDS, "GDALDatasetCreateLayerFromGeomFieldDefn", nullptr);
+
+    if (!pszName)
+    {
+        CPLError(CE_Failure, CPLE_ObjectNull,
+                 "Name was NULL in GDALDatasetCreateLayerFromGeomFieldDefn");
+        return nullptr;
+    }
+
+    OGRLayerH hLayer =
+        OGRLayer::ToHandle(GDALDataset::FromHandle(hDS)->CreateLayer(
+            pszName, OGRGeomFieldDefn::FromHandle(hGeomFieldDefn),
+            papszOptions));
     return hLayer;
 }
 
@@ -5295,6 +5453,7 @@ int GDALDataset::ValidateLayerCreationOptions(const char *const *papszLCO)
     return GDALValidateOptions(pszOptionList, papszLCO, "layer creation option",
                                osDataset);
 }
+
 //! @endcond
 
 /************************************************************************/
@@ -5383,23 +5542,20 @@ int GDALDataset::GetSummaryRefCount() const
 
  @param pszName the name for the new layer.  This should ideally not
  match any existing layer on the datasource.
- @param poSpatialRef the coordinate system to use for the new layer, or NULL if
- no coordinate system is available.
- @param eGType the geometry type for the layer.  Use wkbUnknown if there
- are no constraints on the types geometry to be written.
+ @param poGeomFieldDefn the geometry field definition to use for the new layer,
+ or NULL if there is no geometry field.
  @param papszOptions a StringList of name=value options.  Options are driver
  specific.
 
  @return NULL is returned on failure, or a new OGRLayer handle on success.
 
- @since GDAL 2.0
+ @since GDAL 2.0 (prototype modified in 3.9)
 */
 
 OGRLayer *
 GDALDataset::ICreateLayer(CPL_UNUSED const char *pszName,
-                          CPL_UNUSED const OGRSpatialReference *poSpatialRef,
-                          CPL_UNUSED OGRwkbGeometryType eGType,
-                          CPL_UNUSED char **papszOptions)
+                          CPL_UNUSED const OGRGeomFieldDefn *poGeomFieldDefn,
+                          CPL_UNUSED CSLConstList papszOptions)
 
 {
     CPLError(CE_Failure, CPLE_NotSupported,
@@ -5464,17 +5620,19 @@ OGRLayer *GDALDataset::CopyLayer(OGRLayer *poSrcLayer, const char *pszNewName,
     aosCleanedUpOptions.SetNameValue("COPY_MD", nullptr);
 
     CPLErrorReset();
-    if (poSrcDefn->GetGeomFieldCount() > 1 &&
-        TestCapability(ODsCCreateGeomFieldAfterCreateLayer))
+    const int nSrcGeomFieldCount = poSrcDefn->GetGeomFieldCount();
+    if (nSrcGeomFieldCount == 1)
     {
-        poDstLayer = ICreateLayer(pszNewName, nullptr, wkbNone,
+        OGRGeomFieldDefn oGeomFieldDefn(poSrcDefn->GetGeomFieldDefn(0));
+        if (pszSRSWKT)
+            oGeomFieldDefn.SetSpatialRef(&oDstSpaRef);
+        poDstLayer = ICreateLayer(pszNewName, &oGeomFieldDefn,
                                   aosCleanedUpOptions.List());
     }
     else
     {
-        poDstLayer = ICreateLayer(
-            pszNewName, pszSRSWKT ? &oDstSpaRef : poSrcLayer->GetSpatialRef(),
-            poSrcDefn->GetGeomType(), aosCleanedUpOptions.List());
+        poDstLayer =
+            ICreateLayer(pszNewName, nullptr, aosCleanedUpOptions.List());
     }
 
     if (poDstLayer == nullptr)
@@ -5555,7 +5713,6 @@ OGRLayer *GDALDataset::CopyLayer(OGRLayer *poSrcLayer, const char *pszNewName,
     /* -------------------------------------------------------------------- */
     /*      Create geometry fields.                                         */
     /* -------------------------------------------------------------------- */
-    const int nSrcGeomFieldCount = poSrcDefn->GetGeomFieldCount();
     if (nSrcGeomFieldCount > 1 &&
         TestCapability(ODsCCreateGeomFieldAfterCreateLayer))
     {
@@ -6082,6 +6239,7 @@ OGRErr GDALDataset::ProcessSQLDropTable(const char *pszSQLCommand)
 
     return DeleteLayer(i);
 }
+
 //! @endcond
 
 /************************************************************************/
@@ -6521,6 +6679,7 @@ OGRErr GDALDataset::ProcessSQLAlterTableAlterColumn(const char *pszSQLCommand)
 
     return poLayer->AlterFieldDefn(nFieldIndex, &oNewFieldDefn, l_nFlags);
 }
+
 //! @endcond
 
 /************************************************************************/
@@ -6766,6 +6925,7 @@ GDALDataset::ExecuteSQL(const char *pszStatement, OGRGeometry *poSpatialFilter,
 
     return new OGRUnionLayer("SELECT", nSrcLayers, papoSrcLayers, TRUE);
 }
+
 //! @endcond
 
 /************************************************************************/
@@ -7129,6 +7289,7 @@ GDALDataset::BuildParseInfo(swq_select *psSelectInfo,
 
     return psParseInfo;
 }
+
 //! @endcond
 
 /************************************************************************/
@@ -7239,6 +7400,7 @@ int GDALDataset::IsGenericSQLDialect(const char *pszDialect)
     return pszDialect != nullptr &&
            (EQUAL(pszDialect, "OGRSQL") || EQUAL(pszDialect, "SQLITE"));
 }
+
 //! @endcond
 
 /************************************************************************/
@@ -8208,6 +8370,7 @@ void GDALDataset::ReleaseMutex()
         CPLReleaseMutex(m_poPrivate->hMutex);
     }
 }
+
 //! @endcond
 
 /************************************************************************/
@@ -8761,6 +8924,7 @@ bool GDALDataset::GetRawBinaryLayout(RawBinaryLayout &sLayout)
     CPL_IGNORE_RET_VAL(sLayout);
     return false;
 }
+
 //! @endcond
 
 /************************************************************************/

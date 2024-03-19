@@ -173,8 +173,7 @@ class JPGDatasetCommon CPL_NON_FINAL : public GDALPamDataset
     OGRSpatialReference m_oSRS{};
     bool bGeoTransformValid;
     double adfGeoTransform[6];
-    int nGCPCount;
-    GDAL_GCP *pasGCPList;
+    std::vector<gdal::GCP> m_aoGCPs{};
 
     VSILFILE *m_fpImage;
     GUIntBig nSubfileOffset;
@@ -309,14 +308,17 @@ class JPGDataset final : public JPGDatasetCommon
     CPLErr StartDecompress();
     virtual void StopDecompress() override;
     virtual CPLErr Restart() override;
+
     virtual int GetDataPrecision() override
     {
         return sDInfo.data_precision;
     }
+
     virtual int GetOutColorSpace() override
     {
         return sDInfo.out_color_space;
     }
+
     virtual int GetJPEGColorSpace() override
     {
         return sDInfo.jpeg_color_space;
@@ -370,6 +372,7 @@ class JPGRasterBand final : public GDALPamRasterBand
 
   public:
     JPGRasterBand(JPGDatasetCommon *, int);
+
     virtual ~JPGRasterBand()
     {
     }
@@ -405,6 +408,7 @@ class JPGMaskBand final : public GDALRasterBand
 
   public:
     explicit JPGMaskBand(JPGDatasetCommon *poDS);
+
     virtual ~JPGMaskBand()
     {
     }

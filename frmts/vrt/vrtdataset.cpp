@@ -101,11 +101,6 @@ VRTDataset::~VRTDataset()
         m_poSRS->Release();
     if (m_poGCP_SRS)
         m_poGCP_SRS->Release();
-    if (m_nGCPCount > 0)
-    {
-        GDALDeinitGCPs(m_nGCPCount, m_pasGCPList);
-        CPLFree(m_pasGCPList);
-    }
     CPLFree(m_pszVRTPath);
 
     delete m_poMaskBand;
@@ -315,10 +310,9 @@ CPLXMLNode *VRTDataset::SerializeToXML(const char *pszVRTPathIn)
     /* -------------------------------------------------------------------- */
     /*      GCPs                                                            */
     /* -------------------------------------------------------------------- */
-    if (m_nGCPCount > 0)
+    if (!m_asGCPs.empty())
     {
-        GDALSerializeGCPListToXML(psDSTree, m_pasGCPList, m_nGCPCount,
-                                  m_poGCP_SRS);
+        GDALSerializeGCPListToXML(psDSTree, m_asGCPs, m_poGCP_SRS);
     }
 
     /* -------------------------------------------------------------------- */
@@ -403,6 +397,7 @@ CPLXMLNode *CPL_STDCALL VRTSerializeToXML(VRTDatasetH hDataset,
     return static_cast<VRTDataset *>(GDALDataset::FromHandle(hDataset))
         ->SerializeToXML(pszVRTPath);
 }
+
 /*! @cond Doxygen_Suppress */
 
 /************************************************************************/
@@ -505,8 +500,7 @@ CPLErr VRTDataset::XMLInit(const CPLXMLNode *psTree, const char *pszVRTPathIn)
     /* -------------------------------------------------------------------- */
     if (const CPLXMLNode *psGCPList = CPLGetXMLNode(psTree, "GCPList"))
     {
-        GDALDeserializeGCPListFromXML(psGCPList, &m_pasGCPList, &m_nGCPCount,
-                                      &m_poGCP_SRS);
+        GDALDeserializeGCPListFromXML(psGCPList, m_asGCPs, &m_poGCP_SRS);
     }
 
     /* -------------------------------------------------------------------- */
@@ -621,7 +615,7 @@ CPLErr VRTDataset::XMLInit(const CPLXMLNode *psTree, const char *pszVRTPathIn)
 int VRTDataset::GetGCPCount()
 
 {
-    return m_nGCPCount;
+    return static_cast<int>(m_asGCPs.size());
 }
 
 /************************************************************************/
@@ -631,7 +625,7 @@ int VRTDataset::GetGCPCount()
 const GDAL_GCP *VRTDataset::GetGCPs()
 
 {
-    return m_pasGCPList;
+    return gdal::GCP::c_ptr(m_asGCPs);
 }
 
 /************************************************************************/
@@ -644,17 +638,9 @@ CPLErr VRTDataset::SetGCPs(int nGCPCountIn, const GDAL_GCP *pasGCPListIn,
 {
     if (m_poGCP_SRS)
         m_poGCP_SRS->Release();
-    if (m_nGCPCount > 0)
-    {
-        GDALDeinitGCPs(m_nGCPCount, m_pasGCPList);
-        CPLFree(m_pasGCPList);
-    }
 
     m_poGCP_SRS = poGCP_SRS ? poGCP_SRS->Clone() : nullptr;
-
-    m_nGCPCount = nGCPCountIn;
-
-    m_pasGCPList = GDALDuplicateGCPs(nGCPCountIn, pasGCPListIn);
+    m_asGCPs = gdal::GCP::fromC(pasGCPListIn, nGCPCountIn);
 
     SetNeedsFlush();
 
@@ -1858,6 +1844,7 @@ CPLErr VRTDataset::AddBand(GDALDataType eType, char **papszOptions)
         return CE_None;
     }
 }
+
 /*! @endcond */
 /************************************************************************/
 /*                              VRTAddBand()                            */
@@ -1879,6 +1866,7 @@ int CPL_STDCALL VRTAddBand(VRTDatasetH hDataset, GDALDataType eType,
     return static_cast<VRTDataset *>(GDALDataset::FromHandle(hDataset))
         ->AddBand(eType, papszOptions);
 }
+
 /*! @cond Doxygen_Suppress */
 /************************************************************************/
 /*                               Create()                               */

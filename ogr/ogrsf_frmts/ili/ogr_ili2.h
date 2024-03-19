@@ -115,21 +115,23 @@ class OGRILI2DataSource final : public OGRDataSource
     {
         return pszName;
     }
+
     int GetLayerCount() override
     {
         return static_cast<int>(listLayer.size());
     }
+
     OGRLayer *GetLayer(int) override;
 
-    virtual OGRLayer *ICreateLayer(const char *,
-                                   const OGRSpatialReference * = nullptr,
-                                   OGRwkbGeometryType = wkbUnknown,
-                                   char ** = nullptr) override;
+    OGRLayer *ICreateLayer(const char *pszName,
+                           const OGRGeomFieldDefn *poGeomFieldDefn,
+                           CSLConstList papszOptions) override;
 
     VSILFILE *GetOutputFP()
     {
         return fpOutput;
     }
+
     int TestCapability(const char *) override;
 };
 

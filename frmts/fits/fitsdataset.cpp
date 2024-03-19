@@ -115,12 +115,13 @@ class FITSDataset final : public GDALPamDataset
     {
         return static_cast<int>(m_apoLayers.size());
     }
+
     OGRLayer *GetLayer(int) override;
 
     OGRLayer *ICreateLayer(const char *pszName,
-                           const OGRSpatialReference *poSRS,
-                           OGRwkbGeometryType eGType,
-                           char **papszOptions) override;
+                           const OGRGeomFieldDefn *poGeomFieldDefn,
+                           CSLConstList papszOptions) override;
+
     int TestCapability(const char *pszCap) override;
 
     bool GetRawBinaryLayout(GDALDataset::RawBinaryLayout &) override;
@@ -217,6 +218,7 @@ class FITSLayer final : public OGRLayer,
     {
         return m_poFeatureDefn;
     }
+
     void ResetReading() override;
     int TestCapability(const char *) override;
     OGRFeature *GetFeature(GIntBig) override;
@@ -1849,6 +1851,7 @@ static const char *const ignorableFITSHeaders[] = {
     "XTENSION", "PCOUNT", "GCOUNT", "EXTEND", "CONTINUE", "COMMENT", "",
     "LONGSTRN", "BZERO",  "BSCALE", "BLANK",  "CHECKSUM", "DATASUM",
 };
+
 static bool isIgnorableFITSHeader(const char *name)
 {
     for (const char *keyword : ignorableFITSHeaders)
@@ -2301,12 +2304,13 @@ OGRLayer *FITSDataset::GetLayer(int idx)
 /************************************************************************/
 
 OGRLayer *FITSDataset::ICreateLayer(const char *pszName,
-                                    const OGRSpatialReference * /* poSRS */,
-                                    OGRwkbGeometryType eGType,
-                                    char **papszOptions)
+                                    const OGRGeomFieldDefn *poGeomFieldDefn,
+                                    CSLConstList papszOptions)
 {
     if (!TestCapability(ODsCCreateLayer))
         return nullptr;
+
+    const auto eGType = poGeomFieldDefn ? poGeomFieldDefn->GetType() : wkbNone;
     if (eGType != wkbNone)
     {
         CPLError(CE_Failure, CPLE_NotSupported, "Spatial tables not supported");

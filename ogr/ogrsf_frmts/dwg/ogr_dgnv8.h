@@ -103,6 +103,7 @@ class OGRDGNV8Layer final : public OGRLayer
     OGRFeature *GetNextFeature() override;
     OGRFeature *GetFeature(GIntBig nFID) override;
     OGRErr GetExtent(OGREnvelope *psExtent, int bForce) override;
+
     virtual OGRErr GetExtent(int iGeomField, OGREnvelope *psExtent,
                              int bForce) override
     {
@@ -144,14 +145,15 @@ class OGRDGNV8DataSource final : public GDALDataset
     int Open(const char *, bool bUpdate);
     bool PreCreate(const char *, char **);
 
-    OGRLayer *ICreateLayer(const char *, const OGRSpatialReference * = nullptr,
-                           OGRwkbGeometryType = wkbUnknown,
-                           char ** = nullptr) override;
+    OGRLayer *ICreateLayer(const char *pszName,
+                           const OGRGeomFieldDefn *poGeomFieldDefn,
+                           CSLConstList papszOptions) override;
 
     int GetLayerCount() override
     {
         return m_nLayers;
     }
+
     OGRLayer *GetLayer(int) override;
 
     int TestCapability(const char *) override;
@@ -171,6 +173,7 @@ class OGRDGNV8DataSource final : public GDALDataset
     {
         return m_bUpdate;
     }
+
     void SetModified()
     {
         m_bModified = true;

@@ -274,9 +274,10 @@ int OGRDXFWriterDS::Open(const char *pszFilename, char **papszOptions)
 /*                           ICreateLayer()                             */
 /************************************************************************/
 
-OGRLayer *OGRDXFWriterDS::ICreateLayer(const char *pszName,
-                                       const OGRSpatialReference *,
-                                       OGRwkbGeometryType, char **)
+OGRLayer *
+OGRDXFWriterDS::ICreateLayer(const char *pszName,
+                             const OGRGeomFieldDefn * /*poGeomFieldDefn*/,
+                             CSLConstList /*papszOptions*/)
 
 {
     if (EQUAL(pszName, "blocks") && poBlocksLayer == nullptr)
@@ -339,6 +340,7 @@ static bool WriteValue(VSILFILE *fp, int nCode, double dfValue)
 
     return true;
 }
+
 /************************************************************************/
 /*                        TransferUpdateHeader()                        */
 /************************************************************************/

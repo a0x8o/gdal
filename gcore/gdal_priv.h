@@ -89,6 +89,7 @@ class GDALRelationship;
 #define GMO_SUPPORT_MDMD 0x0008
 #define GMO_MD_DIRTY 0x0010
 #define GMO_PAM_CLASS 0x0020
+
 //! @endcond
 
 /************************************************************************/
@@ -99,23 +100,32 @@ class GDALRelationship;
 class CPL_DLL GDALMultiDomainMetadata
 {
   private:
-    char **papszDomainList;
-    CPLStringList **papoMetadataLists;
+    CPLStringList aosDomainList{};
+
+    struct Comparator
+    {
+        bool operator()(const char *a, const char *b) const
+        {
+            return STRCASECMP(a, b) < 0;
+        }
+    };
+
+    std::map<const char *, CPLStringList, Comparator> oMetadata{};
 
   public:
     GDALMultiDomainMetadata();
     ~GDALMultiDomainMetadata();
 
     int XMLInit(const CPLXMLNode *psMetadata, int bMerge);
-    CPLXMLNode *Serialize();
+    CPLXMLNode *Serialize() const;
 
-    char **GetDomainList()
+    CSLConstList GetDomainList() const
     {
-        return papszDomainList;
+        return aosDomainList.List();
     }
 
     char **GetMetadata(const char *pszDomain = "");
-    CPLErr SetMetadata(char **papszMetadata, const char *pszDomain = "");
+    CPLErr SetMetadata(CSLConstList papszMetadata, const char *pszDomain = "");
     const char *GetMetadataItem(const char *pszName,
                                 const char *pszDomain = "");
     CPLErr SetMetadataItem(const char *pszName, const char *pszValue,
@@ -123,9 +133,15 @@ class CPL_DLL GDALMultiDomainMetadata
 
     void Clear();
 
+    inline void clear()
+    {
+        Clear();
+    }
+
   private:
     CPL_DISALLOW_COPY_ASSIGN(GDALMultiDomainMetadata)
 };
+
 //! @endcond
 
 /* ******************************************************************** */
@@ -268,6 +284,7 @@ class CPL_DLL GDALDefaultOverviews
   private:
     CPL_DISALLOW_COPY_ASSIGN(GDALDefaultOverviews)
 };
+
 //! @endcond
 
 /* ******************************************************************** */
@@ -320,6 +337,124 @@ class CPL_DLL GDALOpenInfo
   private:
     CPL_DISALLOW_COPY_ASSIGN(GDALOpenInfo)
 };
+
+/* ******************************************************************** */
+/*                             gdal::GCP                                */
+/* ******************************************************************** */
+
+namespace gdal
+{
+/** C++ wrapper over the C GDAL_GCP structure.
+ *
+ * It has the same binary layout, and thus a gdal::GCP pointer can be cast as a
+ * GDAL_GCP pointer.
+ *
+ * @since 3.9
+ */
+class CPL_DLL GCP
+{
+  public:
+    explicit GCP(const char *pszId = "", const char *pszInfo = "",
+                 double dfPixel = 0, double dfLine = 0, double dfX = 0,
+                 double dfY = 0, double dfZ = 0);
+    ~GCP();
+    GCP(const GCP &);
+    explicit GCP(const GDAL_GCP &other);
+    GCP &operator=(const GCP &);
+    GCP(GCP &&);
+    GCP &operator=(GCP &&);
+
+    /** Returns the "id" member. */
+    inline const char *Id() const
+    {
+        return gcp.pszId;
+    }
+
+    void SetId(const char *pszId);
+
+    /** Returns the "info" member. */
+    inline const char *Info() const
+    {
+        return gcp.pszInfo;
+    }
+
+    void SetInfo(const char *pszInfo);
+
+    /** Returns the "pixel" member. */
+    inline double Pixel() const
+    {
+        return gcp.dfGCPPixel;
+    }
+
+    /** Returns a reference to the "pixel" member. */
+    inline double &Pixel()
+    {
+        return gcp.dfGCPPixel;
+    }
+
+    /** Returns the "line" member. */
+    inline double Line() const
+    {
+        return gcp.dfGCPLine;
+    }
+
+    /** Returns a reference to the "line" member. */
+    inline double &Line()
+    {
+        return gcp.dfGCPLine;
+    }
+
+    /** Returns the "X" member. */
+    inline double X() const
+    {
+        return gcp.dfGCPX;
+    }
+
+    /** Returns a reference to the "X" member. */
+    inline double &X()
+    {
+        return gcp.dfGCPX;
+    }
+
+    /** Returns the "Y" member. */
+    inline double Y() const
+    {
+        return gcp.dfGCPY;
+    }
+
+    /** Returns a reference to the "Y" member. */
+    inline double &Y()
+    {
+        return gcp.dfGCPY;
+    }
+
+    /** Returns the "Z" member. */
+    inline double Z() const
+    {
+        return gcp.dfGCPZ;
+    }
+
+    /** Returns a reference to the "Z" member. */
+    inline double &Z()
+    {
+        return gcp.dfGCPZ;
+    }
+
+    /** Casts as a C GDAL_GCP pointer */
+    inline const GDAL_GCP *c_ptr() const
+    {
+        return &gcp;
+    }
+
+    static const GDAL_GCP *c_ptr(const std::vector<GCP> &asGCPs);
+
+    static std::vector<GCP> fromC(const GDAL_GCP *pasGCPList, int nGCPCount);
+
+  private:
+    GDAL_GCP gcp;
+};
+
+} /* namespace gdal */
 
 /* ******************************************************************** */
 /*                             GDALDataset                              */
@@ -502,6 +637,7 @@ class CPL_DLL GDALDataset : public GDALMajorObject
       private:
         friend class GDALDataset;
         GDALDataset *m_poSelf;
+
         CPL_INTERNAL explicit Bands(GDALDataset *poSelf) : m_poSelf(poSelf)
         {
         }
@@ -643,6 +779,7 @@ class CPL_DLL GDALDataset : public GDALMajorObject
 
     void MarkSuppressOnClose();
     void UnMarkSuppressOnClose();
+
     /** Return MarkSuppressOnClose flag.
     * @return MarkSuppressOnClose flag.
     */
@@ -762,6 +899,7 @@ class CPL_DLL GDALDataset : public GDALMajorObject
       private:
         friend class GDALDataset;
         GDALDataset *m_poSelf;
+
         CPL_INTERNAL explicit Layers(GDALDataset *poSelf) : m_poSelf(poSelf)
         {
         }
@@ -829,6 +967,7 @@ class CPL_DLL GDALDataset : public GDALMajorObject
       private:
         friend class GDALDataset;
         GDALDataset *m_poSelf;
+
         CPL_INTERNAL explicit Features(GDALDataset *poSelf) : m_poSelf(poSelf)
         {
         }
@@ -891,9 +1030,21 @@ class CPL_DLL GDALDataset : public GDALMajorObject
     UpdateRelationship(std::unique_ptr<GDALRelationship> &&relationship,
                        std::string &failureReason);
 
-    virtual OGRLayer *CreateLayer(
-        const char *pszName, const OGRSpatialReference *poSpatialRef = nullptr,
-        OGRwkbGeometryType eGType = wkbUnknown, char **papszOptions = nullptr);
+    //! @cond Doxygen_Suppress
+    OGRLayer *CreateLayer(const char *pszName);
+
+    OGRLayer *CreateLayer(const char *pszName, std::nullptr_t);
+    //! @endcond
+
+    OGRLayer *CreateLayer(const char *pszName,
+                          const OGRSpatialReference *poSpatialRef,
+                          OGRwkbGeometryType eGType = wkbUnknown,
+                          CSLConstList papszOptions = nullptr);
+
+    OGRLayer *CreateLayer(const char *pszName,
+                          const OGRGeomFieldDefn *poGeomFieldDefn,
+                          CSLConstList papszOptions = nullptr);
+
     virtual OGRLayer *CopyLayer(OGRLayer *poSrcLayer, const char *pszNewName,
                                 char **papszOptions = nullptr);
 
@@ -932,9 +1083,9 @@ class CPL_DLL GDALDataset : public GDALMajorObject
     //! @endcond
 
   protected:
-    virtual OGRLayer *ICreateLayer(
-        const char *pszName, const OGRSpatialReference *poSpatialRef = nullptr,
-        OGRwkbGeometryType eGType = wkbUnknown, char **papszOptions = nullptr);
+    virtual OGRLayer *ICreateLayer(const char *pszName,
+                                   const OGRGeomFieldDefn *poGeomFieldDefn,
+                                   CSLConstList papszOptions);
 
     //! @cond Doxygen_Suppress
     OGRErr ProcessSQLCreateIndex(const char *);
@@ -962,6 +1113,7 @@ struct CPL_DLL GDALDatasetUniquePtrDeleter
         GDALClose(poDataset);
     }
 };
+
 //! @endcond
 
 //! @cond Doxygen_Suppress
@@ -973,6 +1125,7 @@ struct CPL_DLL GDALDatasetUniquePtrReleaser
             poDataset->Release();
     }
 };
+
 //! @endcond
 
 /** Unique pointer type for GDALDataset.
@@ -1029,16 +1182,19 @@ class CPL_DLL GDALRasterBlock
     void Touch(void);
     void MarkDirty(void);
     void MarkClean(void);
+
     /** Increment the lock count */
     int AddLock(void)
     {
         return CPLAtomicInc(&nLockCount);
     }
+
     /** Decrement the lock count */
     int DropLock(void)
     {
         return CPLAtomicDec(&nLockCount);
     }
+
     void Detach();
 
     CPLErr Write();
@@ -1050,6 +1206,7 @@ class CPL_DLL GDALRasterBlock
     {
         return eType;
     }
+
     /** Return the x offset of the top-left corner of the block
      * @return x offset
      */
@@ -1057,6 +1214,7 @@ class CPL_DLL GDALRasterBlock
     {
         return nXOff;
     }
+
     /** Return the y offset of the top-left corner of the block
      * @return y offset
      */
@@ -1064,6 +1222,7 @@ class CPL_DLL GDALRasterBlock
     {
         return nYOff;
     }
+
     /** Return the width of the block
      * @return width
      */
@@ -1071,6 +1230,7 @@ class CPL_DLL GDALRasterBlock
     {
         return nXSize;
     }
+
     /** Return the height of the block
      * @return height
      */
@@ -1078,6 +1238,7 @@ class CPL_DLL GDALRasterBlock
     {
         return nYSize;
     }
+
     /** Return the dirty flag
      * @return dirty flag
      */
@@ -1085,6 +1246,7 @@ class CPL_DLL GDALRasterBlock
     {
         return bDirty;
     }
+
     /** Return the data buffer
      * @return data buffer
      */
@@ -1092,6 +1254,7 @@ class CPL_DLL GDALRasterBlock
     {
         return pData;
     }
+
     /** Return the block size in bytes
      * @return block size.
      */
@@ -1225,14 +1388,17 @@ class GDALAbstractBandBlockCache
     void AddBlockToFreeList(GDALRasterBlock *);
     void IncDirtyBlocks(int nInc);
     void WaitCompletionPendingTasks();
+
     void EnableDirtyBlockWriting()
     {
         --m_nWriteDirtyBlocksDisabled;
     }
+
     void DisableDirtyBlockWriting()
     {
         ++m_nWriteDirtyBlocksDisabled;
     }
+
     bool HasDirtyBlocks() const
     {
         return m_nDirtyBlocks > 0;
@@ -1433,6 +1599,7 @@ class CPL_DLL GDALRasterBand : public GDALMajorObject
     {
         return poBandBlockCache && poBandBlockCache->HasDirtyBlocks();
     }
+
     //! @endcond
 
   public:
@@ -1631,6 +1798,7 @@ class CPL_DLL GDALAllValidMaskBand : public GDALRasterBand
     {
         return true;
     }
+
     GDALMaskValueRange GetMaskValueRange() const override
     {
         return GMVR_0_AND_255_ONLY;
@@ -1670,6 +1838,7 @@ class CPL_DLL GDALNoDataMaskBand : public GDALRasterBand
     {
         return true;
     }
+
     GDALMaskValueRange GetMaskValueRange() const override
     {
         return GMVR_0_AND_255_ONLY;
@@ -1699,6 +1868,7 @@ class CPL_DLL GDALNoDataValuesMaskBand : public GDALRasterBand
     {
         return true;
     }
+
     GDALMaskValueRange GetMaskValueRange() const override
     {
         return GMVR_0_AND_255_ONLY;
@@ -1731,6 +1901,7 @@ class GDALRescaledAlphaBand : public GDALRasterBand
         return true;
     }
 };
+
 //! @endcond
 
 /* ******************************************************************** */
@@ -1822,6 +1993,7 @@ class CPL_DLL GDALDriver : public GDALMajorObject
     typedef GDALDataset *(*OpenCallback)(GDALOpenInfo *);
 
     OpenCallback pfnOpen = nullptr;
+
     virtual OpenCallback GetOpenCallback()
     {
         return pfnOpen;
@@ -1833,6 +2005,7 @@ class CPL_DLL GDALDriver : public GDALMajorObject
                                            char **papszOptions);
 
     CreateCallback pfnCreate = nullptr;
+
     virtual CreateCallback GetCreateCallback()
     {
         return pfnCreate;
@@ -1847,6 +2020,7 @@ class CPL_DLL GDALDriver : public GDALMajorObject
         CSLConstList papszOptions);
 
     CreateMultiDimensionalCallback pfnCreateMultiDimensional = nullptr;
+
     virtual CreateMultiDimensionalCallback GetCreateMultiDimensionalCallback()
     {
         return pfnCreateMultiDimensional;
@@ -1854,6 +2028,7 @@ class CPL_DLL GDALDriver : public GDALMajorObject
 
     typedef CPLErr (*DeleteCallback)(const char *pszName);
     DeleteCallback pfnDelete = nullptr;
+
     virtual DeleteCallback GetDeleteCallback()
     {
         return pfnDelete;
@@ -1865,6 +2040,7 @@ class CPL_DLL GDALDriver : public GDALMajorObject
                                                void *pProgressData);
 
     CreateCopyCallback pfnCreateCopy = nullptr;
+
     virtual CreateCopyCallback GetCreateCopyCallback()
     {
         return pfnCreateCopy;
@@ -1888,6 +2064,7 @@ class CPL_DLL GDALDriver : public GDALMajorObject
     typedef CPLErr (*RenameCallback)(const char *pszNewName,
                                      const char *pszOldName);
     RenameCallback pfnRename = nullptr;
+
     virtual RenameCallback GetRenameCallback()
     {
         return pfnRename;
@@ -1896,6 +2073,7 @@ class CPL_DLL GDALDriver : public GDALMajorObject
     typedef CPLErr (*CopyFilesCallback)(const char *pszNewName,
                                         const char *pszOldName);
     CopyFilesCallback pfnCopyFiles = nullptr;
+
     virtual CopyFilesCallback GetCopyFilesCallback()
     {
         return pfnCopyFiles;
@@ -1972,6 +2150,7 @@ class CPL_DLL GDALDriver : public GDALMajorObject
     static void DefaultCopyMetadata(GDALDataset *poSrcDS, GDALDataset *poDstDS,
                                     CSLConstList papszOptions,
                                     CSLConstList papszExcludedDomains);
+
     //! @endcond
 
     /** Convert a GDALDriver* to a GDALDriverH.
@@ -2056,6 +2235,7 @@ class GDALPluginDriverProxy : public GDALDriver
     {
         m_osPluginFullPath = osFullPath;
     }
+
     //! @endcond
 
   public:
@@ -2219,6 +2399,7 @@ class CPL_DLL GDALAsyncReader
     {
         return poDS;
     }
+
     /** Return x offset.
      * @return x offset.
      */
@@ -2226,6 +2407,7 @@ class CPL_DLL GDALAsyncReader
     {
         return nXOff;
     }
+
     /** Return y offset.
      * @return y offset.
      */
@@ -2233,6 +2415,7 @@ class CPL_DLL GDALAsyncReader
     {
         return nYOff;
     }
+
     /** Return width.
      * @return width
      */
@@ -2240,6 +2423,7 @@ class CPL_DLL GDALAsyncReader
     {
         return nXSize;
     }
+
     /** Return height.
      * @return height
      */
@@ -2247,6 +2431,7 @@ class CPL_DLL GDALAsyncReader
     {
         return nYSize;
     }
+
     /** Return buffer.
      * @return buffer
      */
@@ -2254,6 +2439,7 @@ class CPL_DLL GDALAsyncReader
     {
         return pBuf;
     }
+
     /** Return buffer width.
      * @return buffer width.
      */
@@ -2261,6 +2447,7 @@ class CPL_DLL GDALAsyncReader
     {
         return nBufXSize;
     }
+
     /** Return buffer height.
      * @return buffer height.
      */
@@ -2268,6 +2455,7 @@ class CPL_DLL GDALAsyncReader
     {
         return nBufYSize;
     }
+
     /** Return buffer data type.
      * @return buffer data type.
      */
@@ -2275,6 +2463,7 @@ class CPL_DLL GDALAsyncReader
     {
         return eBufType;
     }
+
     /** Return band count.
      * @return band count
      */
@@ -2282,6 +2471,7 @@ class CPL_DLL GDALAsyncReader
     {
         return nBandCount;
     }
+
     /** Return band map.
      * @return band map.
      */
@@ -2289,6 +2479,7 @@ class CPL_DLL GDALAsyncReader
     {
         return panBandMap;
     }
+
     /** Return pixel spacing.
      * @return pixel spacing.
      */
@@ -2296,6 +2487,7 @@ class CPL_DLL GDALAsyncReader
     {
         return nPixelSpace;
     }
+
     /** Return line spacing.
      * @return line spacing.
      */
@@ -2303,6 +2495,7 @@ class CPL_DLL GDALAsyncReader
     {
         return nLineSpace;
     }
+
     /** Return band spacing.
      * @return band spacing.
      */
@@ -2357,6 +2550,7 @@ class CPL_DLL GDALExtendedDataType
                  GDALExtendedDataTypeSubType eSubType = GEDTST_NONE);
 
     bool operator==(const GDALExtendedDataType &) const;
+
     /** Non-equality operator */
     bool operator!=(const GDALExtendedDataType &other) const
     {
@@ -2608,6 +2802,7 @@ class CPL_DLL GDALGroup : public GDALIHasAttribute
     virtual void NotifyChildrenOfDeletion()
     {
     }
+
     //! @endcond
 
   public:
@@ -2717,6 +2912,7 @@ class CPL_DLL GDALGroup : public GDALIHasAttribute
     {
         return m_osContext;
     }
+
     //! @endcond
 
     //! @cond Doxygen_Suppress
@@ -2790,6 +2986,7 @@ class CPL_DLL GDALAbstractMDArray
     virtual void NotifyChildrenOfDeletion()
     {
     }
+
     //! @endcond
 
   public:
@@ -2927,11 +3124,13 @@ class CPL_DLL GDALRawResult
     {
         return m_raw[idx];
     }
+
     /** Return pointer to the start of data. */
     const GByte *data() const
     {
         return m_raw;
     }
+
     /** Return the size in bytes of the raw result. */
     size_t size() const
     {
@@ -3020,6 +3219,7 @@ class CPL_DLL GDALAttributeString final : public GDALAttribute
 
     const GDALExtendedDataType &GetDataType() const override;
 };
+
 //! @endcond
 
 /************************************************************************/
@@ -3054,6 +3254,7 @@ class CPL_DLL GDALAttributeNumeric final : public GDALAttribute
 
     const GDALExtendedDataType &GetDataType() const override;
 };
+
 //! @endcond
 
 /* ******************************************************************** */
@@ -3203,6 +3404,7 @@ class CPL_DLL GDALMDArray : virtual public GDALAbstractMDArray,
     {
         return SetNoDataValue(static_cast<int64_t>(nNoData));
     }
+
     //! @endcond
 
     bool SetNoDataValue(double dfNoData);
@@ -3325,10 +3527,12 @@ class CPL_DLL GDALMDArray : virtual public GDALAbstractMDArray,
                                  GUInt64 &nCurCost, const GUInt64 nTotalCost,
                                  GDALProgressFunc pfnProgress,
                                  void *pProgressData);
+
     struct Range
     {
         GUInt64 m_nStartIdx;
         GInt64 m_nIncr;
+
         explicit Range(GUInt64 nStartIdx = 0, GInt64 nIncr = 0)
             : m_nStartIdx(nStartIdx), m_nIncr(nIncr)
         {
@@ -3355,6 +3559,7 @@ class CPL_DLL GDALMDArray : virtual public GDALAbstractMDArray,
     {
         return m_osContext;
     }
+
     //! @endcond
 };
 
@@ -3366,6 +3571,7 @@ bool GDALMDRasterIOFromBand(GDALRasterBand *poBand, GDALRWFlag eRWFlag,
                             const GPtrDiff_t *bufferStride,
                             const GDALExtendedDataType &bufferDataType,
                             void *pBuffer);
+
 //! @endcond
 
 /************************************************************************/
@@ -3420,6 +3626,7 @@ class CPL_DLL GDALMDArrayRegularlySpaced : public GDALMDArray
 
     void AddAttribute(const std::shared_ptr<GDALAttribute> &poAttr);
 };
+
 //! @endcond
 
 /* ******************************************************************** */
@@ -3557,6 +3764,7 @@ class CPL_DLL GDALDimensionWeakIndexingVar : public GDALDimension
 
 //! @cond Doxygen_Suppress
 struct GDALAntiRecursionStruct;
+
 class GDALAntiRecursionGuard
 {
     GDALAntiRecursionStruct *m_psAntiRecursionStruct;
@@ -3571,11 +3779,13 @@ class GDALAntiRecursionGuard
     GDALAntiRecursionGuard(const GDALAntiRecursionGuard &other,
                            const std::string &osIdentifier);
     ~GDALAntiRecursionGuard();
+
     int GetCallDepth() const
     {
         return m_nDepth;
     }
 };
+
 //! @endcond
 
 /************************************************************************/
@@ -4053,11 +4263,11 @@ double GDALAdjustNoDataCloseToFloatMax(double dfVal);
 // (minimum value, maximum value, etc.)
 #define GDALSTAT_APPROX_NUMSAMPLES 2500
 
-void GDALSerializeGCPListToXML(CPLXMLNode *psParentNode, GDAL_GCP *pasGCPList,
-                               int nGCPCount,
+void GDALSerializeGCPListToXML(CPLXMLNode *psParentNode,
+                               const std::vector<gdal::GCP> &asGCPs,
                                const OGRSpatialReference *poGCP_SRS);
 void GDALDeserializeGCPListFromXML(const CPLXMLNode *psGCPList,
-                                   GDAL_GCP **ppasGCPList, int *pnGCPCount,
+                                   std::vector<gdal::GCP> &asGCPs,
                                    OGRSpatialReference **ppoGCP_SRS);
 
 void GDALSerializeOpenOptionsToXML(CPLXMLNode *psParentNode,

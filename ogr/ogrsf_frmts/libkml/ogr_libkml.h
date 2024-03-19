@@ -101,10 +101,12 @@ class OGRLIBKMLLayer final : public OGRLayer,
         nFID = 1;
     }
     DEFINE_GET_NEXT_FEATURE_THROUGH_RAW(OGRLIBKMLLayer)
+
     OGRFeatureDefn *GetLayerDefn() override
     {
         return m_poOgrFeatureDefn;
     }
+
     // OGRErr                    SetAttributeFilter(const char * );
     OGRErr ICreateFeature(OGRFeature *poOgrFeat) override;
     OGRErr ISetFeature(OGRFeature *poOgrFeat) override;
@@ -112,6 +114,7 @@ class OGRLIBKMLLayer final : public OGRLayer,
 
     GIntBig GetFeatureCount(int bForce = TRUE) override;
     OGRErr GetExtent(OGREnvelope *psExtent, int bForce = TRUE) override;
+
     virtual OGRErr GetExtent(int iGeomField, OGREnvelope *psExtent,
                              int bForce) override
     {
@@ -128,23 +131,29 @@ class OGRLIBKMLLayer final : public OGRLayer,
     OGRStyleTable *GetStyleTable() override;
     void SetStyleTableDirectly(OGRStyleTable *poStyleTable) override;
     void SetStyleTable(OGRStyleTable *poStyleTable) override;
+
     const char *GetName() override
     {
         return m_pszName;
     }
+
     int TestCapability(const char *) override;
+
     kmldom::ContainerPtr GetKmlLayer()
     {
         return m_poKmlLayer;
     }
+
     kmldom::ElementPtr GetKmlLayerRoot()
     {
         return m_poKmlLayerRoot;
     }
+
     kmldom::SchemaPtr GetKmlSchema()
     {
         return m_poKmlSchema;
     }
+
     const char *GetFileName()
     {
         return m_pszFileName;
@@ -183,6 +192,7 @@ class OGRLIBKMLLayer final : public OGRLayer,
                       const char *pszListStyleIconHref);
 
     void Finalize(kmldom::DocumentPtr poKmlDocument);
+
     void SetUpdateIsFolder(int bUpdateIsFolder)
     {
         m_bUpdateIsFolder = CPL_TO_BOOL(bUpdateIsFolder);
@@ -231,7 +241,7 @@ class OGRLIBKMLDataSource final : public OGRDataSource
 
     /***** style table pointer *****/
     void SetCommonOptions(kmldom::ContainerPtr poKmlContainer,
-                          char **papszOptions);
+                          CSLConstList papszOptions);
 
     void ParseDocumentOptions(kmldom::KmlPtr poKml,
                               kmldom::DocumentPtr poKmlDocument);
@@ -249,14 +259,14 @@ class OGRLIBKMLDataSource final : public OGRDataSource
     {
         return nLayers;
     }
+
     OGRLayer *GetLayer(int) override;
     OGRLayer *GetLayerByName(const char *) override;
     OGRErr DeleteLayer(int) override;
 
     OGRLayer *ICreateLayer(const char *pszName,
-                           const OGRSpatialReference *poSpatialRef = nullptr,
-                           OGRwkbGeometryType eGType = wkbUnknown,
-                           char **papszOptions = nullptr) override;
+                           const OGRGeomFieldDefn *poGeomFieldDefn,
+                           CSLConstList papszOptions) override;
 
     OGRStyleTable *GetStyleTable() override;
     void SetStyleTableDirectly(OGRStyleTable *poStyleTable) override;
@@ -277,6 +287,7 @@ class OGRLIBKMLDataSource final : public OGRDataSource
     {
         return pszStylePath;
     }
+
     int ParseIntoStyleTable(std::string *oKmlStyleKml,
                             const char *pszStylePath);
 
@@ -286,10 +297,12 @@ class OGRLIBKMLDataSource final : public OGRDataSource
     {
         return m_isKml;
     }
+
     int IsKmz() const
     {
         return m_isKmz;
     }
+
     int IsDir() const
     {
         return m_isDir;
@@ -307,6 +320,7 @@ class OGRLIBKMLDataSource final : public OGRDataSource
     {
         return !m_bIssuedCTError;
     }
+
     void IssuedFirstCTError()
     {
         m_bIssuedCTError = true;
@@ -332,11 +346,11 @@ class OGRLIBKMLDataSource final : public OGRDataSource
     OGRLIBKMLLayer *CreateLayerKml(const char *pszLayerName,
                                    const OGRSpatialReference *poOgrSRS,
                                    OGRwkbGeometryType eGType,
-                                   char **papszOptions);
+                                   CSLConstList papszOptions);
     OGRLIBKMLLayer *CreateLayerKmz(const char *pszLayerName,
                                    const OGRSpatialReference *poOgrSRS,
                                    OGRwkbGeometryType eGType,
-                                   char **papszOptions);
+                                   CSLConstList papszOptions);
 
     /***** methods to delete layers on various datasource types *****/
     OGRErr DeleteLayerKml(int);

@@ -103,12 +103,14 @@ class PCIDSK2Dataset final : public GDALPamDataset
     {
         return (int)apoLayers.size();
     }
+
     virtual OGRLayer *GetLayer(int) override;
 
     virtual int TestCapability(const char *) override;
 
-    virtual OGRLayer *ICreateLayer(const char *, const OGRSpatialReference *,
-                                   OGRwkbGeometryType, char **) override;
+    OGRLayer *ICreateLayer(const char *pszName,
+                           const OGRGeomFieldDefn *poGeomFieldDefn,
+                           CSLConstList papszOptions) override;
 };
 
 /************************************************************************/
@@ -213,6 +215,7 @@ class OGRPCIDSKLayer final : public OGRLayer,
 
     GIntBig GetFeatureCount(int) override;
     OGRErr GetExtent(OGREnvelope *psExtent, int bForce) override;
+
     virtual OGRErr GetExtent(int iGeomField, OGREnvelope *psExtent,
                              int bForce) override
     {

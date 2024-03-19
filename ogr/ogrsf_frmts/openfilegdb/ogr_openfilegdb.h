@@ -210,27 +210,31 @@ class OGROpenFileGDBLayer final : public OGRLayer
 
     virtual ~OGROpenFileGDBLayer();
 
-    bool Create(const OGRSpatialReference *poSRS);
+    bool Create(const OGRGeomFieldDefn *poSrcGeomFieldDefn);
     void Close();
 
     const std::string &GetFilename() const
     {
         return m_osGDBFilename;
     }
+
     const std::string &GetXMLDefinition()
     {
         return m_osDefinition;
     }
+
     const std::string &GetXMLDocumentation()
     {
         return m_osDocumentation;
     }
+
     int GetAttrIndexUse()
     {
         return (m_poAttributeIterator == nullptr)        ? 0
                : (m_bIteratorSufficientToEvaluateFilter) ? 2
                                                          : 1;
     }
+
     const OGRField *GetMinMaxValue(OGRFieldDefn *poFieldDefn, int bIsMin,
                                    int &eOutType);
     int GetMinMaxSumCount(OGRFieldDefn *poFieldDefn, double &dfMin,
@@ -238,10 +242,12 @@ class OGROpenFileGDBLayer final : public OGRLayer
     int HasIndexForField(const char *pszFieldName);
     FileGDBIterator *BuildIndex(const char *pszFieldName, int bAscending,
                                 int op, swq_expr_node *poValue);
+
     SPIState GetSpatialIndexState() const
     {
         return m_eSpatialIndexState;
     }
+
     int IsValidLayerDefn()
     {
         return BuildLayerDefinition();
@@ -263,6 +269,7 @@ class OGROpenFileGDBLayer final : public OGRLayer
     {
         return m_osName.c_str();
     }
+
     virtual OGRwkbGeometryType GetGeomType() override;
 
     virtual const char *GetFIDColumn() override;
@@ -274,21 +281,25 @@ class OGROpenFileGDBLayer final : public OGRLayer
 
     virtual GIntBig GetFeatureCount(int bForce = TRUE) override;
     virtual OGRErr GetExtent(OGREnvelope *psExtent, int bForce = TRUE) override;
+
     virtual OGRErr GetExtent(int iGeomField, OGREnvelope *psExtent,
                              int bForce) override
     {
         return OGRLayer::GetExtent(iGeomField, psExtent, bForce);
     }
+
     OGRErr GetExtent3D(int iGeomField, OGREnvelope3D *psExtent,
                        int bForce) override;
 
     virtual OGRFeatureDefn *GetLayerDefn() override;
 
     virtual void SetSpatialFilter(OGRGeometry *) override;
+
     virtual void SetSpatialFilter(int iGeomField, OGRGeometry *poGeom) override
     {
         OGRLayer::SetSpatialFilter(iGeomField, poGeom);
     }
+
     virtual OGRErr SetAttributeFilter(const char *pszFilter) override;
 
     virtual int TestCapability(const char *) override;
@@ -536,6 +547,7 @@ class OGROpenFileGDBDataSource final : public OGRDataSource
     {
         return m_osDirName.c_str();
     }
+
     virtual int GetLayerCount() override
     {
         return static_cast<int>(m_apoLayers.size());
@@ -552,10 +564,10 @@ class OGROpenFileGDBDataSource final : public OGRDataSource
 
     virtual int TestCapability(const char *) override;
 
-    virtual OGRLayer *ICreateLayer(const char *,
-                                   const OGRSpatialReference * = nullptr,
-                                   OGRwkbGeometryType = wkbUnknown,
-                                   char ** = nullptr) override;
+    OGRLayer *ICreateLayer(const char *pszName,
+                           const OGRGeomFieldDefn *poGeomFieldDefn,
+                           CSLConstList papszOptions) override;
+
     virtual OGRErr DeleteLayer(int) override;
 
     virtual char **GetFileList() override;
@@ -661,6 +673,7 @@ class OGROpenFileGDBDataSource final : public OGRDataSource
     {
         return m_bInTransaction;
     }
+
     const std::string &GetBackupDirName() const
     {
         return m_osTransactionBackupDirname;
@@ -692,11 +705,14 @@ class OGROpenFileGDBSingleFeatureLayer final : public OGRLayer
     {
         iNextShapeId = 0;
     }
+
     virtual OGRFeature *GetNextFeature() override;
+
     virtual OGRFeatureDefn *GetLayerDefn() override
     {
         return poFeatureDefn;
     }
+
     virtual int TestCapability(const char *) override
     {
         return FALSE;

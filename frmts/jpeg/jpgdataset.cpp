@@ -328,12 +328,14 @@ void JPGDatasetCommon::ReadXMPMetadata()
             break;
 
         nChunkLoc += 2 + abyChunkHeader[2] * 256 + abyChunkHeader[3];
-        // COM marker.
-        if (abyChunkHeader[0] == 0xFF && abyChunkHeader[1] == 0xFE)
+
+        // Not a marker
+        if (abyChunkHeader[0] != 0xFF)
             continue;
 
-        if (abyChunkHeader[0] != 0xFF || (abyChunkHeader[1] & 0xf0) != 0xe0)
-            break;  // Not an APP chunk.
+        // Stop on Start of Scan
+        if (abyChunkHeader[1] == 0xDA)
+            break;
 
         if (abyChunkHeader[1] == APP1_BYTE &&
             memcmp(reinterpret_cast<char *>(abyChunkHeader) + JFIF_MARKER_SIZE,
@@ -527,15 +529,18 @@ void JPGDatasetCommon::ReadFLIRMetadata()
     {
         int &m_nPamFlagsRef;
         int m_nOldPamFlags;
+
         explicit PamFlagKeeper(int &nPamFlagsRef)
             : m_nPamFlagsRef(nPamFlagsRef), m_nOldPamFlags(nPamFlagsRef)
         {
         }
+
         ~PamFlagKeeper()
         {
             m_nPamFlagsRef = m_nOldPamFlags;
         }
     };
+
     PamFlagKeeper oKeeper(nPamFlags);
 
     const auto SetStringIfNotEmpty =
@@ -852,6 +857,7 @@ void JPGDatasetCommon::ReadFLIRMetadata()
     };
 
     size_t nOffsetDirEntry = nOffsetRecordDirectory;
+
     enum FLIRRecordType
     {
         FLIR_REC_FREE = 0,
@@ -860,6 +866,7 @@ void JPGDatasetCommon::ReadFLIRMetadata()
         FLIR_REC_PALETTE_INFO = 34,
         FLIR_REC_GPS_INFO = 43,
     };
+
     // Iterate over records
     for (std::uint32_t iRec = 0; iRec < nEntryCountRecordDirectory; iRec++)
     {
@@ -1643,9 +1650,9 @@ int JPGRasterBand::GetOverviewCount()
 JPGDatasetCommon::JPGDatasetCommon()
     : nScaleFactor(1), bHasInitInternalOverviews(false),
       nInternalOverviewsCurrent(0), nInternalOverviewsToFree(0),
-      papoInternalOverviews(nullptr), bGeoTransformValid(false), nGCPCount(0),
-      pasGCPList(nullptr), m_fpImage(nullptr), nSubfileOffset(0),
-      nLoadedScanline(-1), m_pabyScanline(nullptr), bHasReadEXIFMetadata(false),
+      papoInternalOverviews(nullptr), bGeoTransformValid(false),
+      m_fpImage(nullptr), nSubfileOffset(0), nLoadedScanline(-1),
+      m_pabyScanline(nullptr), bHasReadEXIFMetadata(false),
       bHasReadXMPMetadata(false), bHasReadICCMetadata(false),
       papszMetadata(nullptr), nExifOffset(-1), nInterOffset(-1), nGPSOffset(-1),
       bSwabflag(false), nTiffDirStart(-1), nTIFFHEADER(-1),
@@ -1677,12 +1684,6 @@ JPGDatasetCommon::~JPGDatasetCommon()
         CPLFree(m_pabyScanline);
     if (papszMetadata != nullptr)
         CSLDestroy(papszMetadata);
-
-    if (nGCPCount > 0)
-    {
-        GDALDeinitGCPs(nGCPCount, pasGCPList);
-        CPLFree(pasGCPList);
-    }
 
     CPLFree(pabyBitMask);
     CPLFree(pabyCMask);
@@ -2499,7 +2500,7 @@ int JPGDatasetCommon::GetGCPCount()
 
     LoadWorldFileOrTab();
 
-    return nGCPCount;
+    return static_cast<int>(m_aoGCPs.size());
 }
 
 /************************************************************************/
@@ -2516,7 +2517,7 @@ const OGRSpatialReference *JPGDatasetCommon::GetGCPSpatialRef() const
 
     const_cast<JPGDatasetCommon *>(this)->LoadWorldFileOrTab();
 
-    if (!m_oSRS.IsEmpty() && nGCPCount > 0)
+    if (!m_oSRS.IsEmpty() && !m_aoGCPs.empty())
         return &m_oSRS;
 
     return nullptr;
@@ -2535,7 +2536,7 @@ const GDAL_GCP *JPGDatasetCommon::GetGCPs()
 
     LoadWorldFileOrTab();
 
-    return pasGCPList;
+    return gdal::GCP::c_ptr(m_aoGCPs);
 }
 
 /************************************************************************/
@@ -2748,10 +2749,12 @@ GDALDataset *JPGDatasetCommon::OpenFLIRRawThermalImage()
                 nRasterXSize = nXSizeIn;
                 nRasterYSize = nYSizeIn;
             }
+
             CPLErr Close() override
             {
                 return GDALPamDataset::Close();
             }
+
             ~JPEGRawDataset() = default;
 
             void SetBand(int nBand, std::unique_ptr<GDALRasterBand> &&poBand)
@@ -3151,12 +3154,17 @@ void JPGDatasetCommon::LoadWorldFileOrTab()
     if (!bGeoTransformValid)
     {
         char *pszProjection = nullptr;
+        int nGCPCount = 0;
+        GDAL_GCP *pasGCPList = nullptr;
         const bool bTabFileOK = CPL_TO_BOOL(GDALReadTabFile2(
             GetDescription(), adfGeoTransform, &pszProjection, &nGCPCount,
             &pasGCPList, oOvManager.GetSiblingFiles(), &pszWldFilename));
         if (pszProjection)
             m_oSRS.importFromWkt(pszProjection);
         CPLFree(pszProjection);
+        m_aoGCPs = gdal::GCP::fromC(pasGCPList, nGCPCount);
+        GDALDeinitGCPs(nGCPCount, pasGCPList);
+        CPLFree(pasGCPList);
 
         if (bTabFileOK && nGCPCount == 0)
             bGeoTransformValid = true;

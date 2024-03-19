@@ -1244,8 +1244,11 @@ static GDALDatasetH GDALWarpIndirect(const char *pszDest, GDALDriverH hDriver,
     CPLStringList aosCreateOptions(psOptions->aosCreateOptions);
     psOptions->aosCreateOptions.Clear();
 
-    if (nSrcCount == 1 && !(EQUAL(psOptions->osFormat.c_str(), "COG") &&
-                            COGHasWarpingOptions(aosCreateOptions.List())))
+    // Do not use a warped VRT input for COG output, because that would cause
+    // warping to be done both during overview computation and creation of
+    // full resolution image. Better materialize a temporary GTiff a bit later
+    // in that method.
+    if (nSrcCount == 1 && !EQUAL(psOptions->osFormat.c_str(), "COG"))
     {
         psOptions->osFormat = "VRT";
         auto pfnProgress = psOptions->pfnProgress;
@@ -3613,14 +3616,12 @@ static GDALDatasetH GDALWarpCreateOutput(
             GDALDataset::Open(pszFilename, GDAL_OF_RASTER, apszAllowedDrivers));
         if (poExistingOutputDS)
         {
-            char **papszFileList = poExistingOutputDS->GetFileList();
-            for (char **papszIter = papszFileList; papszIter && *papszIter;
-                 ++papszIter)
+            for (const char *pszFilenameInList :
+                 CPLStringList(poExistingOutputDS->GetFileList()))
             {
                 oSetExistingDestFiles.insert(
-                    CPLString(*papszIter).replaceAll('\\', '/'));
+                    CPLString(pszFilenameInList).replaceAll('\\', '/'));
             }
-            CSLDestroy(papszFileList);
         }
         CPLPopErrorHandler();
     }
@@ -3665,11 +3666,10 @@ static GDALDatasetH GDALWarpCreateOutput(
                 poSrcDS->GetDescription(), GDAL_OF_RASTER, apszAllowedDrivers));
             if (poSrcDSTmp)
             {
-                char **papszFileList = poSrcDSTmp->GetFileList();
-                for (char **papszIter = papszFileList; papszIter && *papszIter;
-                     ++papszIter)
+                for (const char *pszFilenameInList :
+                     CPLStringList(poSrcDSTmp->GetFileList()))
                 {
-                    CPLString osFilename(*papszIter);
+                    CPLString osFilename(pszFilenameInList);
                     osFilename.replaceAll('\\', '/');
                     if (oSetExistingDestFiles.find(osFilename) !=
                         oSetExistingDestFiles.end())
@@ -3677,7 +3677,6 @@ static GDALDatasetH GDALWarpCreateOutput(
                         oSetExistingDestFilesFoundInSource.insert(osFilename);
                     }
                 }
-                CSLDestroy(papszFileList);
             }
         }
 
@@ -4724,6 +4723,7 @@ class CutlineTransformer : public OGRCoordinateTransformation
     {
         return nullptr;
     }
+
     virtual const OGRSpatialReference *GetTargetCS() const override
     {
         return nullptr;
@@ -5334,6 +5334,7 @@ static bool IsValidSRS(const char *pszUserInput)
 
 #ifndef CheckHasEnoughAdditionalArgs_defined
 #define CheckHasEnoughAdditionalArgs_defined
+
 static bool CheckHasEnoughAdditionalArgs(CSLConstList papszArgv, int i,
                                          int nExtraArg, int nArgc)
 {

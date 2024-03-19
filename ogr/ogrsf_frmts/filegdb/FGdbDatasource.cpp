@@ -695,16 +695,16 @@ OGRLayer *FGdbDataSource::GetLayer(int iLayer)
 /* See FGdbLayer::Create for creation options                           */
 /************************************************************************/
 
-OGRLayer *FGdbDataSource::ICreateLayer(const char *pszLayerName,
-                                       const OGRSpatialReference *poSRS,
-                                       OGRwkbGeometryType eType,
-                                       char **papszOptions)
+OGRLayer *
+FGdbDataSource::ICreateLayer(const char *pszLayerName,
+                             const OGRGeomFieldDefn *poSrcGeomFieldDefn,
+                             CSLConstList papszOptions)
 {
     if (!m_bUpdate || m_pGeodatabase == nullptr)
         return nullptr;
 
     FGdbLayer *pLayer = new FGdbLayer();
-    if (!pLayer->Create(this, pszLayerName, poSRS, eType, papszOptions))
+    if (!pLayer->Create(this, pszLayerName, poSrcGeomFieldDefn, papszOptions))
     {
         delete pLayer;
         return nullptr;
@@ -734,11 +734,14 @@ class OGRFGdbSingleFeatureLayer final : public OGRLayer
     {
         iNextShapeId = 0;
     }
+
     virtual OGRFeature *GetNextFeature() override;
+
     virtual OGRFeatureDefn *GetLayerDefn() override
     {
         return poFeatureDefn;
     }
+
     virtual int TestCapability(const char *) override
     {
         return FALSE;

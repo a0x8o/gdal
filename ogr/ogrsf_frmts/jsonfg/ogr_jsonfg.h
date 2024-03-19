@@ -192,6 +192,7 @@ class OGRJSONFGWriteLayer final : public OGRLayer
     {
         return poFeatureDefn_;
     }
+
     OGRSpatialReference *GetSpatialRef() override
     {
         return nullptr;
@@ -200,10 +201,12 @@ class OGRJSONFGWriteLayer final : public OGRLayer
     void ResetReading() override
     {
     }
+
     OGRFeature *GetNextFeature() override
     {
         return nullptr;
     }
+
     OGRErr ICreateFeature(OGRFeature *poFeature) override;
     OGRErr CreateField(const OGRFieldDefn *poField, int bApproxOK) override;
     int TestCapability(const char *pszCap) override;
@@ -245,6 +248,7 @@ class OGRJSONFGDataset final : public GDALDataset
     {
         return static_cast<int>(apoLayers_.size());
     }
+
     OGRLayer *GetLayer(int i) override;
 
     //! Return the output file handle. Used by OGRJSONFGWriteLayer
@@ -270,9 +274,9 @@ class OGRJSONFGDataset final : public GDALDataset
     void BeforeCreateFeature();
 
     OGRLayer *ICreateLayer(const char *pszName,
-                           const OGRSpatialReference *poSRS = nullptr,
-                           OGRwkbGeometryType eGType = wkbUnknown,
-                           char **papszOptions = nullptr) override;
+                           const OGRGeomFieldDefn *poGeomFieldDefn,
+                           CSLConstList papszOptions) override;
+
     int TestCapability(const char *pszCap) override;
 
     OGRErr SyncToDiskInternal();

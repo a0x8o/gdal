@@ -454,6 +454,7 @@ class SENTINEL2_CPLXMLNodeHolder
     explicit SENTINEL2_CPLXMLNodeHolder(CPLXMLNode *psNode) : m_psNode(psNode)
     {
     }
+
     ~SENTINEL2_CPLXMLNodeHolder()
     {
         if (m_psNode)
@@ -3605,7 +3606,14 @@ SENTINEL2Dataset *SENTINEL2Dataset::CreateL1CL2ADataset(
         static_cast<int>((dfMaxY - dfMinY) / nSubDSPrecision + 0.5);
     SENTINEL2Dataset *poDS = new SENTINEL2Dataset(nRasterXSize, nRasterYSize);
 
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnull-dereference"
+#endif
     poDS->aosNonJP2Files = aosNonJP2Files;
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 
     OGRSpatialReference oSRS;
     char *pszProjection = nullptr;

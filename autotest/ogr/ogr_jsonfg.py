@@ -786,6 +786,9 @@ def test_jsonfg_write_basic():
         f["doublelistfield"] = [1.5]
         f["boolfield"] = True
         f["jsonfield"] = json.dumps({"a": [1, 2]})
+        f.SetGeometry(
+            ogr.CreateGeometryFromWkt("POINT(1.23456789 2.23456789 3.23456789)")
+        )
         lyr.CreateFeature(f)
         f = None
         ds = None
@@ -809,6 +812,11 @@ def test_jsonfg_write_basic():
             "boolfield": True,
             "jsonfield": {"a": [1, 2]},
         }
+        assert "xy_coordinate_resolution" not in j
+        assert "z_coordinate_resolution" not in j
+        assert "xy_coordinate_resolution_place" not in j
+        assert "z_coordinate_resolution_place" not in j
+        assert j["features"][0]["geometry"]["coordinates"][2] == 3.235
 
         ds = ogr.Open(filename)
         lyr = ds.GetLayer(0)
@@ -823,6 +831,10 @@ def test_jsonfg_write_basic():
         assert f["doublelistfield"] == [1.5]
         assert f["boolfield"] == True
         assert json.loads(f["jsonfield"]) == {"a": [1, 2]}
+        assert (
+            f.GetGeometryRef().ExportToIsoWkt()
+            == "POINT Z (1.23456789 2.23456789 3.23456789)"
+        )
         ds = None
 
     finally:
@@ -1140,7 +1152,9 @@ def test_jsonfg_write_COORDINATE_PRECISION():
 
     filename = "/vsimem/test_jsonfg_write_COORDINATE_PRECISION.json"
     try:
-        ds = ogr.GetDriverByName("JSONFG").CreateDataSource(filename)
+        ds = ogr.GetDriverByName("JSONFG").CreateDataSource(
+            filename, options=["SINGLE_LAYER=YES"]
+        )
         lyr = ds.CreateLayer(
             "test",
             srs=_get_epsg_crs(32631),
@@ -1157,6 +1171,8 @@ def test_jsonfg_write_COORDINATE_PRECISION():
             gdal.VSIFCloseL(f)
 
         j = json.loads(data)
+        assert j["xy_coordinate_resolution"] == 1e-3
+        assert j["xy_coordinate_resolution_place"] == 1e-2
         feature = j["features"][0]
         assert feature["geometry"]["coordinates"] == pytest.approx(
             [3.0, 40.651], abs=1e-3
@@ -1207,3 +1223,60 @@ def test_jsonfg_write_flushcache():
     finally:
         if gdal.VSIStatL(filename):
             gdal.Unlink(filename)
+
+
+###############################################################################
+# Test geometry coordinate precision support
+
+
+@pytest.mark.parametrize("single_layer", [True, False])
+def test_ogr_jsonfg_geom_coord_precision(tmp_vsimem, single_layer):
+
+    filename = str(tmp_vsimem / "test.json")
+    ds = gdal.GetDriverByName("JSONFG").Create(
+        filename,
+        0,
+        0,
+        0,
+        gdal.GDT_Unknown,
+        options=["SINGLE_LAYER=" + ("YES" if single_layer else "NO")],
+    )
+    geom_fld = ogr.GeomFieldDefn("geometry", ogr.wkbUnknown)
+    prec = ogr.CreateGeomCoordinatePrecision()
+    prec.Set(1e-2, 1e-3, 0)
+    geom_fld.SetCoordinatePrecision(prec)
+    srs = osr.SpatialReference()
+    srs.SetFromUserInput("EPSG:32631+3855")
+    geom_fld.SetSpatialRef(srs)
+    lyr = ds.CreateLayerFromGeomFieldDefn("test", geom_fld)
+    geom_fld = lyr.GetLayerDefn().GetGeomFieldDefn(0)
+    prec = geom_fld.GetCoordinatePrecision()
+    assert prec.GetXYResolution() == 1e-2
+    assert prec.GetZResolution() == 1e-3
+    f = ogr.Feature(lyr.GetLayerDefn())
+    f.SetGeometry(
+        ogr.CreateGeometryFromWkt("POINT(4500000.23456789 5000000.34567891 9.87654321)")
+    )
+    lyr.CreateFeature(f)
+    ds.Close()
+
+    f = gdal.VSIFOpenL(filename, "rb")
+    if f:
+        data = gdal.VSIFReadL(1, 10000, f)
+        gdal.VSIFCloseL(f)
+
+    assert b"[ 46.44289405, 36.08688377, 9.877 ]" in data
+    assert b"[ 4500000.23, 5000000.35, 9.877 ]" in data
+
+    j = json.loads(data)
+    assert j["xy_coordinate_resolution"] == pytest.approx(8.98315e-08)
+    assert j["z_coordinate_resolution"] == 1e-3
+    assert j["xy_coordinate_resolution_place"] == 1e-2
+    assert j["z_coordinate_resolution_place"] == 1e-3
+
+    ds = ogr.Open(filename)
+    lyr = ds.GetLayer(0)
+    geom_fld = lyr.GetLayerDefn().GetGeomFieldDefn(0)
+    prec = geom_fld.GetCoordinatePrecision()
+    assert prec.GetXYResolution() == 1e-2
+    assert prec.GetZResolution() == 1e-3

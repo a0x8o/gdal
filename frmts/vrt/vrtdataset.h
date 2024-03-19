@@ -72,6 +72,7 @@ class VRTOverviewInfo
     int bTriedToOpen = FALSE;
 
     VRTOverviewInfo() = default;
+
     VRTOverviewInfo(VRTOverviewInfo &&oOther) noexcept
         : osFilename(std::move(oOther.osFilename)), nBand(oOther.nBand),
           poBand(oOther.poBand), bTriedToOpen(oOther.bTriedToOpen)
@@ -118,12 +119,14 @@ class CPL_DLL VRTSource
         struct NoInitByte
         {
             GByte value;
+
             // cppcheck-suppress uninitMemberVar
             NoInitByte()
             {
                 // do nothing
                 /* coverity[uninit_member] */
             }
+
             inline operator GByte() const
             {
                 return value;
@@ -165,6 +168,7 @@ class CPL_DLL VRTSource
     {
         return FALSE;
     }
+
     virtual CPLErr FlushCache(bool /*bAtClosing*/)
     {
         return CE_None;
@@ -214,8 +218,7 @@ class CPL_DLL VRTDataset CPL_NON_FINAL : public GDALDataset
     int m_bGeoTransformSet = false;
     double m_adfGeoTransform[6];
 
-    int m_nGCPCount = 0;
-    GDAL_GCP *m_pasGCPList = nullptr;
+    std::vector<gdal::GCP> m_asGCPs{};
     OGRSpatialReference *m_poGCP_SRS = nullptr;
 
     bool m_bNeedsFlush = false;
@@ -271,6 +274,7 @@ class CPL_DLL VRTDataset CPL_NON_FINAL : public GDALDataset
     {
         m_bNeedsFlush = true;
     }
+
     virtual CPLErr FlushCache(bool bAtClosing) override;
 
     void SetWritable(int bWritableIn)
@@ -285,6 +289,7 @@ class CPL_DLL VRTDataset CPL_NON_FINAL : public GDALDataset
     {
         return m_poSRS;
     }
+
     CPLErr SetSpatialRef(const OGRSpatialReference *poSRS) override;
 
     virtual CPLErr GetGeoTransform(double *) override;
@@ -298,10 +303,12 @@ class CPL_DLL VRTDataset CPL_NON_FINAL : public GDALDataset
     virtual char **GetMetadata(const char *pszDomain = "") override;
 
     virtual int GetGCPCount() override;
+
     const OGRSpatialReference *GetGCPSpatialRef() const override
     {
         return m_poGCP_SRS;
     }
+
     virtual const GDAL_GCP *GetGCPs() override;
     using GDALDataset::SetGCPs;
     CPLErr SetGCPs(int nGCPCount, const GDAL_GCP *pasGCPList,
@@ -355,10 +362,12 @@ class CPL_DLL VRTDataset CPL_NON_FINAL : public GDALDataset
     {
         return m_bBlockSizeSpecified;
     }
+
     int GetBlockXSize() const
     {
         return m_nBlockXSize;
     }
+
     int GetBlockYSize() const
     {
         return m_nBlockYSize;
@@ -425,6 +434,14 @@ class CPL_DLL VRTWarpedDataset final : public VRTDataset
                            char **papszOptions = nullptr) override;
 
     virtual char **GetFileList() override;
+
+    virtual CPLErr IRasterIO(GDALRWFlag eRWFlag, int nXOff, int nYOff,
+                             int nXSize, int nYSize, void *pData, int nBufXSize,
+                             int nBufYSize, GDALDataType eBufType,
+                             int nBandCount, int *panBandMap,
+                             GSpacing nPixelSpace, GSpacing nLineSpace,
+                             GSpacing nBandSpace,
+                             GDALRasterIOExtraArg *psExtraArg) override;
 
     CPLErr ProcessBlock(int iBlockX, int iBlockY);
 
@@ -649,6 +666,7 @@ class CPL_DLL VRTRasterBand CPL_NON_FINAL : public GDALRasterBand
     {
         return FALSE;
     }
+
     virtual int IsPansharpenRasterBand()
     {
         return FALSE;
@@ -819,9 +837,20 @@ class CPL_DLL VRTWarpedRasterBand final : public VRTRasterBand
     virtual CPLErr IReadBlock(int, int, void *) override;
     virtual CPLErr IWriteBlock(int, int, void *) override;
 
+    virtual CPLErr IRasterIO(GDALRWFlag eRWFlag, int nXOff, int nYOff,
+                             int nXSize, int nYSize, void *pData, int nBufXSize,
+                             int nBufYSize, GDALDataType eBufType,
+                             GSpacing nPixelSpace, GSpacing nLineSpace,
+                             GDALRasterIOExtraArg *psExtraArg) override;
+
     virtual int GetOverviewCount() override;
     virtual GDALRasterBand *GetOverview(int) override;
+
+  private:
+    int m_nIRasterIOCounter =
+        0;  //! Protects against infinite recursion inside IRasterIO()
 };
+
 /************************************************************************/
 /*                        VRTPansharpenedRasterBand                     */
 /************************************************************************/
@@ -859,6 +888,7 @@ class VRTPansharpenedRasterBand final : public VRTRasterBand
     {
         m_nIndexAsPansharpenedBand = nIdx;
     }
+
     int GetIndexAsPansharpenedBand() const
     {
         return m_nIndexAsPansharpenedBand;
@@ -1103,14 +1133,17 @@ class CPL_DLL VRTSimpleSource CPL_NON_FINAL : public VRTSource
     void SetSrcWindow(double, double, double, double);
     void SetDstWindow(double, double, double, double);
     void GetDstWindow(double &, double &, double &, double &);
+
     const std::string &GetSourceDatasetName() const
     {
         return m_osSrcDSName;
     }
+
     const CPLString &GetResampling() const
     {
         return m_osResampling;
     }
+
     void SetResampling(const char *pszResampling);
 
     int GetSrcDstWindow(double, double, double, double, int, int,
@@ -1144,10 +1177,12 @@ class CPL_DLL VRTSimpleSource CPL_NON_FINAL : public VRTSource
     {
         return TRUE;
     }
+
     virtual const char *GetType()
     {
         return "SimpleSource";
     }
+
     virtual CPLErr FlushCache(bool bAtClosing) override;
 
     GDALRasterBand *GetRasterBand() const;
@@ -1199,6 +1234,7 @@ class VRTAveragedSource final : public VRTSimpleSource
     void SetNoDataValue(double dfNoDataValue);
 
     virtual CPLXMLNode *SerializeToXML(const char *pszVRTPath) override;
+
     virtual const char *GetType() override
     {
         return "AveragedSource";
@@ -1243,6 +1279,7 @@ class VRTNoDataFromMaskSource final : public VRTSimpleSource
     virtual CPLErr XMLInit(const CPLXMLNode *psTree, const char *,
                            std::map<CPLString, GDALDataset *> &) override;
     virtual CPLXMLNode *SerializeToXML(const char *pszVRTPath) override;
+
     virtual const char *GetType() override
     {
         return "VRTNoDataFromMaskSource";
@@ -1334,6 +1371,7 @@ class CPL_DLL VRTComplexSource CPL_NON_FINAL : public VRTSimpleSource
     virtual CPLXMLNode *SerializeToXML(const char *pszVRTPath) override;
     virtual CPLErr XMLInit(const CPLXMLNode *, const char *,
                            std::map<CPLString, GDALDataset *> &) override;
+
     virtual const char *GetType() override
     {
         return "ComplexSource";
@@ -1459,6 +1497,7 @@ class VRTFuncSource final : public VRTSource
     {
         return CE_Failure;
     }
+
     virtual CPLXMLNode *SerializeToXML(const char *pszVRTPath) override;
 
     virtual CPLErr RasterIO(GDALDataType eVRTBandDataType, int nXOff, int nYOff,
@@ -1503,9 +1542,11 @@ class VRTGroup final : public GDALGroup
     struct Ref
     {
         VRTGroup *m_ptr;
+
         explicit Ref(VRTGroup *ptr) : m_ptr(ptr)
         {
         }
+
         Ref(const Ref &) = delete;
         Ref &operator=(const Ref &) = delete;
     };
@@ -1560,6 +1601,7 @@ class VRTGroup final : public GDALGroup
 
     std::vector<std::string>
     GetGroupNames(CSLConstList papszOptions) const override;
+
     std::shared_ptr<GDALGroup> OpenGroup(const std::string &osName,
                                          CSLConstList) const override
     {
@@ -1577,6 +1619,7 @@ class VRTGroup final : public GDALGroup
         auto oIter = m_oMapDimensions.find(name);
         return oIter == m_oMapDimensions.end() ? nullptr : oIter->second;
     }
+
     std::shared_ptr<VRTDimension>
     GetDimensionFromFullName(const std::string &name, bool bEmitError) const;
 
@@ -1607,6 +1650,7 @@ class VRTGroup final : public GDALGroup
     {
         return m_poRefSelf;
     }
+
     VRTGroup *GetRootGroup() const;
     std::shared_ptr<GDALGroup> GetRootGroupSharedPtr() const;
 
@@ -1614,15 +1658,19 @@ class VRTGroup final : public GDALGroup
     {
         return m_osVRTPath;
     }
+
     void SetDirty();
+
     void SetFilename(const std::string &osFilename)
     {
         m_osFilename = osFilename;
     }
+
     const std::string &GetFilename() const
     {
         return m_osFilename;
     }
+
     bool Serialize() const;
     CPLXMLNode *SerializeToXML(const char *pszVRTPathIn) const;
     void Serialize(CPLXMLNode *psParent, const char *pszVRTPathIn) const;

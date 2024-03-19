@@ -2654,6 +2654,7 @@ const char *GDALMBTilesGetTileFormatName(GPKGTileFormat eTF)
              "Unsuppoted value for TILE_FORMAT: %d", static_cast<int>(eTF));
     return nullptr;
 }
+
 /************************************************************************/
 /*                         OpenRaster()                                 */
 /************************************************************************/
@@ -4228,8 +4229,8 @@ char **GDALGeoPackageDataset::GetMetadata(const char *pszDomain)
                 {
                     papszMetadata =
                         CSLMerge(papszMetadata, oLocalMDMD.GetMetadata());
-                    char **papszDomainList = oLocalMDMD.GetDomainList();
-                    char **papszIter = papszDomainList;
+                    CSLConstList papszDomainList = oLocalMDMD.GetDomainList();
+                    CSLConstList papszIter = papszDomainList;
                     while (papszIter && *papszIter)
                     {
                         if (EQUAL(*papszIter, "IMAGE_STRUCTURE"))
@@ -4780,8 +4781,8 @@ void GDALGeoPackageDataset::FlushMetadata()
     CPLXMLNode *psXMLNode = nullptr;
     {
         GDALMultiDomainMetadata oLocalMDMD;
-        char **papszDomainList = oMDMD.GetDomainList();
-        char **papszIter = papszDomainList;
+        CSLConstList papszDomainList = oMDMD.GetDomainList();
+        CSLConstList papszIter = papszDomainList;
         oLocalMDMD.SetMetadata(papszMDDup);
         while (papszIter && *papszIter)
         {
@@ -6023,6 +6024,7 @@ static GDALDataset *GetUnderlyingDataset(GDALDataset *poSrcDS)
 
     return poSrcDS;
 }
+
 /************************************************************************/
 /*                            CreateCopy()                              */
 /************************************************************************/
@@ -6602,9 +6604,10 @@ OGRLayer *GDALGeoPackageDataset::GetLayer(int iLayer)
 /*                          ICreateLayer()                              */
 /************************************************************************/
 
-OGRLayer *GDALGeoPackageDataset::ICreateLayer(
-    const char *pszLayerName, const OGRSpatialReference *poSpatialRef,
-    OGRwkbGeometryType eGType, char **papszOptions)
+OGRLayer *
+GDALGeoPackageDataset::ICreateLayer(const char *pszLayerName,
+                                    const OGRGeomFieldDefn *poSrcGeomFieldDefn,
+                                    CSLConstList papszOptions)
 {
     /* -------------------------------------------------------------------- */
     /*      Verify we are in update mode.                                   */
@@ -6618,6 +6621,11 @@ OGRLayer *GDALGeoPackageDataset::ICreateLayer(
 
         return nullptr;
     }
+
+    const auto eGType =
+        poSrcGeomFieldDefn ? poSrcGeomFieldDefn->GetType() : wkbNone;
+    const auto poSpatialRef =
+        poSrcGeomFieldDefn ? poSrcGeomFieldDefn->GetSpatialRef() : nullptr;
 
     if (!m_bHasGPKGGeometryColumns)
     {
@@ -6675,6 +6683,12 @@ OGRLayer *GDALGeoPackageDataset::ICreateLayer(
         CSLFetchNameValue(papszOptions, "GEOMETRY_NAME");
     if (pszGeomColumnName == nullptr) /* deprecated name */
         pszGeomColumnName = CSLFetchNameValue(papszOptions, "GEOMETRY_COLUMN");
+    if (pszGeomColumnName == nullptr && poSrcGeomFieldDefn)
+    {
+        pszGeomColumnName = poSrcGeomFieldDefn->GetNameRef();
+        if (pszGeomColumnName && pszGeomColumnName[0] == 0)
+            pszGeomColumnName = nullptr;
+    }
     if (pszGeomColumnName == nullptr)
         pszGeomColumnName = "geom";
     const bool bGeomNullable =
@@ -6759,8 +6773,15 @@ OGRLayer *GDALGeoPackageDataset::ICreateLayer(
         poSRS->SetAxisMappingStrategy(OAMS_TRADITIONAL_GIS_ORDER);
     }
     poLayer->SetCreationParameters(
-        eGType, pszGeomColumnName, bGeomNullable, poSRS, pszFIDColumnName,
-        pszIdentifier, CSLFetchNameValue(papszOptions, "DESCRIPTION"));
+        eGType, pszGeomColumnName, bGeomNullable, poSRS,
+        poSrcGeomFieldDefn ? poSrcGeomFieldDefn->GetCoordinatePrecision()
+                           : OGRGeomCoordinatePrecision(),
+        CPLTestBool(
+            CSLFetchNameValueDef(papszOptions, "DISCARD_COORD_LSB", "NO")),
+        CPLTestBool(CSLFetchNameValueDef(
+            papszOptions, "UNDO_DISCARD_COORD_LSB_ON_READING", "NO")),
+        pszFIDColumnName, pszIdentifier,
+        CSLFetchNameValue(papszOptions, "DESCRIPTION"));
     if (poSRS)
     {
         poSRS->Release();
@@ -8143,7 +8164,7 @@ static void OGRGeoPackageSetSRID(sqlite3_context *pContext, int /* argc */,
         }
         size_t nBLOBDestLen = 0;
         GByte *pabyDestBLOB =
-            GPkgGeometryFromOGR(poGeom, nDestSRID, &nBLOBDestLen);
+            GPkgGeometryFromOGR(poGeom, nDestSRID, nullptr, &nBLOBDestLen);
         if (!pabyDestBLOB)
         {
             sqlite3_result_null(pContext);
@@ -8208,8 +8229,8 @@ static void OGRGeoPackageSTMakeValid(sqlite3_context *pContext, int argc,
     }
 
     size_t nBLOBDestLen = 0;
-    GByte *pabyDestBLOB =
-        GPkgGeometryFromOGR(poValid.get(), sHeader.iSrsId, &nBLOBDestLen);
+    GByte *pabyDestBLOB = GPkgGeometryFromOGR(poValid.get(), sHeader.iSrsId,
+                                              nullptr, &nBLOBDestLen);
     if (!pabyDestBLOB)
     {
         sqlite3_result_null(pContext);
@@ -8416,7 +8437,7 @@ void OGRGeoPackageTransform(sqlite3_context *pContext, int argc,
 
     size_t nBLOBDestLen = 0;
     GByte *pabyDestBLOB =
-        GPkgGeometryFromOGR(poGeom.get(), nDestSRID, &nBLOBDestLen);
+        GPkgGeometryFromOGR(poGeom.get(), nDestSRID, nullptr, &nBLOBDestLen);
     if (!pabyDestBLOB)
     {
         sqlite3_result_null(pContext);
@@ -8970,7 +8991,8 @@ static void GPKG_ogr_layer_Extent(sqlite3_context *pContext, int /*argc*/,
     const auto poSRS = poLayer->GetSpatialRef();
     const int nSRID = poSRS ? poDS->GetSrsId(*poSRS) : 0;
     size_t nBLOBDestLen = 0;
-    GByte *pabyDestBLOB = GPkgGeometryFromOGR(&oPoly, nSRID, &nBLOBDestLen);
+    GByte *pabyDestBLOB =
+        GPkgGeometryFromOGR(&oPoly, nSRID, nullptr, &nBLOBDestLen);
     if (!pabyDestBLOB)
     {
         sqlite3_result_null(pContext);
