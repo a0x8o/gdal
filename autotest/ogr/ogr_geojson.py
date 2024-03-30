@@ -142,6 +142,8 @@ def copy_shape_to_geojson(gjname, compress=None):
     if lyr is None:
         return False, dst_name
 
+    assert lyr.GetDataset().GetDescription() == ds.GetDescription()
+
     ######################################################
     # Setup schema (all test shapefiles use common schema)
     ogrtest.quick_create_layer_def(lyr, [("FID", ogr.OFTReal), ("NAME", ogr.OFTString)])
@@ -189,6 +191,8 @@ def test_ogr_geojson_2():
 
     lyr = ds.GetLayerByName("point")
     assert lyr is not None, "Missing layer called point"
+
+    assert lyr.GetDataset().GetDescription() == ds.GetDescription()
 
     extent = (100.0, 100.0, 0.0, 0.0)
 
@@ -2689,11 +2693,17 @@ def test_ogr_geojson_57():
 { "type": "Feature", "properties": { }, "bbox": [ 135.0, 88.6984598, -135.0, 90.0 ], "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ 135.0, 88.6984598 ], [ 180.0, 89.0796531 ], [ 180.0, 90.0 ], [ 135.0, 88.6984598 ] ] ], [ [ [ -135.0, 88.6984598 ], [ -180.0, 90.0 ], [ -180.0, 89.0796531 ], [ -135.0, 88.6984598 ] ] ] ] } }
 ]
 }"""
-    assert (
-        json.loads(got) == json.loads(expected)
-        or json.loads(got) == json.loads(expected_geos_overlay_ng)
-        or json.loads(got) == json.loads(expected_geos_3_9_1)
-    ), got
+    if (
+        ogr.GetGEOSVersionMajor() * 10000
+        + ogr.GetGEOSVersionMinor() * 100
+        + ogr.GetGEOSVersionMicro()
+        >= 30900
+    ):
+        assert (
+            json.loads(got) == json.loads(expected)
+            or json.loads(got) == json.loads(expected_geos_overlay_ng)
+            or json.loads(got) == json.loads(expected_geos_3_9_1)
+        ), got
 
     # Polar case: EPSG:3031: WGS 84 / Antarctic Polar Stereographic
     src_ds = gdal.GetDriverByName("Memory").Create("", 0, 0, 0)
