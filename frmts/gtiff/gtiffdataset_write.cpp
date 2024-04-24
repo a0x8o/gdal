@@ -943,8 +943,6 @@ void GTiffDataset::InitCompressionThreads(bool bUpdateMode,
                                                  &m_asCompressionJobs[i]));
                         m_asCompressionJobs[i].nStripOrTile = -1;
                     }
-                    m_hCompressThreadPoolMutex = CPLCreateMutex();
-                    CPLReleaseMutex(m_hCompressThreadPoolMutex);
 
                     // This is kind of a hack, but basically using
                     // TIFFWriteRawStrip/Tile and then TIFFReadEncodedStrip/Tile
@@ -1053,13 +1051,11 @@ void GTiffDataset::ThreadCompressionFunc(void *pData)
         psJob->nCompressedBufferSize = 0;
     }
 
-    auto mutex = poDS->m_poBaseDS ? poDS->m_poBaseDS->m_hCompressThreadPoolMutex
-                                  : poDS->m_hCompressThreadPoolMutex;
-    if (mutex)
+    auto poMainDS = poDS->m_poBaseDS ? poDS->m_poBaseDS : poDS;
+    if (poMainDS->m_poCompressQueue)
     {
-        CPLAcquireMutex(mutex, 1000.0);
+        std::lock_guard oLock(poMainDS->m_oCompressThreadPoolMutex);
         psJob->bReady = true;
-        CPLReleaseMutex(mutex);
     }
 }
 
@@ -1223,13 +1219,11 @@ void GTiffDataset::WriteRawStripOrTile(int nStripOrTile,
 
 void GTiffDataset::WaitCompletionForJobIdx(int i)
 {
-    auto poQueue = m_poBaseDS ? m_poBaseDS->m_poCompressQueue.get()
-                              : m_poCompressQueue.get();
-    auto &oQueue = m_poBaseDS ? m_poBaseDS->m_asQueueJobIdx : m_asQueueJobIdx;
-    auto &asJobs =
-        m_poBaseDS ? m_poBaseDS->m_asCompressionJobs : m_asCompressionJobs;
-    auto mutex = m_poBaseDS ? m_poBaseDS->m_hCompressThreadPoolMutex
-                            : m_hCompressThreadPoolMutex;
+    auto poMainDS = m_poBaseDS ? m_poBaseDS : this;
+    auto poQueue = poMainDS->m_poCompressQueue.get();
+    auto &oQueue = poMainDS->m_asQueueJobIdx;
+    auto &asJobs = poMainDS->m_asCompressionJobs;
+    auto &mutex = poMainDS->m_oCompressThreadPoolMutex;
 
     CPLAssert(i >= 0 && static_cast<size_t>(i) < asJobs.size());
     CPLAssert(asJobs[i].nStripOrTile >= 0);
@@ -1238,9 +1232,11 @@ void GTiffDataset::WaitCompletionForJobIdx(int i)
     bool bHasWarned = false;
     while (true)
     {
-        CPLAcquireMutex(mutex, 1000.0);
-        const bool bReady = asJobs[i].bReady;
-        CPLReleaseMutex(mutex);
+        bool bReady;
+        {
+            std::lock_guard oLock(mutex);
+            bReady = asJobs[i].bReady;
+        }
         if (!bReady)
         {
             if (!bHasWarned)
@@ -1266,7 +1262,11 @@ void GTiffDataset::WaitCompletionForJobIdx(int i)
     }
     asJobs[i].pabyCompressedBuffer = nullptr;
     asJobs[i].nBufferSize = 0;
-    asJobs[i].bReady = false;
+    {
+        // Likely useless, but makes Coverity happy
+        std::lock_guard oLock(mutex);
+        asJobs[i].bReady = false;
+    }
     asJobs[i].nStripOrTile = -1;
     oQueue.pop();
 }
@@ -1395,9 +1395,9 @@ bool GTiffDataset::SubmitCompressionJob(int nStripOrTile, GByte *pabyData,
         return false;
     }
 
-    auto &oQueue = m_poBaseDS ? m_poBaseDS->m_asQueueJobIdx : m_asQueueJobIdx;
-    auto &asJobs =
-        m_poBaseDS ? m_poBaseDS->m_asCompressionJobs : m_asCompressionJobs;
+    auto poMainDS = m_poBaseDS ? m_poBaseDS : this;
+    auto &oQueue = poMainDS->m_asQueueJobIdx;
+    auto &asJobs = poMainDS->m_asCompressionJobs;
 
     int nNextCompressionJobAvail = -1;
 
@@ -2914,10 +2914,7 @@ CPLErr GTiffDataset::CreateInternalMaskOverviews(int nOvrBlockXSize,
     /* -------------------------------------------------------------------- */
     CPLErr eErr = CE_None;
 
-    const char *pszInternalMask =
-        CPLGetConfigOption("GDAL_TIFF_INTERNAL_MASK", nullptr);
-    if (m_poMaskDS != nullptr && m_poMaskDS->GetRasterCount() == 1 &&
-        (pszInternalMask == nullptr || CPLTestBool(pszInternalMask)))
+    if (m_poMaskDS != nullptr && m_poMaskDS->GetRasterCount() == 1)
     {
         int nMaskOvrCompression;
         if (strstr(GDALGetMetadataItem(GDALGetDriverByName("GTiff"),
@@ -3242,7 +3239,13 @@ CPLErr GTiffDataset::IBuildOverviews(const char *pszResampling, int nOverviews,
     /* -------------------------------------------------------------------- */
     /*      Refresh overviews for the mask                                  */
     /* -------------------------------------------------------------------- */
-    if (m_poMaskDS != nullptr && m_poMaskDS->GetRasterCount() == 1)
+    const bool bHasInternalMask =
+        m_poMaskDS != nullptr && m_poMaskDS->GetRasterCount() == 1;
+    const bool bHasExternalMask =
+        !bHasInternalMask && oOvManager.HaveMaskFile();
+    const bool bHasMask = bHasInternalMask || bHasExternalMask;
+
+    if (bHasInternalMask)
     {
         int nMaskOverviews = 0;
 
@@ -3257,11 +3260,24 @@ CPLErr GTiffDataset::IBuildOverviews(const char *pszResampling, int nOverviews,
             }
         }
 
+        void *pScaledProgressData = GDALCreateScaledProgress(
+            0, 1.0 / (nBands + 1), pfnProgress, pProgressData);
         eErr = GDALRegenerateOverviewsEx(
             m_poMaskDS->GetRasterBand(1), nMaskOverviews,
             reinterpret_cast<GDALRasterBandH *>(papoOverviewBands),
-            pszResampling, GDALDummyProgress, nullptr, papszOptions);
+            pszResampling, GDALScaledProgress, pScaledProgressData,
+            papszOptions);
+        GDALDestroyScaledProgress(pScaledProgressData);
         CPLFree(papoOverviewBands);
+    }
+    else if (bHasExternalMask)
+    {
+        void *pScaledProgressData = GDALCreateScaledProgress(
+            0, 1.0 / (nBands + 1), pfnProgress, pProgressData);
+        eErr = oOvManager.BuildOverviewsMask(
+            pszResampling, nOverviews, panOverviewList, GDALScaledProgress,
+            pScaledProgressData, papszOptions);
+        GDALDestroyScaledProgress(pScaledProgressData);
     }
 
     // If we have an alpha band, we want it to be generated before downsampling
@@ -3370,9 +3386,16 @@ CPLErr GTiffDataset::IBuildOverviews(const char *pszResampling, int nOverviews,
             }
         }
 
-        GDALRegenerateOverviewsMultiBand(
-            nBandsIn, papoBandList, nNewOverviews, papapoOverviewBands,
-            pszResampling, pfnProgress, pProgressData, papszOptions);
+        void *pScaledProgressData =
+            bHasMask ? GDALCreateScaledProgress(1.0 / (nBands + 1), 1.0,
+                                                pfnProgress, pProgressData)
+                     : GDALCreateScaledProgress(0.0, 1.0, pfnProgress,
+                                                pProgressData);
+        GDALRegenerateOverviewsMultiBand(nBandsIn, papoBandList, nNewOverviews,
+                                         papapoOverviewBands, pszResampling,
+                                         GDALScaledProgress,
+                                         pScaledProgressData, papszOptions);
+        GDALDestroyScaledProgress(pScaledProgressData);
 
         for (int iBand = 0; iBand < nBandsIn; ++iBand)
         {
@@ -3385,6 +3408,8 @@ CPLErr GTiffDataset::IBuildOverviews(const char *pszResampling, int nOverviews,
     {
         GDALRasterBand **papoOverviewBands = static_cast<GDALRasterBand **>(
             CPLCalloc(sizeof(void *), nOverviews));
+
+        const int iBandOffset = bHasMask ? 1 : 0;
 
         for (int iBand = 0; iBand < nBandsIn && eErr == CE_None; ++iBand)
         {
@@ -3442,9 +3467,11 @@ CPLErr GTiffDataset::IBuildOverviews(const char *pszResampling, int nOverviews,
             }
 
             void *pScaledProgressData = GDALCreateScaledProgress(
-                iBand / static_cast<double>(nBandsIn),
-                (iBand + 1) / static_cast<double>(nBandsIn), pfnProgress,
-                pProgressData);
+                (iBand + iBandOffset) /
+                    static_cast<double>(nBandsIn + iBandOffset),
+                (iBand + iBandOffset + 1) /
+                    static_cast<double>(nBandsIn + iBandOffset),
+                pfnProgress, pProgressData);
 
             eErr = GDALRegenerateOverviewsEx(
                 poBand, nNewOverviews,
@@ -3506,8 +3533,7 @@ static bool IsSRSCompatibleOfGeoTIFF(const OGRSpatialReference *poSRS,
     }
     OGRErr eErr;
     {
-        CPLErrorStateBackuper oErrorStateBackuper;
-        CPLErrorHandlerPusher oErrorHandler(CPLQuietErrorHandler);
+        CPLErrorStateBackuper oErrorStateBackuper(CPLQuietErrorHandler);
         if (poSRS->IsDerivedGeographic() ||
             (poSRS->IsProjected() && !poSRS->IsCompound() &&
              poSRS->GetAxesCount() == 3))
@@ -8734,7 +8760,7 @@ CPLErr GTiffDataset::CreateMaskBand(int nFlagsIn)
 
 bool GTiffDataset::MustCreateInternalMask()
 {
-    return CPLTestBool(CPLGetConfigOption("GDAL_TIFF_INTERNAL_MASK", "NO"));
+    return CPLTestBool(CPLGetConfigOption("GDAL_TIFF_INTERNAL_MASK", "YES"));
 }
 
 /************************************************************************/
@@ -8752,7 +8778,11 @@ CPLErr GTiffRasterBand::CreateMaskBand(int nFlagsIn)
         return CE_Failure;
     }
 
-    if (CPLTestBool(CPLGetConfigOption("GDAL_TIFF_INTERNAL_MASK", "NO")))
+    const char *pszGDAL_TIFF_INTERNAL_MASK =
+        CPLGetConfigOption("GDAL_TIFF_INTERNAL_MASK", nullptr);
+    if ((pszGDAL_TIFF_INTERNAL_MASK &&
+         CPLTestBool(pszGDAL_TIFF_INTERNAL_MASK)) ||
+        nFlagsIn == GMF_PER_DATASET)
     {
         return m_poGDS->CreateMaskBand(nFlagsIn);
     }

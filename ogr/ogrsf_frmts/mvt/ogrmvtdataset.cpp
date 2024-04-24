@@ -3819,7 +3819,7 @@ bool OGRMVTWriterDataset::EncodeRepairedOuterRing(
         oOutPoly.addRingDirectly(poOutLinearRing.release());
         int bIsValid;
         {
-            CPLErrorStateBackuper oErrorStateBackuper;
+            CPLErrorStateBackuper oErrorStateBackuper(CPLQuietErrorHandler);
             bIsValid = oOutPoly.IsValid();
         }
         if (bIsValid)
@@ -3953,8 +3953,7 @@ OGRErr OGRMVTWriterDataset::PreGenerateForTileReal(
         OGRPolygon oPoly;
         oPoly.addRingDirectly(poLR);
 
-        CPLErrorStateBackuper oErrorStateBackuper;
-        CPLErrorHandlerPusher oErrorHandler(CPLQuietErrorHandler);
+        CPLErrorStateBackuper oErrorStateBackuper(CPLQuietErrorHandler);
         auto poTmp = poGeom->Intersection(&oPoly);
         poIntersection = poTmp;
         poIntersectionHolder.reset(poTmp);
@@ -4169,8 +4168,7 @@ OGRErr OGRMVTWriterDataset::PreGenerateForTileReal(
                                     dfAreaOrLength);
             int bIsValid;
             {
-                CPLErrorStateBackuper oErrorStateBackuper;
-                CPLErrorHandlerPusher oErrorHandler(CPLQuietErrorHandler);
+                CPLErrorStateBackuper oErrorStateBackuper(CPLQuietErrorHandler);
                 bIsValid = oOutPoly.IsValid();
             }
             if (!bIsValid)
@@ -4211,8 +4209,7 @@ OGRErr OGRMVTWriterDataset::PreGenerateForTileReal(
             }
             int bIsValid;
             {
-                CPLErrorStateBackuper oErrorStateBackuper;
-                CPLErrorHandlerPusher oErrorHandler(CPLQuietErrorHandler);
+                CPLErrorStateBackuper oErrorStateBackuper(CPLQuietErrorHandler);
                 bIsValid = oOutMP.IsValid();
             }
             if (!bIsValid)
@@ -4268,8 +4265,9 @@ OGRErr OGRMVTWriterDataset::PreGenerateForTileReal(
     oBuffer.assign(static_cast<char *>(pCompressed), nCompressedSize);
     CPLFree(pCompressed);
 
+    std::unique_ptr<std::lock_guard<std::mutex>> poLockGuard;
     if (m_bThreadPoolOK)
-        m_oDBMutex.lock();
+        poLockGuard = std::make_unique<std::lock_guard<std::mutex>>(m_oDBMutex);
 
     m_nTempTiles++;
     sqlite3_bind_int(m_hInsertStmt, 1, nZ);
@@ -4285,9 +4283,6 @@ OGRErr OGRMVTWriterDataset::PreGenerateForTileReal(
     sqlite3_bind_double(m_hInsertStmt, 8, dfAreaOrLength);
     int rc = sqlite3_step(m_hInsertStmt);
     sqlite3_reset(m_hInsertStmt);
-
-    if (m_bThreadPoolOK)
-        m_oDBMutex.unlock();
 
     if (!(rc == SQLITE_OK || rc == SQLITE_DONE))
     {
@@ -4329,9 +4324,8 @@ void OGRMVTWriterDataset::WriterTaskFunc(void *pParam)
         poTask->nSerial, poTask->poGeom.get(), poTask->sEnvelope);
     if (eErr != OGRERR_NONE)
     {
-        poTask->poDS->m_oDBMutex.lock();
+        std::lock_guard oLock(poTask->poDS->m_oDBMutex);
         poTask->poDS->m_bWriteFeatureError = true;
-        poTask->poDS->m_oDBMutex.unlock();
     }
     delete poTask;
 }
@@ -4370,6 +4364,7 @@ OGRErr OGRMVTWriterDataset::PreGenerateForTile(
         // Do not queue more than 1000 jobs to avoid memory exhaustion
         m_oThreadPool.WaitCompletion(1000);
 
+        std::lock_guard oLock(m_oDBMutex);
         return m_bWriteFeatureError ? OGRERR_FAILURE : OGRERR_NONE;
     }
 }
@@ -4693,8 +4688,7 @@ GetReducedPrecisionGeometry(MVTTileLayerFeature::GeomType eGeomType,
                             poOutOuterRing = std::unique_ptr<OGRLinearRing>(
                                 poOutRing.release());
                             {
-                                CPLErrorStateBackuper oErrorStateBackuper;
-                                CPLErrorHandlerPusher oErrorHandler(
+                                CPLErrorStateBackuper oErrorStateBackuper(
                                     CPLQuietErrorHandler);
                                 bIsValid = oPoly.IsValid();
                             }
@@ -4715,8 +4709,7 @@ GetReducedPrecisionGeometry(MVTTileLayerFeature::GeomType eGeomType,
                         oPoly.addRing(poOutOuterRing.get());
                         oPoly.addRingDirectly(poOutRing.release());
                         {
-                            CPLErrorStateBackuper oErrorStateBackuper;
-                            CPLErrorHandlerPusher oErrorHandler(
+                            CPLErrorStateBackuper oErrorStateBackuper(
                                 CPLQuietErrorHandler);
                             bIsValid = oPoly.IsValid();
                         }
