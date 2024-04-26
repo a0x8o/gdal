@@ -4008,7 +4008,9 @@ retry:
                     {
                         if (VSIStat(pszGDALDriverPath, &sStat) != 0)
                         {
-                            osMsg += ". Directory '";
+                            if (osMsg.back() != '.')
+                                osMsg += ".";
+                            osMsg += " Directory '";
                             osMsg += pszGDALDriverPath;
                             osMsg +=
                                 "' pointed by GDAL_DRIVER_PATH does not exist.";
@@ -4016,10 +4018,12 @@ retry:
                     }
                     else
                     {
+                        if (osMsg.back() != '.')
+                            osMsg += ".";
 #ifdef INSTALL_PLUGIN_FULL_DIR
                         if (VSIStat(INSTALL_PLUGIN_FULL_DIR, &sStat) != 0)
                         {
-                            osMsg += ". Directory '";
+                            osMsg += " Directory '";
                             osMsg += INSTALL_PLUGIN_FULL_DIR;
                             osMsg += "' hardcoded in the GDAL library does not "
                                      "exist and the GDAL_DRIVER_PATH "
@@ -4028,7 +4032,7 @@ retry:
                         else
 #endif
                         {
-                            osMsg += ". The GDAL_DRIVER_PATH configuration "
+                            osMsg += " The GDAL_DRIVER_PATH configuration "
                                      "option is not set.";
                         }
                     }
@@ -4909,6 +4913,11 @@ OGRErr GDALDatasetDeleteLayer(GDALDatasetH hDS, int iLayer)
 
 {
     VALIDATE_POINTER1(hDS, "GDALDatasetH", OGRERR_INVALID_HANDLE);
+
+#ifdef OGRAPISPY_ENABLED
+    if (bOGRAPISpyEnabled)
+        OGRAPISpy_DS_DeleteLayer(hDS, iLayer);
+#endif
 
     return GDALDataset::FromHandle(hDS)->DeleteLayer(iLayer);
 }

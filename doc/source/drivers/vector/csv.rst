@@ -54,7 +54,7 @@ for geometries encoded in WKT
 Starting with GDAL 2.2, the "JSonStringList", "JSonIntegerList",
 "JSonInteger64List" and "JSonRealList" types can be used in .csvt to map
 to the corresponding OGR StringList, IntegerList, Integer64List and
-RealList types. The field values are then encoded as JSon arrays, with
+RealList types. The field values are then encoded as JSON arrays, with
 proper CSV escaping.
 
 Automatic field type guessing can also be done
@@ -517,7 +517,7 @@ Examples
       ogr2ogr -f CSV output.csv input.shp -lco GEOMETRY=AS_XYZ
 
 -  This example shows using ogr2ogr to transform a shapefile into a .csv
-   file with geography field formatted using GeoJSON format.
+   file with geometry field formatted using GeoJSON format.
 
    ::
 
