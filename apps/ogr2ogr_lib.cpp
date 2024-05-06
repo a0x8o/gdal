@@ -6657,19 +6657,9 @@ static std::unique_ptr<GDALArgumentParser> GDALVectorTranslateOptionsGetParser(
 
     argParser->add_output_format_argument(psOptions->osFormat);
 
-    argParser->add_argument("-dsco")
-        .metavar("<NAME>=<VALUE>")
-        .append()
-        .action([psOptions](const std::string &s)
-                { psOptions->aosDSCO.AddString(s.c_str()); })
-        .help(_("Dataset creation option (format specific)."));
+    argParser->add_dataset_creation_options_argument(psOptions->aosDSCO);
 
-    argParser->add_argument("-lco")
-        .metavar("<NAME>=<VALUE>")
-        .append()
-        .action([psOptions](const std::string &s)
-                { psOptions->aosLCO.AddString(s.c_str()); })
-        .help(_("Layer creation option (format specific)."));
+    argParser->add_layer_creation_options_argument(psOptions->aosLCO);
 
     argParser->add_usage_newline();
 
@@ -7221,8 +7211,8 @@ static std::unique_ptr<GDALArgumentParser> GDALVectorTranslateOptionsGetParser(
 
     argParser->add_argument("-datelineoffset")
         .metavar("<val_in_degree>")
-        .store_into(psOptions->dfDateLineOffset)
         .default_value(psOptions->dfDateLineOffset)
+        .store_into(psOptions->dfDateLineOffset)
         .help(_("Offset from dateline in degrees."));
 
     argParser->add_argument("-clipsrc")

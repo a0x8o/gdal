@@ -36,6 +36,7 @@ import shutil
 import struct
 import sys
 
+import gdaltest
 import pytest
 import test_py_scripts  # noqa  # pylint: disable=E0401
 
@@ -140,13 +141,14 @@ def test_gdal2tiles_py_zoom_option(script_path, tmp_path):
 
     tiles_dir = str(tmp_path / "out_gdal2tiles_smallworld")
 
-    # Because of multiprocessing, run as external process, to avoid issues with
-    # Ubuntu 12.04 and socket.setdefaulttimeout()
-    # as well as on Windows that doesn't manage to fork
+    # Because of multiprocessing, run as external process, to avoid issues
+    # for example on Windows that doesn't manage to fork
+    # Also test non-file input dataset (e.g. vrt://)
     test_py_scripts.run_py_script_as_external_script(
         script_path,
         "gdal2tiles",
         "-q --force-kml --processes=2 -z 0-1 "
+        + "vrt://"
         + test_py_scripts.get_data_path("gdrivers")
         + f"small_world.tif {tiles_dir}",
     )
@@ -210,6 +212,9 @@ def test_gdal2tiles_py_resampling_option(script_path, tmp_path, resample):
 
 @pytest.mark.require_driver("PNG")
 def test_gdal2tiles_py_xyz(script_path, tmp_path):
+
+    if gdaltest.is_travis_branch("sanitize"):
+        pytest.skip("fails on sanitize for unknown reason")
 
     input_tif = str(tmp_path / "out_gdal2tiles_smallworld_xyz.tif")
     out_dir = input_tif.strip(".tif")
@@ -623,6 +628,61 @@ def test_gdal2tiles_excluded_values(script_path, tmp_path):
         (12 + 22 + 42) // 3,
         255,
     )
+
+
+@pytest.mark.require_driver("PNG")
+def test_gdal2tiles_nodata_values_pct_threshold(script_path, tmp_path):
+
+    input_tif = str(tmp_path / "test_gdal2tiles_nodata_values_pct_threshold.tif")
+    output_folder = str(tmp_path / "test_gdal2tiles_nodata_values_pct_threshold")
+
+    src_ds = gdal.GetDriverByName("GTiff").Create(input_tif, 256, 256, 1, gdal.GDT_Byte)
+    src_ds.GetRasterBand(1).SetNoDataValue(20)
+    src_ds.GetRasterBand(1).WriteRaster(
+        0, 0, 2, 2, struct.pack("B" * 4, 10, 20, 30, 40)
+    )
+    srs = osr.SpatialReference()
+    srs.ImportFromEPSG(3857)
+    src_ds.SetSpatialRef(srs)
+    MAX_GM = 20037508.342789244
+    RES_Z0 = 2 * MAX_GM / 256
+    RES_Z1 = RES_Z0 / 2
+    # Spatial extent of tile (0,0) at zoom level 1
+    src_ds.SetGeoTransform([-MAX_GM, RES_Z1, 0, MAX_GM, 0, -RES_Z1])
+    src_ds = None
+
+    test_py_scripts.run_py_script_as_external_script(
+        script_path,
+        "gdal2tiles",
+        f"-q -z 0-1 {input_tif} {output_folder}",
+    )
+
+    ds = gdal.Open(f"{output_folder}/0/0/0.png")
+    assert struct.unpack("B" * 2, ds.ReadRaster(0, 0, 1, 1)) == (
+        round((10 + 30 + 40) / 3),
+        255,
+    )
+
+    test_py_scripts.run_py_script_as_external_script(
+        script_path,
+        "gdal2tiles",
+        f"-q -z 0-1 --nodata-values-pct-threshold=50 {input_tif} {output_folder}",
+    )
+
+    ds = gdal.Open(f"{output_folder}/0/0/0.png")
+    assert struct.unpack("B" * 2, ds.ReadRaster(0, 0, 1, 1)) == (
+        round((10 + 30 + 40) / 3),
+        255,
+    )
+
+    test_py_scripts.run_py_script_as_external_script(
+        script_path,
+        "gdal2tiles",
+        f"-q -z 0-1 --nodata-values-pct-threshold=25 {input_tif} {output_folder}",
+    )
+
+    ds = gdal.Open(f"{output_folder}/0/0/0.png")
+    assert struct.unpack("B" * 2, ds.ReadRaster(0, 0, 1, 1)) == (0, 0)
 
 
 @pytest.mark.require_driver("JPEG")

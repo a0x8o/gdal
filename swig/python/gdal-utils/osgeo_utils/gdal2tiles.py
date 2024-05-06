@@ -885,12 +885,17 @@ def scale_query_to_tile(dsquery, dstile, options, tilefilename=""):
     )
     dstile.SetGeoTransform((0.0, 1.0, 0.0, 0.0, 0.0, 1.0))
 
-    if options.resampling == "average" and options.excluded_values:
+    if options.resampling == "average" and (
+        options.excluded_values or options.nodata_values_pct_threshold < 100
+    ):
 
         gdal.Warp(
             dstile,
             dsquery,
-            options=f"-r average -wo EXCLUDED_VALUES={options.excluded_values} -wo EXCLUDED_VALUES_PCT_THRESHOLD={options.excluded_values_pct_threshold}",
+            options="-r average "
+            + f"-wo EXCLUDED_VALUES={options.excluded_values} "
+            + f"-wo EXCLUDED_VALUES_PCT_THRESHOLD={options.excluded_values_pct_threshold} "
+            + f"-wo NODATA_VALUES_PCT_THRESHOLD={options.nodata_values_pct_threshold}",
         )
 
     elif options.resampling == "average":
@@ -1872,6 +1877,13 @@ def optparse_init() -> optparse.OptionParser:
         default=50,
         help="Minimum percentage of source pixels that must be set at one of the --excluded-values to cause the excluded value, that is in majority among source pixels, to be used as the target pixel value. Default value is 50 (%)",
     )
+    p.add_option(
+        "--nodata-values-pct-threshold",
+        dest="nodata_values_pct_threshold",
+        type=float,
+        default=100,
+        help="Minimum percentage of source pixels that must be at nodata (or alpha=0 or any other way to express transparent pixel) to cause the target pixel value to be transparent. Default value is 100 (%). Only taken into account for average resampling",
+    )
 
     # KML options
     g = optparse.OptionGroup(
@@ -2010,9 +2022,14 @@ def process_args(argv: List[str], called_from_main=False) -> Tuple[str, str, Opt
         )
 
     input_file = args[0]
-    if not isfile(input_file):
+    try:
+        input_file_exists = gdal.Open(input_file) is not None
+    except Exception:
+        input_file_exists = False
+    if not input_file_exists:
         exit_with_error(
-            "The provided input file %s does not exist or is not a file" % input_file
+            "The provided input file %s does not exist or is not a recognized GDAL dataset"
+            % input_file
         )
 
     if len(args) == 2:
