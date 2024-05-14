@@ -233,11 +233,15 @@ std::string CPL_DLL GDALVectorInfoGetParserUsage();
 
 std::string CPL_DLL GDALTranslateGetParserUsage();
 
+std::string CPL_DLL GDALMultiDimTranslateAppGetParserUsage();
+
 std::string CPL_DLL GDALVectorTranslateGetParserUsage();
 
 std::string CPL_DLL GDALWarpAppGetParserUsage();
 
 std::string CPL_DLL GDALInfoAppGetParserUsage();
+
+std::string CPL_DLL GDALMultiDimInfoAppGetParserUsage();
 
 std::string CPL_DLL GDALGridGetParserUsage();
 
