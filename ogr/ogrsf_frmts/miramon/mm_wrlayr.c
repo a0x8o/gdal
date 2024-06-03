@@ -828,7 +828,7 @@ static int MMChangeFinalPartOfTheName(char *pszName, size_t nMaxSizeOfName,
     // It's the implementation on windows of the linux strrstr()
     // pszLastFound = strrstr(pszWhereToFind, pszFinalPart);
     pszWhereToFind = pszName;
-    while (nullptr != (pAux = strstr(pszWhereToFind, pszFinalPart)))
+    while (nullptr != (pAux = MM_stristr(pszWhereToFind, pszFinalPart)))
     {
         pszLastFound = pAux;
         pszWhereToFind = pAux + strlen(pAux);
@@ -3657,7 +3657,9 @@ void MMResetFeatureRecord(struct MiraMonFeature *hMMFeature)
                     '\0';
             hMMFeature->pRecords[nIRecord].pField[nIField].bIsValid = 0;
         }
+        hMMFeature->pRecords[nIRecord].nNumField = 0;
     }
+    hMMFeature->nNumMRecords = 0;
 }
 
 // Destroys all allocated memory
@@ -4409,7 +4411,10 @@ static int MMCreateRecordDBF(struct MiraMonVectLayerInfo *hMiraMonLayer,
     if (hMiraMonLayer->TopHeader.nElemCount == 0)
     {
         if (MMCreateMMDB(hMiraMonLayer, nullptr))
+        {
+            MMDestroyMMDB(hMiraMonLayer);
             return MM_FATAL_ERROR_WRITING_FEATURES;
+        }
     }
 
     result = MMAddDBFRecordToMMDB(hMiraMonLayer, hMMFeature);
@@ -5384,7 +5389,7 @@ int MMReturnCodeFromMM_m_idofic(char *pMMSRS_or_pSRS, char *szResult,
                    "Wrong format in data\\MM_m_idofic.csv.\n");
         return 1;
     }
-    id_geodes = strstr(pszLine, "ID_GEODES");
+    id_geodes = MM_stristr(pszLine, "ID_GEODES");
     if (!id_geodes)
     {
         fclose_function(pfMMSRS);
@@ -5393,7 +5398,7 @@ int MMReturnCodeFromMM_m_idofic(char *pMMSRS_or_pSRS, char *szResult,
         return 1;
     }
     id_geodes[strlen("ID_GEODES")] = '\0';
-    psidgeodes = strstr(pszLine, "PSIDGEODES");
+    psidgeodes = MM_stristr(pszLine, "PSIDGEODES");
     if (!psidgeodes)
     {
         fclose_function(pfMMSRS);
@@ -6099,16 +6104,16 @@ int MMCheck_REL_FILE(const char *szREL_file)
         return 1;
     }
 
-    // SubVers>=3?
+    // SubVers>=0?
     pszLine = MMReturnValueFromSectionINIFile(szREL_file, SECTION_VERSIO,
                                               KEY_SubVers);
     if (pszLine)
     {
-        if (*pszLine == '\0' || atoi(pszLine) < (int)MM_SUBVERS)
+        if (*pszLine == '\0' || atoi(pszLine) < (int)MM_SUBVERS_ACCEPTED)
         {
             MMCPLError(CE_Failure, CPLE_OpenFailed,
                        "The file \"%s\" must have %s>=%d.", szREL_file,
-                       KEY_SubVers, MM_SUBVERS);
+                       KEY_SubVers, MM_SUBVERS_ACCEPTED);
 
             free_function(pszLine);
             return 1;
@@ -6119,20 +6124,20 @@ int MMCheck_REL_FILE(const char *szREL_file)
     {
         MMCPLError(CE_Failure, CPLE_OpenFailed,
                    "The file \"%s\" must have %s>=%d.", szREL_file, KEY_SubVers,
-                   MM_SUBVERS);
+                   MM_SUBVERS_ACCEPTED);
         return 1;
     }
 
-    // VersMetaDades>=5?
+    // VersMetaDades>=4?
     pszLine = MMReturnValueFromSectionINIFile(szREL_file, SECTION_VERSIO,
                                               KEY_VersMetaDades);
     if (pszLine)
     {
-        if (*pszLine == '\0' || atoi(pszLine) < (int)MM_VERS_METADADES)
+        if (*pszLine == '\0' || atoi(pszLine) < (int)MM_VERS_METADADES_ACCEPTED)
         {
             MMCPLError(CE_Failure, CPLE_OpenFailed,
                        "The file \"%s\" must have %s>=%d.", szREL_file,
-                       KEY_VersMetaDades, MM_VERS_METADADES);
+                       KEY_VersMetaDades, MM_VERS_METADADES_ACCEPTED);
             free_function(pszLine);
             return 1;
         }
@@ -6142,7 +6147,7 @@ int MMCheck_REL_FILE(const char *szREL_file)
     {
         MMCPLError(CE_Failure, CPLE_OpenFailed,
                    "The file \"%s\" must have %s>=%d.", szREL_file,
-                   KEY_VersMetaDades, MM_VERS_METADADES);
+                   KEY_VersMetaDades, MM_VERS_METADADES_ACCEPTED);
         return 1;
     }
 

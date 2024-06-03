@@ -1,7 +1,7 @@
 .. _gdal_retile:
 
 ================================================================================
-gdal_retile.py
+gdal_retile
 ================================================================================
 
 .. only:: html
@@ -15,7 +15,7 @@ Synopsis
 
 .. code-block::
 
-    gdal_retile.py [--help] [--help-general]
+    gdal_retile [--help] [--help-general]
                    [-v] [-co <NAME>=<VALUE>]... [-of <out_format>] [-ps <pixelWidth> <pixelHeight>]
                    [-overlap <val_in_pixel>]
                    [-ot  {Byte/Int8/Int16/UInt16/UInt32/Int32/Float32/Float64/
@@ -41,6 +41,10 @@ It is possible to generate shape file(s) for the tiled output.
 
 If your number of input tiles exhausts the command line buffer, use the general
 :ref:`--optfile <raster_common_options_optfile>` option
+
+.. note::
+
+    gdal_retile is a Python utility, and is only available if GDAL Python bindings are available.
 
 .. program:: gdal_retile
 
@@ -127,8 +131,3 @@ If your number of input tiles exhausts the command line buffer, use the general
 .. option:: -resume
 
     Resume mode. Generate only missing files.
-
-.. note::
-
-    gdal_retile.py is a Python script, and will only work if GDAL was built
-    with Python support.

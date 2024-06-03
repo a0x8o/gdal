@@ -71,7 +71,7 @@ jobs:
             build_script: build.sh
             os: ubuntu-22.04
 
-          - name: Alpine, gcc 32-bit
+          - name: Alpine, clang 32-bit
             id: alpine_32bit
             container: alpine_32bit
             build_script: build.sh
@@ -174,11 +174,11 @@ jobs:
           sudo sysctl vm.mmap_rnd_bits=28
 
       - name: Checkout
-        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
       - name: Login to Docker Hub
         if: env.CONTAINER_REGISTRY == 'docker.io'
-        uses: docker/login-action@e92390c5fb421da1463c202d546fed0ec5c39f20 # v3.1.0
+        uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446 # v3.2.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -338,7 +338,7 @@ jobs:
             ${TEST_CMD}
 
       - name: Coveralls
-        uses: coverallsapp/github-action@3dfc5567390f6fa9267c0ee9c251e4c8c3f18949 # v2.2.3
+        uses: coverallsapp/github-action@643bc377ffa44ace6394b2b5d0d3950076de9f63 # v2.3.0
         if: ${{ matrix.id == 'coverage' }}
         with:
           format: lcov
