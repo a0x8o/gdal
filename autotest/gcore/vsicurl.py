@@ -37,6 +37,17 @@ import webserver
 
 from osgeo import gdal, ogr
 
+
+def curl_version():
+    actual_version = [0, 0, 0]
+    for build_info_item in gdal.VersionInfo("BUILD_INFO").strip().split("\n"):
+        if build_info_item.startswith("CURL_VERSION="):
+            actual_version = [
+                int(x) for x in build_info_item[len("CURL_VERSION=") :].split(".")
+            ]
+    return actual_version
+
+
 pytestmark = pytest.mark.require_curl()
 
 ###############################################################################
@@ -1143,6 +1154,11 @@ def test_vsicurl_GDAL_HTTP_HEADERS(server):
 # Test CPL_VSIL_CURL_USE_HEAD=NO
 
 
+# Cf fix of https://github.com/curl/curl/pull/14390
+@pytest.mark.skipif(
+    curl_version() == [8, 9, 1],
+    reason="fail with SIGPIPE with curl 8.9.1",
+)
 def test_vsicurl_test_CPL_VSIL_CURL_USE_HEAD_NO(server):
 
     gdal.VSICurlClearCache()
