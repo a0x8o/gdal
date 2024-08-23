@@ -766,7 +766,7 @@ netCDFGroup::netCDFGroup(const std::shared_ptr<netCDFSharedResources> &poShared,
     if (m_gid == m_poShared->GetCDFId())
     {
         int nFormat = 0;
-        nc_inq_format(m_gid, &nFormat);
+        NCDF_ERR(nc_inq_format(m_gid, &nFormat));
         if (nFormat == NC_FORMAT_CLASSIC)
         {
             m_aosStructuralInfo.SetNameValue("NC_FORMAT", "CLASSIC");
@@ -3469,9 +3469,9 @@ bool netCDFVariable::ReadOneElement(const GDALExtendedDataType &src_datatype,
         NCDF_ERR(ret);
         if (ret != NC_NOERR)
             return false;
-        nc_free_string(1, &pszStr);
         GDALExtendedDataType::CopyValue(&pszStr, src_datatype, pDstBuffer,
                                         bufferDataType);
+        nc_free_string(1, &pszStr);
         return true;
     }
 
