@@ -9,23 +9,7 @@
  ******************************************************************************
  * Copyright (c) 2019, Even Rouault <even.rouault at spatialys.com>
  *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
+ * SPDX-License-Identifier: MIT
  ****************************************************************************/
 
 #include <assert.h>
@@ -8187,10 +8171,10 @@ std::shared_ptr<GDALMDArray> GDALMDArrayResampled::Create(
                          "Setting geolocation array from variables %s and %s",
                          poLongVar->GetName().c_str(),
                          poLatVar->GetName().c_str());
-                std::string osFilenameLong =
-                    CPLSPrintf("/vsimem/%p/longitude.tif", poParent.get());
-                std::string osFilenameLat =
-                    CPLSPrintf("/vsimem/%p/latitude.tif", poParent.get());
+                const std::string osFilenameLong =
+                    VSIMemGenerateHiddenFilename("longitude.tif");
+                const std::string osFilenameLat =
+                    VSIMemGenerateHiddenFilename("latitude.tif");
                 std::unique_ptr<GDALDataset> poTmpLongDS(
                     longDimCount == 1
                         ? poLongVar->AsClassicDataset(0, 0)
@@ -9500,6 +9484,12 @@ lbl_next_depth:
         }
         poDS->SetDerivedDatasetName(osDerivedDatasetName.c_str());
         poDS->TryLoadXML();
+
+        for (const auto &[pszKey, pszValue] : cpl::IterateNameValue(
+                 CSLConstList(poDS->GDALPamDataset::GetMetadata())))
+        {
+            poDS->m_oMDD.SetMetadataItem(pszKey, pszValue);
+        }
     }
 
     return poDS.release();

@@ -7,23 +7,7 @@
  ******************************************************************************
  * Copyright (c) 2020, Even Rouault, <even.rouault at spatialys.com>
  *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
+ * SPDX-License-Identifier: MIT
  ****************************************************************************/
 
 #include "cpl_error.h"
@@ -35,9 +19,7 @@
 #include "ogrsf_frmts.h"
 #include "ogr_spatialref.h"
 
-#ifdef OGR_ENABLE_DRIVER_GML
 #include "parsexsd.h"
-#endif
 
 #include <algorithm>
 #include <memory>
@@ -511,10 +493,15 @@ bool OGCAPIDataset::Download(const CPLString &osURL, const char *pszPostContent,
 
     if (psResult->pszErrBuf != nullptr)
     {
-        CPLError(CE_Failure, CPLE_AppDefined, "%s",
-                 psResult->pabyData
-                     ? reinterpret_cast<const char *>(psResult->pabyData)
-                     : psResult->pszErrBuf);
+        std::string osErrorMsg(psResult->pszErrBuf);
+        const char *pszData =
+            reinterpret_cast<const char *>(psResult->pabyData);
+        if (pszData)
+        {
+            osErrorMsg += ", ";
+            osErrorMsg.append(pszData, CPLStrnlen(pszData, 1000));
+        }
+        CPLError(CE_Failure, CPLE_AppDefined, "%s", osErrorMsg.c_str());
         CPLHTTPDestroyResult(psResult);
         return false;
     }
@@ -633,8 +620,7 @@ OGCAPIDataset::OpenTile(const CPLString &osURLPattern, int nMatrix, int nColumn,
     if (bEmptyContent)
         return nullptr;
 
-    CPLString osTempFile;
-    osTempFile.Printf("/vsimem/ogcapi/%p", this);
+    const CPLString osTempFile(VSIMemGenerateHiddenFilename("ogcapi"));
     VSIFCloseL(VSIFileFromMemBuffer(osTempFile.c_str(),
                                     reinterpret_cast<GByte *>(&m_osTileData[0]),
                                     m_osTileData.size(), false));
@@ -1645,7 +1631,6 @@ GDALColorInterp OGCAPIMapWrapperBand::GetColorInterpretation()
 /*                           ParseXMLSchema()                           */
 /************************************************************************/
 
-#ifdef OGR_ENABLE_DRIVER_GML
 static bool
 ParseXMLSchema(const std::string &osURL,
                std::vector<std::unique_ptr<OGRFieldDefn>> &apoFields,
@@ -1690,7 +1675,6 @@ ParseXMLSchema(const std::string &osURL,
 
     return false;
 }
-#endif
 
 /************************************************************************/
 /*                         InitWithTilesAPI()                           */
@@ -1962,14 +1946,12 @@ bool OGCAPIDataset::InitWithTilesAPI(GDALOpenInfo *poOpenInfo,
             }
         }
 
-#ifdef OGR_ENABLE_DRIVER_GML
         std::vector<std::unique_ptr<OGRFieldDefn>> apoFields;
         bool bGotSchema = false;
         if (!osXMLSchemaURL.empty())
         {
             bGotSchema = ParseXMLSchema(osXMLSchemaURL, apoFields, eGeomType);
         }
-#endif
 
         for (const auto &tileMatrix : tms->tileMatrixList())
         {
@@ -2017,10 +1999,8 @@ bool OGCAPIDataset::InitWithTilesAPI(GDALOpenInfo *poOpenInfo,
                     tileMatrix, eGeomType));
             poLayer->SetMinMaxXY(minCol, minRow, maxCol, maxRow);
             poLayer->SetExtent(dfXMin, dfYMin, dfXMax, dfYMax);
-#ifdef OGR_ENABLE_DRIVER_GML
             if (bGotSchema)
                 poLayer->SetFields(apoFields);
-#endif
             m_apoLayers.emplace_back(std::move(poLayer));
         }
 

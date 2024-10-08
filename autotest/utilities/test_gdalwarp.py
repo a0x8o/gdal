@@ -10,23 +10,7 @@
 ###############################################################################
 # Copyright (c) 2008-2013, Even Rouault <even dot rouault at spatialys.com>
 #
-# Permission is hereby granted, free of charge, to any person obtaining a
-# copy of this software and associated documentation files (the "Software"),
-# to deal in the Software without restriction, including without limitation
-# the rights to use, copy, modify, merge, publish, distribute, sublicense,
-# and/or sell copies of the Software, and to permit persons to whom the
-# Software is furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included
-# in all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-# OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-# DEALINGS IN THE SOFTWARE.
+# SPDX-License-Identifier: MIT
 ###############################################################################
 
 import os
@@ -383,6 +367,10 @@ def test_gdalwarp_14(gdalwarp_path, testgdalwarp_gcp_tif, tmp_path):
 # Test -of VRT which is a special case
 
 
+@pytest.mark.skipif(
+    not gdaltest.vrt_has_open_support(),
+    reason="VRT driver open missing",
+)
 def test_gdalwarp_16(gdalwarp_path, testgdalwarp_gcp_tif, tmp_path):
 
     dst_vrt = str(tmp_path / "testgdalwarp16.vrt")
@@ -463,6 +451,10 @@ def test_gdalwarp_19(gdalwarp_path, testgdalwarp_gcp_tif, tmp_path):
 # Test -of VRT -et 0 which is a special case
 
 
+@pytest.mark.skipif(
+    not gdaltest.vrt_has_open_support(),
+    reason="VRT driver open missing",
+)
 def test_gdalwarp_20(gdalwarp_path, testgdalwarp_gcp_tif, tmp_path):
 
     dst_vrt = str(tmp_path / "testgdalwarp20.vrt")
@@ -1047,6 +1039,10 @@ def test_gdalwarp_39(gdalwarp_path, tmp_path):
 # Test -ovr
 
 
+@pytest.mark.skipif(
+    not gdaltest.vrt_has_open_support(),
+    reason="VRT driver open missing",
+)
 def test_gdalwarp_40(gdalwarp_path, tmp_path):
 
     src_tif = str(tmp_path / "test_gdalwarp_40_src.tif")
@@ -1162,6 +1158,25 @@ def test_gdalwarp_40(gdalwarp_path, tmp_path):
     )
     ds = gdal.Open(dst_tif)
     expected_cs = ds.GetRasterBand(1).Checksum()
+    ds = None
+
+    # Test that tiny variations in -te that result in a target resampling factor
+    # very close to the one of overview 0 lead to overview 0 been selected
+
+    gdaltest.runexternal(
+        f"{gdalwarp_path} {src_tif} {dst_vrt} -overwrite -ts 10 10 -te 440721 3750120 441920 3751320 -of VRT"
+    )
+
+    ds = gdal.Open(dst_vrt)
+    assert ds.GetRasterBand(1).Checksum() == cs_ov0
+    ds = None
+
+    gdaltest.runexternal(
+        f"{gdalwarp_path} {src_tif} {dst_vrt} -overwrite -ts 10 10 -te 440719 3750120 441920 3751320 -of VRT"
+    )
+
+    ds = gdal.Open(dst_vrt)
+    assert ds.GetRasterBand(1).Checksum() == cs_ov0
     ds = None
 
     # Should select overview 0 too

@@ -11,23 +11,7 @@
  * Copyright (c) 2010, Kyle Shannon <kyle at pobox dot com>
  * Copyright (c) 2021, CLS
  *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
+ * SPDX-License-Identifier: MIT
  ****************************************************************************/
 
 #include "cpl_port.h"
@@ -1965,6 +1949,7 @@ void netCDFRasterBand::CreateMetadataFromOtherVars()
     m_bCreateMetadataFromOtherVarsDone = true;
 
     netCDFDataset *l_poDS = reinterpret_cast<netCDFDataset *>(poDS);
+    const int nPamFlagsBackup = l_poDS->nPamFlags;
 
     // Compute all dimensions from Band number and save in Metadata.
     int nd = 0;
@@ -2134,6 +2119,8 @@ void netCDFRasterBand::CreateMetadataFromOtherVars()
 
         Taken += result * Sum;
     }  // End loop non-spatial dimensions.
+
+    l_poDS->nPamFlags = nPamFlagsBackup;
 }
 
 /************************************************************************/
@@ -6448,7 +6435,7 @@ void netCDFDataset::CreateSubDatasetList(int nGroupId)
             nc_type nVarType;
             nc_inq_vartype(nGroupId, nVar, &nVarType);
             // Get rid of the last "x" character.
-            osDim.resize(osDim.size() - 1);
+            osDim.pop_back();
             const char *pszType = "";
             switch (nVarType)
             {
@@ -7646,11 +7633,11 @@ bool netCDFDatasetCreateTempFile(NetCDFFormatEnum eFormat,
                     {
                         if (osVal.back() == ';' || osVal.back() == ' ')
                         {
-                            osVal.resize(osVal.size() - 1);
+                            osVal.pop_back();
                         }
                         else if (osVal.back() == '"')
                         {
-                            osVal.resize(osVal.size() - 1);
+                            osVal.pop_back();
                             break;
                         }
                         else
@@ -7669,7 +7656,7 @@ bool netCDFDatasetCreateTempFile(NetCDFFormatEnum eFormat,
                     {
                         if (osVal.back() == ';' || osVal.back() == ' ')
                         {
-                            osVal.resize(osVal.size() - 1);
+                            osVal.pop_back();
                         }
                         else
                         {
@@ -7680,12 +7667,12 @@ bool netCDFDatasetCreateTempFile(NetCDFFormatEnum eFormat,
                     if (!osVal.empty() && osVal.back() == 'b')
                     {
                         nc_datatype = NC_BYTE;
-                        osVal.resize(osVal.size() - 1);
+                        osVal.pop_back();
                     }
                     else if (!osVal.empty() && osVal.back() == 's')
                     {
                         nc_datatype = NC_SHORT;
-                        osVal.resize(osVal.size() - 1);
+                        osVal.pop_back();
                     }
                     if (CPLGetValueType(osVal) == CPL_VALUE_INTEGER)
                     {
@@ -7779,7 +7766,7 @@ bool netCDFDatasetCreateTempFile(NetCDFFormatEnum eFormat,
                 }
                 if (pszLine == nullptr)
                     break;
-                osAccVal.resize(osAccVal.size() - 1);
+                osAccVal.pop_back();
 
                 const std::vector<int> aoDimIds =
                     oMapVarIdToVectorOfDimId[nVarId];

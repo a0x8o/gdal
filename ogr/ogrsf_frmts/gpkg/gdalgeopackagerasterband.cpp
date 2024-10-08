@@ -7,23 +7,7 @@
  ******************************************************************************
  * Copyright (c) 2014, Even Rouault <even dot rouault at spatialys dot com>
  *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
+ * SPDX-License-Identifier: MIT
  ****************************************************************************/
 
 #include "ogr_geopackage.h"
@@ -243,8 +227,8 @@ GDALColorTable *GDALGPKGMBTilesLikeRasterBand::GetColorTable()
                     const int nBytes = sqlite3_column_bytes(hStmt, 0);
                     GByte *pabyRawData = reinterpret_cast<GByte *>(
                         const_cast<void *>(sqlite3_column_blob(hStmt, 0)));
-                    CPLString osMemFileName;
-                    osMemFileName.Printf("/vsimem/gpkg_read_tile_%p", this);
+                    const CPLString osMemFileName(
+                        VSIMemGenerateHiddenFilename("gpkg_read_tile"));
                     VSILFILE *fp = VSIFileFromMemBuffer(
                         osMemFileName.c_str(), pabyRawData, nBytes, FALSE);
                     VSIFCloseL(fp);
@@ -915,8 +899,8 @@ GByte *GDALGPKGMBTilesLikePseudoDataset::ReadTile(int nRow, int nCol,
             (m_eDT == GDT_Byte) ? 0 : sqlite3_column_int64(hStmt, 1);
         GByte *pabyRawData = static_cast<GByte *>(
             const_cast<void *>(sqlite3_column_blob(hStmt, 0)));
-        CPLString osMemFileName;
-        osMemFileName.Printf("/vsimem/gpkg_read_tile_%p", this);
+        const CPLString osMemFileName(
+            VSIMemGenerateHiddenFilename("gpkg_read_tile"));
         VSILFILE *fp = VSIFileFromMemBuffer(osMemFileName.c_str(), pabyRawData,
                                             nBytes, FALSE);
         VSIFCloseL(fp);
@@ -1847,8 +1831,8 @@ CPLErr GDALGPKGMBTilesLikePseudoDataset::WriteTileInternal()
                  nRow, nCol, m_nZoomLevel);
     }
 
-    CPLString osMemFileName;
-    osMemFileName.Printf("/vsimem/gpkg_write_tile_%p", this);
+    const CPLString osMemFileName(
+        VSIMemGenerateHiddenFilename("gpkg_write_tile"));
     const char *pszDriverName = "PNG";
     bool bTileDriverSupports1Band = false;
     bool bTileDriverSupports2Bands = false;
@@ -2727,8 +2711,8 @@ GDALGPKGMBTilesLikePseudoDataset::FlushRemainingShiftedTiles(bool bPartialFlush)
                         GByte *pabyRawData =
                             const_cast<GByte *>(static_cast<const GByte *>(
                                 sqlite3_column_blob(hNewStmt, 0)));
-                        CPLString osMemFileName;
-                        osMemFileName.Printf("/vsimem/gpkg_read_tile_%p", this);
+                        const CPLString osMemFileName(
+                            VSIMemGenerateHiddenFilename("gpkg_read_tile"));
                         VSILFILE *fp = VSIFileFromMemBuffer(
                             osMemFileName.c_str(), pabyRawData, nBytes, FALSE);
                         VSIFCloseL(fp);
