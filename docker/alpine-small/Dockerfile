@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1
+
 ##
 # osgeo/gdal:alpine-small
 
@@ -11,16 +13,22 @@ FROM alpine:${ALPINE_VERSION} AS builder
 # Derived from osgeo/proj by Howard Butler <howard@hobu.co>
 LABEL maintainer="Even Rouault <even.rouault@spatialys.com>"
 
+ENV HOME="/root"
+
 # Setup build env for PROJ
 RUN apk add --no-cache wget curl unzip make libtool autoconf automake pkgconfig g++ sqlite sqlite-dev
 
 # For PROJ and GDAL
 RUN apk add --no-cache \
+    ccache \
     cmake ninja-build \
     linux-headers \
     curl-dev tiff-dev \
     zlib-dev zstd-dev lz4-dev libdeflate-dev libarchive-dev \
-    libjpeg-turbo-dev libpng-dev libwebp-dev expat-dev postgresql-dev openjpeg-dev
+    libjpeg-turbo-dev libpng-dev libwebp-dev expat-dev \
+    postgresql-dev \
+    rsync \
+    openjpeg-dev
 
 # Ninja is not in the default path on Alpine.
 ENV PATH=/usr/lib/ninja-build/bin:$PATH
@@ -43,8 +51,6 @@ RUN if test "${OPENJPEG_VERSION}" != ""; then ( \
     && rm -rf openjpeg-${OPENJPEG_VERSION} \
     ); fi
 
-RUN apk add --no-cache rsync ccache
-
 ARG PROJ_DATUMGRID_LATEST_LAST_MODIFIED
 RUN \
     mkdir -p /build_projgrids/usr/share/proj \
@@ -53,21 +59,24 @@ RUN \
     && rm -f *.zip
 
 ARG RSYNC_REMOTE
+ARG WITH_CCACHE
 
 # Build PROJ
 ARG PROJ_VERSION=master
-RUN mkdir proj \
+RUN --mount=type=cache,id=alpine-small-proj,target=$HOME/.cache \
+    mkdir proj \
     && curl -L -fsS https://github.com/OSGeo/PROJ/archive/${PROJ_VERSION}.tar.gz \
         | tar xz -C proj --strip-components=1 \
     && cd proj \
     && if test "${RSYNC_REMOTE}" != ""; then \
         echo "Downloading cache..."; \
-        mkdir -p "$HOME/.cache"; \
         rsync -ra ${RSYNC_REMOTE}/proj/$(uname -m)/ $HOME/.cache/; \
         echo "Finished"; \
+    fi \
+    && if [ -n "${WITH_CCACHE:-}" ]; then \
         export CC="ccache gcc"; \
         export CXX="ccache g++"; \
-        export PROJ_DB_CACHE_DIR="$HOME/.cache"; \
+        export PROJ_DB_CACHE_PARAM="-DPROJ_DB_CACHE_DIR=$HOME/.cache"; \
         ccache -M 100M; \
     fi \
     # IPO disabled since it crashes with gcc 13.2.1
@@ -78,15 +87,17 @@ RUN mkdir proj \
         -DCMAKE_INSTALL_PREFIX=/usr \
         -DENABLE_IPO=OFF \
         -DBUILD_TESTING=OFF \
+        $PROJ_DB_CACHE_PARAM \
     && ninja \
     && ninja install \
     && DESTDIR="/build_proj" ninja install \
     && if test "${RSYNC_REMOTE}" != ""; then \
-        ccache -s; \
         echo "Uploading cache..."; \
         rsync -ra --delete $HOME/.cache/ ${RSYNC_REMOTE}/proj/$(uname -m)/; \
         echo "Finished"; \
-        rm -rf $HOME/.cache; \
+    fi \
+    && if [ -n "${WITH_CCACHE:-}" ]; then \
+        ccache -s; \
         unset CC; \
         unset CXX; \
     fi \
@@ -101,7 +112,8 @@ ARG GDAL_RELEASE_DATE
 ARG GDAL_BUILD_IS_RELEASE
 ARG GDAL_REPOSITORY=OSGeo/gdal
 
-RUN if test "${GDAL_VERSION}" = "master"; then \
+RUN --mount=type=cache,id=alpine-small-gdal,target=$HOME/.cache \
+    if test "${GDAL_VERSION}" = "master"; then \
         export GDAL_VERSION=$(curl -Ls https://api.github.com/repos/${GDAL_REPOSITORY}/commits/HEAD -H "Accept: application/vnd.github.VERSION.sha"); \
         export GDAL_RELEASE_DATE=$(date "+%Y%m%d"); \
     fi \
@@ -110,9 +122,10 @@ RUN if test "${GDAL_VERSION}" = "master"; then \
     fi \
     && if test "${RSYNC_REMOTE}" != ""; then \
         echo "Downloading cache..."; \
-        mkdir -p "$HOME/.cache"; \
         rsync -ra ${RSYNC_REMOTE}/gdal/$(uname -m)/ $HOME/.cache/; \
         echo "Finished"; \
+    fi \
+    && if [ -n "${WITH_CCACHE:-}" ]; then \
         export CC="ccache gcc"; \
         export CXX="ccache g++"; \
         ccache -M 1G; \
@@ -134,11 +147,12 @@ RUN if test "${GDAL_VERSION}" = "master"; then \
     && DESTDIR="/build" ninja install \
     && cd .. \
     && if test "${RSYNC_REMOTE}" != ""; then \
-        ccache -s; \
         echo "Uploading cache..."; \
         rsync -ra --delete $HOME/.cache/ ${RSYNC_REMOTE}/gdal/$(uname -m)/; \
         echo "Finished"; \
-        rm -rf $HOME/.cache; \
+    fi \
+    && if [ -n "${WITH_CCACHE:-}" ]; then \
+        ccache -s; \
         unset CC; \
         unset CXX; \
     fi \

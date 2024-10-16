@@ -13,8 +13,8 @@ if [ -z "${GDAL_BUILD_IS_RELEASE:-}" ]; then
 fi
 
 mkdir gdal
-curl -L -fsS "https://github.com/${GDAL_REPOSITORY}/archive/${GDAL_VERSION}.tar.gz" \
-    | tar xz -C gdal --strip-components=1
+wget -q "https://github.com/${GDAL_REPOSITORY}/archive/${GDAL_VERSION}.tar.gz" \
+    -O - | tar xz -C gdal --strip-components=1
 
 
 
@@ -23,10 +23,10 @@ curl -L -fsS "https://github.com/${GDAL_REPOSITORY}/archive/${GDAL_VERSION}.tar.
 
     if test "${RSYNC_REMOTE:-}" != ""; then
         echo "Downloading cache..."
-        mkdir -p "$HOME/.cache/"
         rsync -ra "${RSYNC_REMOTE}/gdal/${GCC_ARCH}/" "$HOME/.cache/"
         echo "Finished"
-
+    fi
+    if [ -n "${WITH_CCACHE:-}" ]; then
         # Little trick to avoid issues with Python bindings
         printf "#!/bin/sh\nccache %s-linux-gnu-gcc \$*" "${GCC_ARCH}" > ccache_gcc.sh
         chmod +x ccache_gcc.sh
@@ -84,13 +84,12 @@ curl -L -fsS "https://github.com/${GDAL_REPOSITORY}/archive/${GDAL_VERSION}.tar.
     cd ..
 
     if [ -n "${RSYNC_REMOTE:-}" ]; then
-        ccache -s
-
         echo "Uploading cache..."
         rsync -ra --delete "$HOME/.cache/" "${RSYNC_REMOTE}/gdal/${GCC_ARCH}/"
         echo "Finished"
-
-        rm -rf "$HOME/.cache"
+    fi
+    if [ -n "${WITH_CCACHE:-}" ]; then
+        ccache -s
         unset CC
         unset CXX
     fi
