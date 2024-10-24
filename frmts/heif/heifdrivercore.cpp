@@ -21,7 +21,7 @@ static const GByte FTYP_4CC[] = {'f', 't', 'y', 'p'};
 static const GByte supportedBrands[][4]{
     {'a', 'v', 'i', 'f'}, {'h', 'e', 'i', 'c'}, {'h', 'e', 'i', 'x'},
     {'j', '2', 'k', 'i'}, {'j', 'p', 'e', 'g'}, {'m', 'i', 'a', 'f'},
-    {'m', 'i', 'f', '1'}, {'m', 'i', 'f', '2'}};
+    {'m', 'i', 'f', '1'}, {'m', 'i', 'f', '2'}, {'v', 'v', 'i', 'c'}};
 
 int HEIFDriverIdentifySimplified(GDALOpenInfo *poOpenInfo)
 {
@@ -86,8 +86,8 @@ void HEIFDriverSetCommonMetadata(GDALDriver *poDriver)
 
     poDriver->pfnIdentify = HEIFDriverIdentifySimplified;
     poDriver->SetMetadataItem(GDAL_DCAP_OPEN, "YES");
-#ifdef LIBHEIF_SUPPORTS_TILES
-    poDriver->SetMetadataItem("HEIF_SUPPORTS_TILES", "YES");
+#ifdef HAS_CUSTOM_FILE_WRITER
+    poDriver->SetMetadataItem(GDAL_DCAP_CREATECOPY, "YES");
 #endif
 }
 
