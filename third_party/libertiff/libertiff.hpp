@@ -405,6 +405,14 @@ constexpr TagCodeType GeoTIFFPixelScale = 33550;
 constexpr TagCodeType GeoTIFFTiePoints = 33922;
 constexpr TagCodeType GeoTIFFGeoKeyDirectory = 34735;
 constexpr TagCodeType GeoTIFFAsciiParams = 34737;
+
+// GDAL tags
+constexpr TagCodeType GDAL_METADATA = 42112;
+constexpr TagCodeType GDAL_NODATA = 42113;
+
+// GeoTIFF related
+constexpr TagCodeType RPCCoefficients = 50844;
+
 }  // namespace TagCode
 
 #define LIBERTIFF_CASE_TAGCODE_STR(x)                                          \
@@ -438,6 +446,9 @@ inline const char *tagCodeName(TagCodeType tagCode)
         LIBERTIFF_CASE_TAGCODE_STR(GeoTIFFTiePoints);
         LIBERTIFF_CASE_TAGCODE_STR(GeoTIFFGeoKeyDirectory);
         LIBERTIFF_CASE_TAGCODE_STR(GeoTIFFAsciiParams);
+        LIBERTIFF_CASE_TAGCODE_STR(GDAL_METADATA);
+        LIBERTIFF_CASE_TAGCODE_STR(GDAL_NODATA);
+        LIBERTIFF_CASE_TAGCODE_STR(RPCCoefficients);
         default:
             break;
     }
@@ -1068,6 +1079,7 @@ class Image
             {
                 if LIBERTIFF_CONSTEXPR (sizeof(tag.count) > sizeof(size_t))
                 {
+                    // coverity[result_independent_of_operands]
                     if (tag.count > std::numeric_limits<size_t>::max())
                     {
                         ok = false;
@@ -1142,6 +1154,7 @@ class Image
         if (!ok)
             return nullptr;
         image->m_tags.reserve(tagCount);
+        // coverity[tainted_data]
         for (int i = 0; i < tagCount; ++i)
         {
             TagEntry entry;
@@ -1332,18 +1345,29 @@ class Image
     /** Final tag processing */
     void finalTagProcessing()
     {
-        if ((m_strileOffsetsTag = tag(TagCode::TileOffsets)) &&
-            (m_strileByteCountsTag = tag(TagCode::TileByteCounts)) &&
-            m_strileOffsetsTag->count == m_strileByteCountsTag->count)
+        m_strileOffsetsTag = tag(TagCode::TileOffsets);
+        if (m_strileOffsetsTag)
         {
-            m_isTiled = true;
-            m_strileCount = m_strileOffsetsTag->count;
+            m_strileByteCountsTag = tag(TagCode::TileByteCounts);
+            if (m_strileByteCountsTag &&
+                m_strileOffsetsTag->count == m_strileByteCountsTag->count)
+            {
+                m_isTiled = true;
+                m_strileCount = m_strileOffsetsTag->count;
+            }
         }
-        else if ((m_strileOffsetsTag = tag(TagCode::StripOffsets)) &&
-                 (m_strileByteCountsTag = tag(TagCode::StripByteCounts)) &&
-                 m_strileOffsetsTag->count == m_strileByteCountsTag->count)
+        else
         {
-            m_strileCount = m_strileOffsetsTag->count;
+            m_strileOffsetsTag = tag(TagCode::StripOffsets);
+            if (m_strileOffsetsTag)
+            {
+                m_strileByteCountsTag = tag(TagCode::StripByteCounts);
+                if (m_strileByteCountsTag &&
+                    m_strileOffsetsTag->count == m_strileByteCountsTag->count)
+                {
+                    m_strileCount = m_strileOffsetsTag->count;
+                }
+            }
         }
     }
 
@@ -1449,7 +1473,7 @@ class Image
         }
         else if (dataTypeSize == sizeof(uint16_t))
         {
-            // Read up to 2 (classic) or 4 (BigTIFF) inline bytes
+            // Read up to 2 (classic) or 4 (BigTIFF) inline 16-bit values
             for (uint32_t idx = 0; idx < entry.count; ++idx)
             {
                 entry.uint16Values[idx] =
@@ -1463,7 +1487,7 @@ class Image
         }
         else if (dataTypeSize == sizeof(uint32_t))
         {
-            // Read up to 1 (classic) or 2 (BigTIFF) inline bytes
+            // Read up to 1 (classic) or 2 (BigTIFF) inline 32-bit values
             entry.uint32Values[0] = m_rc->read<uint32_t>(offset, ok);
             if (entry.count == 1 && entry.type == TagType::Long)
             {
