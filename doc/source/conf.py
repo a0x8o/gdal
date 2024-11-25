@@ -68,6 +68,7 @@ extensions = [
     "breathe",
     "configoptions",
     "driverproperties",
+    "cli_example",
     "source_file",
     "sphinx.ext.napoleon",
     "sphinxcontrib.jquery",
@@ -160,10 +161,9 @@ html_theme_options = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
-html_extra_path = ["../build/html_extra"]
 
-html_js_files = ["announcement.js"]
-html_css_files = ["announcement.css"]
+# For generated content and robots.txt
+html_extra_path = ["../build/html_extra", "extra_path"]
 
 # If true, links to the reST sources are added to the pages.
 html_show_sourcelink = False
