@@ -1,7 +1,6 @@
 #!/usr/bin/env pytest
 # -*- coding: utf-8 -*-
 ###############################################################################
-# $Id$
 #
 # Project:  GDAL/OGR Test Suite
 # Purpose:  GeoJSON driver test suite.
@@ -4202,6 +4201,131 @@ def test_ogr_geojson_read_from_http():
     try:
         with webserver.install_http_handler(handler):
             ds = ogr.Open("http://localhost:%d/foo" % webserver_port)
+        assert ds is not None
+        lyr = ds.GetLayer(0)
+        assert lyr.GetFeatureCount() == 1
+    finally:
+        webserver.server_stop(webserver_process, webserver_port)
+
+
+###############################################################################
+# Test reading http:// resource with GDAL_HTTP_HEADERS config option set
+
+
+@pytest.mark.require_curl()
+def test_ogr_geojson_read_from_http_with_GDAL_HTTP_HEADERS():
+
+    import webserver
+
+    (webserver_process, webserver_port) = webserver.launch(
+        handler=webserver.DispatcherHttpHandler
+    )
+    if webserver_port == 0:
+        pytest.skip()
+
+    response = """{"type": "FeatureCollection", "features":[
+    {"type": "Feature", "geometry": {"type":"Point","coordinates":[1,2]}, "properties": null}]}"""
+
+    handler = webserver.SequentialHandler()
+    handler.add(
+        "GET",
+        "/foo",
+        200,
+        {},
+        response,
+        expected_headers={
+            "foo": "bar",
+            "bar": "baz",
+            "Accept": "text/plain, application/json",
+        },
+    )
+
+    try:
+        with webserver.install_http_handler(handler):
+            with gdaltest.config_option("GDAL_HTTP_HEADERS", "foo: bar\r\nbar: baz"):
+                ds = ogr.Open("http://localhost:%d/foo" % webserver_port)
+        assert ds is not None
+        lyr = ds.GetLayer(0)
+        assert lyr.GetFeatureCount() == 1
+    finally:
+        webserver.server_stop(webserver_process, webserver_port)
+
+
+###############################################################################
+# Test reading http:// resource with GDAL_HTTP_HEADERS config option set
+
+
+@pytest.mark.require_curl()
+def test_ogr_geojson_read_from_http_with_GDAL_HTTP_HEADERS_Accept():
+
+    import webserver
+
+    (webserver_process, webserver_port) = webserver.launch(
+        handler=webserver.DispatcherHttpHandler
+    )
+    if webserver_port == 0:
+        pytest.skip()
+
+    response = """{"type": "FeatureCollection", "features":[
+    {"type": "Feature", "geometry": {"type":"Point","coordinates":[1,2]}, "properties": null}]}"""
+
+    handler = webserver.SequentialHandler()
+    handler.add(
+        "GET",
+        "/foo",
+        200,
+        {},
+        response,
+        expected_headers={"Accept": "application/json, foo/bar"},
+    )
+
+    try:
+        with webserver.install_http_handler(handler):
+            with gdaltest.config_option(
+                "GDAL_HTTP_HEADERS", "Accept: application/json, foo/bar"
+            ):
+                ds = ogr.Open("http://localhost:%d/foo" % webserver_port)
+        assert ds is not None
+        lyr = ds.GetLayer(0)
+        assert lyr.GetFeatureCount() == 1
+    finally:
+        webserver.server_stop(webserver_process, webserver_port)
+
+
+###############################################################################
+# Test reading http:// resource with GDAL_HTTP_HEADERS config option set
+
+
+@pytest.mark.require_curl()
+def test_ogr_geojson_read_from_http_with_GDAL_HTTP_HEADERS_overriding_Accept():
+
+    import webserver
+
+    (webserver_process, webserver_port) = webserver.launch(
+        handler=webserver.DispatcherHttpHandler
+    )
+    if webserver_port == 0:
+        pytest.skip()
+
+    response = """{"type": "FeatureCollection", "features":[
+    {"type": "Feature", "geometry": {"type":"Point","coordinates":[1,2]}, "properties": null}]}"""
+
+    handler = webserver.SequentialHandler()
+    handler.add(
+        "GET",
+        "/foo",
+        200,
+        {},
+        response,
+        expected_headers={"foo": "bar", "bar": "baz", "Accept": "application/json"},
+    )
+
+    try:
+        with webserver.install_http_handler(handler):
+            with gdaltest.config_option(
+                "GDAL_HTTP_HEADERS", "foo: bar,bar: baz,Accept: application/json"
+            ):
+                ds = ogr.Open("http://localhost:%d/foo" % webserver_port)
         assert ds is not None
         lyr = ds.GetLayer(0)
         assert lyr.GetFeatureCount() == 1
