@@ -48,6 +48,16 @@ class OGRGeoJSONLayer final : public OGRMemLayer
     static const char *const DefaultName;
     static const OGRwkbGeometryType DefaultGeometryType;
 
+    static const char *GetValidLayerName(const char *pszName)
+    {
+        if (pszName == nullptr || pszName[0] == 0)
+        {
+            // Can happen for example if reading from /vsistdin/
+            pszName = OGRGeoJSONLayer::DefaultName;
+        }
+        return pszName;
+    }
+
     OGRGeoJSONLayer(const char *pszName, OGRSpatialReference *poSRS,
                     OGRwkbGeometryType eGType, OGRGeoJSONDataSource *poDS,
                     OGRGeoJSONReader *poReader);
@@ -290,6 +300,9 @@ class OGRGeoJSONDataSource final : public GDALDataset
     virtual CPLErr FlushCache(bool bAtClosing) override;
 
     CPLErr Close() override;
+
+    // Analyze the OGR_SCHEMA open options and apply changes to the feature definition, return false in case of a critical error
+    bool DealWithOgrSchemaOpenOption(const GDALOpenInfo *poOpenInfo);
 
     static const size_t SPACE_FOR_BBOX = 130;
 

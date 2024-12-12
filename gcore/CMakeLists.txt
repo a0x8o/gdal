@@ -2,6 +2,8 @@
 add_library(
   gcore OBJECT
   gdal_adbc.cpp
+  gdalalgorithm.cpp
+  gdalalgorithmregistry.cpp
   gdalopeninfo.cpp
   gdaldriver.cpp
   gdaldrivermanager.cpp
@@ -17,6 +19,7 @@ add_library(
   gdaljp2box.cpp
   gdalmultidomainmetadata.cpp
   gdal_rat.cpp
+  gdal_rat_vat_dbf.cpp
   gdalpamproxydb.cpp
   gdalallvalidmaskband.cpp
   gdalnodatamaskband.cpp
@@ -185,12 +188,14 @@ endif ()
 if (GDAL_USE_GEOS)
   target_compile_definitions(gcore PRIVATE -DHAVE_GEOS)
   gdal_target_link_libraries(gcore PRIVATE ${GEOS_TARGET})
+  target_compile_definitions(gcore_gdal_misc PRIVATE -DHAVE_GEOS)
+  gdal_target_link_libraries(gcore_gdal_misc PRIVATE ${GEOS_TARGET})
 endif ()
 
 if (GDAL_USE_CURL)
   # Just for gdal_misc.cpp in fact
-  target_compile_definitions(gcore PRIVATE -DHAVE_CURL)
-  gdal_target_link_libraries(gcore PRIVATE CURL::libcurl)
+  target_compile_definitions(gcore_gdal_misc PRIVATE -DHAVE_CURL)
+  gdal_target_link_libraries(gcore_gdal_misc PRIVATE CURL::libcurl)
 endif ()
 
 # Windows(Mingw/MSVC) link libraries
@@ -206,6 +211,7 @@ target_public_header(
   HEADERS
   ${CMAKE_CURRENT_BINARY_DIR}/gdal_version_full/gdal_version.h
   gdal.h
+  gdalalgorithm.h
   gdaljp2metadata.h
   gdaljp2abstractdataset.h
   gdal_frmts.h
