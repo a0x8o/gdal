@@ -11954,3 +11954,37 @@ def test_tiff_write_preserve_ALPHA_PREMULTIPLIED_on_copy(tmp_path):
                 out_ds.GetRasterBand(4).GetMetadataItem("ALPHA", "IMAGE_STRUCTURE")
                 == "PREMULTIPLIED"
             )
+
+
+###############################################################################
+#
+
+
+@pytest.mark.skipif(
+    not check_libtiff_internal_or_at_least(4, 7, 1),
+    reason="libtiff internal or >= 4.7.1 needed",
+)
+def test_tiff_write_float32_predictor_3_endianness(tmp_path):
+
+    out_filename = str(tmp_path / "out.tif")
+    gdal.GetDriverByName("GTiff").CreateCopy(
+        out_filename,
+        gdal.Open("data/float32.tif"),
+        options=["COMPRESS=LZW", "ENDIANNESS=INVERTED", "PREDICTOR=3"],
+    )
+    with gdal.Open(out_filename) as ds:
+        assert ds.GetRasterBand(1).Checksum() == 4672
+
+
+###############################################################################
+#
+
+
+def test_tiff_write_warn_ignore_predictor_option(tmp_vsimem):
+    out_filename = str(tmp_vsimem / "out.tif")
+    gdal.ErrorReset()
+    with gdal.quiet_errors():
+        gdal.GetDriverByName("GTiff").Create(
+            out_filename, 1, 1, options=["PREDICTOR=2"]
+        )
+    assert "PREDICTOR option is ignored" in gdal.GetLastErrorMsg()

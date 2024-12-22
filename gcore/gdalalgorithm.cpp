@@ -700,6 +700,40 @@ GDALArgDatasetValue::GDALArgDatasetValue(GDALArgDatasetValue &&other)
 }
 
 /************************************************************************/
+/*              GDALInConstructionAlgorithmArg::SetIsCRSArg()           */
+/************************************************************************/
+
+GDALInConstructionAlgorithmArg &
+GDALInConstructionAlgorithmArg::SetIsCRSArg(bool noneAllowed)
+{
+    if (GetType() != GAAT_STRING)
+    {
+        CPLError(CE_Failure, CPLE_AppDefined,
+                 "SetIsCRSArg() can only be called on a String argument");
+        return *this;
+    }
+    return AddValidationAction(
+        [this, noneAllowed]()
+        {
+            const std::string &osVal =
+                static_cast<const GDALInConstructionAlgorithmArg *>(this)
+                    ->Get<std::string>();
+            if (!noneAllowed || (osVal != "none" && osVal != "null"))
+            {
+                OGRSpatialReference oSRS;
+                if (oSRS.SetFromUserInput(osVal.c_str()) != OGRERR_NONE)
+                {
+                    m_owner->ReportError(CE_Failure, CPLE_AppDefined,
+                                         "Invalid value for '%s' argument",
+                                         GetName().c_str());
+                    return false;
+                }
+            }
+            return true;
+        });
+}
+
+/************************************************************************/
 /*                     GDALAlgorithm::GDALAlgorithm()                  */
 /************************************************************************/
 
@@ -2086,6 +2120,39 @@ GDALAlgorithm::AddLayerCreationOptionsArg(std::vector<std::string> *pValue)
             .AddAlias("lco")
             .SetMetaVar("<KEY>=<VALUE>");
     arg.AddValidationAction([this, &arg]() { return ValidateKeyValue(arg); });
+    return arg;
+}
+
+/************************************************************************/
+/*                        GDALAlgorithm::AddBBOXArg()                   */
+/************************************************************************/
+
+/** Add bbox=xmin,ymin,xmax,ymax argument. */
+GDALInConstructionAlgorithmArg &
+GDALAlgorithm::AddBBOXArg(std::vector<double> *pValue, const char *helpMessage)
+{
+    auto &arg = AddArg("bbox", 0,
+                       helpMessage ? helpMessage
+                                   : _("Bounding box as xmin,ymin,xmax,ymax"),
+                       pValue)
+                    .SetRepeatedArgAllowed(false)
+                    .SetMinCount(4)
+                    .SetMaxCount(4)
+                    .SetDisplayHintAboutRepetition(false);
+    arg.AddValidationAction(
+        [&arg]()
+        {
+            const auto &val = arg.Get<std::vector<double>>();
+            CPLAssert(val.size() == 4);
+            if (!(val[0] <= val[2]) || !(val[1] <= val[3]))
+            {
+                CPLError(CE_Failure, CPLE_AppDefined,
+                         "Value of 'bbox' should be xmin,ymin,xmax,ymax with "
+                         "xmin <= xmax and ymin <= ymax");
+                return false;
+            }
+            return true;
+        });
     return arg;
 }
 
