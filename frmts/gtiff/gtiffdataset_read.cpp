@@ -43,6 +43,8 @@
 #include "tifvsi.h"
 #include "xtiffio.h"
 
+#include "tiff_common.h"
+
 /************************************************************************/
 /*                        GetJPEGOverviewCount()                        */
 /************************************************************************/
@@ -210,7 +212,9 @@ CPLErr GTiffDataset::ReadCompressedData(const char *pszFormat, int nXOff,
               m_nPhotometric != PHOTOMETRIC_SEPARATED)) ||
             (m_nCompression == COMPRESSION_WEBP &&
              EQUAL(aosTokens[0], "WEBP")) ||
-            (m_nCompression == COMPRESSION_JXL && EQUAL(aosTokens[0], "JXL")))
+            ((m_nCompression == COMPRESSION_JXL ||
+              m_nCompression == COMPRESSION_JXL_DNG_1_7) &&
+             EQUAL(aosTokens[0], "JXL")))
         {
             std::string osDetailedFormat = aosTokens[0];
 
@@ -987,6 +991,7 @@ bool GTiffDataset::IsMultiThreadedReadCompatible() const
             m_nCompression == COMPRESSION_ZSTD ||
             m_nCompression == COMPRESSION_LERC ||
             m_nCompression == COMPRESSION_JXL ||
+            m_nCompression == COMPRESSION_JXL_DNG_1_7 ||
             m_nCompression == COMPRESSION_WEBP ||
             m_nCompression == COMPRESSION_JPEG);
 }
@@ -4231,7 +4236,7 @@ void GTiffDataset::LookForProjectionFromXML()
         return;
 
     const std::string osXMLFilenameLowerCase =
-        CPLResetExtension(m_pszFilename, "xml");
+        CPLResetExtensionSafe(m_pszFilename, "xml");
 
     CPLString osXMLFilename;
     if (papszSiblingFiles &&
@@ -4265,7 +4270,7 @@ void GTiffDataset::LookForProjectionFromXML()
         else if (VSIIsCaseSensitiveFS(osXMLFilenameLowerCase.c_str()))
         {
             const std::string osXMLFilenameUpperCase =
-                CPLResetExtension(m_pszFilename, "XML");
+                CPLResetExtensionSafe(m_pszFilename, "XML");
             bGotXML = VSIStatExL(osXMLFilenameUpperCase.c_str(), &sStatBuf,
                                  VSI_STAT_EXISTS_FLAG) == 0;
             if (bGotXML)
@@ -5229,88 +5234,10 @@ CPLErr GTiffDataset::OpenOffset(TIFF *hTIFFIn, toff_t nDirOffsetIn,
     }
     else
     {
-        m_poColorTable = std::make_unique<GDALColorTable>();
-
         const int nColorCount = 1 << m_nBitsPerSample;
-
-        if (m_nColorTableMultiplier == 0)
-        {
-            // TIFF color maps are in the [0, 65535] range, so some remapping must
-            // be done to get values in the [0, 255] range, but it is not clear
-            // how to do that exactly. Since GDAL 2.3.0 we have standardized on
-            // using a 257 multiplication factor (https://github.com/OSGeo/gdal/commit/eeec5b62e385d53e7f2edaba7b73c7c74bc2af39)
-            // but other software uses 256 (cf https://github.com/OSGeo/gdal/issues/10310)
-            // Do a first pass to check if all values are multiples of 256 or 257.
-            bool bFoundNonZeroEntry = false;
-            bool bAllValuesMultipleOf256 = true;
-            bool bAllValuesMultipleOf257 = true;
-            unsigned short nMaxColor = 0;
-            for (int iColor = 0; iColor < nColorCount; ++iColor)
-            {
-                if (panRed[iColor] > 0 || panGreen[iColor] > 0 ||
-                    panBlue[iColor] > 0)
-                {
-                    bFoundNonZeroEntry = true;
-                }
-                if ((panRed[iColor] % 256) != 0 ||
-                    (panGreen[iColor] % 256) != 0 ||
-                    (panBlue[iColor] % 256) != 0)
-                {
-                    bAllValuesMultipleOf256 = false;
-                }
-                if ((panRed[iColor] % 257) != 0 ||
-                    (panGreen[iColor] % 257) != 0 ||
-                    (panBlue[iColor] % 257) != 0)
-                {
-                    bAllValuesMultipleOf257 = false;
-                }
-
-                nMaxColor = std::max(nMaxColor, panRed[iColor]);
-                nMaxColor = std::max(nMaxColor, panGreen[iColor]);
-                nMaxColor = std::max(nMaxColor, panBlue[iColor]);
-            }
-
-            if (nMaxColor > 0 && nMaxColor < 256)
-            {
-                // Bug 1384 - Some TIFF files are generated with color map entry
-                // values in range 0-255 instead of 0-65535 - try to handle these
-                // gracefully.
-                m_nColorTableMultiplier = 1;
-                CPLDebug("GTiff",
-                         "TIFF ColorTable seems to be improperly scaled with "
-                         "values all in [0,255] range, fixing up.");
-            }
-            else
-            {
-                if (!bAllValuesMultipleOf256 && !bAllValuesMultipleOf257)
-                {
-                    CPLDebug("GTiff",
-                             "The color map contains entries which are not "
-                             "multiple of 256 or 257, so we don't know for "
-                             "sure how to remap them to [0, 255]. Default to "
-                             "using a 257 multiplication factor");
-                }
-                m_nColorTableMultiplier =
-                    (bFoundNonZeroEntry && bAllValuesMultipleOf256)
-                        ? 256
-                        : DEFAULT_COLOR_TABLE_MULTIPLIER_257;
-            }
-        }
-        CPLAssert(m_nColorTableMultiplier > 0);
-        CPLAssert(m_nColorTableMultiplier <= 257);
-        for (int iColor = nColorCount - 1; iColor >= 0; iColor--)
-        {
-            const GDALColorEntry oEntry = {
-                static_cast<short>(panRed[iColor] / m_nColorTableMultiplier),
-                static_cast<short>(panGreen[iColor] / m_nColorTableMultiplier),
-                static_cast<short>(panBlue[iColor] / m_nColorTableMultiplier),
-                static_cast<short>(
-                    m_bNoDataSet && static_cast<int>(m_dfNoDataValue) == iColor
-                        ? 0
-                        : 255)};
-
-            m_poColorTable->SetColorEntry(iColor, &oEntry);
-        }
+        m_poColorTable = gdal::tiff_common::TIFFColorMapTagToColorTable(
+            panRed, panGreen, panBlue, nColorCount, m_nColorTableMultiplier,
+            DEFAULT_COLOR_TABLE_MULTIPLIER_257, m_bNoDataSet, m_dfNoDataValue);
     }
 
     /* -------------------------------------------------------------------- */
@@ -5576,7 +5503,8 @@ CPLErr GTiffDataset::OpenOffset(TIFF *hTIFFIn, toff_t nDirOffsetIn,
                     m_dfMaxZErrorOverview = CPLAtof(pszValue);
                 }
 #if HAVE_JXL
-                else if (m_nCompression == COMPRESSION_JXL &&
+                else if ((m_nCompression == COMPRESSION_JXL ||
+                          m_nCompression == COMPRESSION_JXL_DNG_1_7) &&
                          EQUAL(pszKey, "COMPRESSION_REVERSIBILITY"))
                 {
                     if (EQUAL(pszValue, "LOSSLESS"))
@@ -5584,7 +5512,8 @@ CPLErr GTiffDataset::OpenOffset(TIFF *hTIFFIn, toff_t nDirOffsetIn,
                     else if (EQUAL(pszValue, "LOSSY"))
                         m_bJXLLossless = false;
                 }
-                else if (m_nCompression == COMPRESSION_JXL &&
+                else if ((m_nCompression == COMPRESSION_JXL ||
+                          m_nCompression == COMPRESSION_JXL_DNG_1_7) &&
                          EQUAL(pszKey, "JXL_DISTANCE"))
                 {
                     const double dfVal = CPLAtof(pszValue);
@@ -5597,7 +5526,8 @@ CPLErr GTiffDataset::OpenOffset(TIFF *hTIFFIn, toff_t nDirOffsetIn,
                         m_fJXLDistance = static_cast<float>(dfVal);
                     }
                 }
-                else if (m_nCompression == COMPRESSION_JXL &&
+                else if ((m_nCompression == COMPRESSION_JXL ||
+                          m_nCompression == COMPRESSION_JXL_DNG_1_7) &&
                          EQUAL(pszKey, "JXL_ALPHA_DISTANCE"))
                 {
                     const double dfVal = CPLAtof(pszValue);
@@ -5609,7 +5539,8 @@ CPLErr GTiffDataset::OpenOffset(TIFF *hTIFFIn, toff_t nDirOffsetIn,
                         m_fJXLAlphaDistance = static_cast<float>(dfVal);
                     }
                 }
-                else if (m_nCompression == COMPRESSION_JXL &&
+                else if ((m_nCompression == COMPRESSION_JXL ||
+                          m_nCompression == COMPRESSION_JXL_DNG_1_7) &&
                          EQUAL(pszKey, "JXL_EFFORT"))
                 {
                     const int nEffort = atoi(pszValue);
@@ -5786,7 +5717,8 @@ CPLErr GTiffDataset::OpenOffset(TIFF *hTIFFIn, toff_t nDirOffsetIn,
             }
         }
 #ifdef HAVE_JXL
-        else if (m_nCompression == COMPRESSION_JXL)
+        else if (m_nCompression == COMPRESSION_JXL ||
+                 m_nCompression == COMPRESSION_JXL_DNG_1_7)
         {
             const char *pszReversibility =
                 GetMetadataItem("COMPRESSION_REVERSIBILITY", "IMAGE_STRUCTURE");
@@ -5838,12 +5770,12 @@ CSLConstList GTiffDataset::GetSiblingFiles()
     m_bHasGotSiblingFiles = true;
     const int nMaxFiles =
         atoi(CPLGetConfigOption("GDAL_READDIR_LIMIT_ON_OPEN", "1000"));
-    CPLStringList aosSiblingFiles(
-        VSIReadDirEx(CPLGetDirname(m_pszFilename), nMaxFiles));
+    const std::string osDirname = CPLGetDirnameSafe(m_pszFilename);
+    CPLStringList aosSiblingFiles(VSIReadDirEx(osDirname.c_str(), nMaxFiles));
     if (nMaxFiles > 0 && aosSiblingFiles.size() > nMaxFiles)
     {
         CPLDebug("GTiff", "GDAL_READDIR_LIMIT_ON_OPEN reached on %s",
-                 CPLGetDirname(m_pszFilename));
+                 osDirname.c_str());
         aosSiblingFiles.clear();
     }
     oOvManager.TransferSiblingFiles(aosSiblingFiles.StealList());
@@ -6381,7 +6313,8 @@ const char *GTiffDataset::GetMetadataItem(const char *pszName,
     if (pszDomain != nullptr && EQUAL(pszDomain, "IMAGE_STRUCTURE"))
     {
         if ((m_nCompression == COMPRESSION_WEBP ||
-             m_nCompression == COMPRESSION_JXL) &&
+             m_nCompression == COMPRESSION_JXL ||
+             m_nCompression == COMPRESSION_JXL_DNG_1_7) &&
             EQUAL(pszName, "COMPRESSION_REVERSIBILITY") &&
             m_oGTiffMDMD.GetMetadataItem("COMPRESSION_REVERSIBILITY",
                                          "IMAGE_STRUCTURE") == nullptr)
@@ -6653,7 +6586,7 @@ void GTiffDataset::LoadMetadata()
         return;
     m_bIMDRPCMetadataLoaded = true;
 
-    if (EQUAL(CPLGetExtension(GetDescription()), "ovr"))
+    if (EQUAL(CPLGetExtensionSafe(GetDescription()).c_str(), "ovr"))
     {
         // Do not attempt to retrieve metadata files on .tif.ovr files.
         // For example the Pleiades metadata reader might wrongly associate a

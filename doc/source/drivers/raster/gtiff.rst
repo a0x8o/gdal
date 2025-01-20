@@ -25,6 +25,9 @@ file, such as YCbCr color model files, are automatically translated into
 RGBA (red, green, blue, alpha) form, and treated as four eight bit
 bands.
 
+For an alternative which offers thread-safe read-only capabilities, consult
+:ref:`raster.libertiff`.
+
 Driver capabilities
 -------------------
 
@@ -178,7 +181,7 @@ metadata :
 -  TIFFTAG_RESOLUTIONUNIT
 -  TIFFTAG_MINSAMPLEVALUE (read only)
 -  TIFFTAG_MAXSAMPLEVALUE (read only)
--  `GEO_METADATA <https://www.awaresystems.be/imaging/tiff/tifftags/geo_metadata.html>`__:
+-  `GEO_METADATA <https://portal.dgiwg.org/files/70843>`__:
    This tag may be used for embedding XML-encoded instance documents
    prepared using 19139-based schema (GeoTIFF DGIWG) (GDAL >= 2.3)
 -  `TIFF_RSID <https://www.awaresystems.be/imaging/tiff/tifftags/tiff_rsid.html>`__:
