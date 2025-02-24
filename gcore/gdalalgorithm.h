@@ -423,7 +423,7 @@ class CPL_DLL GDALArgDatasetValue final
     /** Set dataset name */
     void Set(const std::string &name);
 
-    /** Transfer dataset to this instance (does not affect is reference
+    /** Transfer dataset to this instance (does not affect its reference
      * counter). */
     void Set(std::unique_ptr<GDALDataset> poDS);
 
@@ -1447,6 +1447,8 @@ class CPL_DLL GDALAlgorithmArg /* non-final */
         return RunAllActions();
     }
 
+    bool ProcessString(std::string &value) const;
+
     bool RunAllActions();
     void RunActions();
     bool RunValidationActions();
@@ -2150,7 +2152,8 @@ class CPL_DLL GDALAlgorithmRegistry
     GDALInConstructionAlgorithmArg &AddOutputStringArg(std::string *pValue);
 
     /** Add output format argument. */
-    GDALInConstructionAlgorithmArg &AddOutputFormatArg(std::string *pValue);
+    GDALInConstructionAlgorithmArg &
+    AddOutputFormatArg(std::string *pValue, bool bStreamAllowed = false);
 
     /** Add creation option(s) argument. */
     GDALInConstructionAlgorithmArg &
@@ -2232,7 +2235,7 @@ class CPL_DLL GDALAlgorithmRegistry
                          std::vector<double>, std::vector<GDALArgDatasetValue>>>
             &inConstructionValues);
 
-    bool ValidateFormat(const GDALAlgorithmArg &arg) const;
+    bool ValidateFormat(const GDALAlgorithmArg &arg, bool bStreamAllowed) const;
 
     virtual bool RunImpl(GDALProgressFunc pfnProgress, void *pProgressData) = 0;
 

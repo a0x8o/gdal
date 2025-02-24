@@ -42,8 +42,10 @@ _gdal_data_type_to_array_type = {
     gdal.GDT_UInt32: "I",
     gdal.GDT_Int64: "q",
     gdal.GDT_UInt64: "Q",
+    gdal.GDT_Float16: "e",
     gdal.GDT_Float32: "f",
     gdal.GDT_Float64: "d",
+    gdal.GDT_CFloat16: "e",
     gdal.GDT_CFloat32: "f",
     gdal.GDT_CFloat64: "d",
 }
@@ -87,6 +89,13 @@ _gdal_data_type_to_array_type = {
             (1 << 64) - 1,
         ],  # not really legit to have the fill_value as a str, but libjson-c can't support numeric values in int64::max(), uint64::max() range.
         [">u8", gdal.GDT_UInt64, None, None],
+        # We would like to test these, but SWIG does not support float16 (yet?)
+        # ["<f2", gdal.GDT_Float16, None, None],
+        # [">f2", gdal.GDT_Float16, None, None],
+        # ["<f2", gdal.GDT_Float16, 1.5, 1.5],
+        # ["<f2", gdal.GDT_Float16, "NaN", float("nan")],
+        # ["<f2", gdal.GDT_Float16, "Infinity", float("infinity")],
+        # ["<f2", gdal.GDT_Float16, "-Infinity", float("-infinity")],
         ["<f4", gdal.GDT_Float32, None, None],
         [">f4", gdal.GDT_Float32, None, None],
         ["<f4", gdal.GDT_Float32, 1.5, 1.5],
@@ -98,6 +107,9 @@ _gdal_data_type_to_array_type = {
         ["<f8", gdal.GDT_Float64, "NaN", float("nan")],
         ["<f8", gdal.GDT_Float64, "Infinity", float("infinity")],
         ["<f8", gdal.GDT_Float64, "-Infinity", float("-infinity")],
+        # We would like to test these, but SWIG does not support complex32 (yet?)
+        # ["<c4", gdal.GDT_CFloat16, None, None],
+        # [">c4", gdal.GDT_CFloat16, None, None],
         ["<c8", gdal.GDT_CFloat32, None, None],
         [">c8", gdal.GDT_CFloat32, None, None],
         ["<c16", gdal.GDT_CFloat64, None, None],
@@ -125,7 +137,7 @@ def test_zarr_basic(
     try:
         gdal.Mkdir("/vsimem/test.zarr", 0)
         gdal.FileFromMemBuffer("/vsimem/test.zarr/.zarray", json.dumps(j))
-        if gdaltype not in (gdal.GDT_CFloat32, gdal.GDT_CFloat64):
+        if gdaltype not in (gdal.GDT_CFloat16, gdal.GDT_CFloat32, gdal.GDT_CFloat64):
             tile_0_0_data = struct.pack(dtype[0] + (structtype * 6), 1, 2, 3, 5, 6, 7)
             tile_0_1_data = struct.pack(dtype[0] + (structtype * 6), 4, 0, 0, 8, 0, 0)
         else:
@@ -167,7 +179,7 @@ def test_zarr_basic(
         structtype_read = structtype
 
         # Read block 0,0
-        if gdaltype not in (gdal.GDT_CFloat32, gdal.GDT_CFloat64):
+        if gdaltype not in (gdal.GDT_CFloat16, gdal.GDT_CFloat32, gdal.GDT_CFloat64):
             assert ar[0:2, 0:3].Read(
                 buffer_datatype=gdal.ExtendedDataType.Create(gdal.GDT_Float64)
             ) == struct.pack("d" * 6, 1, 2, 3, 5, 6, 7)
@@ -236,7 +248,7 @@ def test_zarr_basic(
             nv,
         )
 
-        if gdaltype not in (gdal.GDT_CFloat32, gdal.GDT_CFloat64):
+        if gdaltype not in (gdal.GDT_CFloat16, gdal.GDT_CFloat32, gdal.GDT_CFloat64):
             assert ar.Read() == array.array(
                 structtype_read,
                 [
@@ -970,11 +982,13 @@ def test_zarr_read_ARRAY_DIMENSIONS(use_zmetadata, filename):
     assert len(rg.GetDimensions()) == 2
 
 
+@pytest.mark.parametrize(
+    "ds_name", ["data/zarr/v3/test_deprecated_no_codecs.zr3", "data/zarr/v3/test.zr3"]
+)
 @pytest.mark.parametrize("use_get_names", [True, False])
-def test_zarr_read_v3(use_get_names):
+def test_zarr_read_v3(ds_name, use_get_names):
 
-    filename = "data/zarr/v3/test.zr3"
-    ds = gdal.OpenEx(filename, gdal.OF_MULTIDIM_RASTER)
+    ds = gdal.OpenEx(ds_name, gdal.OF_MULTIDIM_RASTER)
     assert ds is not None
     rg = ds.GetRootGroup()
     assert rg.GetName() == "/"
@@ -1687,6 +1701,7 @@ def getCompoundDT():
         [gdal.ExtendedDataType.Create(gdal.GDT_Int16), None],
         [gdal.ExtendedDataType.Create(gdal.GDT_UInt32), None],
         [gdal.ExtendedDataType.Create(gdal.GDT_Int32), None],
+        [gdal.ExtendedDataType.Create(gdal.GDT_Float16), None],
         [gdal.ExtendedDataType.Create(gdal.GDT_Float32), None],
         [gdal.ExtendedDataType.Create(gdal.GDT_Float64), None],
         [gdal.ExtendedDataType.Create(gdal.GDT_Float64), 1.5],
@@ -1695,6 +1710,8 @@ def getCompoundDT():
         [gdal.ExtendedDataType.Create(gdal.GDT_Float64), float("-infinity")],
         [gdal.ExtendedDataType.Create(gdal.GDT_CInt16), None],
         [gdal.ExtendedDataType.Create(gdal.GDT_CInt32), None],
+        # CFloat16 is not yet supported in Python
+        # [gdal.ExtendedDataType.Create(gdal.GDT_CFloat16), None],
         [gdal.ExtendedDataType.Create(gdal.GDT_CFloat32), None],
         [gdal.ExtendedDataType.Create(gdal.GDT_CFloat64), None],
         [gdal.ExtendedDataType.CreateString(10), None],
@@ -1915,21 +1932,28 @@ def test_zarr_create_array_compressor(compressor, options, expected_json):
 @pytest.mark.parametrize(
     "compressor,options,expected_json",
     [
-        ["NONE", [], None],
+        ["NONE", [], [{"name": "bytes", "configuration": {"endian": "little"}}]],
         [
             "gzip",
             [],
-            [{"name": "gzip", "configuration": {"level": 6}}],
+            [
+                {"name": "bytes", "configuration": {"endian": "little"}},
+                {"name": "gzip", "configuration": {"level": 6}},
+            ],
         ],
         [
             "gzip",
             ["GZIP_LEVEL=1"],
-            [{"name": "gzip", "configuration": {"level": 1}}],
+            [
+                {"name": "bytes", "configuration": {"endian": "little"}},
+                {"name": "gzip", "configuration": {"level": 1}},
+            ],
         ],
         [
             "blosc",
             [],
             [
+                {"name": "bytes", "configuration": {"endian": "little"}},
                 {
                     "name": "blosc",
                     "configuration": {
@@ -1939,7 +1963,7 @@ def test_zarr_create_array_compressor(compressor, options, expected_json):
                         "typesize": 1,
                         "blocksize": 0,
                     },
-                }
+                },
             ],
         ],
         [
@@ -1951,6 +1975,7 @@ def test_zarr_create_array_compressor(compressor, options, expected_json):
                 "BLOSC_BLOCKSIZE=2",
             ],
             [
+                {"name": "bytes", "configuration": {"endian": "little"}},
                 {
                     "name": "blosc",
                     "configuration": {
@@ -1959,7 +1984,23 @@ def test_zarr_create_array_compressor(compressor, options, expected_json):
                         "shuffle": "noshuffle",
                         "blocksize": 2,
                     },
-                }
+                },
+            ],
+        ],
+        [
+            "zstd",
+            ["ZSTD_LEVEL=20"],
+            [
+                {"name": "bytes", "configuration": {"endian": "little"}},
+                {"name": "zstd", "configuration": {"level": 20, "checksum": False}},
+            ],
+        ],
+        [
+            "zstd",
+            ["ZSTD_CHECKSUM=YES"],
+            [
+                {"name": "bytes", "configuration": {"endian": "little"}},
+                {"name": "zstd", "configuration": {"level": 13, "checksum": True}},
             ],
         ],
     ],
@@ -2017,28 +2058,28 @@ def test_zarr_create_array_compressor_v3(compressor, options, expected_json):
     [
         [
             ["@ENDIAN=little"],
-            [{"configuration": {"endian": "little"}, "name": "endian"}],
+            [{"configuration": {"endian": "little"}, "name": "bytes"}],
         ],
-        [["@ENDIAN=big"], [{"configuration": {"endian": "big"}, "name": "endian"}]],
+        [["@ENDIAN=big"], [{"configuration": {"endian": "big"}, "name": "bytes"}]],
         [
             ["@ENDIAN=little", "CHUNK_MEMORY_LAYOUT=F"],
             [
                 {"name": "transpose", "configuration": {"order": "F"}},
-                {"configuration": {"endian": "little"}, "name": "endian"},
+                {"configuration": {"endian": "little"}, "name": "bytes"},
             ],
         ],
         [
             ["@ENDIAN=big", "CHUNK_MEMORY_LAYOUT=F"],
             [
                 {"name": "transpose", "configuration": {"order": "F"}},
-                {"configuration": {"endian": "big"}, "name": "endian"},
+                {"configuration": {"endian": "big"}, "name": "bytes"},
             ],
         ],
         [
             ["@ENDIAN=big", "CHUNK_MEMORY_LAYOUT=F", "COMPRESS=GZIP"],
             [
                 {"name": "transpose", "configuration": {"order": "F"}},
-                {"name": "endian", "configuration": {"endian": "big"}},
+                {"name": "bytes", "configuration": {"endian": "big"}},
                 {"name": "gzip", "configuration": {"level": 6}},
             ],
         ],
@@ -2055,6 +2096,8 @@ def test_zarr_create_array_compressor_v3(compressor, options, expected_json):
         gdal.GDT_UInt32,
         gdal.GDT_Int64,
         gdal.GDT_UInt64,
+        # Float16 not yet supported by SWIG
+        # gdal.GDT_Float16,
         gdal.GDT_Float32,
         gdal.GDT_Float64,
     ],
@@ -2445,6 +2488,9 @@ def test_zarr_read_data_type_fallback_zarr_v3():
 @pytest.mark.parametrize(
     "data_type,fill_value,nodata",
     [
+        # JSON NoDataValues cannot be Float16
+        # ("float16", "0x3e00", 1.5),
+        # ("float16", str(bin(0x3E00)), 1.5),
         ("float32", "0x3fc00000", 1.5),
         ("float32", str(bin(0x3FC00000)), 1.5),
         ("float64", "0x3ff8000000000000", 1.5),
@@ -2473,6 +2519,8 @@ def test_zarr_read_fill_value_v3(data_type, fill_value, nodata):
 
 
 @gdaltest.enable_exceptions()
+# complex32 is not yet supported by Python
+# @pytest.mark.parametrize("data_type", ["complex128", "complex64", "complex32"])
 @pytest.mark.parametrize("data_type", ["complex128", "complex64"])
 @pytest.mark.parametrize(
     "fill_value,nodata",
@@ -2505,10 +2553,17 @@ def test_zarr_read_fill_value_complex_datatype_v3(data_type, fill_value, nodata)
         if data_type == "complex64" and fill_value[0] == 1234567890123:
             fill_value[0] = 123456
             nodata[0] = 123456
+        # float16 precision not sufficient to hold 1234567890123
+        if data_type == "complex32" and fill_value[0] == 1234567890123:
+            fill_value[0] = 1234
+            nodata[0] = 1234
 
         # convert float64 nan hexadecimal representation to float32
         if data_type == "complex64" and str(fill_value[0]) == "0x7ff8000000000000":
             fill_value[0] = "0x7fc00000"
+        # convert float64 nan hexadecimal representation to float16
+        if data_type == "complex32" and str(fill_value[0]) == "0x7ff8000000000000":
+            fill_value[0] = "0x7e00"
 
     j = {
         "zarr_format": 3,
@@ -2755,6 +2810,13 @@ def test_zarr_create_array_set_dimension_name():
         ["<u4", gdal.GDT_UInt32, 4000000000, 4000000000],
         ["<u8", gdal.GDT_Float64, 4000000000, 4000000000],
         [">u8", gdal.GDT_Float64, None, None],
+        # TODO: Test reading/writing GDT_Float16 via float32 Python data
+        # ["<f2", gdal.GDT_Float16, None, None],
+        # [">f2", gdal.GDT_Float16, None, None],
+        # ["<f2", gdal.GDT_Float16, 1.5, 1.5],
+        # ["<f2", gdal.GDT_Float16, "NaN", float("nan")],
+        # ["<f2", gdal.GDT_Float16, "Infinity", float("infinity")],
+        # ["<f2", gdal.GDT_Float16, "-Infinity", float("-infinity")],
         ["<f4", gdal.GDT_Float32, None, None],
         [">f4", gdal.GDT_Float32, None, None],
         ["<f4", gdal.GDT_Float32, 1.5, 1.5],
@@ -2766,6 +2828,9 @@ def test_zarr_create_array_set_dimension_name():
         ["<f8", gdal.GDT_Float64, "NaN", float("nan")],
         ["<f8", gdal.GDT_Float64, "Infinity", float("infinity")],
         ["<f8", gdal.GDT_Float64, "-Infinity", float("-infinity")],
+        # TODO: Test reading/writing GDT_CFloat16 via complex64 Python data
+        # ["<c4", gdal.GDT_CFloat16, None, None],
+        # [">c4", gdal.GDT_CFloat16, None, None],
         ["<c8", gdal.GDT_CFloat32, None, None],
         [">c8", gdal.GDT_CFloat32, None, None],
         ["<c16", gdal.GDT_CFloat64, None, None],
@@ -2804,7 +2869,7 @@ def test_zarr_write_array_content(
         gdal.VSIFWriteL(data, 1, len(data), f)
         gdal.VSIFCloseL(f)
 
-        if gdaltype not in (gdal.GDT_CFloat32, gdal.GDT_CFloat64):
+        if gdaltype not in (gdal.GDT_CFloat16, gdal.GDT_CFloat32, gdal.GDT_CFloat64):
             tile_0_0_data = struct.pack(dtype[0] + (structtype * 6), 1, 2, 3, 5, 6, 7)
             tile_0_1_data = struct.pack(dtype[0] + (structtype * 6), 4, 0, 0, 8, 0, 0)
         else:
@@ -2840,7 +2905,14 @@ def test_zarr_write_array_content(
             "d",
             [nv]
             * (
-                5 * 4 * (2 if gdaltype in (gdal.GDT_CFloat32, gdal.GDT_CFloat64) else 1)
+                5
+                * 4
+                * (
+                    2
+                    if gdaltype
+                    in (gdal.GDT_CFloat16, gdal.GDT_CFloat32, gdal.GDT_CFloat64)
+                    else 1
+                )
             ),
         )
         assert ar.Write(buf_nodata, buffer_datatype=dt) == gdal.CE_None
@@ -2858,7 +2930,14 @@ def test_zarr_write_array_content(
             "d",
             [0]
             * (
-                5 * 4 * (2 if gdaltype in (gdal.GDT_CFloat32, gdal.GDT_CFloat64) else 1)
+                5
+                * 4
+                * (
+                    2
+                    if gdaltype
+                    in (gdal.GDT_CFloat16, gdal.GDT_CFloat32, gdal.GDT_CFloat64)
+                    else 1
+                )
             ),
         )
         assert ar.Write(ones, buffer_datatype=dt) == gdal.CE_None
@@ -3074,6 +3153,8 @@ def test_zarr_update_array_string(srcfilename):
         gdal.GDT_UInt32,
         gdal.GDT_Int64,
         gdal.GDT_UInt64,
+        # SWIG does not support Float16
+        # gdal.GDT_Float16,
         gdal.GDT_Float32,
         gdal.GDT_Float64,
     ],
@@ -3125,6 +3206,7 @@ def test_zarr_create_fortran_order_3d_and_compression_and_dim_separator(
             assert "codecs" in j
             assert j["codecs"] == [
                 {"name": "transpose", "configuration": {"order": "F"}},
+                {"name": "bytes", "configuration": {"endian": "little"}},
                 {"name": "gzip", "configuration": {"level": 6}},
             ]
 
@@ -5457,7 +5539,7 @@ def test_zarr_driver_copy_files(format):
         assert gdal.Open(filename)
 
         assert gdal.VSIStatL(newfilename)
-        print(gdal.ReadDirRecursive(newfilename))
+        # print(gdal.ReadDirRecursive(newfilename))
         assert gdal.Open(newfilename)
 
     finally:

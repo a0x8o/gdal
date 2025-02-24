@@ -34,6 +34,7 @@ static int getAlignment(GDALDataType ntype)
             return 1;
         case GDT_Int16:
         case GDT_UInt16:
+        case GDT_Float16:
             return 2;
         case GDT_Int32:
         case GDT_UInt32:
@@ -44,6 +45,7 @@ static int getAlignment(GDALDataType ntype)
         case GDT_UInt64:
             return 8;
         case GDT_CInt16:
+        case GDT_CFloat16:
             return 2;
         case GDT_CInt32:
         case GDT_CFloat32:
@@ -184,8 +186,12 @@ static void readraster_releasebuffer(CPLErr eErr,
                   gdalconst.GDT_UInt16:   ("%su2" % byteorders[sys.byteorder]),
                   gdalconst.GDT_Int32:    ("%si4" % byteorders[sys.byteorder]),
                   gdalconst.GDT_UInt32:   ("%su4" % byteorders[sys.byteorder]),
+                  gdalconst.GDT_Int64:    ("%si8" % byteorders[sys.byteorder]),
+                  gdalconst.GDT_UInt64:   ("%su8" % byteorders[sys.byteorder]),
+                  gdalconst.GDT_Float16:  ("%sf2" % byteorders[sys.byteorder]),
                   gdalconst.GDT_Float32:  ("%sf4" % byteorders[sys.byteorder]),
                   gdalconst.GDT_Float64:  ("%sf8" % byteorders[sys.byteorder]),
+                  gdalconst.GDT_CFloat16: ("%sf2" % byteorders[sys.byteorder]),
                   gdalconst.GDT_CFloat32: ("%sf4" % byteorders[sys.byteorder]),
                   gdalconst.GDT_CFloat64: ("%sf8" % byteorders[sys.byteorder]),
                   gdalconst.GDT_Byte:     ("%st8" % byteorders[sys.byteorder]),
@@ -1845,6 +1851,10 @@ def GetMDArrayNames(self, options = []) -> "list[str]":
         buffer_stride.reverse()
       if not buffer_datatype:
         buffer_datatype = self.GetDataType()
+        if buffer_datatype.GetClass() == GEDTC_NUMERIC and buffer_datatype.GetNumericDataType() == gdalconst.GDT_Float16:
+          buffer_datatype = ExtendedDataType.Create(GDT_Float32)
+        elif buffer_datatype.GetClass() == GEDTC_NUMERIC and buffer_datatype.GetNumericDataType() == gdalconst.GDT_CFloat16:
+          buffer_datatype = ExtendedDataType.Create(GDT_CFloat32)
       return _gdal.MDArray_Read(self, array_start_idx, count, array_step, buffer_stride, buffer_datatype)
 
   def ReadAsArray(self,
@@ -1922,8 +1932,12 @@ def GetMDArrayNames(self, options = []) -> "list[str]":
              ('l', 4): GDT_Int32,
              ('q', 8): GDT_Int64,
              ('Q', 8): GDT_UInt64,
+             ('e', 2): GDT_Float16,
              ('f', 4): GDT_Float32,
-             ('d', 8): GDT_Float64
+             ('d', 8): GDT_Float64,
+             # ('E', 2): GDT_CFloat16,
+             ('F', 4): GDT_CFloat32,
+             ('D', 8): GDT_CFloat64
           }
           key = (buffer.typecode, buffer.itemsize)
           if key not in map_typecode_itemsize_to_gdal:
@@ -5237,6 +5251,92 @@ class VSIFile(BytesIO):
         return VSIFTellL(self._fp)
 %}
 
+
+/* -------------------------------------------------------------------- */
+/* GDALAlgorithmRegistryHS                                              */
+/* -------------------------------------------------------------------- */
+
+%extend GDALAlgorithmRegistryHS {
+%pythoncode %{
+
+    def __getitem__(self, key):
+        """Instantiate an algorithm
+
+           Shortcut for self.InstantiateAlg(key)
+
+           Example
+           -------
+           >>> gdal.GetGlobalAlgorithmRegistry()["raster"]
+        """
+
+        return self.InstantiateAlg(key)
+%}
+}
+
+/* -------------------------------------------------------------------- */
+/* GDALAlgorithmHS                                                      */
+/* -------------------------------------------------------------------- */
+
+%extend GDALAlgorithmHS {
+%pythoncode %{
+
+    def __getitem__(self, key):
+        """Get the value of an argument.
+
+           Shortcut for self.GetActualAlgorithm().GetArg(key).Get()
+           or self.InstantiateSubAlgorithm(key) for a non-leaf algorithm
+
+           Parameters
+           -----------
+           key: str
+               Name of a known argument of the algorithm
+           value:
+               Value of the argument
+
+           Example
+           -------
+           >>> alg["output-string"]
+           >>> alg["output"].GetName()
+           >>> alg["output"].GetDataset()
+           >>> gdal.GetGlobalAlgorithmRegistry()["raster"]["info"]
+        """
+
+        if self.HasSubAlgorithms():
+            return self.InstantiateSubAlgorithm(key)
+        else:
+            return self.GetActualAlgorithm().GetArg(key).Get()
+
+    def __setitem__(self, key, value):
+        """Set the value of an argment.
+
+           Shortcut for self.GetArg(key).Set(value)
+
+           Parameters
+           -----------
+           key: str
+               Name of a known argument of the algorithm
+           value:
+               Value of the argument
+
+           Examples
+           --------
+           >>> alg["bbox"] = [2, 49, 3, 50]
+           >>> alg["where"] = "country = 'France'"
+           >>> alg["input"] = "byte.tif"
+           >>> alg["input"] = gdal.Open("byte.tif")
+           >>> alg["target-aligned-pixels"] = True
+
+           >>> # Multiple input datasets
+           >>> alg["input"] = ["one.tif", "two.tif"]
+           >>> alg["input"] = [one_ds, two_ds]
+        """
+
+        if not self.GetArg(key).Set(value):
+            raise Exception(f"Cannot set argument {key} to {value}")
+%}
+}
+
+
 /* -------------------------------------------------------------------- */
 /* GDALAlgorithmArgHS                                                   */
 /* -------------------------------------------------------------------- */
@@ -5265,6 +5365,10 @@ class VSIFile(BytesIO):
         raise Exception("Unhandled algorithm argument data type")
 
     def Set(self, value):
+        import os
+        if isinstance(value, os.PathLike):
+            value = str(value)
+
         type = self.GetType()
         if type == GAAT_BOOLEAN:
             return self.SetAsBoolean(value)
@@ -5276,9 +5380,11 @@ class VSIFile(BytesIO):
             return self.SetAsDouble(value)
         if type == GAAT_DATASET:
             if isinstance(value, str):
-                return self.GetAsDatasetValue().SetName(value)
+                self.GetAsDatasetValue().SetName(value)
+                return True
             elif isinstance(value, Dataset):
-                return self.GetAsDatasetValue().SetDataset(value)
+                self.GetAsDatasetValue().SetDataset(value)
+                return True
             else:
                 return self.SetAsDatasetValue(value)
         if type == GAAT_STRING_LIST:

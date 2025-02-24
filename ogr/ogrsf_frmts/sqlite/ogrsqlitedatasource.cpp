@@ -1557,14 +1557,6 @@ bool OGRSQLiteBaseDataSource::OpenOrCreateDB(int flagsIn,
         }
 #endif
 
-        const char *pszPreludeStatements =
-            CSLFetchNameValue(papszOpenOptions, "PRELUDE_STATEMENTS");
-        if (pszPreludeStatements)
-        {
-            if (SQLCommand(hDB, pszPreludeStatements) != OGRERR_NONE)
-                return false;
-        }
-
         if (pszSqlitePragma != nullptr)
         {
             char **papszTokens =
@@ -1820,6 +1812,14 @@ bool OGRSQLiteDataSource::OpenOrCreateDB(int flagsIn,
     // errour we catch, but only if OGR2SQLITEModule has been created by
     // above OGR2SQLITE_Setup()
     LoadExtensions();
+
+    const char *pszPreludeStatements =
+        CSLFetchNameValue(papszOpenOptions, "PRELUDE_STATEMENTS");
+    if (pszPreludeStatements)
+    {
+        if (SQLCommand(hDB, pszPreludeStatements) != OGRERR_NONE)
+            return false;
+    }
 
     return true;
 }
@@ -4255,7 +4255,7 @@ OGRErr OGRSQLiteBaseDataSource::SoftRollbackTransaction()
 OGRErr OGRSQLiteBaseDataSource::StartSavepoint(const std::string &osName)
 {
 
-    // A SAVEPOINT implicity starts a transaction, let's fake one
+    // A SAVEPOINT implicitly starts a transaction, let's fake one
     if (!IsInTransaction())
     {
         m_bImplicitTransactionOpened = true;

@@ -26,11 +26,13 @@ single :program:`gdal` program that accepts commands and subcommands.
    :hidden:
 
    migration_guide_to_gdal_cli
+   gdal_cli_from_python
    gdal
    gdal_info
    gdal_convert
    gdal_raster
    gdal_raster_info
+   gdal_raster_calc
    gdal_raster_clip
    gdal_raster_convert
    gdal_raster_edit
@@ -45,16 +47,21 @@ single :program:`gdal` program that accepts commands and subcommands.
    gdal_vector_info
    gdal_vector_clip
    gdal_vector_convert
+   gdal_vector_filter
    gdal_vector_pipeline
+   gdal_vector_select
+   gdal_vector_sql
 
 .. only:: html
 
     - :ref:`migration_guide_to_gdal_cli`: Migration guide to "gdal" command line interface
+    - :ref:`gdal_cli_from_python`: How to use "gdal" CLI algorithms from Python
     - :ref:`gdal_program`: Main "gdal" entry point
     - :ref:`gdal_info_command`: Get information on a dataset
     - :ref:`gdal_convert_command`: Convert a dataset
     - :ref:`gdal_raster_command`: Entry point for raster commands
     - :ref:`gdal_raster_info_subcommand`: Get information on a raster dataset
+    - :ref:`gdal_raster_calc_subcommand`: Perform raster algebra
     - :ref:`gdal_raster_clip_subcommand`: Clip a raster dataset
     - :ref:`gdal_raster_convert_subcommand`: Convert a raster dataset
     - :ref:`gdal_raster_edit_subcommand`: Edit in place a raster dataset
@@ -68,8 +75,11 @@ single :program:`gdal` program that accepts commands and subcommands.
     - :ref:`gdal_vector_command`: Entry point for vector commands
     - :ref:`gdal_vector_info_subcommand`: Get information on a vector dataset
     - :ref:`gdal_vector_clip_subcommand`: Clip a vector dataset
+    - :ref:`gdal_vector_filter_subcommand`: Filter a vector dataset
     - :ref:`gdal_vector_convert_subcommand`: Convert a vector dataset
     - :ref:`gdal_vector_pipeline_subcommand`: Process a vector dataset
+    - :ref:`gdal_vector_select_subcommand`:
+    - :ref:`gdal_vector_sql_subcommand`: Apply SQL statement(s) to a dataset
 
 
 "Traditional" applications

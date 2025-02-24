@@ -12,6 +12,7 @@ add_library(
   gdalalg_pipeline.cpp
   gdalalg_raster.cpp
   gdalalg_raster_info.cpp
+  gdalalg_raster_calc.cpp
   gdalalg_raster_clip.cpp
   gdalalg_raster_convert.cpp
   gdalalg_raster_edit.cpp
@@ -31,6 +32,8 @@ add_library(
   gdalalg_vector_read.cpp
   gdalalg_vector_filter.cpp
   gdalalg_vector_reproject.cpp
+  gdalalg_vector_select.cpp
+  gdalalg_vector_sql.cpp
   gdalalg_vector_write.cpp
   gdalinfo_lib.cpp
   gdalbuildvrt_lib.cpp

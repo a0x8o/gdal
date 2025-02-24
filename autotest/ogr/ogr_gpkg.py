@@ -624,7 +624,7 @@ def test_ogr_gpkg_6(gpkg_ds, tmp_path):
 def test_ogr_gpkg_7(gpkg_ds):
     def get_feature_count_from_gpkg_contents():
         with gpkg_ds.ExecuteSQL(
-            'SELECT feature_count FROM gpkg_ogr_contents WHERE table_name = "field_test_layer"',
+            "SELECT feature_count FROM gpkg_ogr_contents WHERE table_name = 'field_test_layer'",
             dialect="DEBUG",
         ) as sql_lyr:
             f = sql_lyr.GetNextFeature()
@@ -5867,6 +5867,27 @@ def test_ogr_gpkg_prelude_statements(tmp_vsimem):
     )
     with ds.ExecuteSQL("SELECT * FROM poly JOIN other.poly USING (eas_id)") as sql_lyr:
         assert sql_lyr.GetFeatureCount() == 10
+
+
+###############################################################################
+# Test PRELUDE_STATEMENTS open option
+
+
+def test_ogr_gpkg_prelude_statements_after_spatialite_loading(tmp_vsimem):
+
+    gdal.VectorTranslate(tmp_vsimem / "test.gpkg", "data/poly.shp", format="GPKG")
+
+    with ogr.Open(tmp_vsimem / "test.gpkg") as ds:
+        if not _has_spatialite_4_3_or_later(ds):
+            pytest.skip("spatialite missing")
+
+    with gdal.OpenEx(
+        tmp_vsimem / "test.gpkg",
+        open_options=["PRELUDE_STATEMENTS=SELECT setdecimalprecision(1)"],
+    ) as ds:
+        with ds.ExecuteSQL("SELECT ST_AsText(geom) FROM poly LIMIT 1") as sql_lyr:
+            f = sql_lyr.GetNextFeature()
+            assert f[0].startswith("POLYGON((479819.8 4765180.5,")
 
 
 ###############################################################################
