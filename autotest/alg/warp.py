@@ -1175,6 +1175,7 @@ def test_warp_weighted_average():
 )
 def test_warp_weighted_mode(dtype):
 
+    pytest.importorskip("osgeo.gdal_array")
     np = pytest.importorskip("numpy")
 
     with gdal.GetDriverByName("MEM").Create("", 3, 3, eType=dtype) as src_ds:
@@ -1563,6 +1564,7 @@ def test_warp_55():
 @pytest.mark.parametrize("use_optim", ["YES", "NO"])
 def test_warp_56(use_optim):
 
+    pytest.importorskip("osgeo.gdal_array")
     numpy = pytest.importorskip("numpy")
 
     pix_ds = gdal.GetDriverByName("MEM").Create("", 1, 1)
@@ -1660,6 +1662,8 @@ def test_warp_rms_2():
 @pytest.mark.parametrize("tie_strategy", ("FIRST", "MIN", "MAX", "HOPE"))
 @pytest.mark.parametrize("dtype", (gdal.GDT_Int16, gdal.GDT_Int32))
 def test_warp_mode_ties(tie_strategy, dtype):
+
+    pytest.importorskip("osgeo.gdal_array")
     numpy = pytest.importorskip("numpy")
 
     # 1 and 5 are tied for the mode; 1 encountered first
@@ -1960,3 +1964,30 @@ def test_warp_nodata_substitution(dt, expected_val, resampling):
         struct.unpack("d", out_ds.ReadRaster(0, 0, 1, 1, buf_type=gdal.GDT_Float64))[0]
         == expected_val
     )
+
+
+###############################################################################
+# Test propagation of errors from I/O threads to main thread in multi-threaded reading
+
+
+@gdaltest.enable_exceptions()
+def test_warp_multi_threaded_errors(tmp_vsimem):
+
+    filename1 = str(tmp_vsimem / "tmp1.tif")
+    ds = gdal.GetDriverByName("GTiff").Create(filename1, 1, 1)
+    ds.SetGeoTransform([2, 1, 0, 49, 0, -1])
+    ds.Close()
+
+    filename2 = str(tmp_vsimem / "tmp2.tif")
+    ds = gdal.GetDriverByName("GTiff").Create(filename2, 1, 1)
+    ds.SetGeoTransform([3, 1, 0, 49, 0, -1])
+    ds.Close()
+
+    vrt_filename = str(tmp_vsimem / "tmp.vrt")
+    gdal.BuildVRT(vrt_filename, [filename1, filename2])
+
+    gdal.Unlink(filename2)
+
+    with gdal.Open(vrt_filename) as ds:
+        with pytest.raises(Exception):
+            gdal.Warp("", ds, format="MEM", multithread=True)
