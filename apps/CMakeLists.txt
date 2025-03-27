@@ -9,9 +9,13 @@ add_library(
   gdalalg_convert.cpp
   gdalalg_info.cpp
   gdalalg_main.cpp
+  gdalalg_mdim.cpp
+  gdalalg_mdim_info.cpp
+  gdalalg_mdim_convert.cpp
   gdalalg_pipeline.cpp
   gdalalg_raster.cpp
   gdalalg_raster_info.cpp
+  gdalalg_raster_astype.cpp
   gdalalg_raster_calc.cpp
   gdalalg_raster_clip.cpp
   gdalalg_raster_convert.cpp
@@ -24,16 +28,23 @@ add_library(
   gdalalg_raster_read.cpp
   gdalalg_raster_reproject.cpp
   gdalalg_raster_resize.cpp
+  gdalalg_raster_scale.cpp
+  gdalalg_raster_select.cpp
   gdalalg_raster_stack.cpp
+  gdalalg_raster_unscale.cpp
   gdalalg_raster_write.cpp
   gdalalg_vector.cpp
   gdalalg_vector_info.cpp
   gdalalg_vector_clip.cpp
   gdalalg_vector_convert.cpp
+  gdalalg_vector_edit.cpp
   gdalalg_vector_pipeline.cpp
   gdalalg_vector_rasterize.cpp
   gdalalg_vector_read.cpp
   gdalalg_vector_filter.cpp
+  gdalalg_vector_geom.cpp
+  gdalalg_vector_geom_set_type.cpp
+  gdalalg_vector_geom_explode_collections.cpp
   gdalalg_vector_reproject.cpp
   gdalalg_vector_select.cpp
   gdalalg_vector_sql.cpp

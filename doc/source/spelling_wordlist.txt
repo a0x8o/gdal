@@ -34,6 +34,7 @@ advertizing
 AdviseRead
 advized
 AES
+affine
 Affine
 ahArrays
 airphotos
@@ -106,6 +107,7 @@ Astrogeology
 Astun
 AStyle
 astylename
+astype
 async
 atable
 athematic
@@ -267,6 +269,7 @@ bPixelIsPoint
 bpw
 branche
 Brashear
+bRelativeToReferencePath
 Bresenham
 bReversed
 Brezenham
@@ -364,6 +367,7 @@ checksums
 Cheeseman
 Christoph
 Chroma
+chrominance
 chs
 chSep
 cid
@@ -522,6 +526,7 @@ cvs
 Cxx
 Cygwin
 dall
+dan
 DanB
 DanielM
 danlittle
@@ -733,6 +738,7 @@ dstSRS
 dstType
 dt
 dT
+dtype
 DUnits
 dValue
 dve
@@ -798,6 +804,7 @@ Erdas
 eRequestedInputDT
 erer
 eResampleAlg
+Errno
 erroring
 errorMsg
 ers
@@ -947,6 +954,7 @@ fs
 fSecond
 fseek
 fsiz
+fsspec
 ftell
 FTimesBold
 FTimesRoman
@@ -996,8 +1004,10 @@ gdaldata
 GDALDataset
 gdaldem
 gdaldriver
+GDALEDTComponent
 gdalenhance
 gdalframework
+gdalg
 gdalgmlcoverage
 GDALGridDataMetricsOptions
 GDALGridInverseDistanceToAPowerNearestNeighborOptions
@@ -1401,6 +1411,7 @@ importFromEPSGA
 importFromURN
 importFromWkb
 ImportFromWKB
+importFromWkt
 ImportFromWKT
 Impots
 imtem
@@ -1454,6 +1465,7 @@ iSubGeom
 ISurface
 itemtypes
 iterable
+iteratively
 itf
 itopen
 iTXt
@@ -1499,6 +1511,7 @@ julian
 Julien
 Jupyter
 Jürgen
+Ka
 Kadaster
 kak
 kakadu
@@ -1758,6 +1771,7 @@ md
 mdb
 mdbtools
 mdd
+mdim
 megt
 Melero
 mem
@@ -1913,6 +1927,7 @@ Namespaces
 namespacing
 nan
 NaN
+nanometer
 nArgc
 nArray
 nArrays
@@ -2120,6 +2135,7 @@ Nummeraanduiding
 numnorth
 numpy
 Numpy
+NumPy
 numslope
 numwoodies
 nUpdatedFieldsCount
@@ -2148,6 +2164,7 @@ objdir
 objectclasses
 OBJECTID
 objektkoordinaten
+observability
 oci
 OCI
 odbc
@@ -2223,6 +2240,7 @@ orthocorrection
 orthorectification
 Orthorectified
 orthorectifying
+os
 osAfter
 osBefore
 osgeo
@@ -2495,6 +2513,7 @@ poOtherGeom
 poppler
 Poppler
 poRootGroup
+pos
 positionName
 posix
 Posix
@@ -2654,6 +2673,7 @@ pszPath
 pszPreferredAuthority
 pszPrefix
 pszProj
+pszReferencePath
 pszRequest
 pszSource
 pszSrc
@@ -3142,7 +3162,7 @@ subsetted
 subsetting
 Subsetting
 subsettings
-substituable
+substitutable
 substring
 subsubgroup
 subtelty
@@ -3256,6 +3276,7 @@ TileY
 tim
 timePosition
 timesheet
+timezones
 TinZ
 tippecanoe
 tm
@@ -3424,6 +3445,7 @@ utf
 UTF
 utils
 utm
+utmsmall
 va
 Vaisala
 valgrind

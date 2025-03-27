@@ -65,6 +65,8 @@ class GDALVectorPipelineStepAlgorithm /* non final */ : public GDALAlgorithm
 
   private:
     bool RunImpl(GDALProgressFunc pfnProgress, void *pProgressData) override;
+    GDALAlgorithm::ProcessGDALGOutputRet ProcessGDALGOutput() override;
+    bool CheckSafeForStreamOutput() override;
 };
 
 /************************************************************************/
@@ -110,6 +112,9 @@ class GDALVectorPipelineAlgorithm final
     {
         return m_outputDataset;
     }
+
+  private:
+    std::string m_helpDocCategory{};
 };
 
 /************************************************************************/
@@ -138,6 +143,40 @@ class GDALVectorPipelineOutputLayer /* non final */
   private:
     std::vector<std::unique_ptr<OGRFeature>> m_pendingFeatures{};
     size_t m_idxInPendingFeatures = 0;
+};
+
+/************************************************************************/
+/*                  GDALVectorPipelinePassthroughLayer                  */
+/************************************************************************/
+
+/** Class that forwards GetNextFeature() calls to the source layer and
+ * can be aded to GDALVectorPipelineOutputDataset::AddLayer()
+ */
+class GDALVectorPipelinePassthroughLayer /* non final */
+    : public GDALVectorPipelineOutputLayer
+{
+  public:
+    explicit GDALVectorPipelinePassthroughLayer(OGRLayer &oSrcLayer)
+        : GDALVectorPipelineOutputLayer(oSrcLayer)
+    {
+    }
+
+    OGRFeatureDefn *GetLayerDefn() override
+    {
+        return m_srcLayer.GetLayerDefn();
+    }
+
+    int TestCapability(const char *pszCap) override
+    {
+        return m_srcLayer.TestCapability(pszCap);
+    }
+
+    void TranslateFeature(
+        std::unique_ptr<OGRFeature> poSrcFeature,
+        std::vector<std::unique_ptr<OGRFeature>> &apoOutFeatures) override
+    {
+        apoOutFeatures.push_back(std::move(poSrcFeature));
+    }
 };
 
 /************************************************************************/

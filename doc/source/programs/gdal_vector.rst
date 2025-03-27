@@ -15,29 +15,20 @@
 Synopsis
 --------
 
-.. code-block::
-
-    Usage: gdal vector <SUBCOMMAND>
-    where <SUBCOMMAND> is one of:
-      - clip:      Clip a vector dataset.
-      - convert:   Convert a vector dataset.
-      - filter:    Filter a vector dataset.
-      - info:      Return information on a vector dataset.
-      - pipeline:  Process a vector dataset.
-      - rasterize: Burns vector geometries into a raster.
-      - reproject: Reproject a vector dataset.
-      - select:    Select a subset of fields from a vector dataset.
-      - sql:       Apply SQL statement(s) to a dataset.
+.. program-output:: gdal vector --help-doc
 
 Available sub-commands
 ----------------------
 
 - :ref:`gdal_vector_clip_subcommand`
 - :ref:`gdal_vector_convert_subcommand`
+- :ref:`gdal_vector_edit_subcommand`
 - :ref:`gdal_vector_filter_subcommand`
+- :ref:`gdal_vector_geom_subcommand`
 - :ref:`gdal_vector_info_subcommand`
 - :ref:`gdal_vector_pipeline_subcommand`
 - :ref:`gdal_vector_rasterize_subcommand`
+- :ref:`gdal_vector_reproject_subcommand`
 - :ref:`gdal_vector_select_subcommand`
 - :ref:`gdal_vector_sql_subcommand`
 

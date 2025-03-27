@@ -134,6 +134,34 @@ def test_gdalalg_raster_pipeline_usage_as_json():
     assert "pipeline_algorithms" in j
 
 
+def test_gdalalg_raster_pipeline_help_doc():
+
+    import gdaltest
+    import test_cli_utilities
+
+    gdal_path = test_cli_utilities.get_gdal_path()
+    if gdal_path is None:
+        pytest.skip("gdal binary missing")
+
+    out = gdaltest.runexternal(f"{gdal_path} raster pipeline --help-doc=main")
+
+    assert "Usage: gdal raster pipeline [OPTIONS] <PIPELINE>" in out
+    assert (
+        "<PIPELINE> is of the form: read [READ-OPTIONS] ( ! <STEP-NAME> [STEP-OPTIONS] )* ! write [WRITE-OPTIONS]"
+        in out
+    )
+
+    out = gdaltest.runexternal(f"{gdal_path} raster pipeline --help-doc=edit")
+
+    assert "* edit [OPTIONS]" in out
+
+    out, _ = gdaltest.runexternal_out_and_err(
+        f"{gdal_path} raster pipeline --help-doc=unknown"
+    )
+
+    assert "ERROR: unknown pipeline step 'unknown'" in out
+
+
 def test_gdalalg_raster_pipeline_quoted(tmp_vsimem):
 
     out_filename = str(tmp_vsimem / "out.tif")
@@ -182,6 +210,21 @@ def test_gdalalg_raster_easter_egg(tmp_path):
 
     with gdal.OpenEx(out_filename) as ds:
         assert ds.GetRasterBand(1).Checksum() == 4672
+
+
+def test_gdalalg_raster_easter_egg_failed():
+
+    import gdaltest
+    import test_cli_utilities
+
+    gdal_path = test_cli_utilities.get_gdal_path()
+    if gdal_path is None:
+        pytest.skip("gdal binary missing")
+    _, err = gdaltest.runexternal_out_and_err(
+        f"{gdal_path} raster +gdal=pipeline +step +gdal=read +input=../gcore/data/byte.tif +step +gdal=unknown +step +write +output=/vsimem/out.tif"
+    )
+
+    assert "pipeline: unknown step name: unknown" in err
 
 
 def test_gdalalg_raster_pipeline_usage_as_json_bis():
@@ -537,6 +580,33 @@ def test_gdalalg_raster_pipeline_reproject_almost_all_args(tmp_vsimem):
         assert ds.GetRasterBand(1).Checksum() == 8515
 
 
+def test_gdalalg_raster_pipeline_reproject_proj_string(tmp_vsimem):
+
+    out_filename = str(tmp_vsimem / "out.tif")
+
+    pipeline = get_pipeline_alg()
+    assert pipeline.ParseRunAndFinalize(
+        [
+            "read",
+            "../gcore/data/byte.tif",
+            "!",
+            "reproject",
+            "--src-crs=EPSG:32611",
+            "--dst-crs",
+            "+proj=laea +lon_0=147 +lat_0=-40 +datum=WGS84",
+            "!",
+            "write",
+            "--overwrite",
+            out_filename,
+        ]
+    )
+
+    with gdal.OpenEx(out_filename) as ds:
+        assert "Lambert Azimuthal Equal Area" in ds.GetSpatialRef().ExportToWkt(
+            ["FORMAT=WKT2"]
+        ), ds.GetSpatialRef().ExportToWkt(["FORMAT=WKT2"])
+
+
 def test_gdalalg_raster_pipeline_clip_missing_bbox_or_like(tmp_vsimem):
 
     out_filename = str(tmp_vsimem / "out.tif")
@@ -687,4 +757,29 @@ def test_gdalalg_raster_pipeline_clip_bbox_crs(tmp_vsimem):
         print(ds.GetGeoTransform())
         assert ds.GetGeoTransform() == pytest.approx(
             (441620.0, 60.0, 0.0, 3751140.0, 0.0, -60.0), rel=1e-8
+        )
+
+
+def test_gdalalg_raster_pipeline_too_many_steps_for_vrt_output(tmp_vsimem):
+
+    out_filename = str(tmp_vsimem / "out.vrt")
+
+    pipeline = get_pipeline_alg()
+    with pytest.raises(
+        Exception,
+        match="pipeline: VRT output is not supported when there are more than 3 steps",
+    ):
+        pipeline.ParseRunAndFinalize(
+            [
+                "read",
+                "../gcore/data/byte.tif",
+                "!",
+                "reproject",
+                "!",
+                "reproject",
+                "!",
+                "write",
+                "--overwrite",
+                out_filename,
+            ]
         )

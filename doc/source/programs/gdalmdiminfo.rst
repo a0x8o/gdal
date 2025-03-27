@@ -15,12 +15,7 @@ gdalmdiminfo
 Synopsis
 --------
 
-.. code-block::
-
-    gdalmdiminfo [--help] [--help-general]
-                 [-oo <NAME>=<VALUE>]... [-arrayoption <NAME>=<VALUE>]...
-                 [-detailed] [-nopretty] [-array <array_name>] [-limit <number>]
-                 [-stats] [-if <format>]... <datasetname>
+.. program-output:: gdalmdiminfo --help-doc
 
 Description
 -----------
@@ -66,8 +61,8 @@ The following command line parameters can appear in any order
 
 .. option:: -stats
 
-    Read and display image statistics. Force computation if no
-    statistics are stored in an image.
+    Read and display array statistics. Force computation if no
+    statistics are stored in an array.
 
     .. versionadded:: 3.2
 
