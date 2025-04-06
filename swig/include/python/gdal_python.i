@@ -3078,6 +3078,7 @@ def VectorTranslateOptions(options=None, format=None,
          accessMode=None,
          srcSRS=None, dstSRS=None, reproject=True,
          coordinateOperation=None,
+         coordinateOperationOptions=None,
          SQLStatement=None, SQLDialect=None, where=None, selectFields=None,
          addFields=False,
          relaxedFieldNameMatch=False,
@@ -3134,6 +3135,8 @@ def VectorTranslateOptions(options=None, format=None,
         output SRS (with reprojection if reproject = True)
     coordinateOperation:
         coordinate operation as a PROJ string or WKT string
+    coordinateOperationOptions:
+        list or dict of coordinate operation options (ALLOW_BALLPARK=NO, ONLY_BEST=YES, WARN_ABOUT_DIFFERENT_COORD_OP=NO)
     reproject:
         whether to do reprojection
     SQLStatement:
@@ -3276,6 +3279,15 @@ def VectorTranslateOptions(options=None, format=None,
                 new_options += ['-a_srs', str(dstSRS)]
         if coordinateOperation is not None:
             new_options += ['-ct', coordinateOperation]
+
+        if coordinateOperationOptions is not None:
+            if isinstance(coordinateOperationOptions, dict):
+                for k, v in coordinateOperationOptions.items():
+                    new_options += ['-ct_opt', f'{k}={v}']
+            else:
+                for opt in coordinateOperationOptions:
+                    new_options += ['-ct_opt', opt]
+
         if SQLStatement is not None:
             new_options += ['-sql', str(SQLStatement)]
         if SQLDialect is not None:
@@ -3492,7 +3504,7 @@ def VectorTranslate(destNameOrDestDS, srcDS, **kwargs):
 
 def DEMProcessingOptions(options=None, colorFilename=None, format=None,
               creationOptions=None, computeEdges=False, alg=None, band=1,
-              zFactor=None, scale=None, azimuth=None, altitude=None,
+              zFactor=None, scale=None, xscale=None, yscale=None, azimuth=None, altitude=None,
               combined=False, multiDirectional=False, igor=False,
               slopeFormat=None, trigonometric=False, zeroForFlat=False,
               addAlpha=None, colorSelection=None,
@@ -3519,6 +3531,10 @@ def DEMProcessingOptions(options=None, colorFilename=None, format=None,
         (hillshade only) vertical exaggeration used to pre-multiply the elevations.
     scale:
         ratio of vertical units to horizontal.
+    xscale:
+        Ratio of vertical units to horizontal X axis units.
+    yscale:
+        Ratio of vertical units to horizontal Y axis units.
     azimuth:
         (hillshade only) azimuth of the light, in degrees. 0 if it comes from the top of the raster, 90 from the east, ... The default value, 315, should rarely be changed as it is the value generally used to generate shaded maps.
     altitude:
@@ -3569,6 +3585,10 @@ def DEMProcessingOptions(options=None, colorFilename=None, format=None,
             new_options += ['-z', str(zFactor)]
         if scale is not None:
             new_options += ['-s', str(scale)]
+        if xscale is not None:
+            new_options += ['-xscale', str(xscale)]
+        if yscale is not None:
+            new_options += ['-yscale', str(yscale)]
         if azimuth is not None:
             new_options += ['-az', str(azimuth)]
         if altitude is not None:
@@ -5537,7 +5557,10 @@ class VSIFile(BytesIO):
         if type == GAAT_BOOLEAN:
             return self.SetAsBoolean(value)
         if type == GAAT_STRING:
-            return self.SetAsString(value)
+            if isinstance(value, str) or isinstance(value, int) or isinstance(value, float):
+                return self.SetAsString(str(value))
+            else:
+                raise "Unexpected value type %s for an argument of type String" % str(type(value))
         if type == GAAT_INTEGER:
             return self.SetAsInteger(value)
         if type == GAAT_REAL:
@@ -5554,8 +5577,10 @@ class VSIFile(BytesIO):
         if type == GAAT_STRING_LIST:
             if isinstance(value, list):
                 return self.SetAsStringList([str(v) for v in value])
+            elif isinstance(value, dict):
+                return self.SetAsStringList([f"{k}={str(value[k])}" for k in value])
             else:
-                return self.SetAsStringList([str(v)])
+                return self.SetAsStringList([str(value)])
         if type == GAAT_INTEGER_LIST:
             return self.SetAsIntegerList(value)
         if type == GAAT_REAL_LIST:
@@ -5565,6 +5590,8 @@ class VSIFile(BytesIO):
                 return self.SetDatasetNames([str(v) for v in value])
             elif isinstance(value[0], Dataset):
                 return self.SetDatasets(value)
+            else:
+                raise "Unexpected value type %s for an argument of type DatasetList" % str(type(value))
         raise Exception("Unhandled algorithm argument data type")
 
 %}

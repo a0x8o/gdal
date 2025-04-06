@@ -2141,3 +2141,13 @@ def error_raised(type, match=""):
 @functools.lru_cache()
 def gdal_has_vrt_expression_dialect(dialect):
     return dialect in gdal.GetDriverByName("VRT").GetMetadataItem("ExpressionDialects")
+
+
+###############################################################################
+
+
+def importorskip_gdal_array():
+    pytest_version = [int(x) for x in pytest.__version__.split(".")]
+    if pytest_version >= [8, 2, 0]:
+        return pytest.importorskip("osgeo.gdal_array", exc_type=ImportError)
+    return pytest.importorskip("osgeo.gdal_array")

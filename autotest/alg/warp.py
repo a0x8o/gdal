@@ -28,6 +28,8 @@ pytestmark = pytest.mark.skipif(
     reason="VRT driver open missing",
 )
 
+from lxml import etree
+
 from osgeo import gdal, osr
 
 ###############################################################################
@@ -1212,7 +1214,7 @@ def test_warp_weighted_average():
 )
 def test_warp_weighted_mode(dtype):
 
-    pytest.importorskip("osgeo.gdal_array")
+    gdaltest.importorskip_gdal_array()
     np = pytest.importorskip("numpy")
 
     with gdal.GetDriverByName("MEM").Create("", 3, 3, eType=dtype) as src_ds:
@@ -1601,7 +1603,7 @@ def test_warp_55():
 @pytest.mark.parametrize("use_optim", ["YES", "NO"])
 def test_warp_56(use_optim):
 
-    pytest.importorskip("osgeo.gdal_array")
+    gdaltest.importorskip_gdal_array()
     numpy = pytest.importorskip("numpy")
 
     pix_ds = gdal.GetDriverByName("MEM").Create("", 1, 1)
@@ -1700,7 +1702,7 @@ def test_warp_rms_2():
 @pytest.mark.parametrize("dtype", (gdal.GDT_Int16, gdal.GDT_Int32))
 def test_warp_mode_ties(tie_strategy, dtype):
 
-    pytest.importorskip("osgeo.gdal_array")
+    gdaltest.importorskip_gdal_array()
     numpy = pytest.importorskip("numpy")
 
     # 1 and 5 are tied for the mode; 1 encountered first
@@ -1708,7 +1710,8 @@ def test_warp_mode_ties(tie_strategy, dtype):
     src_ds.SetGeoTransform([1, 1, 0, 1, 0, 1])
     src_ds.GetRasterBand(1).WriteArray(numpy.array([[1, 1, 1], [2, 3, 4], [5, 5, 5]]))
 
-    with gdaltest.disable_exceptions():
+    with gdaltest.disable_exceptions(), gdal.quiet_errors():
+        gdal.ErrorReset()
         out_ds = gdal.Warp(
             "",
             src_ds,
@@ -1720,6 +1723,10 @@ def test_warp_mode_ties(tie_strategy, dtype):
         )
 
     if tie_strategy == "HOPE":
+        assert (
+            gdal.GetLastErrorMsg()
+            == "'HOPE' is an unexpected value for MODE_TIES option of type string-select."
+        )
         assert out_ds is None
         return
 
@@ -2028,3 +2035,80 @@ def test_warp_multi_threaded_errors(tmp_vsimem):
     with gdal.Open(vrt_filename) as ds:
         with pytest.raises(Exception):
             gdal.Warp("", ds, format="MEM", multithread=True)
+
+
+###############################################################################
+
+
+schema_optionlist = etree.XML(
+    r"""
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="Value">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute type="xs:string" name="alias" use="optional"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Option">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element ref="Value" maxOccurs="unbounded" minOccurs="0"/>
+      </xs:sequence>
+      <xs:attribute name="name" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:pattern value="[^\s]*"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="type" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="int" />
+            <xs:enumeration value="float" />
+            <xs:enumeration value="boolean" />
+            <xs:enumeration value="string-select" />
+            <xs:enumeration value="string" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute type="xs:string" name="description" use="optional"/>
+      <xs:attribute type="xs:string" name="default" use="optional"/>
+      <xs:attribute type="xs:string" name="alias" use="optional"/>
+      <xs:attribute type="xs:string" name="min" use="optional"/>
+      <xs:attribute type="xs:string" name="max" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OptionList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Option" maxOccurs="unbounded" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+"""
+)
+
+
+def test_warp_validate_options():
+
+    if (
+        gdaltest.is_travis_branch("mingw64")
+        or gdaltest.is_travis_branch("build-windows-conda")
+        or gdaltest.is_travis_branch("build-windows-minimum")
+    ):
+        pytest.skip("Crashes for unknown reason")
+
+    schema = etree.XMLSchema(schema_optionlist)
+
+    xml = gdal.WarpGetOptionList()
+    try:
+        parser = etree.XMLParser(schema=schema)
+        etree.fromstring(xml, parser)
+    except Exception:
+        print(xml)
+        raise

@@ -291,6 +291,9 @@ constexpr const char *GAAC_ESOTERIC = "Esoteric";
  * "output-format" argument */
 constexpr const char *GAAMDI_REQUIRED_CAPABILITIES = "required_capabilities";
 
+/** Argument metadata item that applies to "output-format" argument */
+constexpr const char *GAAMDI_VRT_COMPATIBLE = "vrt_compatible";
+
 /** Name of the argument for an input dataset. */
 constexpr const char *GDAL_ARG_NAME_INPUT = "input";
 
@@ -678,6 +681,46 @@ class CPL_DLL GDALAlgorithmArgDecl final
         return *this;
     }
 
+    /** Set the minimum (included) value allowed.
+     *
+     * Only taken into account on GAAT_INTEGER, GAAT_INTEGER_LIST,
+     * GAAT_REAL and GAAT_REAL_LIST arguments.
+     */
+    GDALAlgorithmArgDecl &SetMinValueIncluded(double min)
+    {
+        m_minVal = min;
+        m_minValIsIncluded = true;
+        return *this;
+    }
+
+    /** Set the minimum (excluded) value allowed.
+     *
+     * Only taken into account on GAAT_INTEGER, GAAT_INTEGER_LIST,
+     * GAAT_REAL and GAAT_REAL_LIST arguments.
+     */
+    GDALAlgorithmArgDecl &SetMinValueExcluded(double min)
+    {
+        m_minVal = min;
+        m_minValIsIncluded = false;
+        return *this;
+    }
+
+    /** Set the maximum (included) value allowed. */
+    GDALAlgorithmArgDecl &SetMaxValueIncluded(double max)
+    {
+        m_maxVal = max;
+        m_maxValIsIncluded = true;
+        return *this;
+    }
+
+    /** Set the maximum (excluded) value allowed. */
+    GDALAlgorithmArgDecl &SetMaxValueExcluded(double max)
+    {
+        m_maxVal = max;
+        m_maxValIsIncluded = false;
+        return *this;
+    }
+
     //! @cond Doxygen_Suppress
     GDALAlgorithmArgDecl &SetHiddenChoices()
     {
@@ -854,6 +897,18 @@ class CPL_DLL GDALAlgorithmArgDecl final
     inline const std::vector<std::string> &GetHiddenChoices() const
     {
         return m_hiddenChoices;
+    }
+
+    /** Return the minimum value and whether it is included. */
+    inline std::pair<double, bool> GetMinValue() const
+    {
+        return {m_minVal, m_minValIsIncluded};
+    }
+
+    /** Return the maximum value and whether it is included. */
+    inline std::pair<double, bool> GetMaxValue() const
+    {
+        return {m_maxVal, m_maxValIsIncluded};
     }
 
     /** Return whether the argument is required. Defaults to false.
@@ -1062,6 +1117,10 @@ class CPL_DLL GDALAlgorithmArgDecl final
     std::variant<bool, std::string, int, double, std::vector<std::string>,
                  std::vector<int>, std::vector<double>>
         m_defaultValue{};
+    double m_minVal = std::numeric_limits<double>::quiet_NaN();
+    double m_maxVal = std::numeric_limits<double>::quiet_NaN();
+    bool m_minValIsIncluded = false;
+    bool m_maxValIsIncluded = false;
 };
 
 /************************************************************************/
@@ -1213,6 +1272,18 @@ class CPL_DLL GDALAlgorithmArg /* non-final */
         if (m_autoCompleteFunction)
             return m_autoCompleteFunction(currentValue);
         return {};
+    }
+
+    /** Alias for GDALAlgorithmArgDecl::GetMinValue() */
+    inline std::pair<double, bool> GetMinValue() const
+    {
+        return m_decl.GetMinValue();
+    }
+
+    /** Alias for GDALAlgorithmArgDecl::GetMaxValue() */
+    inline std::pair<double, bool> GetMaxValue() const
+    {
+        return m_decl.GetMaxValue();
     }
 
     /** Return whether the argument value has been explicitly set with Set() */
@@ -1504,6 +1575,9 @@ class CPL_DLL GDALAlgorithmArg /* non-final */
     bool RunAllActions();
     void RunActions();
     bool RunValidationActions();
+    bool ValidateChoice(const std::string &value) const;
+    bool ValidateIntRange(int val) const;
+    bool ValidateRealRange(double val) const;
 };
 
 /************************************************************************/
@@ -1637,6 +1711,34 @@ class CPL_DLL GDALInConstructionAlgorithmArg final : public GDALAlgorithmArg
         return *this;
     }
 
+    /** Alias for GDALAlgorithmArgDecl::SetMinValueIncluded() */
+    GDALInConstructionAlgorithmArg &SetMinValueIncluded(double min)
+    {
+        m_decl.SetMinValueIncluded(min);
+        return *this;
+    }
+
+    /** Alias for GDALAlgorithmArgDecl::SetMinValueExcluded() */
+    GDALInConstructionAlgorithmArg &SetMinValueExcluded(double min)
+    {
+        m_decl.SetMinValueExcluded(min);
+        return *this;
+    }
+
+    /** Alias for GDALAlgorithmArgDecl::SetMaxValueIncluded() */
+    GDALInConstructionAlgorithmArg &SetMaxValueIncluded(double max)
+    {
+        m_decl.SetMaxValueIncluded(max);
+        return *this;
+    }
+
+    /** Alias for GDALAlgorithmArgDecl::SetMaxValueExcluded() */
+    GDALInConstructionAlgorithmArg &SetMaxValueExcluded(double max)
+    {
+        m_decl.SetMaxValueExcluded(max);
+        return *this;
+    }
+
     /** Alias for GDALAlgorithmArgDecl::SetHidden() */
     GDALInConstructionAlgorithmArg &SetHidden()
     {
@@ -1721,7 +1823,10 @@ class CPL_DLL GDALInConstructionAlgorithmArg final : public GDALAlgorithmArg
 
     /** Register an action that is executed, once and exactly once, if the
      * argument is explicitly set, at the latest by the ValidateArguments()
-     * method. If the provided function returns false, validation fails. */
+     * method. If the provided function returns false, validation fails.
+     * The validation function of a given argument can only check the value of
+     * this argument, and cannot assume other arguments have already been set.
+     */
     GDALInConstructionAlgorithmArg &AddValidationAction(std::function<bool()> f)
     {
         m_validationActions.push_back(f);
@@ -1787,7 +1892,7 @@ class CPL_DLL GDALAlgorithmRegistry
     {
         AlgInfo info;
         info.m_name = MyAlgorithm::NAME;
-        info.m_aliases = MyAlgorithm::GetAliases();
+        info.m_aliases = MyAlgorithm::GetAliasesStatic();
         info.m_creationFunc = []() -> std::unique_ptr<GDALAlgorithm>
         { return std::make_unique<MyAlgorithm>(); };
         return Register(info);
@@ -1996,9 +2101,14 @@ class CPL_DLL GDALAlgorithmRegistry
     virtual bool
     ParseCommandLineArguments(const std::vector<std::string> &args);
 
-    /** Validate that all constraints are met. This method is automatically
-     * executed by ParseCommandLineArguments() and Run(), and thus does
-     * generally not need to be explicitly called.
+    /** Validate that all constraints are met.
+     *
+     * This method may emit several errors if several constraints are not met.
+     *
+     * This method is automatically executed by ParseCommandLineArguments()
+     * and Run(), and thus does generally not need to be explicitly called.
+     * Derived classes overriding this method should generally call the base
+     * method.
      */
     virtual bool ValidateArguments();
 
@@ -2077,6 +2187,17 @@ class CPL_DLL GDALAlgorithmRegistry
         return m_aliases;
     }
 
+    //! @cond Doxygen_Suppress
+    /** Return alias names. This method should be redefined in derived classes
+     * that want to define aliases.
+     */
+    static std::vector<std::string> GetAliasesStatic()
+    {
+        return {};
+    }
+
+    //! @endcond
+
     /** Used by the "gdal info" special algorithm when it first tries to
      * run "gdal raster info", to inherit from the potential special flags,
      * such as \--help or \--json-usage, that this later algorithm has received.
@@ -2097,7 +2218,8 @@ class CPL_DLL GDALAlgorithmRegistry
 
     /** Return auto completion suggestions */
     virtual std::vector<std::string>
-    GetAutoComplete(std::vector<std::string> &args, bool showAllOptions);
+    GetAutoComplete(std::vector<std::string> &args, bool lastWordIsComplete,
+                    bool showAllOptions);
 
   protected:
     friend class GDALInConstructionAlgorithmArg;
@@ -2210,78 +2332,107 @@ class CPL_DLL GDALAlgorithmRegistry
                                           GDAL_OF_MULTIDIM_RASTER);
 
     /** Add input dataset argument. */
-    GDALInConstructionAlgorithmArg &
-    AddInputDatasetArg(GDALArgDatasetValue *pValue,
-                       GDALArgDatasetValueType type = GDAL_OF_RASTER |
-                                                      GDAL_OF_VECTOR |
-                                                      GDAL_OF_MULTIDIM_RASTER,
-                       bool positionalAndRequired = true);
+    GDALInConstructionAlgorithmArg &AddInputDatasetArg(
+        GDALArgDatasetValue *pValue,
+        GDALArgDatasetValueType type = GDAL_OF_RASTER | GDAL_OF_VECTOR |
+                                       GDAL_OF_MULTIDIM_RASTER,
+        bool positionalAndRequired = true, const char *helpMessage = nullptr);
 
     /** Add input dataset argument. */
-    GDALInConstructionAlgorithmArg &
-    AddInputDatasetArg(std::vector<GDALArgDatasetValue> *pValue,
-                       GDALArgDatasetValueType type = GDAL_OF_RASTER |
-                                                      GDAL_OF_VECTOR |
-                                                      GDAL_OF_MULTIDIM_RASTER,
-                       bool positionalAndRequired = true);
+    GDALInConstructionAlgorithmArg &AddInputDatasetArg(
+        std::vector<GDALArgDatasetValue> *pValue,
+        GDALArgDatasetValueType type = GDAL_OF_RASTER | GDAL_OF_VECTOR |
+                                       GDAL_OF_MULTIDIM_RASTER,
+        bool positionalAndRequired = true, const char *helpMessage = nullptr);
 
     /** Add open option(s) argument. */
     GDALInConstructionAlgorithmArg &
-    AddOpenOptionsArg(std::vector<std::string> *pValue);
+    AddOpenOptionsArg(std::vector<std::string> *pValue,
+                      const char *helpMessage = nullptr);
 
     /** Add input format(s) argument. */
     GDALInConstructionAlgorithmArg &
-    AddInputFormatsArg(std::vector<std::string> *pValue);
+    AddInputFormatsArg(std::vector<std::string> *pValue,
+                       const char *helpMessage = nullptr);
 
     /** Add output dataset argument. */
-    GDALInConstructionAlgorithmArg &
-    AddOutputDatasetArg(GDALArgDatasetValue *pValue,
-                        GDALArgDatasetValueType type = GDAL_OF_RASTER |
-                                                       GDAL_OF_VECTOR |
-                                                       GDAL_OF_MULTIDIM_RASTER,
-                        bool positionalAndRequired = true);
+    GDALInConstructionAlgorithmArg &AddOutputDatasetArg(
+        GDALArgDatasetValue *pValue,
+        GDALArgDatasetValueType type = GDAL_OF_RASTER | GDAL_OF_VECTOR |
+                                       GDAL_OF_MULTIDIM_RASTER,
+        bool positionalAndRequired = true, const char *helpMessage = nullptr);
 
     /** Add \--overwrite argument. */
-    GDALInConstructionAlgorithmArg &AddOverwriteArg(bool *pValue);
+    GDALInConstructionAlgorithmArg &
+    AddOverwriteArg(bool *pValue, const char *helpMessage = nullptr);
 
     /** Add \--update argument. */
-    GDALInConstructionAlgorithmArg &AddUpdateArg(bool *pValue);
+    GDALInConstructionAlgorithmArg &
+    AddUpdateArg(bool *pValue, const char *helpMessage = nullptr);
 
     /** Add (non-CLI) output-string argument. */
-    GDALInConstructionAlgorithmArg &AddOutputStringArg(std::string *pValue);
+    GDALInConstructionAlgorithmArg &
+    AddOutputStringArg(std::string *pValue, const char *helpMessage = nullptr);
 
     /** Add output format argument. */
     GDALInConstructionAlgorithmArg &
     AddOutputFormatArg(std::string *pValue, bool bStreamAllowed = false,
-                       bool bGDALGAllowed = false);
+                       bool bGDALGAllowed = false,
+                       const char *helpMessage = nullptr);
 
     /** Add output data type argument. */
-    GDALInConstructionAlgorithmArg &AddOutputDataTypeArg(std::string *pValue);
+    GDALInConstructionAlgorithmArg &
+    AddOutputDataTypeArg(std::string *pValue,
+                         const char *helpMessage = nullptr);
 
     /** Add creation option(s) argument. */
     GDALInConstructionAlgorithmArg &
-    AddCreationOptionsArg(std::vector<std::string> *pValue);
+    AddCreationOptionsArg(std::vector<std::string> *pValue,
+                          const char *helpMessage = nullptr);
 
     /** Add layer creation option(s) argument. */
     GDALInConstructionAlgorithmArg &
-    AddLayerCreationOptionsArg(std::vector<std::string> *pValue);
+    AddLayerCreationOptionsArg(std::vector<std::string> *pValue,
+                               const char *helpMessage = nullptr);
 
     /** Add (single) layer name argument. */
-    GDALInConstructionAlgorithmArg &AddLayerNameArg(std::string *pValue);
+    GDALInConstructionAlgorithmArg &
+    AddLayerNameArg(std::string *pValue, const char *helpMessage = nullptr);
 
     /** Add (potentially multiple) layer name(s) argument. */
     GDALInConstructionAlgorithmArg &
-    AddLayerNameArg(std::vector<std::string> *pValue);
+    AddLayerNameArg(std::vector<std::string> *pValue,
+                    const char *helpMessage = nullptr);
+
+    /** Add (single) band argument. */
+    GDALInConstructionAlgorithmArg &
+    AddBandArg(int *pValue, const char *helpMessage = nullptr);
+
+    /** Add (potentially multiple) band argument. */
+    GDALInConstructionAlgorithmArg &
+    AddBandArg(std::vector<int> *pValue, const char *helpMessage = nullptr);
 
     /** Add bbox=xmin,ymin,xmax,ymax argument. */
     GDALInConstructionAlgorithmArg &
     AddBBOXArg(std::vector<double> *pValue, const char *helpMessage = nullptr);
 
     /** Add active layer argument. */
-    GDALInConstructionAlgorithmArg &AddActiveLayerArg(std::string *pValue);
+    GDALInConstructionAlgorithmArg &
+    AddActiveLayerArg(std::string *pValue, const char *helpMessage = nullptr);
 
     /** Add \--progress argument. */
     GDALInConstructionAlgorithmArg &AddProgressArg();
+
+    /** Register an action that is executed by the ValidateArguments()
+     * method. If the provided function returns false, validation fails.
+     * Such validation function should typically be used to ensure
+     * cross-argument validation. For validation of individual arguments,
+     * GDALAlgorithmArg::AddValidationAction should rather be called.
+     */
+    void AddValidationAction(std::function<bool()> f)
+    {
+        m_validationActions.push_back(f);
+    }
 
     /** Add KEY=VALUE suggestion from open, creation options */
     static bool AddOptionsSuggestions(const char *pszXML, int datasetType,
@@ -2361,6 +2512,7 @@ class CPL_DLL GDALAlgorithmRegistry
     std::unique_ptr<GDALAlgorithm> m_selectedSubAlgHolder{};
     std::function<std::vector<std::string>(const std::vector<std::string> &)>
         m_autoCompleteFunction{};
+    std::vector<std::function<bool()>> m_validationActions{};
 
     GDALInConstructionAlgorithmArg &
     AddArg(std::unique_ptr<GDALInConstructionAlgorithmArg> arg);

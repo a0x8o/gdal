@@ -36,12 +36,15 @@ single :program:`gdal` program that accepts commands and subcommands.
    gdal_mdim_convert
    gdal_raster
    gdal_raster_info
+   gdal_raster_aspect
    gdal_raster_astype
    gdal_raster_calc
    gdal_raster_clip
+   gdal_raster_color_map
    gdal_raster_contour
    gdal_raster_convert
    gdal_raster_edit
+   gdal_raster_hillshade
    gdal_raster_mosaic
    gdal_raster_overview
    gdal_raster_overview_add
@@ -49,9 +52,13 @@ single :program:`gdal` program that accepts commands and subcommands.
    gdal_raster_pipeline
    gdal_raster_reproject
    gdal_raster_resize
+   gdal_raster_roughness
    gdal_raster_scale
    gdal_raster_select
+   gdal_raster_slope
    gdal_raster_stack
+   gdal_raster_tpi
+   gdal_raster_tri
    gdal_raster_unscale
    gdal_vector
    gdal_vector_info
@@ -62,6 +69,12 @@ single :program:`gdal` program that accepts commands and subcommands.
    gdal_vector_geom
    gdal_vector_geom_set_type
    gdal_vector_geom_explode_collections
+   gdal_vector_geom_make_valid
+   gdal_vector_geom_segmentize
+   gdal_vector_geom_simplify
+   gdal_vector_geom_buffer
+   gdal_vector_geom_swap_xy
+   gdal_vector_grid
    gdal_vector_pipeline
    gdal_vector_rasterize
    gdal_vector_reproject
@@ -81,12 +94,15 @@ single :program:`gdal` program that accepts commands and subcommands.
     - :ref:`gdal_mdim_convert_subcommand`: Convert a multidimensional dataset
     - :ref:`gdal_raster_command`: Entry point for raster commands
     - :ref:`gdal_raster_info_subcommand`: Get information on a raster dataset
+    - :ref:`gdal_raster_aspect_subcommand`: Generate an aspect map.
     - :ref:`gdal_raster_astype_subcommand`: Modify the data type of bands of a raster dataset
     - :ref:`gdal_raster_calc_subcommand`: Perform raster algebra
     - :ref:`gdal_raster_clip_subcommand`: Clip a raster dataset
+    - :ref:`gdal_raster_color_map_subcommand`: Generate a RGB or RGBA dataset from a single band, using a color map
     - :ref:`gdal_raster_convert_subcommand`: Convert a raster dataset
     - :ref:`gdal_raster_contour_subcommand`: Builds vector contour lines from a raster elevation model
     - :ref:`gdal_raster_edit_subcommand`: Edit in place a raster dataset
+    - :ref:`gdal_raster_hillshade_subcommand`: Generate a shaded relief map
     - :ref:`gdal_raster_mosaic_subcommand`: Build a mosaic, either virtual (VRT) or materialized.
     - :ref:`gdal_raster_overview_subcommand`: Manage overviews of a raster dataset
     - :ref:`gdal_raster_overview_add_subcommand`: Add overviews to a raster dataset
@@ -94,9 +110,13 @@ single :program:`gdal` program that accepts commands and subcommands.
     - :ref:`gdal_raster_pipeline_subcommand`: Process a raster dataset
     - :ref:`gdal_raster_reproject_subcommand`: Reproject a raster dataset
     - :ref:`gdal_raster_resize_subcommand`: Resize a raster dataset without changing the georeferenced extents
+    - :ref:`gdal_raster_roughness_subcommand`: Generate a roughness map.
     - :ref:`gdal_raster_scale_subcommand`: Scale the values of the bands of a raster dataset.
     - :ref:`gdal_raster_select_subcommand`: Select a subset of bands from a raster dataset.
+    - :ref:`gdal_raster_slope_subcommand`: Generate a slope map.
     - :ref:`gdal_raster_stack_subcommand`: Combine together input bands into a multi-band output, either virtual (VRT) or materialized.
+    - :ref:`gdal_raster_tpi_subcommand`: Generate a Topographic Position Index (TPI) map.
+    - :ref:`gdal_raster_tri_subcommand`: Generate a Terrain Ruggedness Index (TRI) map.
     - :ref:`gdal_raster_unscale_subcommand`: Convert scaled values of a raster dataset into unscaled values.
     - :ref:`gdal_vector_command`: Entry point for vector commands
     - :ref:`gdal_vector_info_subcommand`: Get information on a vector dataset
@@ -106,6 +126,12 @@ single :program:`gdal` program that accepts commands and subcommands.
     - :ref:`gdal_vector_geom_subcommand`: Geometry operations on a vector dataset
     - :ref:`gdal_vector_geom_set_type_subsubcommand`: Modify the geometry type of a vector dataset
     - :ref:`gdal_vector_geom_explode_collections_subsubcommand`: Explode geometries of type collection of a vector dataset
+    - :ref:`gdal_vector_geom_make_valid_subsubcommand`: Fix validity of geometries of a vector dataset
+    - :ref:`gdal_vector_geom_segmentize_subsubcommand`: Segmentize geometries of a vector dataset
+    - :ref:`gdal_vector_geom_simplify_subsubcommand`: Simplify geometries of a vector dataset
+    - :ref:`gdal_vector_geom_buffer_subsubcommand`: Compute a buffer around geometries of a vector dataset
+    - :ref:`gdal_vector_geom_swap_xy_subsubcommand`: Swap X and Y coordinates of geometries of a vector dataset
+    - :ref:`gdal_vector_grid_subcommand`: Create a regular grid from scattered points
     - :ref:`gdal_vector_convert_subcommand`: Convert a vector dataset
     - :ref:`gdal_vector_pipeline_subcommand`: Process a vector dataset
     - :ref:`gdal_vector_reproject_subcommand`: Reproject a vector dataset

@@ -12,8 +12,10 @@
 
 #include "gdalalg_raster_reproject.h"
 
+#include "gdal_alg.h"
 #include "gdal_priv.h"
 #include "gdal_utils.h"
+#include "gdalwarper.h"
 
 #include <cmath>
 
@@ -44,49 +46,24 @@ GDALRasterReprojectAlgorithm::GDALRasterReprojectAlgorithm(bool standaloneStep)
         .SetDefault("nearest")
         .SetHiddenChoices("near");
 
-    auto &resArg =
-        AddArg("resolution", 0,
-               _("Target resolution (in destination CRS units)"), &m_resolution)
-            .SetMinCount(2)
-            .SetMaxCount(2)
-            .SetRepeatedArgAllowed(false)
-            .SetDisplayHintAboutRepetition(false)
-            .SetMetaVar("<xres>,<yres>")
-            .SetMutualExclusionGroup("resolution-size");
-    resArg.AddValidationAction(
-        [&resArg]()
-        {
-            const auto &val = resArg.Get<std::vector<double>>();
-            CPLAssert(val.size() == 2);
-            if (!(val[0] > 0 && val[1] > 0))
-            {
-                CPLError(CE_Failure, CPLE_AppDefined,
-                         "Target resolution should be strictly positive.");
-                return false;
-            }
-            return true;
-        });
+    AddArg("resolution", 0, _("Target resolution (in destination CRS units)"),
+           &m_resolution)
+        .SetMinCount(2)
+        .SetMaxCount(2)
+        .SetMinValueExcluded(0)
+        .SetRepeatedArgAllowed(false)
+        .SetDisplayHintAboutRepetition(false)
+        .SetMetaVar("<xres>,<yres>")
+        .SetMutualExclusionGroup("resolution-size");
 
-    auto &sizeArg = AddArg("size", 0, _("Target size in pixels"), &m_size)
-                        .SetMinCount(2)
-                        .SetMaxCount(2)
-                        .SetRepeatedArgAllowed(false)
-                        .SetDisplayHintAboutRepetition(false)
-                        .SetMetaVar("<width>,<height>")
-                        .SetMutualExclusionGroup("resolution-size");
-    sizeArg.AddValidationAction(
-        [&sizeArg]()
-        {
-            const auto &val = sizeArg.Get<std::vector<int>>();
-            CPLAssert(val.size() == 2);
-            if (!(val[0] >= 0 && val[1] >= 0))
-            {
-                CPLError(CE_Failure, CPLE_AppDefined,
-                         "Target size should be positive or 0.");
-                return false;
-            }
-            return true;
-        });
+    AddArg("size", 0, _("Target size in pixels"), &m_size)
+        .SetMinCount(2)
+        .SetMaxCount(2)
+        .SetMinValueIncluded(0)
+        .SetRepeatedArgAllowed(false)
+        .SetDisplayHintAboutRepetition(false)
+        .SetMetaVar("<width>,<height>")
+        .SetMutualExclusionGroup("resolution-size");
 
     AddBBOXArg(&m_bbox, _("Target bounding box (in destination CRS units)"));
     AddArg("bbox-crs", 0, _("CRS of target bounding box"), &m_bboxCrs)
@@ -115,14 +92,41 @@ GDALRasterReprojectAlgorithm::GDALRasterReprojectAlgorithm(bool standaloneStep)
              "raster have none."),
            &m_addAlpha)
         .SetCategory(GAAC_ADVANCED);
-    AddArg("warp-option", 0, _("Warping option(s)"), &m_warpOptions)
-        .AddAlias("wo")
-        .SetMetaVar("<NAME>=<VALUE>")
-        .SetCategory(GAAC_ADVANCED);
-    AddArg("transform-option", 0, _("Transform option(s)"), &m_transformOptions)
-        .AddAlias("to")
-        .SetMetaVar("<NAME>=<VALUE>")
-        .SetCategory(GAAC_ADVANCED);
+    {
+        auto &arg =
+            AddArg("warp-option", 0, _("Warping option(s)"), &m_warpOptions)
+                .AddAlias("wo")
+                .SetMetaVar("<NAME>=<VALUE>")
+                .SetCategory(GAAC_ADVANCED);
+        arg.AddValidationAction([this, &arg]()
+                                { return ValidateKeyValue(arg); });
+        arg.SetAutoCompleteFunction(
+            [](const std::string &currentValue)
+            {
+                std::vector<std::string> ret;
+                GDALAlgorithm::AddOptionsSuggestions(GDALWarpGetOptionList(), 0,
+                                                     currentValue, ret);
+                return ret;
+            });
+    }
+    {
+        auto &arg = AddArg("transform-option", 0, _("Transform option(s)"),
+                           &m_transformOptions)
+                        .AddAlias("to")
+                        .SetMetaVar("<NAME>=<VALUE>")
+                        .SetCategory(GAAC_ADVANCED);
+        arg.AddValidationAction([this, &arg]()
+                                { return ValidateKeyValue(arg); });
+        arg.SetAutoCompleteFunction(
+            [](const std::string &currentValue)
+            {
+                std::vector<std::string> ret;
+                GDALAlgorithm::AddOptionsSuggestions(
+                    GDALGetGenImgProjTranformerOptionList(), 0, currentValue,
+                    ret);
+                return ret;
+            });
+    }
     AddArg("error-threshold", 0, _("Error threshold"), &m_errorThreshold)
         .AddAlias("et")
         .SetCategory(GAAC_ADVANCED);

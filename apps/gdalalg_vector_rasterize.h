@@ -33,22 +33,7 @@ class GDALVectorRasterizeAlgorithm final : public GDALAlgorithm
     static constexpr const char *HELP_URL =
         "/programs/gdal_vector_rasterize.html";
 
-    static std::vector<std::string> GetAliases()
-    {
-        return {};
-    }
-
     GDALVectorRasterizeAlgorithm();
-
-    void SetDataset(GDALDataset *poDS)
-    {
-        auto arg = GetArg(GDAL_ARG_NAME_INPUT);
-        if (arg)
-        {
-            arg->Set(poDS);
-            arg->SetSkipIfAlreadySet();
-        }
-    }
 
   private:
     bool RunImpl(GDALProgressFunc pfnProgress, void *pProgressData) override;

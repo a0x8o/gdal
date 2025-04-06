@@ -15,12 +15,15 @@ add_library(
   gdalalg_pipeline.cpp
   gdalalg_raster.cpp
   gdalalg_raster_info.cpp
+  gdalalg_raster_aspect.cpp
   gdalalg_raster_astype.cpp
   gdalalg_raster_calc.cpp
   gdalalg_raster_clip.cpp
+  gdalalg_raster_color_map.cpp
   gdalalg_raster_convert.cpp
   gdalalg_raster_edit.cpp
   gdalalg_raster_contour.cpp
+  gdalalg_raster_hillshade.cpp
   gdalalg_raster_mosaic.cpp
   gdalalg_raster_pipeline.cpp
   gdalalg_raster_overview_add.cpp
@@ -28,9 +31,13 @@ add_library(
   gdalalg_raster_read.cpp
   gdalalg_raster_reproject.cpp
   gdalalg_raster_resize.cpp
+  gdalalg_raster_roughness.cpp
   gdalalg_raster_scale.cpp
   gdalalg_raster_select.cpp
+  gdalalg_raster_slope.cpp
   gdalalg_raster_stack.cpp
+  gdalalg_raster_tpi.cpp
+  gdalalg_raster_tri.cpp
   gdalalg_raster_unscale.cpp
   gdalalg_raster_write.cpp
   gdalalg_vector.cpp
@@ -45,6 +52,18 @@ add_library(
   gdalalg_vector_geom.cpp
   gdalalg_vector_geom_set_type.cpp
   gdalalg_vector_geom_explode_collections.cpp
+  gdalalg_vector_geom_make_valid.cpp
+  gdalalg_vector_geom_segmentize.cpp
+  gdalalg_vector_geom_simplify.cpp
+  gdalalg_vector_geom_buffer.cpp
+  gdalalg_vector_geom_swap_xy.cpp
+  gdalalg_vector_grid.cpp
+  gdalalg_vector_grid_average.cpp
+  gdalalg_vector_grid_data_metrics.cpp
+  gdalalg_vector_grid_invdist.cpp
+  gdalalg_vector_grid_invdistnn.cpp
+  gdalalg_vector_grid_linear.cpp
+  gdalalg_vector_grid_nearest.cpp
   gdalalg_vector_reproject.cpp
   gdalalg_vector_select.cpp
   gdalalg_vector_sql.cpp
@@ -77,6 +96,11 @@ target_include_directories(
 gdal_target_link_libraries(appslib PRIVATE PROJ::proj)
 
 set_property(TARGET appslib PROPERTY POSITION_INDEPENDENT_CODE ${GDAL_OBJECT_LIBRARIES_POSITION_INDEPENDENT_CODE})
+
+if (GDAL_USE_GEOS)
+  target_compile_definitions(appslib PRIVATE -DHAVE_GEOS=1)
+  target_include_directories(appslib PRIVATE $<TARGET_PROPERTY:${GEOS_TARGET},INTERFACE_INCLUDE_DIRECTORIES>)
+endif ()
 
 if (GDAL_ENABLE_DRIVER_GTIFF)
   target_compile_definitions(appslib PRIVATE -DHAVE_TIFF)

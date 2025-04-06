@@ -17,6 +17,7 @@
 #include "gdalalg_vector_convert.h"
 #include "gdalalg_vector_edit.h"
 #include "gdalalg_vector_geom.h"
+#include "gdalalg_vector_grid.h"
 #include "gdalalg_vector_pipeline.h"
 #include "gdalalg_vector_rasterize.h"
 #include "gdalalg_vector_filter.h"
@@ -35,17 +36,13 @@ class GDALVectorAlgorithm final : public GDALAlgorithm
     static constexpr const char *DESCRIPTION = "Vector commands.";
     static constexpr const char *HELP_URL = "/programs/gdal_vector.html";
 
-    static std::vector<std::string> GetAliases()
-    {
-        return {};
-    }
-
     GDALVectorAlgorithm() : GDALAlgorithm(NAME, DESCRIPTION, HELP_URL)
     {
         RegisterSubAlgorithm<GDALVectorInfoAlgorithm>();
         RegisterSubAlgorithm<GDALVectorClipAlgorithmStandalone>();
         RegisterSubAlgorithm<GDALVectorConvertAlgorithm>();
         RegisterSubAlgorithm<GDALVectorEditAlgorithmStandalone>();
+        RegisterSubAlgorithm<GDALVectorGridAlgorithm>();
         RegisterSubAlgorithm<GDALVectorRasterizeAlgorithm>();
         RegisterSubAlgorithm<GDALVectorPipelineAlgorithm>();
         RegisterSubAlgorithm<GDALVectorFilterAlgorithmStandalone>();
