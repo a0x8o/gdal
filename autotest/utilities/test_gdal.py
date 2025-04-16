@@ -173,6 +173,14 @@ def test_gdal_completion(gdal_path):
         == "** description:\\ Target\\ resolution\\ (in\\ destination\\ CRS\\ units)"
     )
 
+    out = gdaltest.runexternal(
+        f"{gdal_path} completion gdal raster convert --input /vsi"
+    ).split(" ")
+    assert "/vsimem/" in out
+
+    # Just run it. Result will depend on local configuration
+    gdaltest.runexternal(f"{gdal_path} completion gdal raster convert --input /vsis3/")
+
 
 def test_gdal_completion_co(gdal_path):
 
@@ -412,3 +420,22 @@ def test_gdal_completion_pipeline(gdal_path, subcommand):
             f"{gdal_path} completion gdal {subcommand} pipeline read foo ! geom"
         ).split(" ")
         assert "set-type" in out
+
+
+def test_gdal_algorithm_getter_setter():
+
+    with pytest.raises(
+        Exception, match="'not_existing' is not a valid sub-algorithm of 'raster'"
+    ):
+        gdal.GetGlobalAlgorithmRegistry()["raster"]["not_existing"]
+
+    alg = gdal.GetGlobalAlgorithmRegistry()["raster"]["info"]
+
+    with pytest.raises(Exception, match="'foo' is not a valid argument of 'info'"):
+        alg["foo"]
+
+    with pytest.raises(Exception, match="'foo' is not a valid argument of 'info'"):
+        alg["foo"] = "bar"
+
+    with pytest.raises(Exception):
+        alg["no-mask"] = "bar"

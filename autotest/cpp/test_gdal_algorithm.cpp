@@ -1068,6 +1068,58 @@ TEST_F(test_gdal_algorithm, double_max_val_excluded)
     }
 }
 
+TEST_F(test_gdal_algorithm, string_min_char_count)
+{
+    class MyAlgorithm : public MyAlgorithmWithDummyRun
+    {
+      public:
+        std::string m_val{};
+
+        MyAlgorithm()
+        {
+            AddArg("val", 0, "", &m_val).SetMinCharCount(2);
+        }
+    };
+
+    {
+        MyAlgorithm alg;
+        EXPECT_TRUE(alg.ParseCommandLineArguments({"--val=ab"}));
+        EXPECT_STREQ(alg.m_val.c_str(), "ab");
+    }
+
+    {
+        MyAlgorithm alg;
+        CPLErrorStateBackuper oBackuper(CPLQuietErrorHandler);
+        EXPECT_FALSE(alg.ParseCommandLineArguments({"--val=a"}));
+    }
+}
+
+TEST_F(test_gdal_algorithm, string_vector_min_char_count)
+{
+    class MyAlgorithm : public MyAlgorithmWithDummyRun
+    {
+      public:
+        std::vector<std::string> m_val{};
+
+        MyAlgorithm()
+        {
+            AddArg("val", 0, "", &m_val).SetMinCharCount(2);
+        }
+    };
+
+    {
+        MyAlgorithm alg;
+        EXPECT_TRUE(alg.ParseCommandLineArguments({"--val=ab"}));
+        EXPECT_STREQ(alg.m_val[0].c_str(), "ab");
+    }
+
+    {
+        MyAlgorithm alg;
+        CPLErrorStateBackuper oBackuper(CPLQuietErrorHandler);
+        EXPECT_FALSE(alg.ParseCommandLineArguments({"--val=a"}));
+    }
+}
+
 TEST_F(test_gdal_algorithm, SetDisplayInJSONUsage)
 {
     class MyAlgorithm : public MyAlgorithmWithDummyRun
@@ -3502,8 +3554,8 @@ TEST_F(test_gdal_algorithm, raster_edit_failures_dataset_0_0)
     CPLErrorReset();
     EXPECT_FALSE(edit->Run());
     EXPECT_EQ(CPLGetLastErrorType(), CE_Failure);
-    EXPECT_STREQ(CPLGetLastErrorMsg(),
-                 "edit: Cannot set extent because dataset has 0x0 dimension");
+    EXPECT_STREQ(CPLGetLastErrorMsg(), "edit: Cannot set extent because one of "
+                                       "dataset height or width is null");
 }
 
 TEST_F(test_gdal_algorithm, raster_edit_failures_set_spatial_ref_none)
@@ -3694,6 +3746,82 @@ TEST_F(test_gdal_algorithm, raster_edit_failures_unset_metadata)
     EXPECT_EQ(CPLGetLastErrorType(), CE_Failure);
     EXPECT_STREQ(CPLGetLastErrorMsg(),
                  "edit: SetMetadataItem('foo', NULL) failed");
+}
+
+TEST_F(test_gdal_algorithm, register_plugin_algorithms)
+{
+    auto &singleton = GDALGlobalAlgorithmRegistry::GetSingleton();
+    bool flag = false;
+    singleton.DeclareAlgorithm(
+        {"foo", "bar"},
+        [&flag]() -> std::unique_ptr<GDALAlgorithm>
+        {
+            flag = true;
+            return std::make_unique<GDALContainerAlgorithm>("dummy");
+        });
+
+    {
+        EXPECT_NE(singleton.Instantiate("foo"), nullptr);
+        EXPECT_FALSE(flag);
+    }
+
+    {
+        auto got = singleton.GetDeclaredSubAlgorithmNames({"gdal"});
+        EXPECT_TRUE(std::find(got.begin(), got.end(), "foo") != got.end());
+        EXPECT_FALSE(flag);
+    }
+
+    {
+        auto got = singleton.GetDeclaredSubAlgorithmNames({"gdal", "foo"});
+        EXPECT_TRUE(std::find(got.begin(), got.end(), "bar") != got.end());
+        EXPECT_TRUE(flag);
+        flag = false;
+    }
+
+    {
+        auto got =
+            singleton.GetDeclaredSubAlgorithmNames({"gdal", "foo", "bar"});
+        EXPECT_TRUE(got.empty());
+        EXPECT_FALSE(flag);
+    }
+
+    {
+        auto got = singleton.GetDeclaredSubAlgorithmNames({"gdal", "bar"});
+        EXPECT_TRUE(got.empty());
+        EXPECT_FALSE(flag);
+    }
+
+    {
+        auto alg = singleton.InstantiateDeclaredSubAlgorithm({"gdal", "foo"});
+        ASSERT_NE(alg, nullptr);
+        EXPECT_TRUE(alg->HasSubAlgorithms());
+        EXPECT_EQ(alg->GetSubAlgorithmNames().size(), 1);
+        EXPECT_TRUE(flag);
+        flag = false;
+    }
+
+    {
+        auto alg =
+            singleton.InstantiateDeclaredSubAlgorithm({"gdal", "foo", "bar"});
+        ASSERT_NE(alg, nullptr);
+        EXPECT_TRUE(flag);
+        flag = false;
+    }
+
+    {
+        auto alg = singleton.Instantiate("foo")->InstantiateSubAlgorithm("bar");
+        ASSERT_NE(alg, nullptr);
+        EXPECT_TRUE(flag);
+    }
+
+    {
+        auto alg = singleton.InstantiateDeclaredSubAlgorithm({"gdal", "bar"});
+        ASSERT_EQ(alg, nullptr);
+    }
+
+    singleton.DeclareAlgorithm({"foo", "bar"},
+                               []() -> std::unique_ptr<GDALAlgorithm>
+                               { return nullptr; });
 }
 
 }  // namespace test_gdal_algorithm

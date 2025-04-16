@@ -31,6 +31,7 @@ single :program:`gdal` program that accepts commands and subcommands.
    gdal
    gdal_info
    gdal_convert
+   gdal_driver_gti_create
    gdal_mdim
    gdal_mdim_info
    gdal_mdim_convert
@@ -43,8 +44,10 @@ single :program:`gdal` program that accepts commands and subcommands.
    gdal_raster_color_map
    gdal_raster_contour
    gdal_raster_convert
+   gdal_raster_create
    gdal_raster_edit
    gdal_raster_hillshade
+   gdal_raster_index
    gdal_raster_mosaic
    gdal_raster_overview
    gdal_raster_overview_add
@@ -80,6 +83,10 @@ single :program:`gdal` program that accepts commands and subcommands.
    gdal_vector_reproject
    gdal_vector_select
    gdal_vector_sql
+   gdal_vfs
+   gdal_vfs_copy
+   gdal_vfs_delete
+   gdal_vfs_list
 
 .. only:: html
 
@@ -89,6 +96,7 @@ single :program:`gdal` program that accepts commands and subcommands.
     - :ref:`gdal_program`: Main "gdal" entry point
     - :ref:`gdal_info_command`: Get information on a dataset
     - :ref:`gdal_convert_command`: Convert a dataset
+    - :ref:`gdal_driver_gti_create_subcommand`: Create an index of raster datasets compatible of the GDAL Tile Index (GTI) driver
     - :ref:`gdal_mdim_command`: Entry point for multidimensional commands
     - :ref:`gdal_mdim_info_subcommand`: Get information on a multidimensional dataset
     - :ref:`gdal_mdim_convert_subcommand`: Convert a multidimensional dataset
@@ -101,8 +109,10 @@ single :program:`gdal` program that accepts commands and subcommands.
     - :ref:`gdal_raster_color_map_subcommand`: Generate a RGB or RGBA dataset from a single band, using a color map
     - :ref:`gdal_raster_convert_subcommand`: Convert a raster dataset
     - :ref:`gdal_raster_contour_subcommand`: Builds vector contour lines from a raster elevation model
+    - :ref:`gdal_raster_create_subcommand`: Create a new raster dataset
     - :ref:`gdal_raster_edit_subcommand`: Edit in place a raster dataset
     - :ref:`gdal_raster_hillshade_subcommand`: Generate a shaded relief map
+    - :ref:`gdal_raster_index_subcommand`: Create a vector index of raster datasets
     - :ref:`gdal_raster_mosaic_subcommand`: Build a mosaic, either virtual (VRT) or materialized.
     - :ref:`gdal_raster_overview_subcommand`: Manage overviews of a raster dataset
     - :ref:`gdal_raster_overview_add_subcommand`: Add overviews to a raster dataset
@@ -138,6 +148,10 @@ single :program:`gdal` program that accepts commands and subcommands.
     - :ref:`gdal_vector_select_subcommand`: Select a subset of fields from a vector dataset.
     - :ref:`gdal_vector_rasterize_subcommand`: Burns vector geometries into a raster
     - :ref:`gdal_vector_sql_subcommand`: Apply SQL statement(s) to a dataset
+    - :ref:`gdal_vfs_command`: Entry point for GDAL Virtual file system (VSI) commands
+    - :ref:`gdal_vfs_copy_subcommand`: Copy files located on GDAL Virtual file systems (VSI)
+    - :ref:`gdal_vfs_delete_subcommand`: Delete files located on GDAL Virtual file systems (VSI)
+    - :ref:`gdal_vfs_list_subcommand`: List files of one of the GDAL Virtual file systems (VSI)
 
 
 "Traditional" applications

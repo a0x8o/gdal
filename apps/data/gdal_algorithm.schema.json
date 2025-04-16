@@ -79,8 +79,6 @@
       },
       "required": [
         "description",
-        "short_url",
-        "url",
         "sub_algorithms",
         "input_arguments",
         "output_arguments",
@@ -113,6 +111,10 @@
         "description": {
           "type": "string",
           "$comment": "Argument description"
+        },
+        "metavar": {
+          "type": "string",
+          "$comment": "Hint on the expected value of the argument"
         },
         "choices": {
           "type": "array",

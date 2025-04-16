@@ -21,9 +21,11 @@ add_library(
   gdalalg_raster_clip.cpp
   gdalalg_raster_color_map.cpp
   gdalalg_raster_convert.cpp
+  gdalalg_raster_create.cpp
   gdalalg_raster_edit.cpp
   gdalalg_raster_contour.cpp
   gdalalg_raster_hillshade.cpp
+  gdalalg_raster_index.cpp
   gdalalg_raster_mosaic.cpp
   gdalalg_raster_pipeline.cpp
   gdalalg_raster_overview_add.cpp
@@ -64,10 +66,15 @@ add_library(
   gdalalg_vector_grid_invdistnn.cpp
   gdalalg_vector_grid_linear.cpp
   gdalalg_vector_grid_nearest.cpp
+  gdalalg_vector_output_abstract.cpp
   gdalalg_vector_reproject.cpp
   gdalalg_vector_select.cpp
   gdalalg_vector_sql.cpp
   gdalalg_vector_write.cpp
+  gdalalg_vfs.cpp
+  gdalalg_vfs_copy.cpp
+  gdalalg_vfs_delete.cpp
+  gdalalg_vfs_list.cpp
   gdalinfo_lib.cpp
   gdalbuildvrt_lib.cpp
   gdal_grid_lib.cpp
@@ -90,8 +97,7 @@ target_sources(${GDAL_LIB_TARGET_NAME} PRIVATE $<TARGET_OBJECTS:appslib>)
 gdal_standard_includes(appslib)
 target_compile_options(appslib PRIVATE ${GDAL_CXX_WARNING_FLAGS} ${WFLAG_OLD_STYLE_CAST} ${WFLAG_EFFCXX})
 target_include_directories(
-  appslib PRIVATE $<TARGET_PROPERTY:gdal_vrt,SOURCE_DIR> $<TARGET_PROPERTY:ogrsf_generic,SOURCE_DIR>
-                  $<TARGET_PROPERTY:ogr_MEM,SOURCE_DIR>)
+  appslib PRIVATE $<TARGET_PROPERTY:gdal_vrt,SOURCE_DIR> $<TARGET_PROPERTY:ogrsf_generic,SOURCE_DIR>)
 
 gdal_target_link_libraries(appslib PRIVATE PROJ::proj)
 
@@ -212,8 +218,7 @@ if (BUILD_APPS)
     target_compile_options(${UTILCMD} PRIVATE ${GDAL_CXX_WARNING_FLAGS} ${WFLAG_OLD_STYLE_CAST})
     add_dependencies(${UTILCMD} generate_gdal_version_h)
     target_include_directories(
-      ${UTILCMD} PRIVATE $<TARGET_PROPERTY:gdal_vrt,SOURCE_DIR> $<TARGET_PROPERTY:ogrsf_generic,SOURCE_DIR>
-                         $<TARGET_PROPERTY:ogr_MEM,SOURCE_DIR>)
+      ${UTILCMD} PRIVATE $<TARGET_PROPERTY:gdal_vrt,SOURCE_DIR> $<TARGET_PROPERTY:ogrsf_generic,SOURCE_DIR>)
     if (MSVC)
       set_target_properties(${UTILCMD} PROPERTIES LINK_FLAGS "wsetargv.obj")
     endif ()
@@ -283,8 +288,7 @@ if (BUILD_APPS)
       target_link_libraries(${UTILCMD} PRIVATE wsock32 ws2_32 psapi)
     endif ()
     target_include_directories(
-      ${UTILCMD} PRIVATE $<TARGET_PROPERTY:gdal_vrt,SOURCE_DIR> $<TARGET_PROPERTY:ogrsf_generic,SOURCE_DIR>
-                         $<TARGET_PROPERTY:ogr_MEM,SOURCE_DIR>)
+      ${UTILCMD} PRIVATE $<TARGET_PROPERTY:gdal_vrt,SOURCE_DIR> $<TARGET_PROPERTY:ogrsf_generic,SOURCE_DIR>)
     target_link_libraries(${UTILCMD} PRIVATE $<TARGET_NAME:${GDAL_LIB_TARGET_NAME}>)
   endforeach ()
 endif ()

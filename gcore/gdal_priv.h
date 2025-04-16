@@ -34,6 +34,7 @@ class GDALProxyDataset;
 class GDALProxyRasterBand;
 class GDALAsyncReader;
 class GDALRelationship;
+class GDALAlgorithm;
 
 /* -------------------------------------------------------------------- */
 /*      Pull in the public declarations.  This gets the C apis, and     */
@@ -1832,6 +1833,8 @@ class CPL_DLL GDALRasterBand : public GDALMajorObject
     virtual CPLErr SetNoDataValue(double dfNoData);
     virtual CPLErr SetNoDataValueAsInt64(int64_t nNoData);
     virtual CPLErr SetNoDataValueAsUInt64(uint64_t nNoData);
+    CPLErr SetNoDataValueAsString(const char *pszNoData,
+                                  bool *pbCannotBeExactlyRepresented = nullptr);
     virtual CPLErr DeleteNoDataValue();
     virtual CPLErr SetColorTable(GDALColorTable *poCT);
     virtual CPLErr SetColorInterpretation(GDALColorInterp eColorInterp);
@@ -2368,6 +2371,26 @@ class CPL_DLL GDALDriver : public GDALMajorObject
     GDALSubdatasetInfo *(*pfnGetSubdatasetInfoFunc)(const char *pszFileName) =
         nullptr;
 
+    typedef GDALAlgorithm *(*InstantiateAlgorithmCallback)(
+        const std::vector<std::string> &aosPath);
+    InstantiateAlgorithmCallback pfnInstantiateAlgorithm = nullptr;
+
+    virtual InstantiateAlgorithmCallback GetInstantiateAlgorithmCallback()
+    {
+        return pfnInstantiateAlgorithm;
+    }
+
+    /** Instantiate an algorithm by its full path (omitting leading "gdal").
+     * For example {"driver", "pdf", "list-layers"}
+     */
+    GDALAlgorithm *
+    InstantiateAlgorithm(const std::vector<std::string> &aosPath);
+
+    /** Declare an algorithm by its full path (omitting leading "gdal").
+     * For example {"driver", "pdf", "list-layers"}
+     */
+    void DeclareAlgorithm(const std::vector<std::string> &aosPath);
+
     //! @endcond
 
     /* -------------------------------------------------------------------- */
@@ -2517,6 +2540,8 @@ class GDALPluginDriverProxy : public GDALDriver
     RenameCallback GetRenameCallback() override;
 
     CopyFilesCallback GetCopyFilesCallback() override;
+
+    InstantiateAlgorithmCallback GetInstantiateAlgorithmCallback() override;
     //! @endcond
 
     CPLErr SetMetadataItem(const char *pszName, const char *pszValue,
@@ -2558,11 +2583,7 @@ class CPL_DLL GDALDriverManager : public GDALMajorObject
                                                     : nullptr;
     }
 
-    GDALDriver *GetDriverByName_unlocked(const char *pszName) const
-    {
-        auto oIter = oMapNameToDrivers.find(CPLString(pszName).toupper());
-        return oIter == oMapNameToDrivers.end() ? nullptr : oIter->second;
-    }
+    GDALDriver *GetDriverByName_unlocked(const char *pszName) const;
 
     static void CleanupPythonDrivers();
 
@@ -4668,8 +4689,9 @@ bool CPL_DLL GDALBufferHasOnlyNoData(const void *pBuffer, double dfNoDataValue,
                                      int nBitsPerSample,
                                      GDALBufferSampleFormat nSampleFormat);
 
-void CPL_DLL GDALCopyNoDataValue(GDALRasterBand *poDstBand,
-                                 GDALRasterBand *poSrcBand);
+bool CPL_DLL GDALCopyNoDataValue(GDALRasterBand *poDstBand,
+                                 GDALRasterBand *poSrcBand,
+                                 bool *pbCannotBeExactlyRepresented = nullptr);
 
 double CPL_DLL GDALGetNoDataValueCastToDouble(int64_t nVal);
 double CPL_DLL GDALGetNoDataValueCastToDouble(uint64_t nVal);

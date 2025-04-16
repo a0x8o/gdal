@@ -83,6 +83,7 @@ extensions = [
     "sphinxcontrib_programoutput_gdal",
     "sphinxcontrib.spelling",
     "myst_nb",
+    "sphinx_tabs.tabs",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -287,6 +288,13 @@ man_pages = [
         1,
     ),
     (
+        "programs/gdal_raster_create",
+        "gdal-raster-create",
+        "Create a new raster dataset",
+        [author_evenr],
+        1,
+    ),
+    (
         "programs/gdal_raster_edit",
         "gdal-raster-edit",
         "Edit in place a raster dataset",
@@ -297,6 +305,13 @@ man_pages = [
         "programs/gdal_raster_hillshade",
         "gdal-raster-hillshade",
         "Generate a shaded relief map",
+        [author_evenr],
+        1,
+    ),
+    (
+        "programs/gdal_raster_index",
+        "gdal-raster-index",
+        "Create a vector index of raster datasets",
         [author_evenr],
         1,
     ),
@@ -528,6 +543,34 @@ man_pages = [
         "programs/gdal_vector_sql",
         "gdal-vector-sql",
         "Apply SQL statement(s) to a dataset",
+        [author_evenr],
+        1,
+    ),
+    (
+        "programs/gdal_vfs",
+        "gdal-vfs",
+        "Entry point for GDAL Virtual file system (VSI) commands",
+        [author_evenr],
+        1,
+    ),
+    (
+        "programs/gdal_vfs_copy",
+        "gdal-vfs-copy",
+        "Copy files located on GDAL Virtual file systems (VSI)",
+        [author_evenr],
+        1,
+    ),
+    (
+        "programs/gdal_vfs_delete",
+        "gdal-vfs-delete",
+        "Delete files located on GDAL Virtual file systems (VSI)",
+        [author_evenr],
+        1,
+    ),
+    (
+        "programs/gdal_vfs_list",
+        "gdal-vfs-list",
+        "List files of one of the GDAL Virtual file systems (VSI)",
         [author_evenr],
         1,
     ),
