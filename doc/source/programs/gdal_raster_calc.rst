@@ -1,7 +1,7 @@
-.. _gdal_raster_calc_subcommand:
+.. _gdal_raster_calc:
 
 ================================================================================
-"gdal raster calc" sub-command
+``gdal raster calc``
 ================================================================================
 
 .. versionadded:: 3.11
@@ -99,4 +99,4 @@ Examples
 
    .. code-block:: bash
 
-       gdal_calc -i "A=input.tif" -o=result.tif --calc="A > 0 ? A : NaN"
+       gdal raster calc -i "A=input.tif" -o result.tif --calc="A > 0 ? A : NaN"

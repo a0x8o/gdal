@@ -1,7 +1,7 @@
-.. _gdal_vector_pipeline_subcommand:
+.. _gdal_vector_pipeline:
 
 ================================================================================
-"gdal vector pipeline" sub-command
+``gdal vector pipeline``
 ================================================================================
 
 .. versionadded:: 3.11
@@ -18,8 +18,8 @@ Synopsis
 .. program-output:: gdal vector pipeline --help-doc=main
 
 A pipeline chains several steps, separated with the `!` (quotation mark) character.
-The first step must be ``read``, and the last one ``write``. Each step has its
-own positional or non-positional arguments. Apart from ``read`` and ``write``,
+The first step must be ``read`` or ``concat``, and the last one ``write``. Each step has its
+own positional or non-positional arguments. Apart from ``read``, ``concat`` and ``write``,
 all other steps can potentially be used several times in a pipeline.
 
 Potential steps are:
@@ -28,47 +28,53 @@ Potential steps are:
 
 .. program-output:: gdal vector pipeline --help-doc=read
 
+* concat
+
+.. program-output:: gdal vector pipeline --help-doc=concat
+
+Details for options can be found in :ref:`gdal_vector_concat`.
+
 * clip
 
 .. program-output:: gdal vector pipeline --help-doc=clip
 
-Details for options can be found in :ref:`gdal_vector_clip_subcommand`.
+Details for options can be found in :ref:`gdal_vector_clip`.
 
 * edit
 
 .. program-output:: gdal vector pipeline --help-doc=edit
 
-Details for options can be found in :ref:`gdal_vector_edit_subcommand`.
+Details for options can be found in :ref:`gdal_vector_edit`.
 
 * filter
 
 .. program-output:: gdal vector pipeline --help-doc=filter
 
-Details for options can be found in :ref:`gdal_vector_filter_subcommand`.
+Details for options can be found in :ref:`gdal_vector_filter`.
 
 * geom
 
 .. program-output:: gdal vector pipeline --help-doc=geom
 
-Details for options can be found in :ref:`gdal_vector_geom_subcommand`.
+Details for options can be found in :ref:`gdal_vector_geom`.
 
 * reproject
 
 .. program-output:: gdal vector pipeline --help-doc=reproject
 
-Details for options can be found in :ref:`gdal_vector_reproject_subcommand`.
+Details for options can be found in :ref:`gdal_vector_reproject`.
 
 * select
 
 .. program-output:: gdal vector pipeline --help-doc=select
 
-Details for options can be found in :ref:`gdal_vector_select_subcommand`.
+Details for options can be found in :ref:`gdal_vector_select`.
 
 * sql
 
 .. program-output:: gdal vector pipeline --help-doc=sql
 
-Details for options can be found in :ref:`gdal_vector_sql_subcommand`.
+Details for options can be found in :ref:`gdal_vector_sql`.
 
 * write
 
@@ -127,3 +133,10 @@ Examples
 
         $ gdal vector pipeline --progress ! read in.gpkg ! reproject --dst-crs=EPSG:32632 ! write in_epsg_32632.gdalg.json --overwrite
         $ gdal vector info in_epsg_32632.gdalg.json
+
+.. example:: Union 2 source shapefiles (with similar structure), reproject them to EPSG:32632, keep only cities larger than 1 million inhabitants and write to a GeoPackage
+   :title:
+
+   .. code-block:: bash
+
+        $ gdal vector pipeline --progress ! concat --single --dst-crs=EPSG:32632 france.shp belgium.shp ! filter --where "pop > 1e6" ! write out.gpkg --overwrite
