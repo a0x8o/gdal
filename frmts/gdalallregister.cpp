@@ -178,6 +178,11 @@ void CPL_STDCALL GDALAllRegister()
 #if defined(DEFERRED_HDF4_DRIVER)
     DeclareDeferredHDF4Plugin();
 #endif
+#if defined(DEFERRED_KEA_DRIVER)
+    // Must be registered before HDF5 so that when the plugin is not
+    // installer the proper suggestion message is displayed
+    DeclareDeferredKEAPlugin();
+#endif
 #if defined(DEFERRED_HDF5_DRIVER)
     DeclareDeferredHDF5Plugin();
 #endif
@@ -198,9 +203,6 @@ void CPL_STDCALL GDALAllRegister()
 #endif
 #if defined(DEFERRED_JPIPKAK_DRIVER)
     DeclareDeferredJPIPKAKPlugin();
-#endif
-#if defined(DEFERRED_KEA_DRIVER)
-    DeclareDeferredKEAPlugin();
 #endif
 #if defined(DEFERRED_LIBKML_DRIVER)
     DeclareDeferredOGRLIBKMLPlugin();
@@ -548,6 +550,7 @@ void CPL_STDCALL GDALAllRegister()
 #endif
 
 #ifdef FRMT_gsg
+    GDALRegister_GSBG();
     GDALRegister_GS7BG();
 #endif
 

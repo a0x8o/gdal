@@ -131,6 +131,12 @@ def test_algorithm(tmp_path):
     with pytest.raises(Exception, match="must only be called on arguments of type"):
         arg.GetAsStringList()
     assert arg.Get() is False
+    assert (
+        arg.GetDatasetType()
+        == gdal.OF_RASTER | gdal.OF_VECTOR | gdal.OF_MULTIDIM_RASTER
+    )
+    assert arg.GetDatasetInputFlags() == gdal.GADV_NAME | gdal.GADV_OBJECT
+    assert arg.GetDatasetOutputFlags() == gdal.GADV_OBJECT
 
     arg = convert.GetArg("input")
     with pytest.raises(Exception, match="must only be called on arguments of type"):
@@ -376,29 +382,29 @@ def test_algorithm_arg_set_double_list():
     reg = gdal.GetGlobalAlgorithmRegistry()
     alg = reg["raster"]["footprint"]
 
-    alg["srcnodata"] = 2
-    assert alg["srcnodata"] == [2]
+    alg["src-nodata"] = 2
+    assert alg["src-nodata"] == [2]
 
-    alg["srcnodata"] = "2"
-    assert alg["srcnodata"] == [2]
+    alg["src-nodata"] = "2"
+    assert alg["src-nodata"] == [2]
 
-    alg["srcnodata"] = 2.5
-    assert alg["srcnodata"] == [2.5]
+    alg["src-nodata"] = 2.5
+    assert alg["src-nodata"] == [2.5]
 
-    alg["srcnodata"] = [2, 4]
-    assert alg["srcnodata"] == [2, 4]
+    alg["src-nodata"] = [2, 4]
+    assert alg["src-nodata"] == [2, 4]
 
-    alg["srcnodata"] = ["2", "4"]
-    assert alg["srcnodata"] == [2, 4]
+    alg["src-nodata"] = ["2", "4"]
+    assert alg["src-nodata"] == [2, 4]
 
-    alg["srcnodata"] = [2.5, 4.5]
-    assert alg["srcnodata"] == [2.5, 4.5]
-
-    with pytest.raises(TypeError):
-        alg["srcnodata"] = None
+    alg["src-nodata"] = [2.5, 4.5]
+    assert alg["src-nodata"] == [2.5, 4.5]
 
     with pytest.raises(TypeError):
-        alg["srcnodata"] = [None]
+        alg["src-nodata"] = None
+
+    with pytest.raises(TypeError):
+        alg["src-nodata"] = [None]
 
 
 ###############################################################################

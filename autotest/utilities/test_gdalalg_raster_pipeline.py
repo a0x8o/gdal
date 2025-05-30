@@ -12,7 +12,9 @@
 ###############################################################################
 
 import json
+import os
 
+import gdaltest
 import pytest
 
 from osgeo import gdal
@@ -605,197 +607,6 @@ def test_gdalalg_raster_pipeline_reproject_proj_string(tmp_vsimem):
         ), ds.GetSpatialRef().ExportToWkt(["FORMAT=WKT2"])
 
 
-def test_gdalalg_raster_pipeline_clip_missing_bbox_or_like(tmp_vsimem):
-
-    out_filename = str(tmp_vsimem / "out.tif")
-
-    pipeline = get_pipeline_alg()
-    with pytest.raises(
-        Exception, match="clip: Either --bbox or --like must be specified"
-    ):
-        pipeline.ParseRunAndFinalize(
-            [
-                "read",
-                "../gcore/data/byte.tif",
-                "!",
-                "clip",
-                "!",
-                "write",
-                "--overwrite",
-                out_filename,
-            ]
-        )
-
-
-def test_gdalalg_raster_pipeline_clip(tmp_vsimem):
-
-    out_filename = str(tmp_vsimem / "out.tif")
-
-    pipeline = get_pipeline_alg()
-    assert pipeline.ParseRunAndFinalize(
-        [
-            "read",
-            "../gcore/data/byte.tif",
-            "!",
-            "clip",
-            "--bbox=440780,3750200,441860,3751260",
-            "!",
-            "write",
-            "--overwrite",
-            out_filename,
-        ]
-    )
-
-    with gdal.Open(out_filename) as ds:
-        assert ds.RasterXSize == 18
-        assert ds.RasterYSize == 18
-        assert ds.GetSpatialRef().GetAuthorityCode(None) == "26711"
-        assert ds.GetGeoTransform() == pytest.approx(
-            (440780, 60, 0, 3751260, 0, -60), rel=1e-8
-        )
-        assert ds.GetRasterBand(1).Checksum() == 3695
-
-    out2_filename = str(tmp_vsimem / "out2.tif")
-
-    pipeline = get_pipeline_alg()
-    assert pipeline.ParseRunAndFinalize(
-        [
-            "read",
-            "../gcore/data/byte.tif",
-            "!",
-            "clip",
-            "--like",
-            out_filename,
-            "!",
-            "write",
-            "--overwrite",
-            out2_filename,
-        ]
-    )
-
-    with gdal.Open(out_filename) as ds:
-        assert ds.RasterXSize == 18
-        assert ds.RasterYSize == 18
-        assert ds.GetSpatialRef().GetAuthorityCode(None) == "26711"
-        assert ds.GetGeoTransform() == pytest.approx(
-            (440780, 60, 0, 3751260, 0, -60), rel=1e-8
-        )
-        assert ds.GetRasterBand(1).Checksum() == 3695
-
-
-def test_gdalalg_raster_pipeline_clip_like_error(tmp_vsimem):
-
-    ref_filename = str(tmp_vsimem / "out.tif")
-    gdal.GetDriverByName("GTiff").Create(ref_filename, 1, 1)
-
-    out_filename = str(tmp_vsimem / "out.tif")
-
-    pipeline = get_pipeline_alg()
-    with pytest.raises(Exception, match="has no geotransform matrix"):
-        pipeline.ParseRunAndFinalize(
-            [
-                "read",
-                "../gcore/data/byte.tif",
-                "!",
-                "clip",
-                "--like",
-                ref_filename,
-                "!",
-                "write",
-                "--overwrite",
-                out_filename,
-            ]
-        )
-
-    with gdal.GetDriverByName("GTiff").Create(ref_filename, 1, 1) as ds:
-        ds.SetGeoTransform([2, 1, 0, 49, 0, -1])
-
-    pipeline = get_pipeline_alg()
-    with pytest.raises(Exception, match="has no SRS"):
-        pipeline.ParseRunAndFinalize(
-            [
-                "read",
-                "../gcore/data/byte.tif",
-                "!",
-                "clip",
-                "--like",
-                ref_filename,
-                "!",
-                "write",
-                "--overwrite",
-                out_filename,
-            ]
-        )
-
-
-@pytest.mark.parametrize("allow_bbox_outside_source", (True, False))
-@pytest.mark.parametrize("bbox_pos", ("partially outside", "completely outside"))
-def test_gdalalg_raster_pipeline_clip_bbox_outside_source(
-    tmp_vsimem, bbox_pos, allow_bbox_outside_source
-):
-
-    pipeline = get_pipeline_alg()
-
-    flags = []
-    if allow_bbox_outside_source:
-        flags.append("--allow-bbox-outside-source")
-    if bbox_pos == "partially outside":
-        flags.append("--bbox=0,0,441920,3751320")
-    elif bbox_pos == "completely outside":
-        flags.append("--bbox=0,100,0,100")
-
-    try:
-        pipeline.ParseRunAndFinalize(
-            [
-                "read",
-                "../gcore/data/byte.tif",
-                "!",
-                "clip",
-            ]
-            + flags
-            + [
-                "!",
-                "write",
-                tmp_vsimem / "out.tif",
-            ]
-        )
-    except Exception as e:
-        assert not allow_bbox_outside_source
-        assert bbox_pos in str(e)
-    else:
-        assert allow_bbox_outside_source
-
-
-def test_gdalalg_raster_pipeline_clip_bbox_crs(tmp_vsimem):
-
-    out_filename = str(tmp_vsimem / "out.tif")
-
-    pipeline = get_pipeline_alg()
-    assert pipeline.ParseRunAndFinalize(
-        [
-            "read",
-            "../gcore/data/byte.tif",
-            "!",
-            "clip",
-            "--bbox=-117.631,33.89,-117.628,33.9005",
-            "--bbox-crs=NAD27",
-            "--allow-bbox-outside-source",
-            "!",
-            "write",
-            "--overwrite",
-            out_filename,
-        ]
-    )
-
-    with gdal.Open(out_filename) as ds:
-        assert ds.RasterXSize == 6
-        assert ds.RasterYSize == 20
-        assert ds.GetSpatialRef().GetAuthorityCode(None) == "26711"
-        assert ds.GetGeoTransform() == pytest.approx(
-            (441620.0, 60.0, 0.0, 3751140.0, 0.0, -60.0), rel=1e-8
-        )
-
-
 def test_gdalalg_raster_pipeline_too_many_steps_for_vrt_output(tmp_vsimem):
 
     out_filename = str(tmp_vsimem / "out.vrt")
@@ -819,3 +630,59 @@ def test_gdalalg_raster_pipeline_too_many_steps_for_vrt_output(tmp_vsimem):
                 out_filename,
             ]
         )
+
+
+@pytest.mark.parametrize(
+    "config_options", [{}, {"GDAL_RASTER_PIPELINE_USE_GTIFF_FOR_TEMP_DATASET": "YES"}]
+)
+def test_gdalalg_raster_pipeline_to_gdalg_step_non_natively_streamable(
+    tmp_vsimem, config_options
+):
+
+    src_filename = os.path.join(os.getcwd(), "../gcore/data/byte.tif")
+
+    with gdaltest.error_raised(gdal.CE_Warning):
+        gdal.Run(
+            "raster",
+            "pipeline",
+            pipeline=f"read {src_filename} ! fill-nodata ! write {tmp_vsimem}/out.gdalg.json",
+        )
+
+    if gdal.GetDriverByName("GDALG"):
+        with gdaltest.config_options(config_options):
+            with gdal.Open(tmp_vsimem / "out.gdalg.json") as ds:
+                assert ds.GetRasterBand(1).Checksum() == 4672
+
+        new_options = {"CPL_TMPDIR": "/i_do/not/exist"}
+        new_options.update(config_options)
+        with gdaltest.config_options(new_options):
+            with pytest.raises(Exception):
+                gdal.Open(tmp_vsimem / "out.gdalg.json")
+
+
+def test_gdalalg_raster_pipeline_help():
+
+    import gdaltest
+    import test_cli_utilities
+
+    gdal_path = test_cli_utilities.get_gdal_path()
+    if gdal_path is None:
+        pytest.skip("gdal binary missing")
+
+    out = gdaltest.runexternal(f"{gdal_path} raster pipeline --help")
+    assert out.startswith("Usage: gdal raster pipeline [OPTIONS] <PIPELINE>")
+    assert "* read [OPTIONS] <INPUT>" in out
+    assert "* write [OPTIONS] <OUTPUT>" in out
+
+    out = gdaltest.runexternal(f"{gdal_path} raster pipeline --progress --help")
+    assert out.startswith("Usage: gdal raster pipeline [OPTIONS] <PIPELINE>")
+    assert "* read [OPTIONS] <INPUT>" in out
+    assert "* write [OPTIONS] <OUTPUT>" in out
+
+    out = gdaltest.runexternal(f"{gdal_path} raster pipeline read --help")
+    assert out.startswith("Usage: read [OPTIONS] <INPUT>")
+
+    out = gdaltest.runexternal(
+        f"{gdal_path} raster pipeline read foo.tif ! select --help"
+    )
+    assert out.startswith("Usage: select [OPTIONS] <BAND>")

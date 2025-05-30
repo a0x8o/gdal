@@ -17,6 +17,7 @@
 
 #include <cerrno>
 #include <cstddef>
+#include <cstdlib>
 #include <cstring>
 #include <ctime>
 #if HAVE_FCNTL_H
@@ -216,7 +217,8 @@ class VSIMemFilesystemHandler final : public VSIFilesystemHandler
     int Rmdir(const char *pszDirname) override;
     int RmdirRecursive(const char *pszDirname) override;
     char **ReadDirEx(const char *pszDirname, int nMaxFiles) override;
-    int Rename(const char *oldpath, const char *newpath) override;
+    int Rename(const char *oldpath, const char *newpath, GDALProgressFunc,
+               void *) override;
     GIntBig GetDiskFreeSpace(const char *pszDirname) override;
 
     static std::string NormalizePath(const std::string &in);
@@ -1047,7 +1049,8 @@ char **VSIMemFilesystemHandler::ReadDirEx(const char *pszPath, int nMaxFiles)
 /************************************************************************/
 
 int VSIMemFilesystemHandler::Rename(const char *pszOldPath,
-                                    const char *pszNewPath)
+                                    const char *pszNewPath, GDALProgressFunc,
+                                    void *)
 
 {
     CPLMutexHolder oHolder(&hMutex);

@@ -74,6 +74,18 @@ def test_gdalalg_raster_footprint_existing_output(tmp_vsimem):
     lyr = ds.GetLayer(0)
     assert lyr.GetFeatureCount() == 2
     assert alg.Finalize()
+    ds.Close()
+
+    alg = get_alg()
+    alg["input"] = "../gcore/data/byte.tif"
+    out_ds = gdal.OpenEx(out_filename, gdal.OF_UPDATE)
+    alg["output"] = out_ds
+    alg["append"] = True
+    assert alg.Run()
+    lyr = out_ds.GetLayer(0)
+    assert lyr.GetFeatureCount() == 3
+    assert alg.Finalize()
+    out_ds.Close()
 
     alg = get_alg()
     alg["input"] = "../gcore/data/byte.tif"
@@ -189,7 +201,7 @@ def test_gdalalg_raster_footprint_overview():
     alg["overview"] = 0
     with pytest.raises(
         Exception,
-        match="Source dataset has no overviews. Argument 'ovr' should not be specified",
+        match="Source dataset has no overviews. Argument 'overview' should not be specified",
     ):
         alg.Run()
 
@@ -214,7 +226,7 @@ def test_gdalalg_raster_footprint_overview():
     alg["overview"] = 1
     with pytest.raises(
         Exception,
-        match="Source dataset has only 1 overview levels. 'ovr' value should be strictly lower than this number",
+        match="Source dataset has only 1 overview levels. 'overview' value should be strictly lower than this number",
     ):
         alg.Run()
 
@@ -228,7 +240,7 @@ def test_gdalalg_raster_footprint_srcnodata():
     alg["input"] = src_ds
     alg["output"] = ""
     alg["output-format"] = "MEM"
-    alg["srcnodata"] = 255
+    alg["src-nodata"] = 255
     assert alg.Run()
     ds = alg["output"].GetDataset()
     lyr = ds.GetLayer(0)
@@ -252,7 +264,7 @@ def test_gdalalg_raster_footprint_srcnodata_several(use_setnodatavalue):
     alg["output"] = ""
     alg["output-format"] = "MEM"
     if not use_setnodatavalue:
-        alg["srcnodata"] = [0, 1]
+        alg["src-nodata"] = [0, 1]
     assert alg.Run()
     ds = alg["output"].GetDataset()
     lyr = ds.GetLayer(0)

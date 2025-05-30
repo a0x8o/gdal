@@ -25,6 +25,31 @@
 //! @cond Doxygen_Suppress
 
 /************************************************************************/
+/*                  GDALVectorPipelineStepRunContext                    */
+/************************************************************************/
+
+class GDALVectorPipelineStepAlgorithm;
+
+class GDALVectorPipelineStepRunContext
+{
+  public:
+    GDALVectorPipelineStepRunContext() = default;
+
+    // Progress callback to use during execution of the step
+    GDALProgressFunc m_pfnProgress = nullptr;
+    void *m_pProgressData = nullptr;
+
+    // If there is a step in the pipeline immediately following step to which
+    // this instance of GDALRasterPipelineStepRunContext is passed, and that
+    // this next step is usable by the current step (as determined by
+    // CanHandleNextStep()), then this member will point to this next step.
+    GDALVectorPipelineStepAlgorithm *m_poNextUsableStep = nullptr;
+
+  private:
+    CPL_DISALLOW_COPY_ASSIGN(GDALVectorPipelineStepRunContext)
+};
+
+/************************************************************************/
 /*                GDALVectorPipelineStepAlgorithm                       */
 /************************************************************************/
 
@@ -36,16 +61,68 @@ class GDALVectorPipelineStepAlgorithm /* non final */ : public GDALAlgorithm
                                     const std::string &helpURL,
                                     bool standaloneStep);
 
+    struct ConstructorOptions
+    {
+        bool standaloneStep = false;
+        bool outputDatasetRequired = true;
+        std::string updateMutualExclusionGroup{};
+        std::string outputDatasetMutualExclusionGroup{};
+
+        inline ConstructorOptions &SetStandaloneStep(bool b)
+        {
+            standaloneStep = b;
+            return *this;
+        }
+
+        inline ConstructorOptions &SetOutputDatasetRequired(bool b)
+        {
+            outputDatasetRequired = b;
+            return *this;
+        }
+
+        inline ConstructorOptions &
+        SetUpdateMutualExclusionGroup(const std::string &s)
+        {
+            updateMutualExclusionGroup = s;
+            return *this;
+        }
+
+        inline ConstructorOptions &
+        SetOutputDatasetMutualExclusionGroup(const std::string &s)
+        {
+            outputDatasetMutualExclusionGroup = s;
+            return *this;
+        }
+    };
+
+    GDALVectorPipelineStepAlgorithm(const std::string &name,
+                                    const std::string &description,
+                                    const std::string &helpURL,
+                                    const ConstructorOptions &options);
+
+    using StepRunContext = GDALVectorPipelineStepRunContext;
+
     friend class GDALVectorPipelineAlgorithm;
     friend class GDALAbstractPipelineAlgorithm<GDALVectorPipelineStepAlgorithm>;
     friend class GDALVectorConcatAlgorithm;
 
-    virtual bool RunStep(GDALProgressFunc pfnProgress, void *pProgressData) = 0;
+    virtual bool IsNativelyStreamingCompatible() const
+    {
+        return true;
+    }
+
+    virtual bool CanHandleNextStep(GDALVectorPipelineStepAlgorithm *) const
+    {
+        return false;
+    }
+
+    virtual bool RunStep(GDALVectorPipelineStepRunContext &ctxt) = 0;
 
     void AddInputArgs(bool hiddenForCLI);
     void AddOutputArgs(bool hiddenForCLI, bool shortNameOutputLayerAllowed);
 
     bool m_standaloneStep = false;
+    const ConstructorOptions m_constructorOptions;
 
     bool m_outputVRTCompatible = false;
 
@@ -134,6 +211,7 @@ class GDALVectorPipelineOutputLayer /* non final */
 {
   protected:
     explicit GDALVectorPipelineOutputLayer(OGRLayer &oSrcLayer);
+    ~GDALVectorPipelineOutputLayer();
 
     DEFINE_GET_NEXT_FEATURE_THROUGH_RAW(GDALVectorPipelineOutputLayer)
 
@@ -153,7 +231,7 @@ class GDALVectorPipelineOutputLayer /* non final */
 /************************************************************************/
 
 /** Class that forwards GetNextFeature() calls to the source layer and
- * can be aded to GDALVectorPipelineOutputDataset::AddLayer()
+ * can be added to GDALVectorPipelineOutputDataset::AddLayer()
  */
 class GDALVectorPipelinePassthroughLayer /* non final */
     : public GDALVectorPipelineOutputLayer
@@ -183,6 +261,37 @@ class GDALVectorPipelinePassthroughLayer /* non final */
 };
 
 /************************************************************************/
+/*                 GDALVectorNonStreamingAlgorithmDataset               */
+/************************************************************************/
+
+class MEMDataset;
+
+/**
+ * Dataset used to read all input features into memory and perform some
+ * processing.
+ */
+class GDALVectorNonStreamingAlgorithmDataset /* non final */
+    : public GDALDataset
+{
+  public:
+    GDALVectorNonStreamingAlgorithmDataset();
+    ~GDALVectorNonStreamingAlgorithmDataset();
+
+    virtual bool Process(OGRLayer &srcLayer, OGRLayer &dstLayer) = 0;
+
+    bool AddProcessedLayer(OGRLayer &srcLayer);
+    void AddPassThroughLayer(OGRLayer &oLayer);
+    int GetLayerCount() final override;
+    OGRLayer *GetLayer(int idx) final override;
+    int TestCapability(const char *pszCap) override;
+
+  private:
+    std::vector<std::unique_ptr<OGRLayer>> m_passthrough_layers{};
+    std::vector<OGRLayer *> m_layers{};
+    std::unique_ptr<MEMDataset> m_ds{};
+};
+
+/************************************************************************/
 /*                 GDALVectorPipelineOutputDataset                      */
 /************************************************************************/
 
@@ -206,6 +315,7 @@ class GDALVectorPipelineOutputDataset final : public GDALDataset
 
   public:
     explicit GDALVectorPipelineOutputDataset(GDALDataset &oSrcDS);
+    ~GDALVectorPipelineOutputDataset();
 
     void AddLayer(OGRLayer &oSrcLayer,
                   std::unique_ptr<OGRLayerWithTranslateFeature> poNewLayer);

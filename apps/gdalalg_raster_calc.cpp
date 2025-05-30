@@ -15,11 +15,13 @@
 #include "../frmts/vrt/gdal_vrt.h"
 #include "../frmts/vrt/vrtdataset.h"
 
+#include "cpl_float.h"
+#include "cpl_vsi_virtual.h"
 #include "gdal_priv.h"
 #include "gdal_utils.h"
 
 #include <algorithm>
-#include <cpl_vsi_virtual.h>
+#include <array>
 #include <optional>
 
 //! @cond Doxygen_Suppress
@@ -30,6 +32,7 @@
 
 struct GDALCalcOptions
 {
+    GDALDataType dstType{GDT_Float64};
     bool checkSRS{true};
     bool checkExtent{true};
 };
@@ -224,6 +227,39 @@ UpdateSourceProperties(SourceProperties &out, const std::string &dsn,
     return source;
 }
 
+static bool IsSumAllSources(const std::string &expression,
+                            const std::map<std::string, std::string> &sources)
+{
+    bool ok = false;
+    std::string modExpression;
+    const char *pszSep = "+ ";
+    if (cpl::starts_with(expression, "sum(") && expression.back() == ')')
+    {
+        modExpression = expression.substr(4, expression.size() - 5);
+        pszSep = ", ";
+    }
+    else
+    {
+        modExpression = expression;
+    }
+    const CPLStringList aosTokens(
+        CSLTokenizeString2(modExpression.c_str(), pszSep, 0));
+    if (static_cast<size_t>(aosTokens.size()) == sources.size())
+    {
+        std::set<std::string> foundSources;
+        for (int i = 0; i < aosTokens.size(); ++i)
+        {
+            if (cpl::contains(sources, aosTokens[i]) &&
+                !cpl::contains(foundSources, aosTokens[i]))
+            {
+                foundSources.insert(aosTokens[i]);
+            }
+        }
+        ok = foundSources.size() == sources.size();
+    }
+    return ok;
+}
+
 /** Create XML nodes for one or more derived bands resulting from the evaluation
  *  of a single expression
  *
@@ -233,14 +269,18 @@ UpdateSourceProperties(SourceProperties &out, const std::string &dsn,
  * @param expression Expression for which band(s) should be added
  * @param sources Mapping of source names to DSNs
  * @param sourceProps Mapping of source names to properties
+ * @param fakeSourceFilename If not empty, used instead of real input filenames.
  * @return true if the band(s) were added, false otherwise
  */
 static bool
 CreateDerivedBandXML(CPLXMLNode *root, int nXOut, int nYOut,
-                     const std::string &expression,
+                     GDALDataType bandType, const std::string &expression,
                      const std::map<std::string, std::string> &sources,
-                     const std::map<std::string, SourceProperties> &sourceProps)
+                     const std::map<std::string, SourceProperties> &sourceProps,
+                     const std::string &fakeSourceFilename)
 {
+    const bool bIsSumAllSources = IsSumAllSources(expression, sources);
+
     int nOutBands = 1;  // By default, each expression produces a single output
                         // band. When processing the expression below, we may
                         // discover that the expression produces multiple bands,
@@ -254,14 +294,8 @@ CreateDerivedBandXML(CPLXMLNode *root, int nXOut, int nYOut,
 
         CPLXMLNode *band = CPLCreateXMLNode(root, CXT_Element, "VRTRasterBand");
         CPLAddXMLAttributeAndValue(band, "subClass", "VRTDerivedRasterBand");
-        // TODO: Allow user specification of output data type?
-        CPLAddXMLAttributeAndValue(band, "dataType", "Float64");
-
-        CPLXMLNode *pixelFunctionType =
-            CPLCreateXMLNode(band, CXT_Element, "PixelFunctionType");
-        CPLCreateXMLNode(pixelFunctionType, CXT_Text, "expression");
-        CPLXMLNode *arguments =
-            CPLCreateXMLNode(band, CXT_Element, "PixelFunctionArguments");
+        CPLAddXMLAttributeAndValue(band, "dataType",
+                                   GDALGetDataTypeName(bandType));
 
         for (const auto &[source_name, dsn] : sources)
         {
@@ -318,42 +352,64 @@ CreateDerivedBandXML(CPLXMLNode *root, int nXOut, int nYOut,
 
                 CPLXMLNode *sourceFilename =
                     CPLCreateXMLNode(source, CXT_Element, "SourceFilename");
-                CPLAddXMLAttributeAndValue(sourceFilename, "relativeToVRT",
-                                           "0");
-                CPLCreateXMLNode(sourceFilename, CXT_Text, dsn.c_str());
+                if (fakeSourceFilename.empty())
+                {
+                    CPLAddXMLAttributeAndValue(sourceFilename, "relativeToVRT",
+                                               "0");
+                    CPLCreateXMLNode(sourceFilename, CXT_Text, dsn.c_str());
+                }
+                else
+                {
+                    CPLCreateXMLNode(sourceFilename, CXT_Text,
+                                     fakeSourceFilename.c_str());
+                }
 
                 CPLXMLNode *sourceBand =
                     CPLCreateXMLNode(source, CXT_Element, "SourceBand");
                 CPLCreateXMLNode(sourceBand, CXT_Text,
                                  std::to_string(nInBand).c_str());
 
-                // TODO add <SourceProperties> ?
+                if (fakeSourceFilename.empty())
+                {
+                    CPLXMLNode *srcRect =
+                        CPLCreateXMLNode(source, CXT_Element, "SrcRect");
+                    CPLAddXMLAttributeAndValue(srcRect, "xOff", "0");
+                    CPLAddXMLAttributeAndValue(srcRect, "yOff", "0");
+                    CPLAddXMLAttributeAndValue(
+                        srcRect, "xSize", std::to_string(props.nX).c_str());
+                    CPLAddXMLAttributeAndValue(
+                        srcRect, "ySize", std::to_string(props.nY).c_str());
 
-                CPLXMLNode *srcRect =
-                    CPLCreateXMLNode(source, CXT_Element, "SrcRect");
-                CPLAddXMLAttributeAndValue(srcRect, "xOff", "0");
-                CPLAddXMLAttributeAndValue(srcRect, "yOff", "0");
-                CPLAddXMLAttributeAndValue(srcRect, "xSize",
-                                           std::to_string(props.nX).c_str());
-                CPLAddXMLAttributeAndValue(srcRect, "ySize",
-                                           std::to_string(props.nY).c_str());
-
-                CPLXMLNode *dstRect =
-                    CPLCreateXMLNode(source, CXT_Element, "DstRect");
-                CPLAddXMLAttributeAndValue(dstRect, "xOff", "0");
-                CPLAddXMLAttributeAndValue(dstRect, "yOff", "0");
-                CPLAddXMLAttributeAndValue(dstRect, "xSize",
-                                           std::to_string(nXOut).c_str());
-                CPLAddXMLAttributeAndValue(dstRect, "ySize",
-                                           std::to_string(nYOut).c_str());
+                    CPLXMLNode *dstRect =
+                        CPLCreateXMLNode(source, CXT_Element, "DstRect");
+                    CPLAddXMLAttributeAndValue(dstRect, "xOff", "0");
+                    CPLAddXMLAttributeAndValue(dstRect, "yOff", "0");
+                    CPLAddXMLAttributeAndValue(dstRect, "xSize",
+                                               std::to_string(nXOut).c_str());
+                    CPLAddXMLAttributeAndValue(dstRect, "ySize",
+                                               std::to_string(nYOut).c_str());
+                }
             }
         }
 
-        // Add the expression as a last step, because we may modify the
-        // expression as we iterate through the bands.
-        CPLAddXMLAttributeAndValue(arguments, "expression",
-                                   bandExpression.c_str());
-        CPLAddXMLAttributeAndValue(arguments, "dialect", "muparser");
+        CPLXMLNode *pixelFunctionType =
+            CPLCreateXMLNode(band, CXT_Element, "PixelFunctionType");
+        if (bIsSumAllSources)
+        {
+            CPLCreateXMLNode(pixelFunctionType, CXT_Text, "sum");
+        }
+        else
+        {
+            CPLCreateXMLNode(pixelFunctionType, CXT_Text, "expression");
+            CPLXMLNode *arguments =
+                CPLCreateXMLNode(band, CXT_Element, "PixelFunctionArguments");
+
+            // Add the expression as a last step, because we may modify the
+            // expression as we iterate through the bands.
+            CPLAddXMLAttributeAndValue(arguments, "expression",
+                                       bandExpression.c_str());
+            CPLAddXMLAttributeAndValue(arguments, "dialect", "muparser");
+        }
     }
 
     return true;
@@ -367,9 +423,9 @@ static bool ParseSourceDescriptors(const std::vector<std::string> &inputs,
 
     for (const auto &input : inputs)
     {
-        std::string name = "";
+        std::string name;
 
-        auto pos = input.find('=');
+        const auto pos = input.find('=');
         if (pos == std::string::npos)
         {
             if (inputs.size() > 1)
@@ -386,13 +442,50 @@ static bool ParseSourceDescriptors(const std::vector<std::string> &inputs,
             name = input.substr(0, pos);
         }
 
+        // Check input name is legal
+        for (size_t i = 0; i < name.size(); ++i)
+        {
+            const char c = name[i];
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+            {
+                // ok
+            }
+            else if (c == '_' || (c >= '0' && c <= '9'))
+            {
+                if (i == 0)
+                {
+                    // Reserved constants in MuParser start with an underscore
+                    CPLError(
+                        CE_Failure, CPLE_AppDefined,
+                        "Name '%s' is illegal because it starts with a '%c'",
+                        name.c_str(), c);
+                    return false;
+                }
+            }
+            else
+            {
+                CPLError(CE_Failure, CPLE_AppDefined,
+                         "Name '%s' is illegal because character '%c' is not "
+                         "allowed",
+                         name.c_str(), c);
+                return false;
+            }
+        }
+
         std::string dsn =
             (pos == std::string::npos) ? input : input.substr(pos + 1);
+        if (datasets.find(name) != datasets.end())
+        {
+            CPLError(CE_Failure, CPLE_AppDefined,
+                     "An input with name '%s' has already been provided",
+                     name.c_str());
+            return false;
+        }
         datasets[name] = std::move(dsn);
 
         if (isFirst)
         {
-            firstSourceName = name;
+            firstSourceName = std::move(name);
             isFirst = false;
         }
     }
@@ -442,13 +535,15 @@ static bool ReadFileLists(std::vector<std::string> &inputs)
  * @param inputs A list of sources, expressed as NAME=DSN
  * @param expressions A list of expressions to be evaluated
  * @param options flags controlling which checks should be performed on the inputs
+ * @param fakeSourceFilename If not empty, used instead of real input filenames.
  *
  * @return a newly created VRTDataset, or nullptr on error
  */
 static std::unique_ptr<GDALDataset>
 GDALCalcCreateVRTDerived(const std::vector<std::string> &inputs,
                          const std::vector<std::string> &expressions,
-                         const GDALCalcOptions &options)
+                         const GDALCalcOptions &options,
+                         const std::string &fakeSourceFilename = std::string())
 {
     if (inputs.empty())
     {
@@ -507,8 +602,9 @@ GDALCalcCreateVRTDerived(const std::vector<std::string> &inputs,
 
     for (const auto &origExpression : expressions)
     {
-        if (!CreateDerivedBandXML(root.get(), out.nX, out.nY, origExpression,
-                                  sources, sourceProps))
+        if (!CreateDerivedBandXML(root.get(), out.nX, out.nY, options.dstType,
+                                  origExpression, sources, sourceProps,
+                                  fakeSourceFilename))
         {
             return nullptr;
         }
@@ -516,7 +612,9 @@ GDALCalcCreateVRTDerived(const std::vector<std::string> &inputs,
 
     //CPLDebug("VRT", "%s", CPLSerializeXMLTree(root.get()));
 
-    auto ds = std::make_unique<VRTDataset>(out.nX, out.nY);
+    auto ds = fakeSourceFilename.empty()
+                  ? std::make_unique<VRTDataset>(out.nX, out.nY)
+                  : std::make_unique<VRTDataset>(1, 1);
     if (ds->XMLInit(root.get(), "") != CE_None)
     {
         return nullptr;
@@ -537,6 +635,8 @@ GDALCalcCreateVRTDerived(const std::vector<std::string> &inputs,
 GDALRasterCalcAlgorithm::GDALRasterCalcAlgorithm() noexcept
     : GDALAlgorithm(NAME, DESCRIPTION, HELP_URL)
 {
+    m_supportsStreamedOutput = true;
+
     AddProgressArg();
 
     AddArg(GDAL_ARG_NAME_INPUT, 'i', _("Input raster datasets"), &m_inputs)
@@ -545,10 +645,12 @@ GDALRasterCalcAlgorithm::GDALRasterCalcAlgorithm() noexcept
         .SetAutoOpenDataset(false)
         .SetMetaVar("INPUTS");
 
-    AddOutputFormatArg(&m_format);
+    AddOutputFormatArg(&m_format, /* bStreamAllowed = */ true,
+                       /* bGDALGAllowed = */ true);
     AddOutputDatasetArg(&m_outputDataset, GDAL_OF_RASTER);
     AddCreationOptionsArg(&m_creationOptions);
     AddOverwriteArg(&m_overwrite);
+    AddOutputDataTypeArg(&m_type);
 
     AddArg("no-check-srs", 0,
            _("Do not check consistency of input spatial reference systems"),
@@ -558,7 +660,23 @@ GDALRasterCalcAlgorithm::GDALRasterCalcAlgorithm() noexcept
 
     AddArg("calc", 0, _("Expression(s) to evaluate"), &m_expr)
         .SetRequired()
+        .SetPackedValuesAllowed(false)
         .SetMinCount(1);
+
+    // This is a hidden option only used by test_gdalalg_raster_calc_expression_rewriting()
+    // for now
+    AddArg("no-check-expression", 0,
+           _("Whether to skip expression validity checks for virtual format "
+             "output"),
+           &m_noCheckExpression)
+        .SetHidden();
+
+    AddValidationAction(
+        [this]()
+        {
+            return m_noCheckExpression || !IsGDALGOutput() ||
+                   RunImpl(nullptr, nullptr);
+        });
 }
 
 /************************************************************************/
@@ -568,30 +686,15 @@ GDALRasterCalcAlgorithm::GDALRasterCalcAlgorithm() noexcept
 bool GDALRasterCalcAlgorithm::RunImpl(GDALProgressFunc pfnProgress,
                                       void *pProgressData)
 {
-    if (m_outputDataset.GetDatasetRef())
-    {
-        CPLError(CE_Failure, CPLE_NotSupported,
-                 "gdal raster calc does not support outputting to an "
-                 "already opened output dataset");
-        return false;
-    }
-
-    VSIStatBufL sStat;
-    if (!m_overwrite && !m_outputDataset.GetName().empty() &&
-        (VSIStatL(m_outputDataset.GetName().c_str(), &sStat) == 0 ||
-         std::unique_ptr<GDALDataset>(
-             GDALDataset::Open(m_outputDataset.GetName().c_str()))))
-    {
-        ReportError(CE_Failure, CPLE_AppDefined,
-                    "File '%s' already exists. Specify the --overwrite "
-                    "option to overwrite it.",
-                    m_outputDataset.GetName().c_str());
-        return false;
-    }
+    CPLAssert(!m_outputDataset.GetDatasetRef());
 
     GDALCalcOptions options;
     options.checkExtent = !m_NoCheckExtent;
     options.checkSRS = !m_NoCheckSRS;
+    if (!m_type.empty())
+    {
+        options.dstType = GDALGetDataTypeByName(m_type.c_str());
+    }
 
     if (!ReadFileLists(m_inputs))
     {
@@ -599,10 +702,62 @@ bool GDALRasterCalcAlgorithm::RunImpl(GDALProgressFunc pfnProgress,
     }
 
     auto vrt = GDALCalcCreateVRTDerived(m_inputs, m_expr, options);
-
     if (vrt == nullptr)
     {
         return false;
+    }
+
+    if (!m_noCheckExpression)
+    {
+        const bool bIsVRT =
+            m_format == "VRT" ||
+            (m_format.empty() &&
+             EQUAL(
+                 CPLGetExtensionSafe(m_outputDataset.GetName().c_str()).c_str(),
+                 "VRT"));
+        const bool bIsGDALG =
+            m_format == "GDALG" ||
+            (m_format.empty() &&
+             cpl::ends_with(m_outputDataset.GetName(), ".gdalg.json"));
+        if (m_format == "stream" || bIsVRT || bIsGDALG)
+        {
+            // Try reading a single pixel to check formulas are valid.
+            std::vector<GByte> dummyData(vrt->GetRasterCount());
+
+            auto poGTIFFDrv = GetGDALDriverManager()->GetDriverByName("GTiff");
+            std::string osTmpFilename;
+            if (poGTIFFDrv)
+            {
+                std::string osFilename =
+                    VSIMemGenerateHiddenFilename("tmp.tif");
+                auto poDS = std::unique_ptr<GDALDataset>(poGTIFFDrv->Create(
+                    osFilename.c_str(), 1, 1, 1, GDT_Byte, nullptr));
+                if (poDS)
+                    osTmpFilename = std::move(osFilename);
+            }
+            if (!osTmpFilename.empty())
+            {
+                auto fakeVRT = GDALCalcCreateVRTDerived(m_inputs, m_expr,
+                                                        options, osTmpFilename);
+                if (fakeVRT &&
+                    fakeVRT->RasterIO(GF_Read, 0, 0, 1, 1, dummyData.data(), 1,
+                                      1, GDT_Byte, vrt->GetRasterCount(),
+                                      nullptr, 0, 0, 0, nullptr) != CE_None)
+                {
+                    return false;
+                }
+            }
+            if (bIsGDALG)
+            {
+                return true;
+            }
+        }
+    }
+
+    if (m_format == "stream")
+    {
+        m_outputDataset.Set(std::move(vrt));
+        return true;
     }
 
     CPLStringList translateArgs;
@@ -628,14 +783,10 @@ bool GDALRasterCalcAlgorithm::RunImpl(GDALProgressFunc pfnProgress,
             translateOptions, nullptr)));
     GDALTranslateOptionsFree(translateOptions);
 
-    if (!poOutDS)
-    {
-        return false;
-    }
-
+    const bool bOK = poOutDS != nullptr;
     m_outputDataset.Set(std::move(poOutDS));
 
-    return true;
+    return bOK;
 }
 
 //! @endcond

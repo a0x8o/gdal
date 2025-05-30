@@ -18,6 +18,7 @@
 #include "cpl_conv.h"
 #include "cpl_json.h"
 #include "gdalalgorithm.h"
+#include "gdal_priv.h"
 
 #include <algorithm>
 
@@ -47,6 +48,14 @@ class GDALAbstractPipelineAlgorithm CPL_NON_FINAL : public StepAlgorithm
     {
     }
 
+    GDALAbstractPipelineAlgorithm(
+        const std::string &name, const std::string &description,
+        const std::string &helpURL,
+        const typename StepAlgorithm::ConstructorOptions &options)
+        : StepAlgorithm(name, description, helpURL, options)
+    {
+    }
+
     ~GDALAbstractPipelineAlgorithm() override
     {
         // Destroy steps in the reverse order they have been constructed,
@@ -68,9 +77,10 @@ class GDALAbstractPipelineAlgorithm CPL_NON_FINAL : public StepAlgorithm
 
     GDALAlgorithmRegistry m_stepRegistry{};
     std::vector<std::unique_ptr<StepAlgorithm>> m_steps{};
+    std::unique_ptr<StepAlgorithm> m_stepOnWhichHelpIsRequested{};
 
   private:
-    bool RunStep(GDALProgressFunc pfnProgress, void *pProgressData) override;
+    bool RunStep(typename StepAlgorithm::StepRunContext &ctxt) override;
 };
 
 /************************************************************************/
@@ -145,8 +155,16 @@ GDALAbstractPipelineAlgorithm<StepAlgorithm>::GetAutoComplete(
 
 template <class StepAlgorithm>
 bool GDALAbstractPipelineAlgorithm<StepAlgorithm>::RunStep(
-    GDALProgressFunc pfnProgress, void *pProgressData)
+    typename StepAlgorithm::StepRunContext &ctxt)
 {
+    if (m_stepOnWhichHelpIsRequested)
+    {
+        printf(
+            "%s",
+            m_stepOnWhichHelpIsRequested->GetUsageForCLI(false).c_str()); /*ok*/
+        return true;
+    }
+
     if (m_steps.empty())
     {
         // If invoked programmatically, not from the command line.
@@ -172,8 +190,8 @@ bool GDALAbstractPipelineAlgorithm<StepAlgorithm>::RunStep(
             const auto &filename =
                 outputArg->GDALAlgorithmArg::template Get<GDALArgDatasetValue>()
                     .GetName();
-            VSIStatBufL sStat;
-            if (VSIStatL(filename.c_str(), &sStat) == 0)
+            const char *pszType = "";
+            if (GDALDoesFileOrDatasetExist(filename.c_str(), &pszType))
             {
                 const auto overwriteArg =
                     m_steps.back()->GetArg(GDAL_ARG_NAME_OVERWRITE);
@@ -182,9 +200,9 @@ bool GDALAbstractPipelineAlgorithm<StepAlgorithm>::RunStep(
                     if (!overwriteArg->GDALAlgorithmArg::template Get<bool>())
                     {
                         CPLError(CE_Failure, CPLE_AppDefined,
-                                 "File '%s' already exists. Specify the "
+                                 "%s '%s' already exists. Specify the "
                                  "--overwrite option to overwrite it.",
-                                 filename.c_str());
+                                 pszType, filename.c_str());
                         return false;
                     }
                 }
@@ -203,6 +221,15 @@ bool GDALAbstractPipelineAlgorithm<StepAlgorithm>::RunStep(
             for (size_t i = 0; i + 1 < m_steps.size(); ++i)
             {
                 const auto &step = m_steps[i];
+                if (!step->IsNativelyStreamingCompatible())
+                {
+                    GDALAlgorithm::ReportError(
+                        CE_Warning, CPLE_AppDefined,
+                        "Step %s is not natively streaming compatible, and "
+                        "may cause significant processing time at opening",
+                        step->GDALAlgorithm::GetName().c_str());
+                }
+
                 if (i > 0)
                     osCommandLine += " !";
                 for (const auto &path : step->GDALAlgorithm::m_callPath)
@@ -230,11 +257,7 @@ bool GDALAbstractPipelineAlgorithm<StepAlgorithm>::RunStep(
                 }
             }
 
-            CPLJSONDocument oDoc;
-            oDoc.GetRoot().Add("type", "gdal_streamed_alg");
-            oDoc.GetRoot().Add("command_line", osCommandLine);
-
-            return oDoc.Save(filename);
+            return GDALAlgorithm::SaveGDALG(filename, osCommandLine);
         }
 
         const auto outputFormatArg =
@@ -306,7 +329,25 @@ bool GDALAbstractPipelineAlgorithm<StepAlgorithm>::RunStep(
         }
     }
 
+    int countPipelinesWithProgress = 0;
+    for (size_t i = 1; i < m_steps.size(); ++i)
+    {
+        const bool bCanHandleNextStep =
+            i < m_steps.size() - 1 &&
+            !m_steps[i]->CanHandleNextStep(m_steps[i + 1].get());
+        if (bCanHandleNextStep &&
+            !m_steps[i + 1]->IsNativelyStreamingCompatible())
+            ++countPipelinesWithProgress;
+        else if (!m_steps[i]->IsNativelyStreamingCompatible())
+            ++countPipelinesWithProgress;
+        if (bCanHandleNextStep)
+            ++i;
+    }
+    if (countPipelinesWithProgress == 0)
+        countPipelinesWithProgress = 1;
+
     GDALDataset *poCurDS = nullptr;
+    int iCurPipelineWithProgress = 0;
     for (size_t i = 0; i < m_steps.size(); ++i)
     {
         auto &step = m_steps[i];
@@ -353,8 +394,33 @@ bool GDALAbstractPipelineAlgorithm<StepAlgorithm>::RunStep(
                 static_cast<int>(i), step->GetName().c_str());
             return false;
         }
-        if (!step->Run(i < m_steps.size() - 1 ? nullptr : pfnProgress,
-                       i < m_steps.size() - 1 ? nullptr : pProgressData))
+
+        const bool bCanHandleNextStep =
+            i < m_steps.size() - 1 &&
+            step->CanHandleNextStep(m_steps[i + 1].get());
+
+        std::unique_ptr<void, decltype(&GDALDestroyScaledProgress)> pScaledData(
+            nullptr, GDALDestroyScaledProgress);
+        typename StepAlgorithm::StepRunContext stepCtxt;
+        if ((bCanHandleNextStep &&
+             m_steps[i + 1]->IsNativelyStreamingCompatible()) ||
+            !step->IsNativelyStreamingCompatible())
+        {
+            pScaledData.reset(GDALCreateScaledProgress(
+                iCurPipelineWithProgress /
+                    static_cast<double>(countPipelinesWithProgress),
+                (iCurPipelineWithProgress + 1) /
+                    static_cast<double>(countPipelinesWithProgress),
+                ctxt.m_pfnProgress, ctxt.m_pProgressData));
+            ++iCurPipelineWithProgress;
+            stepCtxt.m_pfnProgress = pScaledData ? GDALScaledProgress : nullptr;
+            stepCtxt.m_pProgressData = pScaledData.get();
+        }
+        if (bCanHandleNextStep)
+        {
+            stepCtxt.m_poNextUsableStep = m_steps[i + 1].get();
+        }
+        if (!step->ValidateArguments() || !step->RunStep(stepCtxt))
         {
             return false;
         }
@@ -367,7 +433,15 @@ bool GDALAbstractPipelineAlgorithm<StepAlgorithm>::RunStep(
                 static_cast<int>(i), step->GetName().c_str());
             return false;
         }
+
+        if (bCanHandleNextStep)
+        {
+            ++i;
+        }
     }
+
+    if (ctxt.m_pfnProgress)
+        ctxt.m_pfnProgress(1.0, "", ctxt.m_pProgressData);
 
     if (!GetOutputDataset().GetDatasetRef())
     {
@@ -406,9 +480,12 @@ std::string GDALAbstractPipelineAlgorithm<StepAlgorithm>::GetUsageAsJSON() const
     for (const std::string &name : m_stepRegistry.GetNames())
     {
         auto alg = GetStepAlg(name);
-        CPLJSONDocument oStepDoc;
-        CPL_IGNORE_RET_VAL(oStepDoc.LoadMemory(alg->GetUsageAsJSON()));
-        jPipelineSteps.Add(oStepDoc.GetRoot());
+        if (!alg->IsHidden())
+        {
+            CPLJSONDocument oStepDoc;
+            CPL_IGNORE_RET_VAL(oStepDoc.LoadMemory(alg->GetUsageAsJSON()));
+            jPipelineSteps.Add(oStepDoc.GetRoot());
+        }
     }
     oDoc.GetRoot().Add("pipeline_algorithms", jPipelineSteps);
 

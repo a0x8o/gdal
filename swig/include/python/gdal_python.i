@@ -10,6 +10,7 @@
 %include "gdal_band_docs.i"
 %include "gdal_dataset_docs.i"
 %include "gdal_driver_docs.i"
+%include "gdal_mdm_docs.i"
 %include "gdal_operations_docs.i"
 
 %init %{
@@ -599,6 +600,7 @@ void wrapper_VSIGetMemFileBuffer(const char *utf8_path, GByte **out, vsi_l_offse
   def ReadAsMaskedArray(self, xoff=0, yoff=0, win_xsize=None, win_ysize=None,
                   buf_xsize=None, buf_ysize=None, buf_type=None,
                   resample_alg=gdalconst.GRIORA_NearestNeighbour,
+                  mask_resample_alg=gdalconst.GRIORA_NearestNeighbour,
                   callback=None,
                   callback_data=None):
       """
@@ -606,8 +608,10 @@ void wrapper_VSIGetMemFileBuffer(const char *utf8_path, GByte **out, vsi_l_offse
 
       Values of the mask will be ``True`` where pixels are invalid.
 
-      See :py:meth:`ReadAsArray` for a description of arguments.
+      Starting in GDAL 3.11, if resampling (``buf_xsize`` != ``xsize``, or ``buf_ysize`` != ``ysize``) the mask
+      band will be resampled using the algorithm specified by ``mask_resample_alg``.
 
+      See :py:meth:`ReadAsArray` for a description of additional arguments.
       """
       import numpy
       array = self.ReadAsArray(xoff=xoff, yoff=yoff,
@@ -625,7 +629,7 @@ void wrapper_VSIGetMemFileBuffer(const char *utf8_path, GByte **out, vsi_l_offse
                                          win_ysize=win_ysize,
                                          buf_xsize=buf_xsize,
                                          buf_ysize=buf_ysize,
-                                         resample_alg=resample_alg).astype(bool)
+                                         resample_alg=mask_resample_alg).astype(bool)
       else:
           mask_array = None
       return numpy.ma.array(array, mask=mask_array)
@@ -1109,6 +1113,48 @@ CPLErr ReadRaster1( double xoff, double yoff, double xsize, double ysize,
 %clear (GIntBig*);
 
 %pythoncode %{
+
+    def ReadAsMaskedArray(self, xoff=0, yoff=0, xsize=None, ysize=None,
+                    buf_xsize=None, buf_ysize=None, buf_type=None,
+                    resample_alg=gdalconst.GRIORA_NearestNeighbour,
+                    mask_resample_alg=gdalconst.GRIORA_NearestNeighbour,
+                    callback=None,
+                    callback_data=None,
+                    band_list=None):
+        """
+        Read a window from raster bands into a NumPy masked array.
+
+        Values of the mask will be ``True`` where pixels are invalid.
+
+        If resampling (``buf_xsize`` != ``xsize``, or ``buf_ysize`` != ``ysize``) the mask band will be resampled
+        using the algorithm specified by ``mask_resample_alg``.
+
+        See :py:meth:`ReadAsArray` for a description of additional arguments.
+        """
+
+        import numpy as np
+
+        arr = self.ReadAsArray(xoff=xoff, yoff=yoff, xsize=xsize, ysize=ysize,
+                               buf_xsize=buf_xsize, buf_ysize=buf_ysize, buf_type=buf_type,
+                               resample_alg=resample_alg, band_list=band_list)
+
+        if band_list is None:
+            band_list = [i+1 for i in range(self.RasterCount)]
+
+        all_valid = all(self.GetRasterBand(band).GetMaskFlags() == GMF_ALL_VALID for band in band_list)
+
+        if all_valid:
+            return np.ma.masked_array(arr, False)
+
+        masks = [self.GetRasterBand(band).GetMaskBand().ReadAsArray(
+                xoff=xoff, yoff=yoff,
+                win_xsize=xsize, win_ysize=ysize,
+                buf_xsize=buf_xsize, buf_ysize=buf_ysize,
+                resample_alg=mask_resample_alg) != 255
+                 for band in band_list]
+
+        return np.ma.masked_array(arr, np.vstack(masks))
+
 
     def ReadAsArray(self, xoff=0, yoff=0, xsize=None, ysize=None, buf_obj=None,
                     buf_xsize=None, buf_ysize=None, buf_type=None,
@@ -1829,6 +1875,13 @@ def GetMDArrayNames(self, options = []) -> "list[str]":
     if ret is None:
         ret = []
     return ret
+%}
+
+%pythoncode %{
+  def GetDataTypes(self):
+      """Return data types associated with that group (typically enumerations)
+      """
+      return [self.GetDataType(i) for i in range(self.GetDataTypeCount())]
 %}
 
 }
@@ -4558,6 +4611,9 @@ def BuildVRTOptions(options=None,
                     hideNodata=None,
                     nodataMaxMaskThreshold=None,
                     strict=False,
+                    writeAbsolutePath=False,
+                    pixelFunction=None,
+                    pixelFunctionArgs=None,
                     creationOptions=None,
                     callback=None, callback_data=None):
     """Create a BuildVRTOptions() object that can be passed to gdal.BuildVRT()
@@ -4599,8 +4655,16 @@ def BuildVRTOptions(options=None,
         value of the mask band of a source below which the source band values should be replaced by VRTNodata (or 0 if not specified)
     strict:
         set to True if warnings should be failures
+    pixelFunction: str
+        a pixel function to use to calculate output pixel values when multiple
+        sources overlap. For a list of available pixel functions, see
+        :ref:`builtin_pixel_functions`.
+    pixelFunctionArgs:
+        list or dict of pixel function arguments
     creationOptions:
         list or dict of creation options
+    writeAbsolutePath:
+        Enables writing the absolute path of the input datasets. By default, input filenames are written in a relative way with respect to the VRT filename (when possible)
     callback:
         callback method.
     callback_data:
@@ -4653,8 +4717,22 @@ def BuildVRTOptions(options=None,
             new_options += ['-hidenodata']
         if strict:
             new_options += ['-strict']
+        if writeAbsolutePath:
+            new_options += ['-write_absolute_path']
         if creationOptions is not None:
             _addCreationOptions(new_options, creationOptions)
+        if pixelFunction:
+            new_options += ['-pixel-function', pixelFunction]
+        if pixelFunctionArgs:
+            if isinstance(pixelFunctionArgs, str):
+                new_options += ['-pixel-function-arg', pixelFunctionArgs]
+            elif isinstance(pixelFunctionArgs, dict):
+                for k, v in pixelFunctionArgs.items():
+                    new_options += ['-pixel-function-arg', f'{k}={v}']
+            else:
+                for opt in pixelFunctionArgs:
+                    new_options += ['-pixel-function-arg', opt]
+
 
     if return_option_list:
         return new_options
@@ -5588,14 +5666,22 @@ class VSIFile(BytesIO):
         if len(path) == 1:
             if isinstance(path[0], list):
                 alg = GetGlobalAlgorithmRegistry()
+                alg_is_registry = True
                 for i, v in enumerate(path[0]):
                     if i == 0 and v == "gdal":
                         continue
+                    alg_is_registry = False
                     alg = alg[v]
+                if alg_is_registry:
+                    alg = alg["gdal"]
             elif isinstance(path[0], str):
                 alg = GetGlobalAlgorithmRegistry()
+                alg_is_registry = True
                 for v in path[0].lstrip("gdal ").split(' '):
+                    alg_is_registry = False
                     alg = alg[v]
+                if alg_is_registry:
+                    alg = alg["gdal"]
         elif len(path) > 1:
             alg = GetGlobalAlgorithmRegistry()
             for i, v in enumerate(path):
@@ -5924,7 +6010,14 @@ class VSIFile(BytesIO):
 
         if arg_type == GAAT_STRING_LIST:
             if isinstance(value, list):
-                return self.SetAsStringList([str(v) for v in value])
+                if self.GetName() == "gcp" and len(value) >= 1 and \
+                   isinstance(value[0], list) and len(value[0]) >= 4 and \
+                   (isinstance(value[0][0], int) or isinstance(value[0][0], float)):
+                    return self.SetAsStringList([','.join(["%.17g" % x for x in v]) for v in value])
+                elif self.GetName() == "gcp" and len(value) >= 1 and isinstance(value[0], GCP):
+                    return self.SetAsStringList(["%.17g,%.17g,%.17g,%.17g,%.17g" % (gcp.GCPPixel, gcp.GCPLine, gcp.GCPX, gcp.GCPY, gcp.GCPZ) for gcp in value])
+                else:
+                    return self.SetAsStringList([str(v) for v in value])
             elif isinstance(value, dict):
                 return self.SetAsStringList([f"{k}={str(value[k])}" for k in value])
             else:

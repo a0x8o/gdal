@@ -71,6 +71,17 @@ OGRMemLayer::OGRMemLayer(const char *pszName,
     m_poFeatureDefn->Seal(/* bSealFields = */ true);
 }
 
+OGRMemLayer::OGRMemLayer(const OGRFeatureDefn &oFeatureDefn)
+    : m_poFeatureDefn(oFeatureDefn.Clone())
+{
+    m_poFeatureDefn->Reference();
+
+    SetDescription(m_poFeatureDefn->GetName());
+
+    m_oMapFeaturesIter = m_oMapFeatures.begin();
+    m_poFeatureDefn->Seal(/* bSealFields = */ true);
+}
+
 /************************************************************************/
 /*                           ~OGRMemLayer()                           */
 /************************************************************************/
@@ -973,6 +984,8 @@ class OGRMemLayerIteratorArray final : public IOGRMemLayerFeatureIterator
     GIntBig m_iCurIdx = 0;
     const GIntBig m_nMaxFeatureCount;
     OGRFeature **const m_papoFeatures;
+
+    CPL_DISALLOW_COPY_ASSIGN(OGRMemLayerIteratorArray)
 
   public:
     OGRMemLayerIteratorArray(GIntBig nMaxFeatureCount,

@@ -48,6 +48,10 @@ GDALRasterMosaicAlgorithm::GDALRasterMosaicAlgorithm()
     AddCreationOptionsArg(&m_creationOptions);
     AddBandArg(&m_bands);
     AddOverwriteArg(&m_overwrite);
+    AddAbsolutePathArg(
+        &m_writeAbsolutePaths,
+        _("Whether the path to the input datasets should be stored as an "
+          "absolute path"));
     {
         auto &arg =
             AddArg("resolution", 0,
@@ -87,22 +91,31 @@ GDALRasterMosaicAlgorithm::GDALRasterMosaicAlgorithm()
            _("Round target extent to target resolution"),
            &m_targetAlignedPixels)
         .AddHiddenAlias("tap");
-    AddArg("srcnodata", 0, _("Set nodata values for input bands."),
+    AddArg("src-nodata", 0, _("Set nodata values for input bands."),
            &m_srcNoData)
         .SetMinCount(1)
         .SetRepeatedArgAllowed(false);
-    AddArg("dstnodata", 0,
+    AddArg("dst-nodata", 0,
            _("Set nodata values at the destination band level."), &m_dstNoData)
         .SetMinCount(1)
         .SetRepeatedArgAllowed(false);
-    AddArg("hidenodata", 0,
+    AddArg("hide-nodata", 0,
            _("Makes the destination band not report the NoData."),
            &m_hideNoData);
-    AddArg("addalpha", 0,
+    AddArg("add-alpha", 0,
            _("Adds an alpha mask band to the destination when the source "
              "raster have "
              "none."),
            &m_addAlpha);
+    AddArg("pixel-function", 0,
+           _("Specify a pixel function to calculate output value from "
+             "overlapping inputs"),
+           &m_pixelFunction);
+    AddArg("pixel-function-arg", 0,
+           _("Specify argument(s) to pass to the pixel function"),
+           &m_pixelFunctionArgs)
+        .SetMetaVar("<NAME>=<VALUE>")
+        .SetRepeatedArgAllowed(true);
 }
 
 /************************************************************************/
@@ -112,13 +125,7 @@ GDALRasterMosaicAlgorithm::GDALRasterMosaicAlgorithm()
 bool GDALRasterMosaicAlgorithm::RunImpl(GDALProgressFunc pfnProgress,
                                         void *pProgressData)
 {
-    if (m_outputDataset.GetDatasetRef())
-    {
-        ReportError(CE_Failure, CPLE_NotSupported,
-                    "gdal raster mosaic does not support outputting to an "
-                    "already opened output dataset");
-        return false;
-    }
+    CPLAssert(!m_outputDataset.GetDatasetRef());
 
     std::vector<GDALDatasetH> ahInputDatasets;
     CPLStringList aosInputDatasetNames;
@@ -177,19 +184,6 @@ bool GDALRasterMosaicAlgorithm::RunImpl(GDALProgressFunc pfnProgress,
         ReportError(CE_Failure, CPLE_NotSupported,
                     "Input datasets should be provided either all by reference "
                     "or all by name");
-        return false;
-    }
-
-    VSIStatBufL sStat;
-    if (!m_overwrite && !m_outputDataset.GetName().empty() &&
-        (VSIStatL(m_outputDataset.GetName().c_str(), &sStat) == 0 ||
-         std::unique_ptr<GDALDataset>(
-             GDALDataset::Open(m_outputDataset.GetName().c_str()))))
-    {
-        ReportError(CE_Failure, CPLE_AppDefined,
-                    "File '%s' already exists. Specify the --overwrite "
-                    "option to overwrite it.",
-                    m_outputDataset.GetName().c_str());
         return false;
     }
 
@@ -276,9 +270,30 @@ bool GDALRasterMosaicAlgorithm::RunImpl(GDALProgressFunc pfnProgress,
     {
         aosOptions.push_back("-hidenodata");
     }
+    if (m_writeAbsolutePaths)
+    {
+        aosOptions.push_back("-write_absolute_path");
+    }
+
+    if (!m_pixelFunction.empty())
+    {
+        aosOptions.push_back("-pixel-function");
+        aosOptions.push_back(m_pixelFunction);
+    }
+
+    for (const auto &arg : m_pixelFunctionArgs)
+    {
+        aosOptions.push_back("-pixel-function-arg");
+        aosOptions.push_back(arg);
+    }
 
     GDALBuildVRTOptions *psOptions =
         GDALBuildVRTOptionsNew(aosOptions.List(), nullptr);
+    if (!psOptions)
+    {
+        return false;
+    }
+
     if (bVRTOutput)
     {
         GDALBuildVRTOptionsSetProgress(psOptions, pfnProgress, pProgressData);

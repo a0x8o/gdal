@@ -566,8 +566,8 @@ OGRGeoPackageTableLayer::FeatureBindUpdateParameters(OGRFeature *poFeature,
     if (sqlite_err != SQLITE_OK)
     {
         CPLError(CE_Failure, CPLE_AppDefined,
-                 "failed to bind FID '" CPL_FRMT_GIB "' to statement",
-                 poFeature->GetFID());
+                 "failed to bind FID '" CPL_FRMT_GIB "' to statement: %s",
+                 poFeature->GetFID(), sqlite3_errmsg(m_poDS->GetDB()));
         return OGRERR_FAILURE;
     }
 
@@ -920,7 +920,8 @@ OGRErr OGRGeoPackageTableLayer::ReadTableDefinition()
             const char *pszFeatureCount = oResultFeatureCount->GetValue(0, 0);
             if (pszFeatureCount)
             {
-                m_nTotalFeatureCount = CPLAtoGIntBig(pszFeatureCount);
+                m_nTotalFeatureCount =
+                    std::max<GIntBig>(0, CPLAtoGIntBig(pszFeatureCount));
             }
         }
     }
@@ -2488,13 +2489,10 @@ OGRErr OGRGeoPackageTableLayer::CreateOrUpsertFeature(OGRFeature *poFeature,
 
         /* Prepare the SQL into a statement */
         sqlite3 *poDb = m_poDS->GetDB();
-        int err = sqlite3_prepare_v2(poDb, osCommand, -1, &m_poInsertStatement,
-                                     nullptr);
+        int err = SQLPrepareWithError(poDb, osCommand, -1, &m_poInsertStatement,
+                                      nullptr);
         if (err != SQLITE_OK)
         {
-            CPLError(CE_Failure, CPLE_AppDefined,
-                     "failed to prepare SQL: %s - %s", osCommand.c_str(),
-                     sqlite3_errmsg(poDb));
             return OGRERR_FAILURE;
         }
     }
@@ -2649,7 +2647,26 @@ OGRErr OGRGeoPackageTableLayer::CreateOrUpsertFeature(OGRFeature *poFeature,
 
 #ifdef ENABLE_GPKG_OGR_CONTENTS
     if (m_nTotalFeatureCount >= 0)
-        m_nTotalFeatureCount++;
+    {
+        if (m_nTotalFeatureCount < std::numeric_limits<int64_t>::max())
+        {
+            m_nTotalFeatureCount++;
+        }
+        else
+        {
+            if (m_poDS->m_bHasGPKGOGRContents)
+            {
+                char *pszSQL = sqlite3_mprintf(
+                    "UPDATE gpkg_ogr_contents SET feature_count = null "
+                    "WHERE lower(table_name) = lower('%q')",
+                    m_pszTableName);
+                CPL_IGNORE_RET_VAL(sqlite3_exec(m_poDS->hDB, pszSQL, nullptr,
+                                                nullptr, nullptr));
+                sqlite3_free(pszSQL);
+            }
+            m_nTotalFeatureCount = -1;
+        }
+    }
 #endif
 
     m_bContentChanged = true;
@@ -2987,13 +3004,9 @@ void OGRGeoPackageTableLayer::AsyncRTreeThreadFunction()
                     nullptr)
                     ? "INSERT INTO my_rtree_SIMULATE_ERROR VALUES (?,?,?,?,?)"
                     : "INSERT INTO my_rtree VALUES (?,?,?,?,?)";
-            if (sqlite3_prepare_v2(m_hAsyncDBHandle, pszInsertSQL, -1, &hStmt,
-                                   nullptr) != SQLITE_OK)
+            if (SQLPrepareWithError(m_hAsyncDBHandle, pszInsertSQL, -1, &hStmt,
+                                    nullptr) != SQLITE_OK)
             {
-                CPLError(CE_Failure, CPLE_AppDefined,
-                         "failed to prepare SQL: %s: %s", pszInsertSQL,
-                         sqlite3_errmsg(m_hAsyncDBHandle));
-
                 m_bErrorDuringRTreeThread = true;
 
                 sqlite3_close(m_hAsyncDBHandle);
@@ -3143,13 +3156,11 @@ OGRErr OGRGeoPackageTableLayer::ISetFeature(OGRFeature *poFeature)
             return OGRERR_NONE;
 
         /* Prepare the SQL into a statement */
-        int err = sqlite3_prepare_v2(m_poDS->GetDB(), osCommand.c_str(),
-                                     static_cast<int>(osCommand.size()),
-                                     &m_poUpdateStatement, nullptr);
+        int err = SQLPrepareWithError(m_poDS->GetDB(), osCommand.c_str(),
+                                      static_cast<int>(osCommand.size()),
+                                      &m_poUpdateStatement, nullptr);
         if (err != SQLITE_OK)
         {
-            CPLError(CE_Failure, CPLE_AppDefined, "failed to prepare SQL: %s",
-                     osCommand.c_str());
             return OGRERR_FAILURE;
         }
     }
@@ -3332,7 +3343,7 @@ OGRErr OGRGeoPackageTableLayer::IUpdateFeature(
     /* Only work with fields that are set */
     /* Do not stick values into SQL, use placeholder and bind values later
      */
-    const std::string osUpdateStatementSQL = FeatureGenerateUpdateSQL(
+    std::string osUpdateStatementSQL = FeatureGenerateUpdateSQL(
         poFeature, nUpdatedFieldsCount, panUpdatedFieldsIdx,
         nUpdatedGeomFieldsCount, panUpdatedGeomFieldsIdx);
     if (osUpdateStatementSQL.empty())
@@ -3345,16 +3356,14 @@ OGRErr OGRGeoPackageTableLayer::IUpdateFeature(
         m_poUpdateStatement = nullptr;
         /* Prepare the SQL into a statement */
         int err =
-            sqlite3_prepare_v2(m_poDS->GetDB(), osUpdateStatementSQL.c_str(),
-                               static_cast<int>(osUpdateStatementSQL.size()),
-                               &m_poUpdateStatement, nullptr);
+            SQLPrepareWithError(m_poDS->GetDB(), osUpdateStatementSQL.c_str(),
+                                static_cast<int>(osUpdateStatementSQL.size()),
+                                &m_poUpdateStatement, nullptr);
         if (err != SQLITE_OK)
         {
-            CPLError(CE_Failure, CPLE_AppDefined, "failed to prepare SQL: %s",
-                     osUpdateStatementSQL.c_str());
             return OGRERR_FAILURE;
         }
-        m_osUpdateStatementSQL = osUpdateStatementSQL;
+        m_osUpdateStatementSQL = std::move(osUpdateStatementSQL);
     }
 
     /* Bind values onto the statement now */
@@ -3586,12 +3595,10 @@ OGRErr OGRGeoPackageTableLayer::ResetStatementInternal(GIntBig nStartIndex)
 
     CPLDebug("GPKG", "ResetStatement(%s)", soSQL.c_str());
 
-    int err = sqlite3_prepare_v2(m_poDS->GetDB(), soSQL.c_str(), -1,
-                                 &m_poQueryStatement, nullptr);
+    int err = SQLPrepareWithError(m_poDS->GetDB(), soSQL.c_str(), -1,
+                                  &m_poQueryStatement, nullptr);
     if (err != SQLITE_OK)
     {
-        CPLError(CE_Failure, CPLE_AppDefined, "failed to prepare SQL: %s",
-                 soSQL.c_str());
         return OGRERR_FAILURE;
     }
 
@@ -3653,12 +3660,10 @@ OGRFeature *OGRGeoPackageTableLayer::GetFeature(GIntBig nFID)
                      m_soColumns.c_str(), SQLEscapeName(m_pszTableName).c_str(),
                      SQLEscapeName(m_pszFidColumn).c_str());
 
-        const int err = sqlite3_prepare_v2(m_poDS->GetDB(), soSQL.c_str(), -1,
-                                           &m_poGetFeatureStatement, nullptr);
+        const int err = SQLPrepareWithError(m_poDS->GetDB(), soSQL.c_str(), -1,
+                                            &m_poGetFeatureStatement, nullptr);
         if (err != SQLITE_OK)
         {
-            CPLError(CE_Failure, CPLE_AppDefined, "failed to prepare SQL: %s",
-                     soSQL.c_str());
             return nullptr;
         }
     }
@@ -3901,11 +3906,9 @@ bool OGRGeoPackageTableLayer::FlushPendingSpatialIndexUpdate()
     char *pszSQL = sqlite3_mprintf("INSERT INTO \"%w\" VALUES (?,?,?,?,?)",
                                    m_osRTreeName.c_str());
     sqlite3_stmt *hInsertStmt = nullptr;
-    if (sqlite3_prepare_v2(m_poDS->GetDB(), pszSQL, -1, &hInsertStmt,
-                           nullptr) != SQLITE_OK)
+    if (SQLPrepareWithError(m_poDS->GetDB(), pszSQL, -1, &hInsertStmt,
+                            nullptr) != SQLITE_OK)
     {
-        CPLError(CE_Failure, CPLE_AppDefined, "failed to prepare SQL: %s",
-                 pszSQL);
         sqlite3_free(pszSQL);
         m_aoRTreeEntries.clear();
         return false;
@@ -4035,7 +4038,8 @@ GIntBig OGRGeoPackageTableLayer::GetTotalFeatureCount()
             const char *pszFeatureCount = oResult->GetValue(0, 0);
             if (pszFeatureCount)
             {
-                m_nTotalFeatureCount = CPLAtoGIntBig(pszFeatureCount);
+                m_nTotalFeatureCount =
+                    std::max<GIntBig>(0, CPLAtoGIntBig(pszFeatureCount));
             }
         }
     }
@@ -5119,14 +5123,14 @@ bool OGRGeoPackageTableLayer::HasSpatialIndex()
 
     const char *pszT = m_pszTableName;
     const char *pszC = m_poFeatureDefn->GetGeomFieldDefn(0)->GetNameRef();
-    const CPLString osRTreeName(
+    CPLString osRTreeName(
         CPLString("rtree_").append(pszT).append("_").append(pszC));
     const std::map<CPLString, CPLString> &oMap =
         m_poDS->GetNameTypeMapFromSQliteMaster();
     if (cpl::contains(oMap, CPLString(osRTreeName).toupper()))
     {
         m_bHasSpatialIndex = true;
-        m_osRTreeName = osRTreeName;
+        m_osRTreeName = std::move(osRTreeName);
         m_osFIDForRTree = m_pszFidColumn;
     }
 

@@ -138,7 +138,7 @@ double SRPRasterBand::GetNoDataValue(int *pbSuccess)
 GDALColorInterp SRPRasterBand::GetColorInterpretation()
 
 {
-    SRPDataset *l_poDS = (SRPDataset *)this->poDS;
+    SRPDataset *l_poDS = cpl::down_cast<SRPDataset *>(poDS);
 
     if (l_poDS->oCT.GetColorEntryCount() > 0)
         return GCI_PaletteIndex;
@@ -153,7 +153,7 @@ GDALColorInterp SRPRasterBand::GetColorInterpretation()
 GDALColorTable *SRPRasterBand::GetColorTable()
 
 {
-    SRPDataset *l_poDS = (SRPDataset *)this->poDS;
+    SRPDataset *l_poDS = cpl::down_cast<SRPDataset *>(poDS);
 
     if (l_poDS->oCT.GetColorEntryCount() > 0)
         return &(l_poDS->oCT);
@@ -168,7 +168,7 @@ GDALColorTable *SRPRasterBand::GetColorTable()
 CPLErr SRPRasterBand::IReadBlock(int nBlockXOff, int nBlockYOff, void *pImage)
 
 {
-    SRPDataset *l_poDS = (SRPDataset *)this->poDS;
+    SRPDataset *l_poDS = cpl::down_cast<SRPDataset *>(poDS);
     vsi_l_offset offset;
     int nBlock = nBlockYOff * l_poDS->NFC + nBlockXOff;
     if (nBlockXOff >= l_poDS->NFC || nBlockYOff >= l_poDS->NFL)
@@ -537,8 +537,9 @@ bool SRPDataset::GetFromRecord(const char *pszFileName, DDFRecord *record)
         if (field == nullptr)
             return false;
 
-        DDFFieldDefn *fieldDefn = field->GetFieldDefn();
-        DDFSubfieldDefn *subfieldDefn = fieldDefn->FindSubfieldDefn("TSI");
+        const DDFFieldDefn *fieldDefn = field->GetFieldDefn();
+        const DDFSubfieldDefn *subfieldDefn =
+            fieldDefn->FindSubfieldDefn("TSI");
         if (subfieldDefn == nullptr)
             return false;
 
@@ -1394,7 +1395,7 @@ char **SRPDataset::GetIMGListFromGEN(const char *pszFileName,
             const char *pszBAD = record->GetStringSubfield("SPR", 0, "BAD", 0);
             if (pszBAD == nullptr || strlen(pszBAD) != 12)
                 continue;
-            CPLString osBAD = pszBAD;
+            std::string osBAD = pszBAD;
             {
                 char *c = (char *)strchr(osBAD.c_str(), ' ');
                 if (c)
@@ -1405,12 +1406,12 @@ char **SRPDataset::GetIMGListFromGEN(const char *pszFileName,
             /* Build full IMG file name from BAD value */
             const CPLString osGENDir(CPLGetDirnameSafe(pszFileName));
 
-            const CPLString osFileName =
+            std::string osFileName =
                 CPLFormFilenameSafe(osGENDir.c_str(), osBAD.c_str(), nullptr);
             VSIStatBufL sStatBuf;
-            if (VSIStatL(osFileName, &sStatBuf) == 0)
+            if (VSIStatL(osFileName.c_str(), &sStatBuf) == 0)
             {
-                osBAD = osFileName;
+                osBAD = std::move(osFileName);
                 CPLDebug("SRP", "Building IMG full file name : %s",
                          osBAD.c_str());
             }

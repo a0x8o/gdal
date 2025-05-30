@@ -87,6 +87,13 @@ def shape_ds(poly_feat, tmp_path):
 
 def test_ogr_shape_3(shape_ds, poly_feat):
 
+    assert (
+        gdal.GetDriverByName("ESRI Shapefile").GetMetadataItem(
+            gdal.DMD_MAX_STRING_LENGTH
+        )
+        == "254"
+    )
+
     shape_lyr = shape_ds.GetLayer(0)
 
     expect = [168, 169, 166, 158, 165]
@@ -6129,9 +6136,7 @@ def test_ogr_shape_arrow_stream_fid_optim(tmp_vsimem):
 def test_ogr_shape_logical_field(tmp_vsimem):
 
     filename = tmp_vsimem / "test_ogr_shape_logical_field.shp"
-    ds = gdal.GetDriverByName("ESRI Shapefile").Create(
-        filename, 0, 0, 0, gdal.GDT_Unknown
-    )
+    ds = gdal.GetDriverByName("ESRI Shapefile").CreateVector(filename)
     lyr = ds.CreateLayer("test")
     fld_defn = ogr.FieldDefn("bool_field", ogr.OFTInteger)
     fld_defn.SetSubType(ogr.OFSTBoolean)

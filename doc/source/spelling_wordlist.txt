@@ -330,6 +330,7 @@ cass
 Cassini
 casted
 cb
+CBMTILE
 CCache
 ceil
 celldepth
@@ -3502,6 +3503,7 @@ vrf
 vrt
 VRT
 VRTDataset
+VRTDerivedRasterBand
 VRTPansharpenedDataset
 VRTWarpedDataset
 vsgis

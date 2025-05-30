@@ -19,6 +19,7 @@
 #include "cpl_azure.h"
 #include "cpl_port.h"
 #include "cpl_json.h"
+#include "cpl_http.h"
 #include "cpl_string.h"
 #include "cpl_vsil_curl_priv.h"
 #include "cpl_mem_cache.h"
@@ -248,10 +249,6 @@ class VSICurlFilesystemHandlerBase : public VSIFilesystemHandler
 
     int Stat(const char *pszFilename, VSIStatBufL *pStatBuf,
              int nFlags) override;
-    int Unlink(const char *pszFilename) override;
-    int Rename(const char *oldpath, const char *newpath) override;
-    int Mkdir(const char *pszDirname, long nMode) override;
-    int Rmdir(const char *pszDirname) override;
     char **ReadDirEx(const char *pszDirname, int nMaxFiles) override;
     char **SiblingFiles(const char *pszFilename) override;
 
@@ -421,11 +418,24 @@ class VSICurlHandle : public VSIVirtualHandle
     struct AdviseReadRange
     {
         bool bDone = false;
+        bool bToRetry = true;
+        double dfSleepDelay = 0.0;
         std::mutex oMutex{};
         std::condition_variable oCV{};
         vsi_l_offset nStartOffset = 0;
         size_t nSize = 0;
         std::vector<GByte> abyData{};
+        CPLHTTPRetryContext retryContext;
+
+        explicit AdviseReadRange(const CPLHTTPRetryParameters &oRetryParameters)
+            : retryContext(oRetryParameters)
+        {
+        }
+
+        AdviseReadRange(const AdviseReadRange &) = delete;
+        AdviseReadRange &operator=(const AdviseReadRange &) = delete;
+        AdviseReadRange(AdviseReadRange &&) = delete;
+        AdviseReadRange &operator=(AdviseReadRange &&) = delete;
     };
 
     std::vector<std::unique_ptr<AdviseReadRange>> m_aoAdviseReadRanges{};
@@ -617,7 +627,8 @@ class IVSIS3LikeFSHandler : public VSICurlFilesystemHandlerBaseWritable
     int Rmdir(const char *pszDirname) override;
     int Stat(const char *pszFilename, VSIStatBufL *pStatBuf,
              int nFlags) override;
-    int Rename(const char *oldpath, const char *newpath) override;
+    int Rename(const char *oldpath, const char *newpath, GDALProgressFunc,
+               void *) override;
 
     virtual int CopyFile(const char *pszSource, const char *pszTarget,
                          VSILFILE *fpSource, vsi_l_offset nSourceSize,

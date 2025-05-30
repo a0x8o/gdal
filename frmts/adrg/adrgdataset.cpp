@@ -147,7 +147,7 @@ GDALColorInterp ADRGRasterBand::GetColorInterpretation()
 CPLErr ADRGRasterBand::IReadBlock(int nBlockXOff, int nBlockYOff, void *pImage)
 
 {
-    ADRGDataset *l_poDS = (ADRGDataset *)this->poDS;
+    ADRGDataset *l_poDS = cpl::down_cast<ADRGDataset *>(poDS);
     int nBlock = nBlockYOff * l_poDS->NFC + nBlockXOff;
     if (nBlockXOff >= l_poDS->NFC || nBlockYOff >= l_poDS->NFL)
     {
@@ -613,7 +613,7 @@ ADRGDataset *ADRGDataset::OpenDataset(const char *pszGENFileName,
     }
     CPLDebug("ADRG", "BAD=%s", osBAD.c_str());
 
-    DDFSubfieldDefn *subfieldDefn = fieldDefn->GetSubfield(14);
+    const DDFSubfieldDefn *subfieldDefn = fieldDefn->GetSubfield(14);
     if (!(strcmp(subfieldDefn->GetName(), "TIF") == 0 &&
           (subfieldDefn->GetFormat())[0] == 'A'))
     {
@@ -1019,7 +1019,7 @@ char **ADRGDataset::GetIMGListFromGEN(const char *pszFileName,
             const char *pszBAD = record->GetStringSubfield("SPR", 0, "BAD", 0);
             if (pszBAD == nullptr || strlen(pszBAD) != 12)
                 continue;
-            CPLString osBAD = pszBAD;
+            std::string osBAD = pszBAD;
             {
                 char *c = (char *)strchr(osBAD.c_str(), ' ');
                 if (c)
@@ -1030,12 +1030,12 @@ char **ADRGDataset::GetIMGListFromGEN(const char *pszFileName,
             /* Build full IMG file name from BAD value */
             CPLString osGENDir(CPLGetDirnameSafe(pszFileName));
 
-            const CPLString osFileName =
+            std::string osFileName =
                 CPLFormFilenameSafe(osGENDir.c_str(), osBAD.c_str(), nullptr);
             VSIStatBufL sStatBuf;
-            if (VSIStatL(osFileName, &sStatBuf) == 0)
+            if (VSIStatL(osFileName.c_str(), &sStatBuf) == 0)
             {
-                osBAD = osFileName;
+                osBAD = std::move(osFileName);
                 CPLDebug("ADRG", "Building IMG full file name : %s",
                          osBAD.c_str());
             }

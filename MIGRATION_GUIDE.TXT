@@ -1,5 +1,27 @@
+MIGRATION GUIDE FROM GDAL 3.11 to GDAL 3.12
+-------------------------------------------
+
+- The following changes have been done to the "gdal" command line interface:
+
+  * Sub-commands "buffer", "explode-collections", "make-valid", "segmentize",
+    "simplify", "swap-xy" of "gdal vector geom" are now directly available
+    under "gdal vector". Support for the old location is kept for 3.12, but
+    will be definitely removed in 3.13.
+  * Furthermore, sub-command "set-type" of "gdal vector geom" is renamed as
+    "set-geom-type" and also placed under "gdal vector".
+
+- Methods GDALRasterAttributeTable::SetValue() now return a CPLErr instead of
+  void. This will impact in particular out-of-tree drivers that implement those
+  methods in a subclass of GDALRasterAttributeTable.
+
 MIGRATION GUIDE FROM GDAL 3.10 to GDAL 3.11
 -------------------------------------------
+
+- The introduction of the gdal_fwd.h header that normalizes forward declarations
+  of GDAL public opaque types may cause issues with downstream users of the
+  GDAL API that would have redefined themselves those types, particularly when
+  building against a GDAL built in DEBUG mode where the type aliases are stricter
+  than in release mode.
 
 - The OGRLayer::GetExtent(OGREnvelope*, int bForce) and
   OGRLayer::GetExtent(int iGeomField, OGREnvelope*, int bForce) methods are

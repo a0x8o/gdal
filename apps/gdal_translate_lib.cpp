@@ -996,10 +996,10 @@ GDALDatasetH GDALTranslate(const char *pszDest, GDALDatasetH hSrcDataset,
     /*      Verify source window dimensions.                                */
     /* -------------------------------------------------------------------- */
     else if (psOptions->srcWin.dfXOff <= -1 || psOptions->srcWin.dfYOff <= -1 ||
-             psOptions->srcWin.dfXOff + psOptions->srcWin.dfXSize >=
-                 poSrcDS->GetRasterXSize() + 1 ||
-             psOptions->srcWin.dfYOff + psOptions->srcWin.dfYSize >=
-                 poSrcDS->GetRasterYSize() + 1)
+             psOptions->srcWin.dfXOff + psOptions->srcWin.dfXSize - 1 >=
+                 poSrcDS->GetRasterXSize() ||
+             psOptions->srcWin.dfYOff + psOptions->srcWin.dfYSize - 1 >=
+                 poSrcDS->GetRasterYSize())
     {
         const bool bCompletelyOutside =
             psOptions->srcWin.dfXOff + psOptions->srcWin.dfXSize <= 0 ||
@@ -1040,15 +1040,14 @@ GDALDatasetH GDALTranslate(const char *pszDest, GDALDatasetH hSrcDataset,
     /* -------------------------------------------------------------------- */
     if (psOptions->osFormat.empty())
     {
-        const std::string osFormat = GetOutputDriverForRaster(pszDest);
-        if (osFormat.empty())
+        psOptions->osFormat = GetOutputDriverForRaster(pszDest);
+        if (psOptions->osFormat.empty())
         {
             CPLError(CE_Failure, CPLE_AppDefined,
                      "Could not identify an output driver for %s", pszDest);
             GDALTranslateOptionsFree(psOptions);
             return nullptr;
         }
-        psOptions->osFormat = osFormat;
     }
 
     GDALDriverH hDriver = GDALGetDriverByName(psOptions->osFormat.c_str());
@@ -1566,12 +1565,9 @@ GDALDatasetH GDALTranslate(const char *pszDest, GDALDatasetH hSrcDataset,
             psOptions->srcWin.dfXOff * adfDstGeoTransform[4] +
             psOptions->srcWin.dfYOff * adfDstGeoTransform[5];
 
-        const double dfX = static_cast<double>(nOXSize);
-        const double dfY = static_cast<double>(nOYSize);
-        adfDstGeoTransform[1] *= psOptions->srcWin.dfXSize / dfX;
-        adfDstGeoTransform[2] *= psOptions->srcWin.dfYSize / dfY;
-        adfDstGeoTransform[4] *= psOptions->srcWin.dfXSize / dfX;
-        adfDstGeoTransform[5] *= psOptions->srcWin.dfYSize / dfY;
+        const double dfXRatio = psOptions->srcWin.dfXSize / nOXSize;
+        const double dfYRatio = psOptions->srcWin.dfYSize / nOYSize;
+        GDALRescaleGeoTransform(adfDstGeoTransform, dfXRatio, dfYRatio);
 
         if (psOptions->dfXRes != 0.0)
         {
@@ -2807,10 +2803,7 @@ GDALTranslateOptionsGetParser(GDALTranslateOptions *psOptions,
 
     argParser->add_output_format_argument(psOptions->osFormat);
 
-    // Written that way so that in library mode, users can still use the -q
-    // switch, even if it has no effect
-    argParser->add_quiet_argument(
-        psOptionsForBinary ? &(psOptionsForBinary->bQuiet) : nullptr);
+    argParser->add_quiet_argument(&(psOptions->bQuiet));
 
     argParser->add_argument("-b")
         .append()
@@ -3422,8 +3415,8 @@ GDALTranslateOptionsNew(char **papszArgv,
         else if (EQUAL(papszArgv[i], "-a_nodata") && papszArgv[i + 1])
         {
             ++i;
-            const std::string s = papszArgv[i];
-            if (EQUAL(s.c_str(), "none") || EQUAL(s.c_str(), "null"))
+            const char *s = papszArgv[i];
+            if (EQUAL(s, "none") || EQUAL(s, "null"))
             {
                 psOptions->bUnsetNoData = true;
             }
@@ -3535,6 +3528,7 @@ GDALTranslateOptionsNew(char **papszArgv,
 
         if (psOptionsForBinary)
         {
+            psOptionsForBinary->bQuiet = psOptions->bQuiet;
             psOptionsForBinary->aosCreateOptions = psOptions->aosCreateOptions;
             if (!psOptions->osFormat.empty())
                 psOptionsForBinary->osFormat = psOptions->osFormat;

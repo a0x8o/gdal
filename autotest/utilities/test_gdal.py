@@ -62,6 +62,23 @@ def test_gdal_invalid_command_line(gdal_path):
     assert "ret code = 1" in err
 
 
+def test_gdal_format_only(gdal_path):
+
+    out, err = gdaltest.runexternal_out_and_err(f"{gdal_path} --format MEM")
+    assert "Short Name: MEM" in out
+    assert err == ""
+
+
+def test_gdal_format_as_output_format(gdal_path, tmp_path):
+
+    out, err = gdaltest.runexternal_out_and_err(
+        f"{gdal_path} raster convert --format GTIFF ../gcore/data/byte.tif {tmp_path}/out.xxx"
+    )
+    assert out == ""
+    assert err == ""
+    assert gdal.VSIStatL(f"{tmp_path}/out.xxx") is not None
+
+
 def test_gdal_failure_during_run(gdal_path):
 
     out, err = gdaltest.runexternal_out_and_err(
@@ -95,7 +112,10 @@ def test_gdal_config_not_serialized_to_gdalg(tmp_path, gdal_path):
         f"{gdal_path} raster reproject --config FOO=BAR ../gcore/data/byte.tif {out_filename}"
     )
     # Test that configuration option is not serialized
-    assert json.loads(gdal.VSIFile(out_filename, "rb").read()) == {
+    j = json.loads(gdal.VSIFile(out_filename, "rb").read())
+    assert "gdal_version" in j
+    del j["gdal_version"]
+    assert j == {
         "command_line": "gdal raster reproject --input ../gcore/data/byte.tif --output-format stream --output streamed_dataset",
         "type": "gdal_streamed_alg",
     }
@@ -162,6 +182,14 @@ def test_gdal_completion(gdal_path):
     if gdal.GetDriverByName("HFA"):
         assert "HFA" in out
 
+    # Test that config options are taken into account
+    out = gdaltest.runexternal(
+        f"{gdal_path} completion gdal raster convert --config GDAL_SKIP=GTiff --of"
+    ).split(" ")
+    assert "GTiff" not in out
+    if gdal.GetDriverByName("HFA"):
+        assert "HFA" in out
+
     out = gdaltest.runexternal(
         f"{gdal_path} completion gdal raster convert --input"
     ).split(" ")
@@ -182,7 +210,7 @@ def test_gdal_completion(gdal_path):
     )
     assert (
         out
-        == "** description:\\ Target\\ resolution\\ (in\\ destination\\ CRS\\ units)"
+        == "** \xC2\xA0description:\\ Target\\ resolution\\ (in\\ destination\\ CRS\\ units)"
     )
 
     out = gdaltest.runexternal(
@@ -352,15 +380,23 @@ def test_gdal_completion_dst_crs(gdal_path):
 
 def test_gdal_completion_config(gdal_path):
 
-    out = gdaltest.runexternal(
+    out, err = gdaltest.runexternal_out_and_err(
         f"{gdal_path} completion gdal raster convert --config"
-    ).split(" ")
+    )
     assert "CPL_DEBUG=" in out
+    assert err == ""
 
-    out = gdaltest.runexternal(
+    out, err = gdaltest.runexternal_out_and_err(
         f"{gdal_path} completion gdal raster convert --config="
-    ).split(" ")
+    )
     assert "CPL_DEBUG=" in out
+    assert err == ""
+
+    out, err = gdaltest.runexternal_out_and_err(
+        f"{gdal_path} completion gdal raster convert --config CPL_"
+    )
+    assert "CPL_DEBUG=" in out
+    assert err == ""
 
     out = gdaltest.runexternal(
         f"{gdal_path} completion gdal raster convert --config FOO="
@@ -431,7 +467,67 @@ def test_gdal_completion_pipeline(gdal_path, subcommand):
         out = gdaltest.runexternal(
             f"{gdal_path} completion gdal {subcommand} pipeline read foo ! geom"
         ).split(" ")
-        assert "set-type" in out
+        assert "set-geom-type" in out
+
+
+def test_gdal_completion_gdal_vector_info_layer(gdal_path):
+
+    out = gdaltest.runexternal(
+        f"{gdal_path} completion gdal vector info ../ogr/data/poly.shp --layer"
+    ).split(" ")
+    assert out == ["poly"]
+
+    out = gdaltest.runexternal(
+        f"{gdal_path} completion gdal vector info ../ogr/data/poly.shp --layer p"
+    ).split(" ")
+    assert out == ["poly"]
+
+    out = gdaltest.runexternal(
+        f"{gdal_path} completion gdal vector info ../ogr/data/poly.shp --layer poly"
+    ).split(" ")
+    assert out == [""]
+
+    out = gdaltest.runexternal(
+        f"{gdal_path} completion gdal vector info ../ogr/data/poly.shp --layer poly XX"
+    ).split(" ")
+    assert out == [""]
+
+
+def test_gdal_completion_gdal_vector_pipeline_read_layer(gdal_path):
+
+    out = gdaltest.runexternal(
+        f"{gdal_path} completion gdal vector pipeline read ../ogr/data/poly.shp --layer"
+    ).split(" ")
+    assert out == ["poly"]
+
+
+def test_gdal_question_mark(gdal_path):
+
+    _, err = gdaltest.runexternal_out_and_err(
+        f"{gdal_path} vector info ../ogr/data/poly.shp --layer=?"
+    )
+    assert "Single potential value for argument 'layer' is 'poly'" in err
+
+    _, err = gdaltest.runexternal_out_and_err(
+        f"{gdal_path} vector pipeline read ../ogr/data/poly.shp --layer=?"
+    )
+    assert "Single potential value for argument 'input-layer' is 'poly'" in err
+
+    _, err = gdaltest.runexternal_out_and_err(
+        f"{gdal_path} raster reproject --resampling=?"
+    )
+    assert (
+        "Potential values for argument 'resampling' are:\n- nearest\n- bilinear"
+        in err.replace("\r\n", "\n")
+    )
+
+    _, err = gdaltest.runexternal_out_and_err(
+        f"{gdal_path} raster pipeline read ../gcore/data/byte.tif ! reproject --resampling=?"
+    )
+    assert (
+        "Potential values for argument 'resampling' are:\n- nearest\n- bilinear"
+        in err.replace("\r\n", "\n")
+    )
 
 
 def test_gdal_algorithm_getter_setter():
@@ -558,3 +654,11 @@ def test_gdal_run():
         },
     ) as alg:
         assert alg.Output().GetSpatialRef().GetAuthorityCode(None) == "4326"
+
+
+def test_gdal_drivers():
+
+    with gdal.Run([], drivers=True) as alg:
+        j = alg.Output()
+        assert "GTiff" in [x["short_name"] for x in j]
+        assert "ESRI Shapefile" in [x["short_name"] for x in j]

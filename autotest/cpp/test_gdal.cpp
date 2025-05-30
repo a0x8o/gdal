@@ -20,6 +20,8 @@
 #include "tilematrixset.hpp"
 #include "gdalcachedpixelaccessor.h"
 
+#include <algorithm>
+#include <array>
 #include <limits>
 #include <string>
 
@@ -155,6 +157,15 @@ INSTANTIATE_TEST_SUITE_P(
 // Test GDALDataTypeUnion()
 TEST_F(test_gdal, GDALDataTypeUnion_special_cases)
 {
+    EXPECT_EQ(GDALDataTypeUnion(GDT_Byte, GDT_CInt16), GDT_CInt16);
+    EXPECT_EQ(GDALDataTypeUnion(GDT_Byte, GDT_CInt32), GDT_CInt32);
+    // special case (should be GDT_CFloat16)
+    EXPECT_EQ(GDALDataTypeUnion(GDT_Byte, GDT_CFloat16), GDT_CFloat32);
+    EXPECT_EQ(GDALDataTypeUnion(GDT_Byte, GDT_CFloat32), GDT_CFloat32);
+    EXPECT_EQ(GDALDataTypeUnion(GDT_Byte, GDT_CFloat64), GDT_CFloat64);
+
+    EXPECT_EQ(GDALDataTypeUnion(GDT_UInt16, GDT_CInt16), GDT_CInt32);
+
     EXPECT_EQ(GDALDataTypeUnion(GDT_Int16, GDT_UInt16), GDT_Int32);
     EXPECT_EQ(GDALDataTypeUnion(GDT_Int16, GDT_UInt32), GDT_Int64);
     EXPECT_EQ(GDALDataTypeUnion(GDT_UInt32, GDT_Int16), GDT_Int64);
@@ -2180,8 +2191,9 @@ TEST_F(test_gdal, TileMatrixSet)
 
     {
         auto l = gdal::TileMatrixSet::listPredefinedTileMatrixSets();
-        EXPECT_TRUE(l.find("GoogleMapsCompatible") != l.end());
-        EXPECT_TRUE(l.find("NZTM2000") != l.end());
+        EXPECT_TRUE(std::find(l.begin(), l.end(), "GoogleMapsCompatible") !=
+                    l.end());
+        EXPECT_TRUE(std::find(l.begin(), l.end(), "NZTM2000") != l.end());
     }
 
     {
@@ -2245,7 +2257,11 @@ TEST_F(test_gdal, TileMatrixSet)
         auto poTMS = gdal::TileMatrixSet::parse(
             "{\"type\": \"TileMatrixSetType\", \"supportedCRS\": "
             "\"http://www.opengis.net/def/crs/OGC/1.3/CRS84\", \"tileMatrix\": "
-            "[{ \"topLeftCorner\": [-180, 90],\"scaleDenominator\":1.0}] }");
+            "[{ \"topLeftCorner\": [-180, "
+            "90],\"scaleDenominator\":1.0,\"tileWidth\": 1,"
+            "\"tileHeight\": 1,"
+            "\"matrixWidth\": 1,"
+            "\"matrixHeight\": 1}] }");
         EXPECT_TRUE(poTMS != nullptr);
         if (poTMS)
         {
@@ -2256,14 +2272,91 @@ TEST_F(test_gdal, TileMatrixSet)
         }
     }
 
-    // Invalid scaleDenominator
     {
         CPLPushErrorHandler(CPLQuietErrorHandler);
         EXPECT_TRUE(gdal::TileMatrixSet::parse(
                         "{\"type\": \"TileMatrixSetType\", \"supportedCRS\": "
                         "\"http://www.opengis.net/def/crs/OGC/1.3/CRS84\", "
                         "\"tileMatrix\": [{ \"topLeftCorner\": [-180, "
-                        "90],\"scaleDenominator\":0.0}] }") == nullptr);
+                        "90],\"scaleDenominator\":0.0,\"tileWidth\": 1,"
+                        "\"tileHeight\": 1,"
+                        "\"matrixWidth\": 1,"
+                        "\"matrixHeight\": 1}] }") == nullptr);
+        EXPECT_STREQ(CPLGetLastErrorMsg(),
+                     "Invalid scale denominator or non-decreasing series of "
+                     "scale denominators");
+        CPLPopErrorHandler();
+    }
+
+    {
+        CPLPushErrorHandler(CPLQuietErrorHandler);
+        EXPECT_TRUE(gdal::TileMatrixSet::parse(
+                        "{\"type\": \"TileMatrixSetType\", \"supportedCRS\": "
+                        "\"http://www.opengis.net/def/crs/OGC/1.3/CRS84\", "
+                        "\"tileMatrix\": [{ \"topLeftCorner\": [-180, "
+                        "90],\"scaleDenominator\":1.0,\"tileWidth\": 0,"
+                        "\"tileHeight\": 1,"
+                        "\"matrixWidth\": 1,"
+                        "\"matrixHeight\": 1}] }") == nullptr);
+        EXPECT_STREQ(CPLGetLastErrorMsg(), "Invalid tileWidth: 0");
+        CPLPopErrorHandler();
+    }
+
+    {
+        CPLPushErrorHandler(CPLQuietErrorHandler);
+        EXPECT_TRUE(gdal::TileMatrixSet::parse(
+                        "{\"type\": \"TileMatrixSetType\", \"supportedCRS\": "
+                        "\"http://www.opengis.net/def/crs/OGC/1.3/CRS84\", "
+                        "\"tileMatrix\": [{ \"topLeftCorner\": [-180, "
+                        "90],\"scaleDenominator\":1.0,\"tileWidth\": 1,"
+                        "\"tileHeight\": 0,"
+                        "\"matrixWidth\": 1,"
+                        "\"matrixHeight\": 1}] }") == nullptr);
+        EXPECT_STREQ(CPLGetLastErrorMsg(), "Invalid tileHeight: 0");
+        CPLPopErrorHandler();
+    }
+
+    {
+        CPLPushErrorHandler(CPLQuietErrorHandler);
+        EXPECT_TRUE(gdal::TileMatrixSet::parse(
+                        "{\"type\": \"TileMatrixSetType\", \"supportedCRS\": "
+                        "\"http://www.opengis.net/def/crs/OGC/1.3/CRS84\", "
+                        "\"tileMatrix\": [{ \"topLeftCorner\": [-180, "
+                        "90],\"scaleDenominator\":1.0,\"tileWidth\": 100000,"
+                        "\"tileHeight\": 100000,"
+                        "\"matrixWidth\": 1,"
+                        "\"matrixHeight\": 1}] }") == nullptr);
+        EXPECT_STREQ(
+            CPLGetLastErrorMsg(),
+            "tileWidth(100000) x tileHeight(100000) larger than INT_MAX");
+        CPLPopErrorHandler();
+    }
+
+    {
+        CPLPushErrorHandler(CPLQuietErrorHandler);
+        EXPECT_TRUE(gdal::TileMatrixSet::parse(
+                        "{\"type\": \"TileMatrixSetType\", \"supportedCRS\": "
+                        "\"http://www.opengis.net/def/crs/OGC/1.3/CRS84\", "
+                        "\"tileMatrix\": [{ \"topLeftCorner\": [-180, "
+                        "90],\"scaleDenominator\":1.0,\"tileWidth\": 1,"
+                        "\"tileHeight\": 1,"
+                        "\"matrixWidth\": 0,"
+                        "\"matrixHeight\": 1}] }") == nullptr);
+        EXPECT_STREQ(CPLGetLastErrorMsg(), "Invalid matrixWidth: 0");
+        CPLPopErrorHandler();
+    }
+
+    {
+        CPLPushErrorHandler(CPLQuietErrorHandler);
+        EXPECT_TRUE(gdal::TileMatrixSet::parse(
+                        "{\"type\": \"TileMatrixSetType\", \"supportedCRS\": "
+                        "\"http://www.opengis.net/def/crs/OGC/1.3/CRS84\", "
+                        "\"tileMatrix\": [{ \"topLeftCorner\": [-180, "
+                        "90],\"scaleDenominator\":1.0,\"tileWidth\": 1,"
+                        "\"tileHeight\": 1,"
+                        "\"matrixWidth\": 1,"
+                        "\"matrixHeight\": 0}] }") == nullptr);
+        EXPECT_STREQ(CPLGetLastErrorMsg(), "Invalid matrixHeight: 0");
         CPLPopErrorHandler();
     }
 
@@ -5258,6 +5351,164 @@ TEST_F(test_gdal, GDALExpandPackedBitsToByteAt0Or255)
     GDALExpandPackedBitsToByteAt0Or255(in.data(), out.data(), out.size());
 
     EXPECT_EQ(out, expectedOut);
+}
+
+TEST_F(test_gdal, GDALComputeOvFactor)
+{
+    EXPECT_EQ(GDALComputeOvFactor((1000 + 16 - 1) / 16, 1000, 1, 1), 16);
+    EXPECT_EQ(GDALComputeOvFactor(1, 1, (1000 + 16 - 1) / 16, 1000), 16);
+    EXPECT_EQ(GDALComputeOvFactor((1000 + 32 - 1) / 32, 1000,
+                                  (1000 + 32 - 1) / 32, 1000),
+              32);
+    EXPECT_EQ(GDALComputeOvFactor((1000 + 64 - 1) / 64, 1000,
+                                  (1000 + 64 - 1) / 64, 1000),
+              64);
+    EXPECT_EQ(GDALComputeOvFactor((1000 + 128 - 1) / 128, 1000,
+                                  (1000 + 128 - 1) / 128, 1000),
+              128);
+    EXPECT_EQ(GDALComputeOvFactor((1000 + 256 - 1) / 256, 1000,
+                                  (1000 + 256 - 1) / 256, 1000),
+              256);
+    EXPECT_EQ(GDALComputeOvFactor((1000 + 25 - 1) / 25, 1000, 1, 1), 25);
+    EXPECT_EQ(GDALComputeOvFactor(1, 1, (1000 + 25 - 1) / 25, 1000), 25);
+}
+
+TEST_F(test_gdal, GDALRegenerateOverviewsMultiBand_very_large_block_size)
+{
+    class MyBand final : public GDALRasterBand
+    {
+      public:
+        explicit MyBand(int nSize)
+        {
+            nRasterXSize = nSize;
+            nRasterYSize = nSize;
+            nBlockXSize = std::max(1, nSize / 2);
+            nBlockYSize = std::max(1, nSize / 2);
+            eDataType = GDT_Float64;
+        }
+
+        CPLErr IReadBlock(int, int, void *) override
+        {
+            return CE_Failure;
+        }
+
+        CPLErr IRasterIO(GDALRWFlag, int, int, int, int, void *, int, int,
+                         GDALDataType, GSpacing, GSpacing,
+                         GDALRasterIOExtraArg *) override
+        {
+            IReadBlock(0, 0, nullptr);
+            return CE_Failure;
+        }
+    };
+
+    class MyDataset : public GDALDataset
+    {
+      public:
+        MyDataset()
+        {
+            nRasterXSize = INT_MAX;
+            nRasterYSize = INT_MAX;
+            SetBand(1, std::make_unique<MyBand>(INT_MAX));
+        }
+    };
+
+    MyDataset ds;
+    GDALRasterBand *poSrcBand = ds.GetRasterBand(1);
+    GDALRasterBand **ppoSrcBand = &poSrcBand;
+    GDALRasterBandH hSrcBand = GDALRasterBand::ToHandle(poSrcBand);
+
+    MyBand overBand1x1(1);
+    GDALRasterBand *poOvrBand = &overBand1x1;
+    GDALRasterBand **ppoOvrBand = &poOvrBand;
+    GDALRasterBandH hOverBand1x1 = GDALRasterBand::ToHandle(poOvrBand);
+
+    CPLErrorStateBackuper oBackuper(CPLQuietErrorHandler);
+    EXPECT_EQ(GDALRegenerateOverviewsMultiBand(1, &poSrcBand, 1, &ppoSrcBand,
+                                               "AVERAGE", nullptr, nullptr,
+                                               nullptr),
+              CE_Failure);
+
+    EXPECT_EQ(GDALRegenerateOverviewsMultiBand(1, &poSrcBand, 1, &ppoOvrBand,
+                                               "AVERAGE", nullptr, nullptr,
+                                               nullptr),
+              CE_Failure);
+
+    EXPECT_EQ(GDALRegenerateOverviewsEx(hSrcBand, 1, &hSrcBand, "AVERAGE",
+                                        nullptr, nullptr, nullptr),
+              CE_Failure);
+
+    EXPECT_EQ(GDALRegenerateOverviewsEx(hSrcBand, 1, &hOverBand1x1, "AVERAGE",
+                                        nullptr, nullptr, nullptr),
+              CE_Failure);
+}
+
+TEST_F(test_gdal, GDALColorTable_from_qml_paletted)
+{
+    {
+        CPLErrorStateBackuper oBackuper(CPLQuietErrorHandler);
+        CPLErrorReset();
+        auto poCT =
+            GDALColorTable::LoadFromFile(GCORE_DATA_DIR "i_do_not_exist.txt");
+        EXPECT_EQ(poCT, nullptr);
+        EXPECT_EQ(CPLGetLastErrorType(), CE_Failure);
+    }
+
+    {
+        auto poCT = GDALColorTable::LoadFromFile(GCORE_DATA_DIR
+                                                 "qgis_qml_paletted.qml");
+        ASSERT_NE(poCT, nullptr);
+        EXPECT_EQ(poCT->GetColorEntryCount(), 256);
+        const GDALColorEntry *psEntry = poCT->GetColorEntry(74);
+        EXPECT_NE(psEntry, nullptr);
+        EXPECT_EQ(psEntry->c1, 67);
+        EXPECT_EQ(psEntry->c2, 27);
+        EXPECT_EQ(psEntry->c3, 225);
+        EXPECT_EQ(psEntry->c4, 255);
+    }
+
+    {
+        auto poCT = GDALColorTable::LoadFromFile(
+            GCORE_DATA_DIR "qgis_qml_singlebandpseudocolor.qml");
+        ASSERT_NE(poCT, nullptr);
+        EXPECT_EQ(poCT->GetColorEntryCount(), 256);
+        const GDALColorEntry *psEntry = poCT->GetColorEntry(74);
+        EXPECT_NE(psEntry, nullptr);
+        EXPECT_EQ(psEntry->c1, 255);
+        EXPECT_EQ(psEntry->c2, 255);
+        EXPECT_EQ(psEntry->c3, 204);
+        EXPECT_EQ(psEntry->c4, 255);
+    }
+
+    {
+        auto poCT = GDALColorTable::LoadFromFile(
+            UTILITIES_DATA_DIR "color_paletted_red_green_0-255.txt");
+        ASSERT_NE(poCT, nullptr);
+        EXPECT_EQ(poCT->GetColorEntryCount(), 256);
+        {
+            const GDALColorEntry *psEntry = poCT->GetColorEntry(0);
+            EXPECT_NE(psEntry, nullptr);
+            EXPECT_EQ(psEntry->c1, 255);
+            EXPECT_EQ(psEntry->c2, 255);
+            EXPECT_EQ(psEntry->c3, 255);
+            EXPECT_EQ(psEntry->c4, 0);
+        }
+        {
+            const GDALColorEntry *psEntry = poCT->GetColorEntry(1);
+            EXPECT_NE(psEntry, nullptr);
+            EXPECT_EQ(psEntry->c1, 128);
+            EXPECT_EQ(psEntry->c2, 128);
+            EXPECT_EQ(psEntry->c3, 128);
+            EXPECT_EQ(psEntry->c4, 255);
+        }
+        {
+            const GDALColorEntry *psEntry = poCT->GetColorEntry(2);
+            EXPECT_NE(psEntry, nullptr);
+            EXPECT_EQ(psEntry->c1, 255);
+            EXPECT_EQ(psEntry->c2, 0);
+            EXPECT_EQ(psEntry->c3, 0);
+            EXPECT_EQ(psEntry->c4, 255);
+        }
+    }
 }
 
 }  // namespace

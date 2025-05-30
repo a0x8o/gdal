@@ -1085,9 +1085,9 @@ GDALDataset *ILWISDataset::CreateCopy(const char *pszFilename,
             eType = GDALDataTypeUnion(eType, poBand->GetRasterDataType());
     }
 
-    ILWISDataset *poDS = (ILWISDataset *)Create(
-        pszFilename, poSrcDS->GetRasterXSize(), poSrcDS->GetRasterYSize(),
-        nBands, eType, papszOptions);
+    ILWISDataset *poDS = cpl::down_cast<ILWISDataset *>(
+        Create(pszFilename, poSrcDS->GetRasterXSize(),
+               poSrcDS->GetRasterYSize(), nBands, eType, papszOptions));
 
     if (poDS == nullptr)
         return nullptr;
@@ -1126,7 +1126,7 @@ GDALDataset *ILWISDataset::CreateCopy(const char *pszFilename,
 
         GDALRasterBand *poBand = poSrcDS->GetRasterBand(iBand + 1);
         ILWISRasterBand *desBand =
-            (ILWISRasterBand *)poDS->GetRasterBand(iBand + 1);
+            cpl::down_cast<ILWISRasterBand *>(poDS->GetRasterBand(iBand + 1));
 
         /* --------------------------------------------------------------------
          */
@@ -1208,7 +1208,7 @@ GDALDataset *ILWISDataset::CreateCopy(const char *pszFilename,
             return nullptr;
         }
 
-        GByte *pData = (GByte *)CPLMalloc(nLineSize);
+        void *pData = CPLMalloc(nLineSize);
 
         CPLErr eErr = CE_None;
         for (int iLine = 0; iLine < nYSize && eErr == CE_None; iLine++)
@@ -1228,30 +1228,36 @@ GDALDataset *ILWISDataset::CreateCopy(const char *pszFilename,
                     {
                         if (EQUAL(sStoreType.c_str(), "Byte"))
                         {
-                            if (((GByte *)pData)[iCol] == dNoDataValue)
-                                ((GByte *)pData)[iCol] = 0;
+                            if (static_cast<GByte *>(pData)[iCol] ==
+                                dNoDataValue)
+                                static_cast<GByte *>(pData)[iCol] = 0;
                         }
                         else if (EQUAL(sStoreType.c_str(), "Int"))
                         {
-                            if (((GInt16 *)pData)[iCol] == dNoDataValue)
-                                ((GInt16 *)pData)[iCol] = shUNDEF;
+                            if (static_cast<GInt16 *>(pData)[iCol] ==
+                                dNoDataValue)
+                                static_cast<GInt16 *>(pData)[iCol] = shUNDEF;
                         }
                         else if (EQUAL(sStoreType.c_str(), "Long"))
                         {
-                            if (((GInt32 *)pData)[iCol] == dNoDataValue)
-                                ((GInt32 *)pData)[iCol] = iUNDEF;
+                            if (static_cast<GInt32 *>(pData)[iCol] ==
+                                dNoDataValue)
+                                static_cast<GInt32 *>(pData)[iCol] = iUNDEF;
                         }
                         else if (EQUAL(sStoreType.c_str(), "float"))
                         {
-                            if ((((float *)pData)[iCol] == dNoDataValue) ||
-                                (std::isnan(((float *)pData)[iCol])))
-                                ((float *)pData)[iCol] = flUNDEF;
+                            if ((static_cast<float *>(pData)[iCol] ==
+                                 dNoDataValue) ||
+                                (std::isnan(static_cast<float *>(pData)[iCol])))
+                                static_cast<float *>(pData)[iCol] = flUNDEF;
                         }
                         else if (EQUAL(sStoreType.c_str(), "Real"))
                         {
-                            if ((((double *)pData)[iCol] == dNoDataValue) ||
-                                (std::isnan(((double *)pData)[iCol])))
-                                ((double *)pData)[iCol] = rUNDEF;
+                            if ((static_cast<double *>(pData)[iCol] ==
+                                 dNoDataValue) ||
+                                (std::isnan(
+                                    static_cast<double *>(pData)[iCol])))
+                                static_cast<double *>(pData)[iCol] = rUNDEF;
                         }
                     }
                 }
@@ -1391,7 +1397,7 @@ ILWISRasterBand::~ILWISRasterBand()
 /************************************************************************/
 void ILWISRasterBand::ILWISOpen(const std::string &pszFileName)
 {
-    ILWISDataset *dataset = (ILWISDataset *)poDS;
+    ILWISDataset *dataset = cpl::down_cast<ILWISDataset *>(poDS);
     std::string pszDataFile =
         std::string(CPLResetExtensionSafe(pszFileName.c_str(), "mp#"));
 
@@ -1479,9 +1485,8 @@ CPLErr ILWISRasterBand::GetILWISInfo(const std::string &pszFileName)
 
     const std::string domName =
         ReadElement("BaseMap", "Domain", pszFileName.c_str());
-    const std::string osBaseName =
-        std::string(CPLGetBasenameSafe(domName.c_str()));
-    const std::string osPath = std::string(CPLGetPathSafe(pszFileName.c_str()));
+    std::string osBaseName = CPLGetBasenameSafe(domName.c_str());
+    const std::string osPath = CPLGetPathSafe(pszFileName.c_str());
 
     // Check against all "system-domains"
     if (EQUAL(osBaseName.c_str(),
@@ -1507,7 +1512,7 @@ CPLErr ILWISRasterBand::GetILWISInfo(const std::string &pszFileName)
         eDataType = GDT_Byte;
         if (EQUAL(osBaseName.c_str(), "image") ||
             EQUAL(osBaseName.c_str(), "colorcmp"))
-            psInfo.stDomain = osBaseName;
+            psInfo.stDomain = std::move(osBaseName);
     }
     else if (EQUAL(osBaseName.c_str(), "color") ||
              EQUAL(osBaseName.c_str(), "none") ||
@@ -1522,7 +1527,7 @@ CPLErr ILWISRasterBand::GetILWISInfo(const std::string &pszFileName)
     {
         // No match found. Assume it is a self-created domain. Read its type and
         // decide the GDAL type.
-        std::string osDomainFileName =
+        const std::string osDomainFileName =
             CPLFormFilenameSafe(osPath.c_str(), osBaseName.c_str(), "dom");
         std::string domType =
             ReadElement("Domain", "Type", osDomainFileName.c_str());
@@ -1588,7 +1593,7 @@ CPLErr ILWISRasterBand::IReadBlock(CPL_UNUSED int nBlockXOff, int nBlockYOff,
     /*      exist yet, but that we want to read.  Just set to zeros and     */
     /*      return.                                                         */
     /* -------------------------------------------------------------------- */
-    ILWISDataset *poIDS = (ILWISDataset *)poDS;
+    ILWISDataset *poIDS = cpl::down_cast<ILWISDataset *>(poDS);
 
 #ifdef notdef
     if (poIDS->bNewDataset && (poIDS->eAccess == GA_Update))
@@ -1628,37 +1633,40 @@ CPLErr ILWISRasterBand::IReadBlock(CPL_UNUSED int nBlockXOff, int nBlockYOff,
         case stByte:
             for (int iCol = 0; iCol < nBlockXSize; iCol++)
             {
-                double rV = psInfo.bUseValueRange
-                                ? psInfo.vr.rValue(((GByte *)pData)[iCol])
-                                : ((GByte *)pData)[iCol];
+                double rV =
+                    psInfo.bUseValueRange
+                        ? psInfo.vr.rValue(static_cast<GByte *>(pData)[iCol])
+                        : static_cast<GByte *>(pData)[iCol];
                 SetValue(pImage, iCol, rV);
             }
             break;
         case stInt:
             for (int iCol = 0; iCol < nBlockXSize; iCol++)
             {
-                double rV = psInfo.bUseValueRange
-                                ? psInfo.vr.rValue(((GInt16 *)pData)[iCol])
-                                : ((GInt16 *)pData)[iCol];
+                double rV =
+                    psInfo.bUseValueRange
+                        ? psInfo.vr.rValue(static_cast<GInt16 *>(pData)[iCol])
+                        : static_cast<GInt16 *>(pData)[iCol];
                 SetValue(pImage, iCol, rV);
             }
             break;
         case stLong:
             for (int iCol = 0; iCol < nBlockXSize; iCol++)
             {
-                double rV = psInfo.bUseValueRange
-                                ? psInfo.vr.rValue(((GInt32 *)pData)[iCol])
-                                : ((GInt32 *)pData)[iCol];
+                double rV =
+                    psInfo.bUseValueRange
+                        ? psInfo.vr.rValue(static_cast<GInt32 *>(pData)[iCol])
+                        : static_cast<GInt32 *>(pData)[iCol];
                 SetValue(pImage, iCol, rV);
             }
             break;
         case stFloat:
             for (int iCol = 0; iCol < nBlockXSize; iCol++)
-                ((float *)pImage)[iCol] = ((float *)pData)[iCol];
+                ((float *)pImage)[iCol] = static_cast<float *>(pData)[iCol];
             break;
         case stReal:
             for (int iCol = 0; iCol < nBlockXSize; iCol++)
-                ((double *)pImage)[iCol] = ((double *)pData)[iCol];
+                ((double *)pImage)[iCol] = static_cast<double *>(pData)[iCol];
             break;
         default:
             CPLAssert(false);
@@ -1779,7 +1787,7 @@ CPLErr ILWISRasterBand::IWriteBlock(CPL_UNUSED int nBlockXOff, int nBlockYOff,
     // Note that this function will not overwrite existing data in fpRaw, but
     // it will "fill gaps" marked by "nodata" values
 
-    ILWISDataset *dataset = (ILWISDataset *)poDS;
+    ILWISDataset *dataset = cpl::down_cast<ILWISDataset *>(poDS);
 
     CPLAssert(dataset != nullptr && nBlockXOff == 0 && nBlockYOff >= 0 &&
               pImage != nullptr);
@@ -1808,43 +1816,45 @@ CPLErr ILWISRasterBand::IWriteBlock(CPL_UNUSED int nBlockXOff, int nBlockYOff,
         {
             case stByte:
                 for (int iCol = 0; iCol < nXSize; iCol++)
-                    if (((GByte *)pData)[iCol] == 0)
+                    if (static_cast<GByte *>(pData)[iCol] == 0)
                     {
                         double rV = GetValue(pImage, iCol);
-                        ((GByte *)pData)[iCol] =
+                        static_cast<GByte *>(pData)[iCol] =
                             (GByte)(psInfo.bUseValueRange ? psInfo.vr.iRaw(rV)
                                                           : rV);
                     }
                 break;
             case stInt:
                 for (int iCol = 0; iCol < nXSize; iCol++)
-                    if (((GInt16 *)pData)[iCol] == shUNDEF)
+                    if (static_cast<GInt16 *>(pData)[iCol] == shUNDEF)
                     {
                         double rV = GetValue(pImage, iCol);
-                        ((GInt16 *)pData)[iCol] =
+                        static_cast<GInt16 *>(pData)[iCol] =
                             (GInt16)(psInfo.bUseValueRange ? psInfo.vr.iRaw(rV)
                                                            : rV);
                     }
                 break;
             case stLong:
                 for (int iCol = 0; iCol < nXSize; iCol++)
-                    if (((GInt32 *)pData)[iCol] == iUNDEF)
+                    if (static_cast<GInt32 *>(pData)[iCol] == iUNDEF)
                     {
                         double rV = GetValue(pImage, iCol);
-                        ((GInt32 *)pData)[iCol] =
+                        static_cast<GInt32 *>(pData)[iCol] =
                             (GInt32)(psInfo.bUseValueRange ? psInfo.vr.iRaw(rV)
                                                            : rV);
                     }
                 break;
             case stFloat:
                 for (int iCol = 0; iCol < nXSize; iCol++)
-                    if (((float *)pData)[iCol] == flUNDEF)
-                        ((float *)pData)[iCol] = ((float *)pImage)[iCol];
+                    if (static_cast<float *>(pData)[iCol] == flUNDEF)
+                        static_cast<float *>(pData)[iCol] =
+                            ((float *)pImage)[iCol];
                 break;
             case stReal:
                 for (int iCol = 0; iCol < nXSize; iCol++)
-                    if (((double *)pData)[iCol] == rUNDEF)
-                        ((double *)pData)[iCol] = ((double *)pImage)[iCol];
+                    if (static_cast<double *>(pData)[iCol] == rUNDEF)
+                        static_cast<double *>(pData)[iCol] =
+                            ((double *)pImage)[iCol];
                 break;
         }
     }
@@ -1857,7 +1867,7 @@ CPLErr ILWISRasterBand::IWriteBlock(CPL_UNUSED int nBlockXOff, int nBlockYOff,
                 for (int iCol = 0; iCol < nXSize; iCol++)
                 {
                     double rV = GetValue(pImage, iCol);
-                    ((GByte *)pData)[iCol] =
+                    static_cast<GByte *>(pData)[iCol] =
                         (GByte)(psInfo.bUseValueRange ? psInfo.vr.iRaw(rV)
                                                       : rV);
                 }
@@ -1866,7 +1876,7 @@ CPLErr ILWISRasterBand::IWriteBlock(CPL_UNUSED int nBlockXOff, int nBlockYOff,
                 for (int iCol = 0; iCol < nXSize; iCol++)
                 {
                     double rV = GetValue(pImage, iCol);
-                    ((GInt16 *)pData)[iCol] =
+                    static_cast<GInt16 *>(pData)[iCol] =
                         (GInt16)(psInfo.bUseValueRange ? psInfo.vr.iRaw(rV)
                                                        : rV);
                 }
@@ -1875,18 +1885,19 @@ CPLErr ILWISRasterBand::IWriteBlock(CPL_UNUSED int nBlockXOff, int nBlockYOff,
                 for (int iCol = 0; iCol < nXSize; iCol++)
                 {
                     double rV = GetValue(pImage, iCol);
-                    ((GInt32 *)pData)[iCol] =
+                    static_cast<GInt32 *>(pData)[iCol] =
                         (GInt32)(psInfo.bUseValueRange ? psInfo.vr.iRaw(rV)
                                                        : rV);
                 }
                 break;
             case stFloat:
                 for (int iCol = 0; iCol < nXSize; iCol++)
-                    ((float *)pData)[iCol] = ((float *)pImage)[iCol];
+                    static_cast<float *>(pData)[iCol] = ((float *)pImage)[iCol];
                 break;
             case stReal:
                 for (int iCol = 0; iCol < nXSize; iCol++)
-                    ((double *)pData)[iCol] = ((double *)pImage)[iCol];
+                    static_cast<double *>(pData)[iCol] =
+                        ((double *)pImage)[iCol];
                 break;
         }
     }

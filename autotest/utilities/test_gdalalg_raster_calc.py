@@ -39,10 +39,11 @@ def calc():
 @pytest.mark.parametrize("output_format", ("tif", "vrt"))
 def test_gdalalg_raster_calc_basic_1(calc, tmp_vsimem, output_format):
 
+    gdaltest.importorskip_gdal_array()
     np = pytest.importorskip("numpy")
 
     infile = "../gcore/data/rgbsmall.tif"
-    outfile = tmp_vsimem / "out.tif"
+    outfile = tmp_vsimem / "out.{output_format}"
 
     calc["input"] = [infile]
     calc["output"] = outfile
@@ -62,6 +63,7 @@ def test_gdalalg_raster_calc_basic_1(calc, tmp_vsimem, output_format):
 @pytest.mark.parametrize("output_format", ("tif", "vrt"))
 def test_gdalalg_raster_calc_basic_2(calc, tmp_vsimem, output_format):
 
+    gdaltest.importorskip_gdal_array()
     np = pytest.importorskip("numpy")
 
     infile = "../gcore/data/byte.tif"
@@ -114,6 +116,33 @@ def test_gdalalg_raster_calc_output_format(calc, tmp_vsimem):
         assert dst.GetDriver().GetName() == "GTiff"
 
 
+def test_gdalalg_raster_calc_output_type(calc, tmp_vsimem):
+
+    gdaltest.importorskip_gdal_array()
+    np = pytest.importorskip("numpy")
+    gdaltest.importorskip_gdal_array()
+
+    with gdal.GetDriverByName("GTiff").Create(
+        tmp_vsimem / "src.tif", 5, 5, eType=gdal.GDT_Int32
+    ) as src_ds:
+        src_ds.GetRasterBand(1).Fill(500)
+
+    calc["input"] = tmp_vsimem / "src.tif"
+    calc["output"] = ""
+    calc["output-format"] = "MEM"
+    calc["calc"] = "X > 256 ? 100 : 50"
+    calc["output-data-type"] = "Byte"
+
+    assert calc.Run()
+
+    dst_ds = calc["output"].GetDataset()
+
+    assert dst_ds.GetRasterBand(1).DataType == gdal.GDT_Byte
+    assert np.all(dst_ds.ReadAsArray() == 100)
+
+    assert calc.Finalize()
+
+
 def test_gdalalg_raster_calc_overwrite(calc, tmp_vsimem):
 
     infile = "../gcore/data/byte.tif"
@@ -136,6 +165,7 @@ def test_gdalalg_raster_calc_overwrite(calc, tmp_vsimem):
 @pytest.mark.parametrize("expr", ("X + 3", "X[1] + 3"))
 def test_gdalalg_raster_calc_basic_named_source(calc, tmp_vsimem, expr):
 
+    gdaltest.importorskip_gdal_array()
     np = pytest.importorskip("numpy")
 
     infile = "../gcore/data/byte.tif"
@@ -151,8 +181,45 @@ def test_gdalalg_raster_calc_basic_named_source(calc, tmp_vsimem, expr):
         np.testing.assert_array_equal(src.ReadAsArray() + 3.0, dst.ReadAsArray())
 
 
+def test_gdalalg_raster_calc_several_inputs_same_name(calc, tmp_vsimem):
+
+    calc["input"] = ["A=../gcore/data/byte.tif", "A=../gcore/data/uint16.tif"]
+    calc["output"] = tmp_vsimem / "out.vrt"
+    calc["calc"] = "A"
+
+    with pytest.raises(
+        Exception, match="An input with name 'A' has already been provided"
+    ):
+        calc.Run()
+
+
+@pytest.mark.parametrize(
+    "name,expected_error_msg",
+    [
+        ("_pi", "Name '_pi' is illegal because it starts with a '_'"),
+        ("0ko", "Name '0ko' is illegal because it starts with a '0'"),
+        ("ko-", "Name 'ko-' is illegal because character '-' is not allowed"),
+        ("ok", None),
+        ("ok_", None),
+        ("o0123456789", None),
+    ],
+)
+def test_gdalalg_raster_calc_test_name(calc, name, expected_error_msg):
+
+    calc["input"] = f"{name}=../gcore/data/byte.tif"
+    calc["output-format"] = "MEM"
+    calc["calc"] = name
+
+    if expected_error_msg:
+        with pytest.raises(Exception, match=expected_error_msg):
+            calc.Run()
+    else:
+        calc.Run()
+
+
 def test_gdalalg_raster_calc_multiple_calcs(calc, tmp_vsimem):
 
+    gdaltest.importorskip_gdal_array()
     np = pytest.importorskip("numpy")
 
     infile = "../gcore/data/byte.tif"
@@ -181,6 +248,7 @@ def test_gdalalg_raster_calc_multiple_calcs(calc, tmp_vsimem):
 )
 def test_gdalalg_raster_calc_multiple_inputs(calc, tmp_vsimem, expr):
 
+    gdaltest.importorskip_gdal_array()
     np = pytest.importorskip("numpy")
 
     # convert 1-based indices to 0-based indices to evaluate expression
@@ -221,8 +289,10 @@ def test_gdalalg_raster_calc_multiple_inputs(calc, tmp_vsimem, expr):
         np.testing.assert_allclose(dat, eval(numpy_expr), rtol=1e-6)
 
 
-def test_gdalalg_raster_calc_inputs_from_file(calc, tmp_vsimem, tmp_path):
+@pytest.mark.parametrize("formula", ["A+B", "sum(A, B)"])
+def test_gdalalg_raster_calc_inputs_from_file(calc, tmp_vsimem, tmp_path, formula):
 
+    gdaltest.importorskip_gdal_array()
     np = pytest.importorskip("numpy")
 
     input_1 = tmp_vsimem / "in1.tif"
@@ -242,7 +312,7 @@ def test_gdalalg_raster_calc_inputs_from_file(calc, tmp_vsimem, tmp_path):
 
     calc["input"] = [f"@{input_txt}"]
     calc["output"] = outfile
-    calc["calc"] = ["A + B"]
+    calc["calc"] = formula
 
     assert calc.Run()
 
@@ -252,6 +322,7 @@ def test_gdalalg_raster_calc_inputs_from_file(calc, tmp_vsimem, tmp_path):
 
 def test_gdalalg_raster_calc_different_band_counts(calc, tmp_vsimem):
 
+    gdaltest.importorskip_gdal_array()
     np = pytest.importorskip("numpy")
 
     input_1 = tmp_vsimem / "in1.tif"
@@ -279,6 +350,7 @@ def test_gdalalg_raster_calc_different_band_counts(calc, tmp_vsimem):
 
 def test_gdalalg_calc_different_resolutions(calc, tmp_vsimem):
 
+    gdaltest.importorskip_gdal_array()
     np = pytest.importorskip("numpy")
 
     xmax = 60
@@ -461,6 +533,7 @@ def test_gdalalg_raster_calc_expression_rewriting(
     calc["input"] = [f"{source}={infile}"]
     calc["output"] = outfile
     calc["calc"] = [expr]
+    calc["no-check-expression"] = True
 
     assert calc.Run()
 
@@ -471,3 +544,46 @@ def test_gdalalg_raster_calc_expression_rewriting(
         node.attrib["expression"] for node in root.findall(".//PixelFunctionArguments")
     ]
     assert expr == expected
+
+
+@pytest.mark.require_driver("GDALG")
+def test_gdalalg_raster_calc_gdalg_json(calc, tmp_vsimem):
+
+    outfile = tmp_vsimem / "out.gdalg.json"
+
+    calc["input"] = "../gcore/data/byte.tif"
+    calc["output"] = outfile
+    calc["calc"] = "X"
+    assert calc.Run()
+    assert calc.Finalize()
+
+    with gdal.Open(outfile) as ds:
+        assert ds.GetRasterBand(1).Checksum() == 4672
+
+
+@pytest.mark.parametrize(
+    "output_format,ext",
+    [
+        ("VRT", None),
+        ("VRT", "vrt"),
+        ("stream", None),
+        ("GDALG", None),
+        ("GDALG", "gdalg.json"),
+        ("GTiff", None),
+        ("GTiff", "tif"),
+    ],
+)
+def test_gdalalg_raster_calc_invalid_formula(calc, tmp_vsimem, output_format, ext):
+
+    if output_format != "stream" and gdal.GetDriverByName(output_format) is None:
+        pytest.skip(f"{output_format} not available")
+
+    calc["input"] = "../gcore/data/byte.tif"
+    if ext:
+        calc["output"] = tmp_vsimem / f"out.{ext}"
+    else:
+        calc["output-format"] = output_format
+        calc["output"] = tmp_vsimem / "out"
+    calc["calc"] = "invalid"
+    with pytest.raises(Exception, match="Invalid variable name"):
+        calc.Run()

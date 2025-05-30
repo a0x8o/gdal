@@ -2432,9 +2432,6 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
         bUpdate = true;
     }
 
-    const CPLString osDateLineOffset =
-        CPLOPrintf("%g", psOptions->dfDateLineOffset);
-
     if (psOptions->bPreserveFID && psOptions->bExplodeCollections)
     {
         CPLError(CE_Failure, CPLE_IllegalArg,
@@ -2750,21 +2747,13 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
 
         if (psOptions->bNoOverwrite && !EQUAL(pszDest, ""))
         {
-            VSIStatBufL sStat;
-            if (VSIStatL(pszDest, &sStat) == 0)
+            const char *pszType = "";
+            if (GDALDoesFileOrDatasetExist(pszDest, &pszType))
             {
                 CPLError(CE_Failure, CPLE_AppDefined,
-                         "File '%s' already exists. Specify the --overwrite "
+                         "%s '%s' already exists. Specify the --overwrite "
                          "option to overwrite it.",
-                         pszDest);
-                return nullptr;
-            }
-            else if (std::unique_ptr<GDALDataset>(GDALDataset::Open(pszDest)))
-            {
-                CPLError(CE_Failure, CPLE_AppDefined,
-                         "Dataset '%s' already exists. Specify the --overwrite "
-                         "option to overwrite it.",
-                         pszDest);
+                         pszType, pszDest);
                 return nullptr;
             }
         }
@@ -3101,7 +3090,8 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
     oTranslator.m_poODS = poODS;
     oTranslator.m_bTransform = psOptions->bTransform;
     oTranslator.m_bWrapDateline = psOptions->bWrapDateline;
-    oTranslator.m_osDateLineOffset = osDateLineOffset;
+    oTranslator.m_osDateLineOffset =
+        CPLOPrintf("%g", psOptions->dfDateLineOffset);
     oTranslator.m_poOutputSRS = oOutputSRSHolder.get();
     oTranslator.m_bNullifyOutputSRS = psOptions->bNullifyOutputSRS;
     oTranslator.m_poUserSourceSRS = poSourceSRS;
@@ -3605,8 +3595,7 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
             psOptions->osNewLayerName = CPLGetBasenameSafe(osDestFilename);
         }
 
-        std::vector<GIntBig> anLayerCountFeatures;
-        anLayerCountFeatures.resize(nLayerCount);
+        std::vector<GIntBig> anLayerCountFeatures(nLayerCount);
         GIntBig nCountLayersFeatures = 0;
         GIntBig nAccCountFeatures = 0;
 
@@ -3653,7 +3642,18 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
                     if (psOptions->nLimit >= 0)
                         anLayerCountFeatures[iLayer] = std::min(
                             anLayerCountFeatures[iLayer], psOptions->nLimit);
-                    nCountLayersFeatures += anLayerCountFeatures[iLayer];
+                    if (anLayerCountFeatures[iLayer] >= 0 &&
+                        anLayerCountFeatures[iLayer] <=
+                            std::numeric_limits<GIntBig>::max() -
+                                nCountLayersFeatures)
+                    {
+                        nCountLayersFeatures += anLayerCountFeatures[iLayer];
+                    }
+                    else
+                    {
+                        nCountLayersFeatures = 0;
+                        psOptions->bDisplayProgress = false;
+                    }
                 }
             }
         }
@@ -3722,9 +3722,9 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
                             1.0 / nCountLayersFeatures,
                         psOptions->pfnProgress, psOptions->pProgressData);
                 }
-            }
 
-            nAccCountFeatures += anLayerCountFeatures[iLayer];
+                nAccCountFeatures += anLayerCountFeatures[iLayer];
+            }
 
             auto psInfo = oSetup.Setup(poPassedLayer,
                                        psOptions->osNewLayerName.empty()
@@ -8103,10 +8103,13 @@ static std::unique_ptr<GDALArgumentParser> GDALVectorTranslateOptionsGetParser(
         .store_into(psOptions->dfDateLineOffset)
         .help(_("Offset from dateline in degrees."));
 
-    argParser->add_argument("-clipsrc")
-        .nargs(nCountClipSrc)
-        .metavar("[<xmin> <ymin> <xmax> <ymax>]|<WKT>|<datasource>|spat_extent")
-        .help(_("Clip geometries (in source SRS)."));
+    auto &clipsrcArg =
+        argParser->add_argument("-clipsrc")
+            .metavar(
+                "[<xmin> <ymin> <xmax> <ymax>]|<WKT>|<datasource>|spat_extent")
+            .help(_("Clip geometries (in source SRS)."));
+    if (nCountClipSrc > 1)
+        clipsrcArg.nargs(nCountClipSrc);
 
     argParser->add_argument("-clipsrcsql")
         .metavar("<sql_statement>")
@@ -8125,10 +8128,12 @@ static std::unique_ptr<GDALArgumentParser> GDALVectorTranslateOptionsGetParser(
         .help(_("Restrict desired geometries from the source clip layer based "
                 "on an attribute query."));
 
-    argParser->add_argument("-clipdst")
-        .nargs(nCountClipDst)
-        .metavar("[<xmin> <ymin> <xmax> <ymax>]|<WKT>|<datasource>")
-        .help(_("Clip geometries (in target SRS)."));
+    auto &clipdstArg =
+        argParser->add_argument("-clipdst")
+            .metavar("[<xmin> <ymin> <xmax> <ymax>]|<WKT>|<datasource>")
+            .help(_("Clip geometries (in target SRS)."));
+    if (nCountClipDst > 1)
+        clipdstArg.nargs(nCountClipDst);
 
     argParser->add_argument("-clipdstsql")
         .metavar("<sql_statement>")

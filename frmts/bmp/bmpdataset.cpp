@@ -158,12 +158,14 @@ typedef struct
 } BMPInfoHeader;
 
 // Info header size in bytes:
-const unsigned int BIH_WIN4SIZE = 40;  // for BMPT_WIN4
-#if 0                                  /* Unused */
-const unsigned int  BIH_WIN5SIZE = 57; // for BMPT_WIN5
+constexpr unsigned int BIH_WIN4SIZE = 40;  // for BMPT_WIN4
+#if 0
+/* Unused */
+constexpr unsigned int  BIH_WIN5SIZE = 57; // for BMPT_WIN5
 #endif
-const unsigned int BIH_OS21SIZE = 12;  // for BMPT_OS21
-const unsigned int BIH_OS22SIZE = 64;  // for BMPT_OS22
+constexpr unsigned int BIH_OS21SIZE = 12;       // for BMPT_OS21
+constexpr unsigned int BIH_OS22SIZE = 64;       // for BMPT_OS22
+constexpr unsigned int BIH_BITMAPV5SIZE = 124;  // for BITMAPV5HEADER
 
 // We will use plain byte array instead of this structure, but declaration
 // provided for reference
@@ -327,7 +329,7 @@ BMPRasterBand::~BMPRasterBand()
 CPLErr BMPRasterBand::IReadBlock(int /* nBlockXOff */, int nBlockYOff,
                                  void *pImage)
 {
-    BMPDataset *poGDS = (BMPDataset *)poDS;
+    BMPDataset *poGDS = cpl::down_cast<BMPDataset *>(poDS);
     vsi_l_offset iScanOffset = 0;
 
     if (poGDS->sInfoHeader.iHeight > 0)
@@ -385,7 +387,7 @@ CPLErr BMPRasterBand::IReadBlock(int /* nBlockXOff */, int nBlockYOff,
             // in quadruplet should be discarded as it has no meaning.
             // That is why we always use 3 byte count in the following
             // pabyTemp index.
-            ((GByte *)pImage)[i] = *pabyTemp;
+            static_cast<GByte *>(pImage)[i] = *pabyTemp;
             pabyTemp += iBytesPerPixel;
         }
     }
@@ -400,7 +402,7 @@ CPLErr BMPRasterBand::IReadBlock(int /* nBlockXOff */, int nBlockYOff,
         // 8-bit, support BMPC_BITFIELDS channel mask indicators,
         // and generalize band handling.
 
-        GUInt16 *pScan16 = (GUInt16 *)pabyScan;
+        GUInt16 *pScan16 = reinterpret_cast<GUInt16 *>(pabyScan);
 #ifdef CPL_MSB
         GDALSwapWords(pScan16, sizeof(GUInt16), nBlockXSize, 0);
 #endif
@@ -530,7 +532,7 @@ CPLErr BMPRasterBand::IReadBlock(int /* nBlockXOff */, int nBlockYOff,
 
 CPLErr BMPRasterBand::IWriteBlock(int nBlockXOff, int nBlockYOff, void *pImage)
 {
-    BMPDataset *poGDS = (BMPDataset *)poDS;
+    BMPDataset *poGDS = cpl::down_cast<BMPDataset *>(poDS);
 
     CPLAssert(poGDS != nullptr && nBlockXOff >= 0 && nBlockYOff >= 0 &&
               pImage != nullptr);
@@ -577,7 +579,7 @@ CPLErr BMPRasterBand::IWriteBlock(int nBlockXOff, int nBlockYOff, void *pImage)
 
 GDALColorTable *BMPRasterBand::GetColorTable()
 {
-    BMPDataset *poGDS = (BMPDataset *)poDS;
+    BMPDataset *poGDS = cpl::down_cast<BMPDataset *>(poDS);
 
     return poGDS->poColorTable;
 }
@@ -588,7 +590,7 @@ GDALColorTable *BMPRasterBand::GetColorTable()
 
 CPLErr BMPRasterBand::SetColorTable(GDALColorTable *poColorTable)
 {
-    BMPDataset *poGDS = (BMPDataset *)poDS;
+    BMPDataset *poGDS = cpl::down_cast<BMPDataset *>(poDS);
 
     if (poColorTable)
     {
@@ -643,7 +645,7 @@ CPLErr BMPRasterBand::SetColorTable(GDALColorTable *poColorTable)
 
 GDALColorInterp BMPRasterBand::GetColorInterpretation()
 {
-    BMPDataset *poGDS = (BMPDataset *)poDS;
+    BMPDataset *poGDS = cpl::down_cast<BMPDataset *>(poDS);
 
     if (poGDS->sInfoHeader.iBitCount == 24 ||
         poGDS->sInfoHeader.iBitCount == 32 ||
@@ -1073,7 +1075,7 @@ int BMPDataset::Identify(GDALOpenInfo *poOpenInfo)
            sizeof(uint32_t));
     CPL_LSBPTR32(&nInfoHeaderSize);
     // Check against the maximum known size
-    if (nInfoHeaderSize > BIH_OS22SIZE)
+    if (nInfoHeaderSize > BIH_BITMAPV5SIZE)
         return FALSE;
 
     return TRUE;

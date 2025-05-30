@@ -1085,7 +1085,7 @@ GDALPDFObjectNum GDALPDFBaseWriter::WriteOCG(const char *pszLayerName,
     oOCGDesc.nParentId = nParentId;
     oOCGDesc.osLayerName = pszLayerName;
 
-    m_asOCGs.push_back(oOCGDesc);
+    m_asOCGs.push_back(std::move(oOCGDesc));
 
     StartObj(nOCGId);
     {
@@ -1309,7 +1309,7 @@ bool GDALPDFWriter::WriteImagery(GDALDataset *poDS, const char *pszLayerName,
         }
     }
 
-    oPageContext.asRasterDesc.push_back(oRasterDesc);
+    oPageContext.asRasterDesc.push_back(std::move(oRasterDesc));
 
     return true;
 }
@@ -1511,7 +1511,7 @@ bool GDALPDFWriter::WriteClippedImagery(
         }
     }
 
-    oPageContext.asRasterDesc.push_back(oRasterDesc);
+    oPageContext.asRasterDesc.push_back(std::move(oRasterDesc));
 
     return true;
 }
@@ -2881,7 +2881,7 @@ int GDALPDFWriter::WriteOGRFeature(GDALPDFLayerDesc &osVectorDesc,
     iObj++;
 
     osVectorDesc.aUserPropertiesIds.push_back(nFeatureUserProperties);
-    osVectorDesc.aFeatureNames.push_back(osFeatureName);
+    osVectorDesc.aFeatureNames.push_back(std::move(osFeatureName));
 
     return TRUE;
 }
@@ -4150,16 +4150,20 @@ GDALDataset *GDALPDFCreateCopy(const char *pszFilename, GDALDataset *poSrcDS,
                                GDALProgressFunc pfnProgress,
                                void *pProgressData)
 {
-    int nBands = poSrcDS->GetRasterCount();
-    int nWidth = poSrcDS->GetRasterXSize();
-    int nHeight = poSrcDS->GetRasterYSize();
-
-    if (!pfnProgress(0.0, nullptr, pProgressData))
-        return nullptr;
+    const int nBands = poSrcDS->GetRasterCount();
+    const int nWidth = poSrcDS->GetRasterXSize();
+    const int nHeight = poSrcDS->GetRasterYSize();
 
     /* -------------------------------------------------------------------- */
     /*      Some some rudimentary checks                                    */
     /* -------------------------------------------------------------------- */
+    if (nWidth == 0 || nHeight == 0)
+    {
+        CPLError(CE_Failure, CPLE_NotSupported,
+                 "nWidth == 0 || nHeight == 0 not supported");
+        return nullptr;
+    }
+
     if (nBands != 1 && nBands != 3 && nBands != 4)
     {
         CPLError(CE_Failure, CPLE_NotSupported,
@@ -4490,6 +4494,9 @@ GDALDataset *GDALPDFCreateCopy(const char *pszFilename, GDALDataset *poSrcDS,
     const char *pszJavascript = CSLFetchNameValue(papszOptions, "JAVASCRIPT");
     const char *pszJavascriptFile =
         CSLFetchNameValue(papszOptions, "JAVASCRIPT_FILE");
+
+    if (!pfnProgress(0.0, nullptr, pProgressData))
+        return nullptr;
 
     /* -------------------------------------------------------------------- */
     /*      Create file.                                                    */

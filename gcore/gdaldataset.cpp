@@ -2739,7 +2739,7 @@ CPLErr GDALDataset::RasterIO(GDALRWFlag eRWFlag, int nXOff, int nYOff,
 
         psExtraArg = &sExtraArg;
     }
-    else if (CPL_UNLIKELY(psExtraArg->nVersion !=
+    else if (CPL_UNLIKELY(psExtraArg->nVersion >
                           RASTERIO_EXTRA_ARG_CURRENT_VERSION))
     {
         ReportError(CE_Failure, CPLE_AppDefined,
@@ -3257,8 +3257,8 @@ char **GDALDataset::GetFileList()
     VSIStatBufL sStat;
 
     GDALAntiRecursionStruct &sAntiRecursion = GetAntiRecursionOpen();
-    const GDALAntiRecursionStruct::DatasetContext datasetCtxt(osMainFilename, 0,
-                                                              std::string());
+    GDALAntiRecursionStruct::DatasetContext datasetCtxt(osMainFilename, 0,
+                                                        std::string());
     auto &aosDatasetList = sAntiRecursion.aosDatasetNamesWithFlags;
     if (cpl::contains(aosDatasetList, datasetCtxt))
         return nullptr;
@@ -3302,7 +3302,7 @@ char **GDALDataset::GetFileList()
     /* -------------------------------------------------------------------- */
     if (oOvManager.HaveMaskFile())
     {
-        auto iter = aosDatasetList.insert(datasetCtxt).first;
+        auto iter = aosDatasetList.insert(std::move(datasetCtxt)).first;
         for (const char *pszFile :
              CPLStringList(oOvManager.poMaskDS->GetFileList()))
         {
@@ -4083,52 +4083,8 @@ retry:
                         "It could have been recognized by driver ";
                     osMsg += poMissingPluginDriver->GetDescription();
                     osMsg += ", but plugin ";
-                    osMsg += poMissingPluginDriver->GetMetadataItem(
-                        "MISSING_PLUGIN_FILENAME");
-                    osMsg += " is not available in your "
-                             "installation.";
-                    if (const char *pszInstallationMsg =
-                            poMissingPluginDriver->GetMetadataItem(
-                                GDAL_DMD_PLUGIN_INSTALLATION_MESSAGE))
-                    {
-                        osMsg += " ";
-                        osMsg += pszInstallationMsg;
-                    }
-
-                    VSIStatBuf sStat;
-                    if (const char *pszGDALDriverPath =
-                            CPLGetConfigOption("GDAL_DRIVER_PATH", nullptr))
-                    {
-                        if (VSIStat(pszGDALDriverPath, &sStat) != 0)
-                        {
-                            if (osMsg.back() != '.')
-                                osMsg += ".";
-                            osMsg += " Directory '";
-                            osMsg += pszGDALDriverPath;
-                            osMsg +=
-                                "' pointed by GDAL_DRIVER_PATH does not exist.";
-                        }
-                    }
-                    else
-                    {
-                        if (osMsg.back() != '.')
-                            osMsg += ".";
-#ifdef INSTALL_PLUGIN_FULL_DIR
-                        if (VSIStat(INSTALL_PLUGIN_FULL_DIR, &sStat) != 0)
-                        {
-                            osMsg += " Directory '";
-                            osMsg += INSTALL_PLUGIN_FULL_DIR;
-                            osMsg += "' hardcoded in the GDAL library does not "
-                                     "exist and the GDAL_DRIVER_PATH "
-                                     "configuration option is not set.";
-                        }
-                        else
-#endif
-                        {
-                            osMsg += " The GDAL_DRIVER_PATH configuration "
-                                     "option is not set.";
-                        }
-                    }
+                    osMsg += GDALGetMessageAboutMissingPluginDriver(
+                        poMissingPluginDriver);
 
                     CPLError(CE_Failure, CPLE_OpenFailed, "%s", osMsg.c_str());
                 }
@@ -4984,6 +4940,43 @@ int GDALDatasetIsLayerPrivate(GDALDatasetH hDS, int iLayer)
     const bool res = GDALDataset::FromHandle(hDS)->IsLayerPrivate(iLayer);
 
     return res ? 1 : 0;
+}
+
+/************************************************************************/
+/*                            GetLayerIndex()                           */
+/************************************************************************/
+
+/**
+ \brief Returns the index of the layer specified by name.
+
+ @since GDAL 3.12
+
+ @param pszName layer name (not NULL)
+
+ @return an index >= 0, or -1 if not found.
+*/
+
+int GDALDataset::GetLayerIndex(const char *pszName)
+{
+    const int nLayerCount = GetLayerCount();
+    int iMatch = -1;
+    for (int i = 0; i < nLayerCount; ++i)
+    {
+        if (const auto poLayer = GetLayer(i))
+        {
+            const char *pszLayerName = poLayer->GetDescription();
+            if (strcmp(pszName, pszLayerName) == 0)
+            {
+                iMatch = i;
+                break;
+            }
+            else if (EQUAL(pszName, pszLayerName))
+            {
+                iMatch = i;
+            }
+        }
+    }
+    return iMatch;
 }
 
 /************************************************************************/

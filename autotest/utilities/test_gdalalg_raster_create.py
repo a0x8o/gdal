@@ -122,7 +122,7 @@ def test_gdalalg_raster_create_overwrite(tmp_vsimem):
     alg["size"] = [1, 1]
     with pytest.raises(
         Exception,
-        match="already exists. Specify the --overwrite option to overwrite it, or --append to append to it.",
+        match="already exists. Specify the --overwrite option to overwrite it or the --append option to append to it.",
     ):
         alg.Run()
 
@@ -426,3 +426,75 @@ def test_gdalalg_raster_create_creation_option(tmp_vsimem):
     assert alg.Finalize()
     with gdal.Open(tmp_vsimem / "out.tif") as ds:
         assert ds.GetMetadataItem("COMPRESSION", "IMAGE_STRUCTURE") == "LZW"
+
+
+def test_gdalalg_raster_create_overwrite_mem_file_with_real_file_same_name(tmp_vsimem):
+
+    out_filename = tmp_vsimem / "out.tif"
+
+    gdal.FileFromMemBuffer(out_filename, "")
+
+    alg = get_alg()
+    alg["output"] = out_filename
+    alg["output-format"] = "MEM"
+    alg["size"] = [1, 1]
+    alg["overwrite"] = True
+    assert alg.Run()
+
+    assert gdal.VSIStatL(out_filename) is not None
+
+
+def test_gdalalg_raster_create_driver_not_available():
+
+    alg = get_alg()
+    alg["output-format"] = "MEM"
+    alg["size"] = [1, 1]
+
+    # Totally non-nominal !
+    drv = gdal.GetDriverByName("MEM")
+    drv.Deregister()
+    try:
+        with pytest.raises(Exception, match="Cannot find driver MEM"):
+            alg.Run()
+    finally:
+        drv.Register()
+
+
+@pytest.mark.require_driver("NITF")
+def test_gdalalg_raster_set_crs_failed(tmp_vsimem):
+
+    alg = get_alg()
+    alg["output"] = tmp_vsimem / "out.ntf"
+    alg["crs"] = "+proj=ortho +datum=WGS84"
+    alg["size"] = [1, 1]
+
+    with pytest.raises(
+        Exception, match="NITF only supports WGS84 geographic and UTM projections"
+    ):
+        alg.Run()
+
+
+def test_gdalalg_raster_set_bbox_failed_because_null_dimension():
+
+    alg = get_alg()
+    alg["output-format"] = "MEM"
+    alg["bbox"] = [0, 0, 0, 0]
+    alg["size"] = [0, 0]
+
+    with pytest.raises(
+        Exception,
+        match="Cannot set extent because one of dataset height or width is null",
+    ):
+        alg.Run()
+
+
+@pytest.mark.require_driver("GPKG")
+def test_gdalalg_raster_set_bbox_failed(tmp_vsimem):
+
+    alg = get_alg()
+    alg["output"] = tmp_vsimem / "out.gpkg"
+    alg["bbox"] = [0, 0, 0, 0]
+    alg["size"] = [1, 1]
+
+    with pytest.raises(Exception, match="Setting extent failed"):
+        alg.Run()

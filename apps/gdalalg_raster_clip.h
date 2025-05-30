@@ -15,6 +15,8 @@
 
 #include "gdalalg_raster_pipeline.h"
 
+#include "gdalalg_clip_common.h"
+
 //! @cond Doxygen_Suppress
 
 /************************************************************************/
@@ -22,7 +24,8 @@
 /************************************************************************/
 
 class GDALRasterClipAlgorithm /* non final */
-    : public GDALRasterPipelineStepAlgorithm
+    : public GDALRasterPipelineStepAlgorithm,
+      public GDALClipCommon
 {
   public:
     static constexpr const char *NAME = "clip";
@@ -32,12 +35,11 @@ class GDALRasterClipAlgorithm /* non final */
     explicit GDALRasterClipAlgorithm(bool standaloneStep = false);
 
   private:
-    bool RunStep(GDALProgressFunc pfnProgress, void *pProgressData) override;
+    bool RunStep(GDALRasterPipelineStepRunContext &ctxt) override;
 
-    std::vector<double> m_bbox{};
-    std::string m_bboxCrs{};
+    bool m_onlyBBOX{false};
     bool m_allowExtentOutsideSource{false};
-    GDALArgDatasetValue m_likeDataset{};
+    bool m_addAlpha{false};
 };
 
 /************************************************************************/

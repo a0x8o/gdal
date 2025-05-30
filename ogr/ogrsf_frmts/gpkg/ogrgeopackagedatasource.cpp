@@ -1241,7 +1241,7 @@ GDALGeoPackageDataset::GetUnknownExtensionsTableSpecific()
                 oDesc.osDefinition = pszDefinition;
                 oDesc.osScope = pszScope;
                 m_oMapTableToExtensions[CPLString(pszTableName).toupper()]
-                    .push_back(oDesc);
+                    .push_back(std::move(oDesc));
             }
         }
     }
@@ -1690,16 +1690,17 @@ int GDALGeoPackageDataset::Open(GDALOpenInfo *poOpenInfo,
                 // "table_name (geom_col_name)"
                 // The way we handle that might change in the future (e.g
                 // could be a single layer with multiple geometry columns)
-                const std::string osLayerNameWithGeomColName =
+                std::string osLayerNameWithGeomColName =
                     pszGeomColName ? std::string(pszTableName) + " (" +
                                          pszGeomColName + ')'
                                    : std::string(pszTableName);
                 if (cpl::contains(oExistingLayers, osLayerNameWithGeomColName))
                     continue;
                 oExistingLayers.insert(osLayerNameWithGeomColName);
-                const std::string osLayerName = bTableHasSeveralGeomColumns
-                                                    ? osLayerNameWithGeomColName
-                                                    : std::string(pszTableName);
+                const std::string osLayerName =
+                    bTableHasSeveralGeomColumns
+                        ? std::move(osLayerNameWithGeomColName)
+                        : std::string(pszTableName);
                 auto poLayer = std::make_unique<OGRGeoPackageTableLayer>(
                     this, osLayerName.c_str());
                 bool bHasZ = pszZ && atoi(pszZ) > 0;
@@ -2714,7 +2715,7 @@ bool GDALGeoPackageDataset::OpenRaster(
                 }
                 sqlite3_stmt *hSQLStmt = nullptr;
                 int rc =
-                    sqlite3_prepare_v2(hDB, pszSQL, -1, &hSQLStmt, nullptr);
+                    SQLPrepareWithError(hDB, pszSQL, -1, &hSQLStmt, nullptr);
 
                 if (rc == SQLITE_OK)
                 {
@@ -2723,11 +2724,6 @@ bool GDALGeoPackageDataset::OpenRaster(
                         SetDataType(GDT_Float32);
                     }
                     sqlite3_finalize(hSQLStmt);
-                }
-                else
-                {
-                    CPLError(CE_Failure, CPLE_AppDefined,
-                             "Error when running %s", pszSQL);
                 }
                 sqlite3_free(pszSQL);
             }
@@ -7658,7 +7654,7 @@ OGRLayer *GDALGeoPackageDataset::ExecuteSQL(const char *pszSQLCommand,
     if (rc != SQLITE_OK)
     {
         CPLError(CE_Failure, CPLE_AppDefined,
-                 "In ExecuteSQL(): sqlite3_prepare_v2(%s):\n  %s",
+                 "In ExecuteSQL(): sqlite3_prepare_v2(%s): %s",
                  osSQLCommandTruncated.c_str(), sqlite3_errmsg(hDB));
 
         if (hSQLStmt != nullptr)
@@ -9106,7 +9102,7 @@ static CPLString GPKG_GDAL_GetMemFileFromBlob(sqlite3_value **argv)
     int nBytes = sqlite3_value_bytes(argv[0]);
     const GByte *pabyBLOB =
         reinterpret_cast<const GByte *>(sqlite3_value_blob(argv[0]));
-    const CPLString osMemFileName(
+    CPLString osMemFileName(
         VSIMemGenerateHiddenFilename("GPKG_GDAL_GetMemFileFromBlob"));
     VSILFILE *fp = VSIFileFromMemBuffer(
         osMemFileName.c_str(), const_cast<GByte *>(pabyBLOB), nBytes, FALSE);
@@ -10124,11 +10120,9 @@ bool GDALGeoPackageDataset::AddFieldDomain(
                            "description) VALUES ("
                            "?, 'range', NULL, ?, ?, ?, ?, ?)",
                            min_is_inclusive, max_is_inclusive);
-            if (sqlite3_prepare_v2(hDB, pszSQL, -1, &hInsertStmt, nullptr) !=
+            if (SQLPrepareWithError(hDB, pszSQL, -1, &hInsertStmt, nullptr) !=
                 SQLITE_OK)
             {
-                CPLError(CE_Failure, CPLE_AppDefined,
-                         "failed to prepare SQL: %s", pszSQL);
                 return false;
             }
             sqlite3_bind_text(hInsertStmt, 1, domainName.c_str(),
@@ -10153,7 +10147,7 @@ bool GDALGeoPackageDataset::AddFieldDomain(
             if (sqlite_err != SQLITE_OK && sqlite_err != SQLITE_DONE)
             {
                 CPLError(CE_Failure, CPLE_AppDefined,
-                         "failed to execute insertion: %s",
+                         "failed to execute insertion '%s': %s", pszSQL,
                          sqlite3_errmsg(hDB));
                 return false;
             }

@@ -14,6 +14,7 @@
 #define GDALALG_VECTOR_CLIP_INCLUDED
 
 #include "gdalalg_vector_pipeline.h"
+#include "gdalalg_clip_common.h"
 
 //! @cond Doxygen_Suppress
 
@@ -22,7 +23,8 @@
 /************************************************************************/
 
 class GDALVectorClipAlgorithm /* non final */
-    : public GDALVectorPipelineStepAlgorithm
+    : public GDALVectorPipelineStepAlgorithm,
+      public GDALClipCommon
 {
   public:
     static constexpr const char *NAME = "clip";
@@ -32,17 +34,9 @@ class GDALVectorClipAlgorithm /* non final */
     explicit GDALVectorClipAlgorithm(bool standaloneStep = false);
 
   private:
-    bool RunStep(GDALProgressFunc pfnProgress, void *pProgressData) override;
+    bool RunStep(GDALVectorPipelineStepRunContext &ctxt) override;
 
     std::string m_activeLayer{};
-    std::vector<double> m_bbox{};
-    std::string m_bboxCrs{};
-    std::string m_geometry{};
-    std::string m_geometryCrs{};
-    GDALArgDatasetValue m_likeDataset{};
-    std::string m_likeLayer{};
-    std::string m_likeSQL{};
-    std::string m_likeWhere{};
 };
 
 /************************************************************************/

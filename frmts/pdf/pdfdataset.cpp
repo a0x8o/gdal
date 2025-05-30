@@ -2700,8 +2700,7 @@ CPLErr PDFDataset::IRasterIO(GDALRWFlag eRWFlag, int nXOff, int nYOff,
         nYSize == nBufYSize &&
         (nBufXSize > nBandBlockXSize || nBufYSize > nBandBlockYSize) &&
         eBufType == GDT_Byte && nBandCount == nBands &&
-        (nBands >= 3 && panBandMap[0] == 1 && panBandMap[1] == 2 &&
-         panBandMap[2] == 3 && (nBands == 3 || panBandMap[3] == 4)))
+        IsAllBands(nBandCount, panBandMap))
     {
         bReadPixels = TRUE;
 #ifdef HAVE_PODOFO
@@ -4053,7 +4052,7 @@ void PDFDataset::ExploreLayersPdfium(GDALPDFArray *poArray, int iPageOfInterest,
             GDALPDFObject *poName = poDict->Get("Name");
             if (poName != nullptr && poName->GetType() == PDFObjectType_String)
             {
-                const std::string osName =
+                std::string osName =
                     PDFSanitizeLayerName(poName->GetString().c_str());
                 // coverity[copy_paste_error]
                 if (!osTopLayer.empty())
@@ -4062,7 +4061,7 @@ void PDFDataset::ExploreLayersPdfium(GDALPDFArray *poArray, int iPageOfInterest,
                         std::string(osTopLayer).append(".").append(osName);
                 }
                 else
-                    osCurLayer = osName;
+                    osCurLayer = std::move(osName);
                 // CPLDebug("PDF", "Layer %s", osCurLayer.c_str());
 
                 const auto oRefPair =
@@ -4791,9 +4790,14 @@ PDFDataset *PDFDataset::Open(GDALOpenInfo *poOpenInfo)
             return nullptr;
         }
 
+#if POPPLER_MAJOR_VERSION > 25 ||                                              \
+    (POPPLER_MAJOR_VERSION == 25 && POPPLER_MINOR_VERSION >= 3)
+        const Object &oPageObj = poPagePoppler->getPageObj();
+#else
         /* Here's the dirty part: this is a private member */
         /* so we had to #define private public to get it ! */
-        Object &oPageObj = poPagePoppler->pageObj;
+        const Object &oPageObj = poPagePoppler->pageObj;
+#endif
         if (!oPageObj.isDict())
         {
             CPLError(CE_Failure, CPLE_AppDefined,
@@ -4802,7 +4806,7 @@ PDFDataset *PDFDataset::Open(GDALOpenInfo *poOpenInfo)
             return nullptr;
         }
 
-        poPageObj = new GDALPDFObjectPoppler(&oPageObj, FALSE);
+        poPageObj = new GDALPDFObjectPoppler(&oPageObj);
         Ref *poPageRef = poCatalogPoppler->getPageRef(iPage);
         if (poPageRef != nullptr)
         {

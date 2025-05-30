@@ -30,31 +30,18 @@ void GDALVectorOutputAbstractAlgorithm::AddAllOutputArgs()
     AddOutputFormatArg(&m_outputFormat)
         .AddMetadataItem(GAAMDI_REQUIRED_CAPABILITIES,
                          {GDAL_DCAP_VECTOR, GDAL_DCAP_CREATE});
-    AddOutputDatasetArg(&m_outputDataset, GDAL_OF_VECTOR);
-    m_outputDataset.SetInputFlags(GADV_NAME | GADV_OBJECT);
+    AddOutputDatasetArg(&m_outputDataset, GDAL_OF_VECTOR)
+        .SetDatasetInputFlags(GADV_NAME | GADV_OBJECT);
     AddCreationOptionsArg(&m_creationOptions);
     AddLayerCreationOptionsArg(&m_layerCreationOptions);
     AddOverwriteArg(&m_overwrite).SetMutualExclusionGroup("overwrite-update");
-    AddUpdateArg(&m_update).SetMutualExclusionGroup("overwrite-update");
-    AddArg("overwrite-layer", 0,
-           _("Whether overwriting existing layer is allowed"),
-           &m_overwriteLayer)
-        .SetDefault(false)
-        .AddValidationAction(
-            [this]
-            {
-                GetArg(GDAL_ARG_NAME_UPDATE)->Set(true);
-                return true;
-            });
+    auto &updateArg =
+        AddUpdateArg(&m_update).SetMutualExclusionGroup("overwrite-update");
+    AddOverwriteLayerArg(&m_overwriteLayer);
     AddArg("append", 0, _("Whether appending to existing layer is allowed"),
            &m_appendLayer)
         .SetDefault(false)
-        .AddValidationAction(
-            [this]
-            {
-                GetArg(GDAL_ARG_NAME_UPDATE)->Set(true);
-                return true;
-            });
+        .AddAction([&updateArg] { updateArg.Set(true); });
     {
         auto &arg = AddLayerNameArg(&m_outputLayerName)
                         .AddAlias("nln")
@@ -72,26 +59,6 @@ GDALVectorOutputAbstractAlgorithm::SetupOutputDatasetRet
 GDALVectorOutputAbstractAlgorithm::SetupOutputDataset()
 {
     SetupOutputDatasetRet ret;
-
-    VSIStatBufL sStat;
-    if (!m_update && !m_outputDataset.GetName().empty() &&
-        (VSIStatL(m_outputDataset.GetName().c_str(), &sStat) == 0 ||
-         std::unique_ptr<GDALDataset>(
-             GDALDataset::Open(m_outputDataset.GetName().c_str()))))
-    {
-        if (!m_overwrite)
-        {
-            ReportError(CE_Failure, CPLE_AppDefined,
-                        "File '%s' already exists. Specify the --overwrite "
-                        "option to overwrite it, or --update to update it.",
-                        m_outputDataset.GetName().c_str());
-            return ret;
-        }
-        else
-        {
-            VSIUnlink(m_outputDataset.GetName().c_str());
-        }
-    }
 
     GDALDataset *poDstDS = m_outputDataset.GetDatasetRef();
     std::unique_ptr<GDALDataset> poRetDS;
@@ -140,6 +107,8 @@ GDALVectorOutputAbstractAlgorithm::SetupOutputDataset()
     {
         m_outputLayerName = CPLGetBasenameSafe(poDstDS->GetDescription());
     }
+    if (m_outputLayerName.empty() && poDstDS->GetLayerCount() == 1)
+        m_outputLayerName = poDstDS->GetLayer(0)->GetDescription();
 
     auto poDstLayer = m_outputLayerName.empty()
                           ? nullptr
@@ -172,9 +141,10 @@ GDALVectorOutputAbstractAlgorithm::SetupOutputDataset()
         {
             ReportError(CE_Failure, CPLE_AppDefined,
                         "Layer '%s' already exists. Specify the "
-                        "--overwrite-layer option to overwrite it, or --append "
-                        "to append it.",
-                        m_outputLayerName.c_str());
+                        "--%s option to overwrite it, or --%s "
+                        "to append to it.",
+                        m_outputLayerName.c_str(),
+                        GDAL_ARG_NAME_OVERWRITE_LAYER, GDAL_ARG_NAME_APPEND);
             return ret;
         }
     }

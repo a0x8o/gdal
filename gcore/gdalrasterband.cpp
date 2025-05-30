@@ -332,7 +332,7 @@ CPLErr GDALRasterBand::RasterIO(GDALRWFlag eRWFlag, int nXOff, int nYOff,
         INIT_RASTERIO_EXTRA_ARG(sExtraArg);
         psExtraArg = &sExtraArg;
     }
-    else if (CPL_UNLIKELY(psExtraArg->nVersion !=
+    else if (CPL_UNLIKELY(psExtraArg->nVersion >
                           RASTERIO_EXTRA_ARG_CURRENT_VERSION))
     {
         ReportError(CE_Failure, CPLE_AppDefined,
@@ -4089,6 +4089,18 @@ struct GDALNoDataValues
 };
 
 /************************************************************************/
+/*                            ARE_REAL_EQUAL()                          */
+/************************************************************************/
+
+inline bool ARE_REAL_EQUAL(GFloat16 dfVal1, GFloat16 dfVal2, int ulp = 2)
+{
+    using std::abs;
+    return dfVal1 == dfVal2 || /* Should cover infinity */
+           abs(dfVal1 - dfVal2) < cpl::NumericLimits<GFloat16>::epsilon() *
+                                      abs(dfVal1 + dfVal2) * ulp;
+}
+
+/************************************************************************/
 /*                            GetHistogram()                            */
 /************************************************************************/
 
@@ -6536,8 +6548,8 @@ CPLErr GDALRasterBand::ComputeStatistics(int bApproxOK, double *pdfMin,
     // the difference of the sum of square values with the square of the sum.
     // dfMean and dfM2 are updated at each sample.
     // dfM2 is the sum of square of differences to the current mean.
-    double dfMin = std::numeric_limits<double>::max();
-    double dfMax = -std::numeric_limits<double>::max();
+    double dfMin = std::numeric_limits<double>::infinity();
+    double dfMax = -std::numeric_limits<double>::infinity();
     double dfMean = 0.0;
     double dfM2 = 0.0;
 
@@ -6647,9 +6659,17 @@ CPLErr GDALRasterBand::ComputeStatistics(int bApproxOK, double *pdfMin,
                 dfMax = std::max(dfMax, dfValue);
 
                 nValidCount++;
-                const double dfDelta = dfValue - dfMean;
-                dfMean += dfDelta / nValidCount;
-                dfM2 += dfDelta * (dfValue - dfMean);
+                if (dfMin == dfMax)
+                {
+                    if (nValidCount == 1)
+                        dfMean = dfMin;
+                }
+                else
+                {
+                    const double dfDelta = dfValue - dfMean;
+                    dfMean += dfDelta / nValidCount;
+                    dfM2 += dfDelta * (dfValue - dfMean);
+                }
             }
         }
 
@@ -6901,9 +6921,17 @@ CPLErr GDALRasterBand::ComputeStatistics(int bApproxOK, double *pdfMin,
                     dfMax = std::max(dfMax, dfValue);
 
                     nValidCount++;
-                    const double dfDelta = dfValue - dfMean;
-                    dfMean += dfDelta / nValidCount;
-                    dfM2 += dfDelta * (dfValue - dfMean);
+                    if (dfMin == dfMax)
+                    {
+                        if (nValidCount == 1)
+                            dfMean = dfMin;
+                    }
+                    else
+                    {
+                        const double dfDelta = dfValue - dfMean;
+                        dfMean += dfDelta / nValidCount;
+                        dfM2 += dfDelta * (dfValue - dfMean);
+                    }
                 }
             }
 
@@ -7408,9 +7436,9 @@ CPLErr GDALRasterBand::ComputeRasterMinMax(int bApproxOK, double *adfMinMax)
     GInt16 nMaxInt16 =
         std::numeric_limits<GInt16>::lowest();  // used for GInt16 case
     double dfMin =
-        std::numeric_limits<double>::max();  // used for generic code path
+        std::numeric_limits<double>::infinity();  // used for generic code path
     double dfMax =
-        std::numeric_limits<double>::lowest();  // used for generic code path
+        -std::numeric_limits<double>::infinity();  // used for generic code path
     const bool bUseOptimizedPath =
         !poMaskBand && ((eDataType == GDT_Byte && !bSignedByte) ||
                         eDataType == GDT_Int16 || eDataType == GDT_UInt16);

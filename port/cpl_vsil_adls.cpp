@@ -186,7 +186,8 @@ class VSIADLSFSHandler final : public IVSIS3LikeFSHandlerWithMultipartUpload
         return "ADLS";
     }
 
-    int Rename(const char *oldpath, const char *newpath) override;
+    int Rename(const char *oldpath, const char *newpath, GDALProgressFunc,
+               void *) override;
     int Unlink(const char *pszFilename) override;
     int Mkdir(const char *, long) override;
     int Rmdir(const char *) override;
@@ -727,6 +728,7 @@ class VSIADLSHandle final : public VSICurlHandle
     virtual struct curl_slist *
     GetCurlHeaders(const std::string &osVerb,
                    const struct curl_slist *psExistingHeaders) override;
+    bool CanRestartOnError(const char *, const char *, bool) override;
 
   public:
     VSIADLSHandle(VSIADLSFSHandler *poFS, const char *pszFilename,
@@ -1282,7 +1284,8 @@ IVSIS3LikeHandleHelper *VSIADLSFSHandler::CreateHandleHelper(const char *pszURI,
 /*                               Rename()                               */
 /************************************************************************/
 
-int VSIADLSFSHandler::Rename(const char *oldpath, const char *newpath)
+int VSIADLSFSHandler::Rename(const char *oldpath, const char *newpath,
+                             GDALProgressFunc, void *)
 {
     if (!STARTS_WITH_CI(oldpath, GetFSPrefix().c_str()))
         return -1;
@@ -1667,7 +1670,7 @@ int VSIADLSFSHandler::RmdirInternal(const char *pszDirname, bool bRecursive)
                              : "(null)");
                 if (requestHelper.sWriteFuncData.pBuffer != nullptr)
                 {
-                    VSIError(VSIE_AWSError, "%s",
+                    VSIError(VSIE_ObjectStorageGenericError, "%s",
                              requestHelper.sWriteFuncData.pBuffer);
                     if (strstr(requestHelper.sWriteFuncData.pBuffer,
                                "PathNotFound"))
@@ -2160,6 +2163,17 @@ VSIADLSHandle::GetCurlHeaders(const std::string &osVerb,
                               const struct curl_slist *psExistingHeaders)
 {
     return m_poHandleHelper->GetCurlHeaders(osVerb, psExistingHeaders);
+}
+
+/************************************************************************/
+/*                          CanRestartOnError()                         */
+/************************************************************************/
+
+bool VSIADLSHandle::CanRestartOnError(const char *pszErrorMsg,
+                                      const char *pszHeaders, bool bSetError)
+{
+    return m_poHandleHelper->CanRestartOnError(pszErrorMsg, pszHeaders,
+                                               bSetError);
 }
 
 } /* end of namespace cpl */
