@@ -145,9 +145,9 @@ class BAGDataset final : public GDALPamDataset
     hid_t m_hVarresMetadataDataType = -1;
     hid_t m_hVarresMetadataDataspace = -1;
     hid_t m_hVarresMetadataNative = -1;
-    std::map<int, BAGRefinementGrid> m_oMapRefinemendGrids;
+    std::map<int, BAGRefinementGrid> m_oMapRefinemendGrids{};
 
-    CPLStringList m_aosSubdatasets;
+    CPLStringList m_aosSubdatasets{};
 
     hid_t m_hVarresRefinements = -1;
     hid_t m_hVarresRefinementsDataType = -1;
@@ -157,7 +157,7 @@ class BAGDataset final : public GDALPamDataset
 
     unsigned m_nSuperGridRefinementStartIndex = 0;
 
-    lru11::Cache<unsigned, std::vector<float>> m_oCacheRefinementValues;
+    lru11::Cache<unsigned, std::vector<float>> m_oCacheRefinementValues{};
     const float *GetRefinementValues(unsigned nRefinementIndex);
 
     bool GetMeanSupergridsResolution(double &dfResX, double &dfResY);
@@ -181,6 +181,8 @@ class BAGDataset final : public GDALPamDataset
     {
         return m_poSharedResources->m_hHDF5;
     }
+
+    CPL_DISALLOW_COPY_ASSIGN(BAGDataset)
 
   public:
     BAGDataset();
@@ -3527,6 +3529,8 @@ class BAGTrackingListLayer final
 
     OGRFeature *GetNextRawFeature();
 
+    CPL_DISALLOW_COPY_ASSIGN(BAGTrackingListLayer)
+
   public:
     explicit BAGTrackingListLayer(const std::shared_ptr<GDALMDArray> &poArray);
     ~BAGTrackingListLayer();
@@ -3750,8 +3754,8 @@ bool BAGDataset::GetMeanSupergridsResolution(double &dfResX, double &dfResY)
     int nValidSuperGrids = 0;
     std::vector<BAGRefinementGrid> rgrids(static_cast<size_t>(nChunkXSize) *
                                           nChunkYSize);
-    const int county = (m_nLowResHeight + nChunkYSize - 1) / nChunkYSize;
-    const int countx = (m_nLowResWidth + nChunkXSize - 1) / nChunkXSize;
+    const int county = DIV_ROUND_UP(m_nLowResHeight, nChunkYSize);
+    const int countx = DIV_ROUND_UP(m_nLowResWidth, nChunkXSize);
     for (int y = 0; y < county; y++)
     {
         const int nReqCountY =
@@ -5655,9 +5659,9 @@ bool BAGCreator::CreateElevationOrUncertainty(
             break;
 
         const int nYBlocks =
-            static_cast<int>((nYSize + nBlockYSize - 1) / nBlockYSize);
+            static_cast<int>(DIV_ROUND_UP(nYSize, nBlockYSize));
         const int nXBlocks =
-            static_cast<int>((nXSize + nBlockXSize - 1) / nBlockXSize);
+            static_cast<int>(DIV_ROUND_UP(nXSize, nBlockXSize));
         std::vector<float> afValues(static_cast<size_t>(nBlockYSize) *
                                     nBlockXSize);
         ret = true;

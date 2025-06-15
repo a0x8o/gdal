@@ -575,26 +575,12 @@ bool GDALVectorPipelineAlgorithm::ParseCommandLineArguments(
         return false;
     }
 
-    if (steps.front().alg->GetName() != GDALVectorReadAlgorithm::NAME &&
-        steps.front().alg->GetName() != GDALVectorConcatAlgorithm::NAME)
-    {
-        ReportError(
-            CE_Failure, CPLE_AppDefined, "First step should be '%s' or '%s'",
-            GDALVectorReadAlgorithm::NAME, GDALVectorConcatAlgorithm::NAME);
+    std::vector<GDALVectorPipelineStepAlgorithm *> stepAlgs;
+    for (const auto &step : steps)
+        stepAlgs.push_back(step.alg.get());
+    if (!CheckFirstStep(stepAlgs))
         return false;
-    }
-    for (size_t i = 1; i < steps.size() - 1; ++i)
-    {
-        if (steps[i].alg->GetName() == GDALVectorReadAlgorithm::NAME ||
-            steps[i].alg->GetName() == GDALVectorConcatAlgorithm::NAME)
-        {
-            ReportError(CE_Failure, CPLE_AppDefined,
-                        "Only first step can be '%s' or '%s'",
-                        GDALVectorReadAlgorithm::NAME,
-                        GDALVectorConcatAlgorithm::NAME);
-            return false;
-        }
-    }
+
     if (steps.back().alg->GetName() != GDALVectorWriteAlgorithm::NAME)
     {
         if (helpRequested)
@@ -971,6 +957,15 @@ OGRFeature *GDALVectorPipelineOutputDataset::GetNextFeature(
         *ppoBelongingLayer = m_belongingLayer;
     m_idxInPendingFeatures = 1;
     return poFeature;
+}
+
+/************************************************************************/
+/*            GDALVectorPipelinePassthroughLayer::GetLayerDefn()        */
+/************************************************************************/
+
+OGRFeatureDefn *GDALVectorPipelinePassthroughLayer::GetLayerDefn()
+{
+    return m_srcLayer.GetLayerDefn();
 }
 
 /************************************************************************/

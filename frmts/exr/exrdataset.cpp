@@ -59,6 +59,14 @@ class GDALEXRDataset final : public GDALPamDataset
     double m_adfGT[6] = {0, 1, 0, 0, 0, 1};
     bool m_bHasGT = false;
 
+    void AddOverview(std::unique_ptr<GDALEXRDataset> poOvrDS)
+    {
+        m_apoOvrDS.push_back(std::move(poOvrDS));
+        m_apoOvrDS.back()->m_poParent = this;
+    }
+
+    CPL_DISALLOW_COPY_ASSIGN(GDALEXRDataset)
+
   public:
     GDALEXRDataset() = default;
     ~GDALEXRDataset();
@@ -86,7 +94,7 @@ class GDALEXRRasterBand final : public GDALPamRasterBand
     friend class GDALEXRDataset;
 
     GDALColorInterp m_eInterp = GCI_Undefined;
-    std::string m_osChannelName;
+    std::string m_osChannelName{};
 
   protected:
     CPLErr IReadBlock(int, int, void *) override;
@@ -412,11 +420,13 @@ class GDALEXRIOStreamException final : public std::exception
     {
     }
 
-    const char *what() const noexcept override
-    {
-        return m_msg.c_str();
-    }
+    const char *what() const noexcept override;
 };
+
+const char *GDALEXRIOStreamException::what() const noexcept
+{
+    return m_msg.c_str();
+}
 
 #if OPENEXR_VERSION_MAJOR < 3
 typedef Int64 IoInt64Type;
@@ -455,6 +465,8 @@ class GDALEXRIOStream final : public IStream, public OStream
 
   private:
     VSILFILE *m_fp;
+
+    CPL_DISALLOW_COPY_ASSIGN(GDALEXRIOStream)
 };
 
 bool GDALEXRIOStream::read(char c[/*n*/], int n)
@@ -718,22 +730,20 @@ GDALDataset *GDALEXRDataset::Open(GDALOpenInfo *poOpenInfo)
                         break;
                     }
                     auto poOvrDS = std::make_unique<GDALEXRDataset>();
-                    // coverity[escape]
-                    poOvrDS->m_poParent = poDS.get();
                     poOvrDS->m_iLevel = iLevel;
                     poOvrDS->nRasterXSize = nOvrWidth;
                     poOvrDS->nRasterYSize = nOvrHeight;
-                    poDS->m_apoOvrDS.push_back(std::move(poOvrDS));
                     i = 0;
                     for (auto iter = channels.begin(); iter != channels.end();
                          ++iter, ++i)
                     {
                         const Channel &channel = iter.channel();
-                        auto poBand = new GDALEXRRasterBand(
-                            poDS->m_apoOvrDS.back().get(), i + 1, iter.name(),
-                            channel.type, nBlockXSize, nBlockYSize);
-                        poDS->m_apoOvrDS.back()->SetBand(i + 1, poBand);
+                        auto poBand = std::make_unique<GDALEXRRasterBand>(
+                            poOvrDS.get(), i + 1, iter.name(), channel.type,
+                            nBlockXSize, nBlockYSize);
+                        poOvrDS->SetBand(i + 1, std::move(poBand));
                     }
+                    poDS->AddOverview(std::move(poOvrDS));
                 }
             }
 
@@ -1440,6 +1450,8 @@ class GDALEXRWritableDataset final : public GDALPamDataset
     Header m_header;
 
     void WriteHeader();
+
+    CPL_DISALLOW_COPY_ASSIGN(GDALEXRWritableDataset)
 
   public:
     GDALEXRWritableDataset(int nXSize, int nYSize) : m_header(nXSize, nYSize)

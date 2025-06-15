@@ -35,8 +35,12 @@ class S111Dataset final : public S100BaseDataset
     {
     }
 
+    ~S111Dataset() override;
+
     static GDALDataset *Open(GDALOpenInfo *);
 };
+
+S111Dataset::~S111Dataset() = default;
 
 /************************************************************************/
 /*                            S111RasterBand                            */
@@ -50,6 +54,8 @@ class S111RasterBand final : public GDALProxyRasterBand
     std::string m_osUnitType{};
     std::unique_ptr<GDALRasterAttributeTable> m_poRAT{};
 
+    CPL_DISALLOW_COPY_ASSIGN(S111RasterBand)
+
   public:
     explicit S111RasterBand(std::unique_ptr<GDALDataset> &&poDSIn)
         : m_poDS(std::move(poDSIn)),
@@ -60,10 +66,7 @@ class S111RasterBand final : public GDALProxyRasterBand
     }
 
     GDALRasterBand *
-    RefUnderlyingRasterBand(bool /*bForceOpen*/ = true) const override
-    {
-        return m_poUnderlyingBand;
-    }
+    RefUnderlyingRasterBand(bool /*bForceOpen*/ = true) const override;
 
     const char *GetUnitType() override
     {
@@ -81,6 +84,12 @@ class S111RasterBand final : public GDALProxyRasterBand
         return GDALRasterBand::GetMetadata(pszDomain);
     }
 };
+
+GDALRasterBand *
+S111RasterBand::RefUnderlyingRasterBand(bool /*bForceOpen*/) const
+{
+    return m_poUnderlyingBand;
+}
 
 /************************************************************************/
 /*                                Open()                                */

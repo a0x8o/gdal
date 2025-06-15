@@ -1162,6 +1162,12 @@ bool GDALAlgorithmArg::Serialize(std::string &serializedArg) const
 }
 
 /************************************************************************/
+/*                   ~GDALInConstructionAlgorithmArg()                  */
+/************************************************************************/
+
+GDALInConstructionAlgorithmArg::~GDALInConstructionAlgorithmArg() = default;
+
+/************************************************************************/
 /*              GDALInConstructionAlgorithmArg::AddAlias()              */
 /************************************************************************/
 
@@ -3429,12 +3435,23 @@ bool GDALAlgorithm::AddOptionsSuggestions(const char *pszXML, int datasetType,
     CPLXMLTreeCloser poTree(CPLParseXMLString(pszXML));
     if (!poTree)
         return false;
+
+    std::string typedOptionName = currentValue;
+    const auto posEqual = typedOptionName.find('=');
+    std::string typedValue;
+    if (posEqual != 0 && posEqual != std::string::npos)
+    {
+        typedValue = currentValue.substr(posEqual + 1);
+        typedOptionName.resize(posEqual);
+    }
+
     for (const CPLXMLNode *psChild = poTree.get()->psChild; psChild;
          psChild = psChild->psNext)
     {
         const char *pszName = CPLGetXMLValue(psChild, "name", nullptr);
-        if (pszName && currentValue == pszName &&
-            EQUAL(psChild->pszValue, "Option"))
+        if (pszName && typedOptionName == pszName &&
+            (strcmp(psChild->pszValue, "Option") == 0 ||
+             strcmp(psChild->pszValue, "Argument") == 0))
         {
             const char *pszType = CPLGetXMLValue(psChild, "type", "");
             const char *pszMin = CPLGetXMLValue(psChild, "min", nullptr);
@@ -3452,6 +3469,11 @@ bool GDALAlgorithm::AddOptionsSuggestions(const char *pszXML, int datasetType,
             }
             else if (EQUAL(pszType, "boolean"))
             {
+                if (typedValue == "YES" || typedValue == "NO")
+                {
+                    oRet.push_back(currentValue);
+                    return true;
+                }
                 oRet.push_back("NO");
                 oRet.push_back("YES");
             }
@@ -3508,7 +3530,8 @@ bool GDALAlgorithm::AddOptionsSuggestions(const char *pszXML, int datasetType,
          psChild = psChild->psNext)
     {
         const char *pszName = CPLGetXMLValue(psChild, "name", nullptr);
-        if (pszName && EQUAL(psChild->pszValue, "Option"))
+        if (pszName && (strcmp(psChild->pszValue, "Option") == 0 ||
+                        strcmp(psChild->pszValue, "Argument") == 0))
         {
             const char *pszScope = CPLGetXMLValue(psChild, "scope", nullptr);
             if (!pszScope ||
@@ -3898,20 +3921,23 @@ GDALAlgorithm::AddOutputDataTypeArg(std::string *pValue,
 }
 
 /************************************************************************/
-/*                 GDALAlgorithm::AddNodataDataTypeArg()                */
+/*                    GDALAlgorithm::AddNodataArg()                     */
 /************************************************************************/
 
 GDALInConstructionAlgorithmArg &
-GDALAlgorithm::AddNodataDataTypeArg(std::string *pValue, bool noneAllowed,
-                                    const std::string &optionName,
-                                    const char *helpMessage)
+GDALAlgorithm::AddNodataArg(std::string *pValue, bool noneAllowed,
+                            const std::string &optionName,
+                            const char *helpMessage)
 {
-    auto &arg =
-        AddArg(optionName, 0,
-               MsgOrDefault(helpMessage,
-                            _("Assign a specified nodata value to output bands "
-                              "('none', numeric value, 'nan', 'inf', '-inf')")),
-               pValue);
+    auto &arg = AddArg(
+        optionName, 0,
+        MsgOrDefault(helpMessage,
+                     noneAllowed
+                         ? _("Assign a specified nodata value to output bands "
+                             "('none', numeric value, 'nan', 'inf', '-inf')")
+                         : _("Assign a specified nodata value to output bands "
+                             "(numeric value, 'nan', 'inf', '-inf')")),
+        pValue);
     arg.AddValidationAction(
         [this, pValue, noneAllowed, optionName]()
         {
@@ -3922,9 +3948,10 @@ GDALAlgorithm::AddNodataDataTypeArg(std::string *pValue, bool noneAllowed,
                 if (endptr != pValue->c_str() + pValue->size())
                 {
                     ReportError(CE_Failure, CPLE_IllegalArg,
-                                "Value of '%s' should be 'none', a "
+                                "Value of '%s' should be %sa "
                                 "numeric value, 'nan', 'inf' or '-inf'",
-                                optionName.c_str());
+                                optionName.c_str(),
+                                noneAllowed ? "'none', " : "");
                     return false;
                 }
             }
@@ -4081,37 +4108,57 @@ bool GDALAlgorithm::ValidateBandArg() const
     const auto bandArg = GetArg(GDAL_ARG_NAME_BAND);
     const auto inputDatasetArg = GetArg(GDAL_ARG_NAME_INPUT);
     if (bandArg && bandArg->IsExplicitlySet() && inputDatasetArg &&
-        inputDatasetArg->IsExplicitlySet() &&
-        inputDatasetArg->GetType() == GAAT_DATASET &&
+        (inputDatasetArg->GetType() == GAAT_DATASET ||
+         inputDatasetArg->GetType() == GAAT_DATASET_LIST) &&
         (inputDatasetArg->GetDatasetType() & GDAL_OF_RASTER) != 0)
     {
-        auto poDS = inputDatasetArg->Get<GDALArgDatasetValue>().GetDatasetRef();
-        if (poDS)
+        const auto CheckBand = [this](const GDALDataset *poDS, int nBand)
         {
-            const auto CheckBand = [this, poDS](int nBand)
+            if (nBand > poDS->GetRasterCount())
             {
-                if (nBand > poDS->GetRasterCount())
-                {
-                    ReportError(
-                        CE_Failure, CPLE_AppDefined,
-                        "Value of 'band' should be greater or equal than "
-                        "1 and less or equal than %d.",
-                        poDS->GetRasterCount());
-                    return false;
-                }
-                return true;
-            };
+                ReportError(CE_Failure, CPLE_AppDefined,
+                            "Value of 'band' should be greater or equal than "
+                            "1 and less or equal than %d.",
+                            poDS->GetRasterCount());
+                return false;
+            }
+            return true;
+        };
 
+        const auto ValidateForOneDataset =
+            [&bandArg, &CheckBand](const GDALDataset *poDS)
+        {
+            bool l_ret = true;
             if (bandArg->GetType() == GAAT_INTEGER)
             {
-                ret = CheckBand(bandArg->Get<int>());
+                l_ret = CheckBand(poDS, bandArg->Get<int>());
             }
             else if (bandArg->GetType() == GAAT_INTEGER_LIST)
             {
                 for (int nBand : bandArg->Get<std::vector<int>>())
                 {
-                    ret = ret && CheckBand(nBand);
+                    l_ret = l_ret && CheckBand(poDS, nBand);
                 }
+            }
+            return l_ret;
+        };
+
+        if (inputDatasetArg->GetType() == GAAT_DATASET)
+        {
+            auto poDS =
+                inputDatasetArg->Get<GDALArgDatasetValue>().GetDatasetRef();
+            if (poDS && !ValidateForOneDataset(poDS))
+                ret = false;
+        }
+        else
+        {
+            CPLAssert(inputDatasetArg->GetType() == GAAT_DATASET_LIST);
+            for (auto &datasetValue :
+                 inputDatasetArg->Get<std::vector<GDALArgDatasetValue>>())
+            {
+                auto poDS = datasetValue.GetDatasetRef();
+                if (poDS && !ValidateForOneDataset(poDS))
+                    ret = false;
             }
         }
     }
@@ -5620,6 +5667,7 @@ GDALAlgorithm::GetAutoComplete(std::vector<std::string> &args,
     if (option.empty() && !args.empty() && !args.back().empty() &&
         args.back()[0] == '-')
     {
+        const auto &lastArg = args.back();
         // List available options
         for (const auto &arg : GetArgs())
         {
@@ -5633,15 +5681,24 @@ GDALAlgorithm::GetAutoComplete(std::vector<std::string> &args,
             }
             if (!arg->GetShortName().empty())
             {
-                ret.push_back(std::string("-").append(arg->GetShortName()));
+                std::string str = std::string("-").append(arg->GetShortName());
+                if (lastArg == str)
+                    ret.push_back(std::move(str));
             }
-            for (const std::string &alias : arg->GetAliases())
+            if (lastArg != "-" && lastArg != "--")
             {
-                ret.push_back(std::string("--").append(alias));
+                for (const std::string &alias : arg->GetAliases())
+                {
+                    std::string str = std::string("--").append(alias);
+                    if (cpl::starts_with(str, lastArg))
+                        ret.push_back(std::move(str));
+                }
             }
             if (!arg->GetName().empty())
             {
-                ret.push_back(std::string("--").append(arg->GetName()));
+                std::string str = std::string("--").append(arg->GetName());
+                if (cpl::starts_with(str, lastArg))
+                    ret.push_back(std::move(str));
             }
         }
     }
@@ -5793,6 +5850,19 @@ void GDALAlgorithm::ExtractLastOptionAndValue(std::vector<std::string> &args,
         }
     }
 }
+
+//! @cond Doxygen_Suppress
+
+/************************************************************************/
+/*                 GDALContainerAlgorithm::RunImpl()                    */
+/************************************************************************/
+
+bool GDALContainerAlgorithm::RunImpl(GDALProgressFunc, void *)
+{
+    return false;
+}
+
+//! @endcond
 
 /************************************************************************/
 /*                        GDALAlgorithmRelease()                        */

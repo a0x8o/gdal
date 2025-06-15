@@ -120,7 +120,7 @@ TEST(TestFloat16, math)
 {
     for (int i = -100; i <= +100; ++i)
     {
-        double x = i;
+        const double x = i;
 
         using std::isfinite;
         EXPECT_EQ(isfinite(GFloat16(x)), isfinite(x));
@@ -141,20 +141,20 @@ TEST(TestFloat16, math)
         EXPECT_EQ(floor(GFloat16(x)), floor(x));
         using std::round;
         EXPECT_EQ(round(GFloat16(x)), round(x));
-        if (x >= 0)
-        {
-            using std::sqrt;
-            // coverity[negative_returns]
-            EXPECT_NEAR(sqrt(GFloat16(x)), sqrt(x), fabs(sqrt(x) / 1024));
-        }
+    }
+    for (int i = 0; i <= 100; ++i)
+    {
+        const double x = i;
+        using std::sqrt;
+        EXPECT_NEAR(sqrt(GFloat16(x)), sqrt(x), fabs(sqrt(x) / 1024));
     }
 
     for (int i = -100; i <= +100; ++i)
     {
         for (int j = -100; j <= +100; ++j)
         {
-            double x = i;
-            double y = j;
+            const double x = i;
+            const double y = j;
 
             using std::fmax;
             EXPECT_EQ(fmax(GFloat16(x), GFloat16(y)), GFloat16(fmax(x, y)));
@@ -167,11 +167,11 @@ TEST(TestFloat16, math)
             using std::min;
             EXPECT_EQ(min(GFloat16(x), GFloat16(y)), GFloat16(min(x, y)));
             using std::pow;
-            EXPECT_EQ(pow(GFloat16(x), GFloat16(y)), GFloat16(pow(x, y)));
+            EXPECT_EQ(pow(GFloat16(x), GFloat16(y)), GFloat16(pow(i, j)));
             using std::fabs;
             using std::isfinite;
             GFloat16 r1 = GFloat16(pow(GFloat16(x), j));
-            GFloat16 r2 = GFloat16(pow(x, j));
+            GFloat16 r2 = GFloat16(pow(i, j));
             if (!isfinite(r1))
             {
                 EXPECT_EQ(r1, r2);

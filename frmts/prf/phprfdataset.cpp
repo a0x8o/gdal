@@ -26,7 +26,7 @@ enum ph_format
 
 class PhPrfBand final : public VRTSourcedRasterBand
 {
-    std::vector<GDALRasterBand *> osOverview;
+    std::vector<GDALRasterBand *> osOverview{};
 
   public:
     PhPrfBand(GDALDataset *poDataset, int nBandCount, GDALDataType eType,
@@ -40,17 +40,7 @@ class PhPrfBand final : public VRTSourcedRasterBand
         osOverview.push_back(ov);
     }
 
-    int GetOverviewCount() override
-    {
-        if (!osOverview.empty())
-        {
-            return static_cast<int>(osOverview.size());
-        }
-        else
-        {
-            return VRTSourcedRasterBand::GetOverviewCount();
-        }
-    }
+    int GetOverviewCount() override;
 
     GDALRasterBand *GetOverview(int i) override
     {
@@ -66,14 +56,26 @@ class PhPrfBand final : public VRTSourcedRasterBand
     }
 };
 
+int PhPrfBand::GetOverviewCount()
+{
+    if (!osOverview.empty())
+    {
+        return static_cast<int>(osOverview.size());
+    }
+    else
+    {
+        return VRTSourcedRasterBand::GetOverviewCount();
+    }
+}
+
 class PhPrfDataset final : public VRTDataset
 {
-    std::vector<GDALDataset *> osSubTiles;
+    std::vector<GDALDataset *> osSubTiles{};
 
   public:
     PhPrfDataset(GDALAccess eAccess, int nSizeX, int nSizeY, int nBandCount,
                  GDALDataType eType, const char *pszName);
-    ~PhPrfDataset();
+    ~PhPrfDataset() override;
     bool AddTile(const char *pszPartName, GDALAccess eAccess, int nWidth,
                  int nHeight, int nOffsetX, int nOffsetY, int nScale);
     int CloseDependentDatasets() override;
@@ -86,7 +88,7 @@ PhPrfDataset::PhPrfDataset(GDALAccess _eAccess, int nSizeX, int nSizeY,
                            const char *pszName)
     : VRTDataset(nSizeX, nSizeY)
 {
-    poDriver = (GDALDriver *)GDALGetDriverByName(PH_PRF_DRIVER);
+    poDriver = GetGDALDriverManager()->GetDriverByName(PH_PRF_DRIVER);
     eAccess = _eAccess;
     SetWritable(FALSE);  // Avoid rewrite of *.prf file with 'vrt' file
     SetDescription(pszName);
@@ -649,5 +651,5 @@ void GDALRegister_PRF()
     poDriver->SetMetadataItem(GDAL_DMD_HELPTOPIC, "drivers/raster/prf.html");
     poDriver->pfnIdentify = PhPrfDataset::Identify;
     poDriver->pfnOpen = PhPrfDataset::Open;
-    GDALRegisterDriver((GDALDriverH)poDriver);
+    GetGDALDriverManager()->RegisterDriver(poDriver);
 }

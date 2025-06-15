@@ -96,7 +96,7 @@ GDALRasterPansharpenAlgorithm::GDALRasterPansharpenAlgorithm(
 
 bool GDALRasterPansharpenAlgorithm::RunStep(GDALRasterPipelineStepRunContext &)
 {
-    auto poPanDS = m_inputDataset.GetDatasetRef();
+    auto poPanDS = m_inputDataset[0].GetDatasetRef();
     CPLAssert(poPanDS);
     CPLAssert(m_outputDataset.GetName().empty());
     CPLAssert(!m_outputDataset.GetDatasetRef());
@@ -231,5 +231,8 @@ bool GDALRasterPansharpenAlgorithm::RunStep(GDALRasterPipelineStepRunContext &)
     }
     return bRet;
 }
+
+GDALRasterPansharpenAlgorithmStandalone::
+    ~GDALRasterPansharpenAlgorithmStandalone() = default;
 
 //! @endcond

@@ -25,15 +25,17 @@
 
 class MAPDataset final : public GDALDataset
 {
-    GDALDataset *poImageDS;
+    GDALDataset *poImageDS{};
 
     OGRSpatialReference m_oSRS{};
-    int bGeoTransformValid;
+    int bGeoTransformValid{};
     double adfGeoTransform[6];
-    int nGCPCount;
-    GDAL_GCP *pasGCPList;
-    OGRPolygon *poNeatLine;
-    CPLString osImgFilename;
+    int nGCPCount{};
+    GDAL_GCP *pasGCPList{};
+    OGRPolygon *poNeatLine{};
+    CPLString osImgFilename{};
+
+    CPL_DISALLOW_COPY_ASSIGN(MAPDataset)
 
   public:
     MAPDataset();
@@ -59,14 +61,13 @@ class MAPDataset final : public GDALDataset
 /************************************************************************/
 class MAPWrapperRasterBand final : public GDALProxyRasterBand
 {
-    GDALRasterBand *poBaseBand;
+    GDALRasterBand *poBaseBand{};
+
+    CPL_DISALLOW_COPY_ASSIGN(MAPWrapperRasterBand)
 
   protected:
     virtual GDALRasterBand *
-    RefUnderlyingRasterBand(bool /*bForceOpen*/) const override
-    {
-        return poBaseBand;
-    }
+    RefUnderlyingRasterBand(bool /*bForceOpen*/) const override;
 
   public:
     explicit MAPWrapperRasterBand(GDALRasterBand *poBaseBandIn)
@@ -80,6 +81,12 @@ class MAPWrapperRasterBand final : public GDALProxyRasterBand
     {
     }
 };
+
+GDALRasterBand *
+MAPWrapperRasterBand::RefUnderlyingRasterBand(bool /*bForceOpen*/) const
+{
+    return poBaseBand;
+}
 
 /************************************************************************/
 /* ==================================================================== */

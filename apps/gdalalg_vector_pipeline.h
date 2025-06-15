@@ -106,6 +106,11 @@ class GDALVectorPipelineStepAlgorithm /* non final */ : public GDALAlgorithm
     friend class GDALAbstractPipelineAlgorithm<GDALVectorPipelineStepAlgorithm>;
     friend class GDALVectorConcatAlgorithm;
 
+    virtual bool CanBeFirstStep() const
+    {
+        return false;
+    }
+
     virtual bool IsNativelyStreamingCompatible() const
     {
         return true;
@@ -242,10 +247,7 @@ class GDALVectorPipelinePassthroughLayer /* non final */
     {
     }
 
-    OGRFeatureDefn *GetLayerDefn() override
-    {
-        return m_srcLayer.GetLayerDefn();
-    }
+    OGRFeatureDefn *GetLayerDefn() override;
 
     int TestCapability(const char *pszCap) override
     {

@@ -458,6 +458,7 @@ int CPLPipeRead(CPL_FILE_HANDLE fin, void *data, int length)
     {
         while (true)
         {
+            assert(nRemain > 0);
             // coverity[overflow_sink]
             const ssize_t n = read(fin, pabyData, nRemain);
             if (n < 0)
@@ -470,6 +471,7 @@ int CPLPipeRead(CPL_FILE_HANDLE fin, void *data, int length)
             else if (n == 0)
                 return FALSE;
             pabyData += n;
+            assert(n <= nRemain);
             nRemain -= static_cast<int>(n);
             break;
         }
@@ -500,6 +502,7 @@ int CPLPipeWrite(CPL_FILE_HANDLE fout, const void *data, int length)
     {
         while (true)
         {
+            assert(nRemain > 0);
             // coverity[overflow_sink]
             const ssize_t n = write(fout, pabyData, nRemain);
             if (n < 0)
@@ -510,6 +513,7 @@ int CPLPipeWrite(CPL_FILE_HANDLE fout, const void *data, int length)
                     return FALSE;
             }
             pabyData += n;
+            assert(n <= nRemain);
             nRemain -= static_cast<int>(n);
             break;
         }

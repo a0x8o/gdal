@@ -282,6 +282,7 @@ class PDS4EditableLayer final : public OGREditableLayer
   public:
     explicit PDS4EditableLayer(PDS4FixedWidthTable *poBaseLayer);
     explicit PDS4EditableLayer(PDS4DelimitedTable *poBaseLayer);
+    ~PDS4EditableLayer() override;
 
     void RefreshFileAreaObservational(CPLXMLNode *psFAO)
     {
@@ -481,7 +482,7 @@ class PDS4RawRasterBand final : public RawRasterBand
         return CE_None;
     }
 
-    void SetMaskBand(GDALRasterBand *poMaskBand);
+    void SetMaskBand(std::unique_ptr<GDALRasterBand> poMaskBand);
 };
 
 /************************************************************************/
@@ -554,7 +555,7 @@ class PDS4WrapperRasterBand final : public GDALProxyRasterBand
         return poMask;
     }
 
-    void SetMaskBand(GDALRasterBand *poMaskBand);
+    void SetMaskBand(std::unique_ptr<GDALRasterBand> poMaskBand);
 };
 
 /************************************************************************/

@@ -551,14 +551,16 @@ def test_gdalalg_raster_calc_gdalg_json(calc, tmp_vsimem):
 
     outfile = tmp_vsimem / "out.gdalg.json"
 
-    calc["input"] = "../gcore/data/byte.tif"
+    calc["input"] = "../gcore/data/rgbsmall.tif"
     calc["output"] = outfile
     calc["calc"] = "X"
     assert calc.Run()
     assert calc.Finalize()
 
     with gdal.Open(outfile) as ds:
-        assert ds.GetRasterBand(1).Checksum() == 4672
+        assert ds.GetRasterBand(1).Checksum() == 21212
+        assert ds.GetRasterBand(2).Checksum() == 21053
+        assert ds.GetRasterBand(3).Checksum() == 21349
 
 
 @pytest.mark.parametrize(
@@ -585,5 +587,18 @@ def test_gdalalg_raster_calc_invalid_formula(calc, tmp_vsimem, output_format, ex
         calc["output-format"] = output_format
         calc["output"] = tmp_vsimem / "out"
     calc["calc"] = "invalid"
-    with pytest.raises(Exception, match="Invalid variable name"):
+    with pytest.raises(Exception, match="invalid variable name"):
         calc.Run()
+
+
+def test_gdalalg_raster_calc_reference_several_bands_to_stream(calc):
+
+    calc["input"] = "../gcore/data/rgbsmall.tif"
+    calc["output-format"] = "stream"
+    calc["output"] = "streamed"
+    calc["calc"] = "sum(X[1], X[2], X[3])"
+
+    assert calc.Run()
+
+    assert calc["output"].GetDataset().RasterCount == 1
+    assert calc["output"].GetDataset().GetRasterBand(1).Checksum() == 21240

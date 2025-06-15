@@ -26,6 +26,11 @@
 
 #include "cpl_azure.h"
 
+// To avoid aliasing to GetDiskFreeSpace to GetDiskFreeSpaceA on Windows
+#ifdef GetDiskFreeSpace
+#undef GetDiskFreeSpace
+#endif
+
 // #define DEBUG_VERBOSE 1
 
 #ifndef HAVE_CURL
@@ -418,8 +423,8 @@ bool VSIDIRAz::IssueListDir()
     if (response_code != 200)
     {
         CPLDebug("AZURE", "%s", requestHelper.sWriteFuncData.pBuffer);
-        poHandleHelper->CanRestartOnError(requestHelper.sWriteFuncData.pBuffer,
-                                          nullptr, true);
+        CPL_IGNORE_RET_VAL(poHandleHelper->CanRestartOnError(
+            requestHelper.sWriteFuncData.pBuffer, nullptr, true));
     }
     else
     {
@@ -626,6 +631,12 @@ class VSIAzureFSHandler final : public IVSIS3LikeFSHandlerWithMultipartUpload
         // 1 GiB is the maximum reasonable value on a 32-bit machine
         return 1024;
 #endif
+    }
+
+    GIntBig GetDiskFreeSpace(const char * /* pszDirname */) override
+    {
+        return static_cast<GIntBig>(GetMaximumPartCount()) *
+               GetMaximumPartSizeInMiB() * 1024 * 1024;
     }
 };
 

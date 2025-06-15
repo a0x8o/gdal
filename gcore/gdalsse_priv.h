@@ -62,11 +62,15 @@ static inline __m128i GDALCopyInt64ToXMM(const void *ptr)
 #endif
 }
 
+#ifndef GDALCopyXMMToInt16_defined
+#define GDALCopyXMMToInt16_defined
+
 static inline void GDALCopyXMMToInt16(const __m128i xmm, void *pDest)
 {
     GInt16 i = static_cast<GInt16>(_mm_extract_epi16(xmm, 0));
     memcpy(pDest, &i, 2);
 }
+#endif
 
 class XMMReg4Int;
 
@@ -77,15 +81,12 @@ class XMMReg4Float
   public:
     __m128 xmm;
 
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Weffc++"
+    XMMReg4Float()
+#if !defined(_MSC_VER)
+        : xmm(_mm_undefined_ps())
 #endif
-    /* coverity[uninit_member] */
-    XMMReg4Float() = default;
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
+    {
+    }
 
     XMMReg4Float(const XMMReg4Float &other) : xmm(other.xmm)
     {
@@ -431,15 +432,12 @@ class XMMReg4Int
   public:
     __m128i xmm;
 
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Weffc++"
+    XMMReg4Int()
+#if !defined(_MSC_VER)
+        : xmm(_mm_undefined_si128())
 #endif
-    /* coverity[uninit_member] */
-    XMMReg4Int() = default;
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
+    {
+    }
 
     XMMReg4Int(const XMMReg4Int &other) : xmm(other.xmm)
     {
@@ -537,15 +535,12 @@ class XMMReg8Byte
   public:
     __m128i xmm;
 
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Weffc++"
+    XMMReg8Byte()
+#if !defined(_MSC_VER)
+        : xmm(_mm_undefined_si128())
 #endif
-    /* coverity[uninit_member] */
-    XMMReg8Byte() = default;
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
+    {
+    }
 
     XMMReg8Byte(const XMMReg8Byte &other) : xmm(other.xmm)
     {
@@ -624,15 +619,12 @@ class XMMReg2Double
   public:
     __m128d xmm;
 
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Weffc++"
+    XMMReg2Double()
+#if !defined(_MSC_VER)
+        : xmm(_mm_undefined_pd())
 #endif
-    /* coverity[uninit_member] */
-    XMMReg2Double() = default;
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
+    {
+    }
 
     XMMReg2Double(double val) : xmm(_mm_load_sd(&val))
     {
@@ -1749,15 +1741,9 @@ class XMMReg4Double
   public:
     XMMReg2Double low, high;
 
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Weffc++"
-#endif
-    /* coverity[uninit_member] */
-    XMMReg4Double() = default;
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
+    XMMReg4Double() : low(XMMReg2Double()), high(XMMReg2Double())
+    {
+    }
 
     XMMReg4Double(const XMMReg4Double &other) : low(other.low), high(other.high)
     {

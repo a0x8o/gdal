@@ -97,7 +97,7 @@ class GDALRasterAlgorithm final : public GDALAlgorithm
         RegisterSubAlgorithm<GDALRasterRGBToPaletteAlgorithmStandalone>();
         RegisterSubAlgorithm<GDALRasterReclassifyAlgorithmStandalone>();
         RegisterSubAlgorithm<GDALRasterReprojectAlgorithmStandalone>();
-        RegisterSubAlgorithm<GDALRasterMosaicAlgorithm>();
+        RegisterSubAlgorithm<GDALRasterMosaicAlgorithmStandalone>();
         RegisterSubAlgorithm<GDALRasterPansharpenAlgorithmStandalone>();
         RegisterSubAlgorithm<GDALRasterPolygonizeAlgorithm>();
         RegisterSubAlgorithm<GDALRasterResizeAlgorithmStandalone>();
@@ -108,7 +108,7 @@ class GDALRasterAlgorithm final : public GDALAlgorithm
         RegisterSubAlgorithm<GDALRasterSetTypeAlgorithmStandalone>();
         RegisterSubAlgorithm<GDALRasterSieveAlgorithmStandalone>();
         RegisterSubAlgorithm<GDALRasterSlopeAlgorithmStandalone>();
-        RegisterSubAlgorithm<GDALRasterStackAlgorithm>();
+        RegisterSubAlgorithm<GDALRasterStackAlgorithmStandalone>();
         RegisterSubAlgorithm<GDALRasterTileAlgorithm>();
         RegisterSubAlgorithm<GDALRasterTPIAlgorithmStandalone>();
         RegisterSubAlgorithm<GDALRasterTRIAlgorithmStandalone>();
@@ -121,22 +121,23 @@ class GDALRasterAlgorithm final : public GDALAlgorithm
     std::string m_output{};
     bool m_drivers = false;
 
-    bool RunImpl(GDALProgressFunc, void *) override
-    {
-        if (m_drivers)
-        {
-            m_output = GDALPrintDriverList(GDAL_OF_RASTER, true);
-            return true;
-        }
-        else
-        {
-            CPLError(
-                CE_Failure, CPLE_AppDefined,
-                "The Run() method should not be called directly on the \"gdal "
-                "raster\" program.");
-            return false;
-        }
-    }
+    bool RunImpl(GDALProgressFunc, void *) override;
 };
+
+bool GDALRasterAlgorithm::RunImpl(GDALProgressFunc, void *)
+{
+    if (m_drivers)
+    {
+        m_output = GDALPrintDriverList(GDAL_OF_RASTER, true);
+        return true;
+    }
+    else
+    {
+        CPLError(CE_Failure, CPLE_AppDefined,
+                 "The Run() method should not be called directly on the \"gdal "
+                 "raster\" program.");
+        return false;
+    }
+}
 
 GDAL_STATIC_REGISTER_ALG(GDALRasterAlgorithm);

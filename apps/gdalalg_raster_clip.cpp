@@ -75,7 +75,7 @@ GDALRasterClipAlgorithm::GDALRasterClipAlgorithm(bool standaloneStep)
 
 bool GDALRasterClipAlgorithm::RunStep(GDALRasterPipelineStepRunContext &)
 {
-    auto poSrcDS = m_inputDataset.GetDatasetRef();
+    auto poSrcDS = m_inputDataset[0].GetDatasetRef();
     CPLAssert(poSrcDS);
     CPLAssert(m_outputDataset.GetName().empty());
     CPLAssert(!m_outputDataset.GetDatasetRef());
@@ -261,5 +261,8 @@ bool GDALRasterClipAlgorithm::RunStep(GDALRasterPipelineStepRunContext &)
         return bOK;
     }
 }
+
+GDALRasterClipAlgorithmStandalone::~GDALRasterClipAlgorithmStandalone() =
+    default;
 
 //! @endcond

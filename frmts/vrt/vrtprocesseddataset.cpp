@@ -696,16 +696,21 @@ CPLErr VRTProcessedDataset::Init(const CPLXMLNode *psTree,
         m_outputBandDataTypeValue = eCurrentDT;
     }
 
-    if (nBands != 0 &&
-        (nBands != nOutputBandCount ||
-         (m_outputBandDataTypeProvenance == ValueProvenance::FROM_LAST_STEP &&
-          m_outputBandDataTypeValue != papoBands[0]->GetRasterDataType())))
+    const auto ClearBands = [this]()
     {
         for (int i = 0; i < nBands; ++i)
             delete papoBands[i];
         CPLFree(papoBands);
         papoBands = nullptr;
         nBands = 0;
+    };
+
+    if (nBands != 0 &&
+        (nBands != nOutputBandCount ||
+         (m_outputBandDataTypeProvenance == ValueProvenance::FROM_LAST_STEP &&
+          m_outputBandDataTypeValue != papoBands[0]->GetRasterDataType())))
+    {
+        ClearBands();
     }
 
     const auto GetOutputBandType = [this, eCurrentDT](GDALDataType eSourceDT)
@@ -735,11 +740,27 @@ CPLErr VRTProcessedDataset::Init(const CPLXMLNode *psTree,
     else if (m_outputBandCountProvenance != ValueProvenance::FROM_VRTRASTERBAND)
     {
         const GDALDataType eOutputBandType = GetOutputBandType(eInDT);
-        for (int i = 0; i < nOutputBandCount; ++i)
+
+        bool bClearAndSetBands = true;
+        if (nBands == nOutputBandCount)
         {
-            auto poBand =
-                new VRTProcessedRasterBand(this, i + 1, eOutputBandType);
-            SetBand(i + 1, poBand);
+            bClearAndSetBands = false;
+            for (int i = 0; i < nBands; ++i)
+            {
+                bClearAndSetBands =
+                    bClearAndSetBands ||
+                    !dynamic_cast<VRTProcessedRasterBand *>(papoBands[i]) ||
+                    papoBands[i]->GetRasterDataType() != eOutputBandType;
+            }
+        }
+        if (bClearAndSetBands)
+        {
+            ClearBands();
+            for (int i = 0; i < nOutputBandCount; ++i)
+            {
+                SetBand(i + 1, std::make_unique<VRTProcessedRasterBand>(
+                                   this, i + 1, eOutputBandType));
+            }
         }
     }
 
@@ -1529,26 +1550,15 @@ CPLErr VRTProcessedDataset::IRasterIO(
     if (eRWFlag == GF_Read && nXSize == nBufXSize && nYSize == nBufYSize &&
         nBandCount == nBands)
     {
-        const auto IsSequentialBandMap = [panBandMap, nBandCount]()
-        {
-            for (int i = 0; i < nBandCount; ++i)
-            {
-                if (panBandMap[i] != i + 1)
-                {
-                    return false;
-                }
-            }
-            return true;
-        };
-
         const int nBufTypeSize = GDALGetDataTypeSizeBytes(eBufType);
-        const bool bIsBIPLike =
-            nBandSpace == nBufTypeSize && nPixelSpace == nBandSpace * nBands &&
-            nLineSpace >= nPixelSpace * nBufXSize && IsSequentialBandMap();
+        const bool bIsBIPLike = nBandSpace == nBufTypeSize &&
+                                nPixelSpace == nBandSpace * nBands &&
+                                nLineSpace >= nPixelSpace * nBufXSize &&
+                                IsAllBands(nBandCount, panBandMap);
         const bool bIsBSQLike = nPixelSpace == nBufTypeSize &&
                                 nLineSpace >= nPixelSpace * nBufXSize &&
                                 nBandSpace >= nLineSpace * nBufYSize &&
-                                IsSequentialBandMap();
+                                IsAllBands(nBandCount, panBandMap);
         if (bIsBIPLike || bIsBSQLike)
         {
             GByte *pabyData = static_cast<GByte *>(pData);

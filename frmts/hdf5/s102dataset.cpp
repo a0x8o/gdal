@@ -39,8 +39,12 @@ class S102Dataset final : public S100BaseDataset
     {
     }
 
+    ~S102Dataset() override;
+
     static GDALDataset *Open(GDALOpenInfo *);
 };
+
+S102Dataset::~S102Dataset() = default;
 
 /************************************************************************/
 /*                            S102RasterBand                            */
@@ -54,6 +58,8 @@ class S102RasterBand : public GDALProxyRasterBand
     double m_dfMinimum = std::numeric_limits<double>::quiet_NaN();
     double m_dfMaximum = std::numeric_limits<double>::quiet_NaN();
 
+    CPL_DISALLOW_COPY_ASSIGN(S102RasterBand)
+
   public:
     explicit S102RasterBand(std::unique_ptr<GDALDataset> &&poDSIn)
         : m_poDS(std::move(poDSIn)),
@@ -64,10 +70,7 @@ class S102RasterBand : public GDALProxyRasterBand
     }
 
     GDALRasterBand *
-    RefUnderlyingRasterBand(bool /*bForceOpen*/ = true) const override
-    {
-        return m_poUnderlyingBand;
-    }
+    RefUnderlyingRasterBand(bool /*bForceOpen*/ = true) const override;
 
     double GetMinimum(int *pbSuccess = nullptr) override
     {
@@ -89,6 +92,12 @@ class S102RasterBand : public GDALProxyRasterBand
     }
 };
 
+GDALRasterBand *
+S102RasterBand::RefUnderlyingRasterBand(bool /*bForceOpen*/) const
+{
+    return m_poUnderlyingBand;
+}
+
 /************************************************************************/
 /*                   S102GeoreferencedMetadataRasterBand                */
 /************************************************************************/
@@ -100,6 +109,8 @@ class S102GeoreferencedMetadataRasterBand : public GDALProxyRasterBand
     std::unique_ptr<GDALDataset> m_poDS{};
     GDALRasterBand *m_poUnderlyingBand = nullptr;
     std::unique_ptr<GDALRasterAttributeTable> m_poRAT{};
+
+    CPL_DISALLOW_COPY_ASSIGN(S102GeoreferencedMetadataRasterBand)
 
   public:
     explicit S102GeoreferencedMetadataRasterBand(
@@ -114,16 +125,19 @@ class S102GeoreferencedMetadataRasterBand : public GDALProxyRasterBand
     }
 
     GDALRasterBand *
-    RefUnderlyingRasterBand(bool /*bForceOpen*/ = true) const override
-    {
-        return m_poUnderlyingBand;
-    }
+    RefUnderlyingRasterBand(bool /*bForceOpen*/ = true) const override;
 
     GDALRasterAttributeTable *GetDefaultRAT() override
     {
         return m_poRAT.get();
     }
 };
+
+GDALRasterBand *S102GeoreferencedMetadataRasterBand::RefUnderlyingRasterBand(
+    bool /*bForceOpen*/) const
+{
+    return m_poUnderlyingBand;
+}
 
 /************************************************************************/
 /*                                Open()                                */

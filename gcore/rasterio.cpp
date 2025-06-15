@@ -196,6 +196,12 @@ static bool DownsamplingIntegerXFactor(
     return true;
 }
 
+template <class A, class B>
+CPL_NOSANITIZE_UNSIGNED_INT_OVERFLOW inline auto CPLUnsanitizedMul(A a, B b)
+{
+    return a * b;
+}
+
 /************************************************************************/
 /*                             IRasterIO()                              */
 /*                                                                      */
@@ -435,8 +441,9 @@ CPLErr GDALRasterBand::IRasterIO(GDALRWFlag eRWFlag, int nXOff, int nYOff,
                     nXSpan = INT_MAX;
                 const int nXRight = nXSpan;
                 nXSpan = (nXSpan < nXSpanEnd ? nXSpan : nXSpanEnd) - iSrcX;
+
                 const size_t nXSpanSize =
-                    nXSpan * static_cast<size_t>(nPixelSpace);
+                    CPLUnsanitizedMul(nXSpan, static_cast<size_t>(nPixelSpace));
 
                 bool bJustInitialize =
                     eRWFlag == GF_Write && nYOff <= nLBlockY * nBlockYSize &&
@@ -1296,8 +1303,8 @@ CPLErr GDALRasterBand::RasterIOResampled(
             return CE_Failure;
         }
 
-        int nTotalBlocks = ((nBufXSize + nDstBlockXSize - 1) / nDstBlockXSize) *
-                           ((nBufYSize + nDstBlockYSize - 1) / nDstBlockYSize);
+        const int nTotalBlocks = DIV_ROUND_UP(nBufXSize, nDstBlockXSize) *
+                                 DIV_ROUND_UP(nBufYSize, nDstBlockYSize);
         int nBlocksDone = 0;
 
         int nDstYOff;
@@ -1764,8 +1771,8 @@ CPLErr GDALDataset::RasterIOResampled(
             return CE_Failure;
         }
 
-        int nTotalBlocks = ((nBufXSize + nDstBlockXSize - 1) / nDstBlockXSize) *
-                           ((nBufYSize + nDstBlockYSize - 1) / nDstBlockYSize);
+        const int nTotalBlocks = DIV_ROUND_UP(nBufXSize, nDstBlockXSize) *
+                                 DIV_ROUND_UP(nBufYSize, nDstBlockYSize);
         int nBlocksDone = 0;
 
         int nDstYOff;
@@ -2642,6 +2649,24 @@ void GDALCopyWordsT(const double *const CPL_RESTRICT pSrcData,
                             nDstPixelStride, nWordCount);
 }
 
+template <>
+void GDALCopyWordsT(const float *const CPL_RESTRICT pSrcData,
+                    int nSrcPixelStride, double *const CPL_RESTRICT pDstData,
+                    int nDstPixelStride, GPtrDiff_t nWordCount)
+{
+    GDALCopyWordsT_8atatime(pSrcData, nSrcPixelStride, pDstData,
+                            nDstPixelStride, nWordCount);
+}
+
+template <>
+void GDALCopyWordsT(const double *const CPL_RESTRICT pSrcData,
+                    int nSrcPixelStride, float *const CPL_RESTRICT pDstData,
+                    int nDstPixelStride, GPtrDiff_t nWordCount)
+{
+    GDALCopyWordsT_8atatime(pSrcData, nSrcPixelStride, pDstData,
+                            nDstPixelStride, nWordCount);
+}
+
 #endif  // HAVE_SSE2
 
 template <>
@@ -2670,6 +2695,46 @@ void GDALCopyWordsT(const float *const CPL_RESTRICT pSrcData,
     GDALCopyWordsT_8atatime(pSrcData, nSrcPixelStride, pDstData,
                             nDstPixelStride, nWordCount);
 }
+
+#ifdef __F16C__
+
+template <>
+void GDALCopyWordsT(const float *const CPL_RESTRICT pSrcData,
+                    int nSrcPixelStride, GFloat16 *const CPL_RESTRICT pDstData,
+                    int nDstPixelStride, GPtrDiff_t nWordCount)
+{
+    GDALCopyWordsT_8atatime(pSrcData, nSrcPixelStride, pDstData,
+                            nDstPixelStride, nWordCount);
+}
+
+template <>
+void GDALCopyWordsT(const GFloat16 *const CPL_RESTRICT pSrcData,
+                    int nSrcPixelStride, float *const CPL_RESTRICT pDstData,
+                    int nDstPixelStride, GPtrDiff_t nWordCount)
+{
+    GDALCopyWordsT_8atatime(pSrcData, nSrcPixelStride, pDstData,
+                            nDstPixelStride, nWordCount);
+}
+
+template <>
+void GDALCopyWordsT(const double *const CPL_RESTRICT pSrcData,
+                    int nSrcPixelStride, GFloat16 *const CPL_RESTRICT pDstData,
+                    int nDstPixelStride, GPtrDiff_t nWordCount)
+{
+    GDALCopyWordsT_8atatime(pSrcData, nSrcPixelStride, pDstData,
+                            nDstPixelStride, nWordCount);
+}
+
+template <>
+void GDALCopyWordsT(const GFloat16 *const CPL_RESTRICT pSrcData,
+                    int nSrcPixelStride, double *const CPL_RESTRICT pDstData,
+                    int nDstPixelStride, GPtrDiff_t nWordCount)
+{
+    GDALCopyWordsT_8atatime(pSrcData, nSrcPixelStride, pDstData,
+                            nDstPixelStride, nWordCount);
+}
+
+#endif
 
 /************************************************************************/
 /*                   GDALCopyWordsComplexT()                            */

@@ -115,14 +115,7 @@ class GDALPDFOutputDev : public SplashOutputDev
         bEnableBitmap = bFlag;
     }
 
-    virtual void startPage(int pageNum, GfxState *state, XRef *xrefIn) override
-    {
-        SplashOutputDev::startPage(pageNum, state, xrefIn);
-        SplashBitmap *poBitmap = getBitmap();
-        memset(poBitmap->getDataPtr(), 255,
-               static_cast<size_t>(poBitmap->getRowSize()) *
-                   poBitmap->getHeight());
-    }
+    virtual void startPage(int pageNum, GfxState *state, XRef *xrefIn) override;
 
     virtual void stroke(GfxState *state) override
     {
@@ -259,6 +252,14 @@ class GDALPDFOutputDev : public SplashOutputDev
             str->close();
     }
 };
+
+void GDALPDFOutputDev::startPage(int pageNum, GfxState *state, XRef *xrefIn)
+{
+    SplashOutputDev::startPage(pageNum, state, xrefIn);
+    SplashBitmap *poBitmap = getBitmap();
+    memset(poBitmap->getDataPtr(), 255,
+           static_cast<size_t>(poBitmap->getRowSize()) * poBitmap->getHeight());
+}
 
 #endif  // ~ HAVE_POPPLER
 
@@ -1213,7 +1214,7 @@ static int LoadPdfiumDocumentPage(const char *pszFilename,
     // Page not loaded
     if (itPage == poDoc->pages.end())
     {
-        auto pDict = poDoc->doc->GetPageDictionary(pageNum - 1);
+        auto pDict = poDoc->doc->GetMutablePageDictionary(pageNum - 1);
         if (pDict == nullptr)
         {
             CPLError(CE_Failure, CPLE_AppDefined,
@@ -1222,14 +1223,7 @@ static int LoadPdfiumDocumentPage(const char *pszFilename,
             CPLReleaseMutex(g_oPdfiumLoadDocMutex);
             return FALSE;
         }
-        auto pPage = pdfium::MakeRetain<CPDF_Page>(
-            poDoc->doc,
-            // coverity is confused by WrapRetain(), believing that multiple
-            // smart pointers manage the same raw pointer. Which is actually
-            // true, but a RetainPtr holds a reference counted object. It is
-            // thus safe to have several RetainPtr holding it.
-            // coverity[multiple_init_smart_ptr]
-            pdfium::WrapRetain(const_cast<CPDF_Dictionary *>(pDict.Get())));
+        auto pPage = pdfium::MakeRetain<CPDF_Page>(poDoc->doc, pDict);
 
         poPage = new TPdfiumPageStruct;
         if (!poPage)
@@ -2526,15 +2520,10 @@ GDALPDFObject *PDFDataset::GetCatalog()
 #ifdef HAVE_PDFIUM
     if (m_bUseLib.test(PDFLIB_PDFIUM) && m_poDocPdfium)
     {
-        const CPDF_Dictionary *catalog = m_poDocPdfium->doc->GetRoot();
+        RetainPtr<CPDF_Dictionary> catalog =
+            m_poDocPdfium->doc->GetMutableRoot();
         if (catalog)
-            m_poCatalogObject =
-                // coverity is confused by WrapRetain(), believing that multiple
-                // smart pointers manage the same raw pointer. Which is actually
-                // true, but a RetainPtr holds a reference counted object. It is
-                // thus safe to have several RetainPtr holding it.
-                // coverity[multiple_init_smart_ptr]
-                GDALPDFObjectPdfium::Build(pdfium::WrapRetain(catalog));
+            m_poCatalogObject = GDALPDFObjectPdfium::Build(catalog);
     }
 #endif  // ~ HAVE_PDFIUM
 
@@ -7738,47 +7727,49 @@ class GDALPDFListLayersAlgorithm final : public GDALAlgorithm
     }
 
   protected:
-    bool RunImpl(GDALProgressFunc, void *) override
-    {
-        auto poDS = dynamic_cast<PDFDataset *>(m_dataset.GetDatasetRef());
-        if (!poDS)
-        {
-            ReportError(CE_Failure, CPLE_AppDefined, "%s is not a PDF",
-                        m_dataset.GetName().c_str());
-            return false;
-        }
-        if (m_format == "json")
-        {
-            CPLJSonStreamingWriter oWriter(nullptr, nullptr);
-            oWriter.StartArray();
-            for (const auto &[key, value] : cpl::IterateNameValue(
-                     const_cast<CSLConstList>(poDS->GetMetadata("LAYERS"))))
-            {
-                CPL_IGNORE_RET_VAL(key);
-                oWriter.Add(value);
-            }
-            oWriter.EndArray();
-            m_output = oWriter.GetString();
-            m_output += '\n';
-        }
-        else
-        {
-            for (const auto &[key, value] : cpl::IterateNameValue(
-                     const_cast<CSLConstList>(poDS->GetMetadata("LAYERS"))))
-            {
-                CPL_IGNORE_RET_VAL(key);
-                m_output += value;
-                m_output += '\n';
-            }
-        }
-        return true;
-    }
+    bool RunImpl(GDALProgressFunc, void *) override;
 
   private:
     GDALArgDatasetValue m_dataset{};
     std::string m_format = "json";
     std::string m_output{};
 };
+
+bool GDALPDFListLayersAlgorithm::RunImpl(GDALProgressFunc, void *)
+{
+    auto poDS = dynamic_cast<PDFDataset *>(m_dataset.GetDatasetRef());
+    if (!poDS)
+    {
+        ReportError(CE_Failure, CPLE_AppDefined, "%s is not a PDF",
+                    m_dataset.GetName().c_str());
+        return false;
+    }
+    if (m_format == "json")
+    {
+        CPLJSonStreamingWriter oWriter(nullptr, nullptr);
+        oWriter.StartArray();
+        for (const auto &[key, value] : cpl::IterateNameValue(
+                 const_cast<CSLConstList>(poDS->GetMetadata("LAYERS"))))
+        {
+            CPL_IGNORE_RET_VAL(key);
+            oWriter.Add(value);
+        }
+        oWriter.EndArray();
+        m_output = oWriter.GetString();
+        m_output += '\n';
+    }
+    else
+    {
+        for (const auto &[key, value] : cpl::IterateNameValue(
+                 const_cast<CSLConstList>(poDS->GetMetadata("LAYERS"))))
+        {
+            CPL_IGNORE_RET_VAL(key);
+            m_output += value;
+            m_output += '\n';
+        }
+    }
+    return true;
+}
 
 /************************************************************************/
 /*                    GDALPDFInstantiateAlgorithm()                     */
