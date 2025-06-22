@@ -21,20 +21,20 @@
 /*          GDALRasterReadAlgorithm::GDALRasterReadAlgorithm()          */
 /************************************************************************/
 
-GDALRasterReadAlgorithm::GDALRasterReadAlgorithm()
+GDALRasterReadAlgorithm::GDALRasterReadAlgorithm(bool openForMixedRasterVector)
     : GDALRasterPipelineStepAlgorithm(
           NAME, DESCRIPTION, HELP_URL,
           ConstructorOptions().SetAddDefaultArguments(false))
 {
-    AddInputArgs(/* openForMixedRasterVector = */ false,
-                 /* hiddenForCLI = */ false);
+    AddRasterInputArgs(openForMixedRasterVector,
+                       /* hiddenForCLI = */ false);
 }
 
 /************************************************************************/
 /*                  GDALRasterReadAlgorithm::RunStep()                  */
 /************************************************************************/
 
-bool GDALRasterReadAlgorithm::RunStep(GDALRasterPipelineStepRunContext &)
+bool GDALRasterReadAlgorithm::RunStep(GDALPipelineStepRunContext &)
 {
     const auto poSrcDS = m_inputDataset[0].GetDatasetRef();
     CPLAssert(poSrcDS);

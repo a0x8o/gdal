@@ -1287,6 +1287,65 @@ def test_vrt_pixelfn_expression_invalid(
     assert exception in "".join(messages)
 
 
+def test_vrt_pixelfn_expression_coordinates():
+
+    if not gdaltest.gdal_has_vrt_expression_dialect("muparser"):
+        pytest.skip("muparser not available")
+
+    gdaltest.importorskip_gdal_array()
+    np = pytest.importorskip("numpy")
+
+    with gdal.Open("data/byte.tif") as ds:
+        gt = ds.GetGeoTransform()
+        nx = ds.RasterXSize
+        ny = ds.RasterYSize
+
+    xml = f"""
+    <VRTDataset rasterXSize="{nx}" rasterYSize="{ny}">
+      <GeoTransform>{",".join(str(x) for x in gt)}</GeoTransform>
+      <VRTRasterBand dataType="Float32" band="1" subClass="VRTDerivedRasterBand">
+        <PixelFunctionType>expression</PixelFunctionType>
+        <PixelFunctionArguments expression="1.7*_CENTER_X_ + _CENTER_Y_"/>
+        <SimpleSource>
+           <SourceFilename>data/byte.tif</SourceFilename>
+           <SourceBand>1</SourceBand>
+        </SimpleSource>
+      </VRTRasterBand>
+    </VRTDataset>"""
+
+    actual = gdal.Open(xml).ReadAsArray()
+
+    expected = np.zeros((ny, nx), np.float32)
+    for row in range(ny):
+        for col in range(nx):
+            x, y = gdal.ApplyGeoTransform(gt, col + 0.5, row + 0.5)
+            expected[row, col] = 1.7 * x + y
+
+    np.testing.assert_array_equal(actual, expected)
+
+
+@gdaltest.enable_exceptions()
+def test_vrt_pixelfn_expression_coordinates_no_geotransform():
+
+    if not gdaltest.gdal_has_vrt_expression_dialect("muparser"):
+        pytest.skip("muparser not available")
+
+    xml = """
+    <VRTDataset rasterXSize="20" rasterYSize="20">
+      <VRTRasterBand dataType="Float32" band="1" subClass="VRTDerivedRasterBand">
+        <PixelFunctionType>expression</PixelFunctionType>
+        <PixelFunctionArguments expression="1.7*_CENTER_X_ + _CENTER_Y_"/>
+        <SimpleSource>
+           <SourceFilename>data/byte.tif</SourceFilename>
+           <SourceBand>1</SourceBand>
+        </SimpleSource>
+      </VRTRasterBand>
+    </VRTDataset>"""
+
+    with pytest.raises(Exception, match="VRTDataset must have a <GeoTransform>"):
+        gdal.Open(xml).ReadRaster()
+
+
 ###############################################################################
 # Test multiplication / summation by a constant factor
 
@@ -1516,6 +1575,8 @@ def test_vrt_pixelfn_reclassify_nan(tmp_vsimem):
         ("inv", [float("nan")], float("nan"), {}, float("nan")),
         ("log10", [7], 7, {}, 7),
         ("max", [3, 7, 9], 7, {}, 9),
+        ("max", [3, 7, 9], 7, {"k": 10}, 10),
+        ("max", [3, 7, 9], 7, {"k": 5}, 9),
         ("max", [3, 7, 9], 7, {"propagateNoData": True}, 7),
         ("mean", [3, 7, 9], 7, {}, (3 + 9) / 2),
         ("mean", [7, 7, 7], 7, {}, 7),
@@ -1525,6 +1586,8 @@ def test_vrt_pixelfn_reclassify_nan(tmp_vsimem):
         ("median", [7, 7, 7], 7, {}, 7),
         ("median", [3, 7, 9], 7, {"propagateNoData": True}, 7),
         ("min", [3, 7, 9], 7, {}, 3),
+        ("min", [3, 7, 9], 7, {"k": 5}, 3),
+        ("min", [3, 7, 9], 7, {"k": 2}, 2),
         ("min", [3, float("nan"), 9], 7, {}, 3),
         ("min", [3, float("nan"), 9], 7, {"propagateNoData": True}, 7),  # should be 3?
         ("min", [3, 7, 9], 7, {"propagateNoData": True}, 7),

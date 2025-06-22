@@ -16,6 +16,7 @@
 #include "gdal_priv.h"
 #include "gdal_utils.h"
 #include "../frmts/vrt/vrtdataset.h"
+#include "../frmts/vrt/vrtreclassifier.h"
 
 #include <array>
 
@@ -43,7 +44,27 @@ GDALRasterReclassifyAlgorithm::GDALRasterReclassifyAlgorithm(
 }
 
 /************************************************************************/
-/*              GDALRasterReclassifyCreateVRTDerived)                   */
+/*              GDALRasterReclassifyValidateMappings                    */
+/************************************************************************/
+
+static bool GDALReclassifyValidateMappings(GDALDataset &input,
+                                           const std::string &mappings,
+                                           GDALDataType eDstType)
+{
+    int hasNoData;
+    std::optional<double> noData =
+        input.GetRasterBand(1)->GetNoDataValue(&hasNoData);
+    if (!hasNoData)
+    {
+        noData.reset();
+    }
+
+    gdal::Reclassifier reclassifier;
+    return reclassifier.Init(mappings.c_str(), noData, eDstType) == CE_None;
+}
+
+/************************************************************************/
+/*              GDALRasterReclassifyCreateVRTDerived                    */
 /************************************************************************/
 
 static std::unique_ptr<GDALDataset>
@@ -109,7 +130,7 @@ GDALReclassifyCreateVRTDerived(GDALDataset &input, const std::string &mappings,
 /*           GDALRasterReclassifyAlgorithm::RunStep()                   */
 /************************************************************************/
 
-bool GDALRasterReclassifyAlgorithm::RunStep(GDALRasterPipelineStepRunContext &)
+bool GDALRasterReclassifyAlgorithm::RunStep(GDALPipelineStepRunContext &)
 {
     const auto poSrcDS = m_inputDataset[0].GetDatasetRef();
     CPLAssert(poSrcDS);
@@ -179,6 +200,11 @@ bool GDALRasterReclassifyAlgorithm::RunStep(GDALRasterPipelineStepRunContext &)
     }
     if (nErrorCount == CPLGetErrorCounter())
     {
+        if (!GDALReclassifyValidateMappings(*poSrcDS, m_mapping, eDstType))
+        {
+            return false;
+        }
+
         m_outputDataset.Set(
             GDALReclassifyCreateVRTDerived(*poSrcDS, m_mapping, eDstType));
     }

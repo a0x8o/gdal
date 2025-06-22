@@ -22,6 +22,7 @@
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
 #include "ogr_spatialref.h"
+#include "vrtdataset.h"
 
 #include <algorithm>
 #include <cassert>
@@ -30,6 +31,7 @@
 #include <cstdlib>
 #include <limits>
 #include <map>
+#include <string_view>
 
 #ifndef _
 #define _(x) (x)
@@ -1389,8 +1391,90 @@ GDALInConstructionAlgorithmArg &GDALInConstructionAlgorithmArg::SetIsCRSArg(
         });
 
     SetAutoCompleteFunction(
-        [noneAllowed, specialValues](const std::string &currentValue)
+        [this, noneAllowed, specialValues](const std::string &currentValue)
         {
+            bool bIsRaster = false;
+            OGREnvelope sDatasetLongLatEnv;
+            OGRSpatialReference oDSCRS;
+            const char *pszCelestialBodyName = nullptr;
+            if (GetName() == "dst-crs")
+            {
+                auto inputArg = m_owner->GetArg(GDAL_ARG_NAME_INPUT);
+                if (inputArg && inputArg->GetType() == GAAT_DATASET_LIST)
+                {
+                    auto &val =
+                        inputArg->Get<std::vector<GDALArgDatasetValue>>();
+                    if (val.size() == 1)
+                    {
+                        CPLErrorStateBackuper oBackuper(CPLQuietErrorHandler);
+                        auto poDS = std::unique_ptr<GDALDataset>(
+                            GDALDataset::Open(val[0].GetName().c_str()));
+                        if (poDS)
+                        {
+                            bIsRaster = poDS->GetRasterCount() != 0;
+                            const OGRSpatialReference *poCRS;
+                            if ((poCRS = poDS->GetSpatialRef()) != nullptr)
+                            {
+                                oDSCRS = *poCRS;
+                            }
+                            else if (poDS->GetLayerCount() >= 1)
+                            {
+                                if (auto poLayer = poDS->GetLayer(0))
+                                {
+                                    if ((poCRS = poLayer->GetSpatialRef()) !=
+                                        nullptr)
+                                        oDSCRS = *poCRS;
+                                }
+                            }
+                            if (!oDSCRS.IsEmpty())
+                            {
+                                pszCelestialBodyName =
+                                    oDSCRS.GetCelestialBodyName();
+
+                                if (!pszCelestialBodyName ||
+                                    !EQUAL(pszCelestialBodyName, "Earth"))
+                                {
+                                    OGRSpatialReference oLongLat;
+                                    oLongLat.CopyGeogCSFrom(&oDSCRS);
+                                    oLongLat.SetAxisMappingStrategy(
+                                        OAMS_TRADITIONAL_GIS_ORDER);
+                                    poDS->GetExtent(&sDatasetLongLatEnv,
+                                                    &oLongLat);
+                                }
+                                else
+                                {
+                                    poDS->GetExtentWGS84LongLat(
+                                        &sDatasetLongLatEnv);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            const auto IsCRSCompatible =
+                [bIsRaster, &sDatasetLongLatEnv,
+                 pszCelestialBodyName](const OSRCRSInfo *crsInfo)
+            {
+                if (!sDatasetLongLatEnv.IsInit())
+                    return true;
+                return crsInfo->eType != OSR_CRS_TYPE_VERTICAL &&
+                       !(bIsRaster &&
+                         crsInfo->eType == OSR_CRS_TYPE_GEOCENTRIC) &&
+                       crsInfo->dfWestLongitudeDeg <
+                           crsInfo->dfEastLongitudeDeg &&
+                       sDatasetLongLatEnv.MinX < crsInfo->dfEastLongitudeDeg &&
+                       sDatasetLongLatEnv.MaxX > crsInfo->dfWestLongitudeDeg &&
+                       sDatasetLongLatEnv.MinY < crsInfo->dfNorthLatitudeDeg &&
+                       sDatasetLongLatEnv.MaxY > crsInfo->dfSouthLatitudeDeg &&
+                       ((pszCelestialBodyName &&
+                         crsInfo->pszCelestialBodyName &&
+                         EQUAL(pszCelestialBodyName,
+                               crsInfo->pszCelestialBodyName)) ||
+                        (!pszCelestialBodyName &&
+                         !crsInfo->pszCelestialBodyName));
+            };
+
             std::vector<std::string> oRet;
             if (noneAllowed)
                 oRet.push_back("none");
@@ -1405,24 +1489,92 @@ GDALInConstructionAlgorithmArg &GDALInConstructionAlgorithmArg::SetIsCRSArg(
                                                            nullptr, &nCount),
                              OSRDestroyCRSInfoList);
                 std::string osCode;
+
+                std::vector<const OSRCRSInfo *> candidates;
                 for (int i = 0; i < nCount; ++i)
                 {
                     const auto *entry = (pCRSList.get())[i];
-                    if (aosTokens.size() == 1 ||
-                        STARTS_WITH(entry->pszCode, aosTokens[1]))
+                    if (!entry->bDeprecated && IsCRSCompatible(entry))
                     {
-                        if (oRet.empty())
-                            osCode = entry->pszCode;
-                        oRet.push_back(std::string(entry->pszCode)
-                                           .append(" -- ")
-                                           .append(entry->pszName));
+                        if (aosTokens.size() == 1 ||
+                            STARTS_WITH(entry->pszCode, aosTokens[1]))
+                        {
+                            if (candidates.empty())
+                                osCode = entry->pszCode;
+                            candidates.push_back(entry);
+                        }
                     }
                 }
-                if (oRet.size() == 1)
+                if (candidates.size() == 1)
                 {
-                    // If there is a single match, remove the name from the suggestion.
-                    oRet.clear();
                     oRet.push_back(std::move(osCode));
+                }
+                else
+                {
+                    if (sDatasetLongLatEnv.IsInit())
+                    {
+                        std::sort(
+                            candidates.begin(), candidates.end(),
+                            [](const OSRCRSInfo *a, const OSRCRSInfo *b)
+                            {
+                                const double dfXa =
+                                    a->dfWestLongitudeDeg >
+                                            a->dfEastLongitudeDeg
+                                        ? a->dfWestLongitudeDeg -
+                                              a->dfEastLongitudeDeg
+                                        : (180 - a->dfWestLongitudeDeg) +
+                                              (a->dfEastLongitudeDeg - -180);
+                                const double dfYa = a->dfNorthLatitudeDeg -
+                                                    a->dfSouthLatitudeDeg;
+                                const double dfXb =
+                                    b->dfWestLongitudeDeg >
+                                            b->dfEastLongitudeDeg
+                                        ? b->dfWestLongitudeDeg -
+                                              b->dfEastLongitudeDeg
+                                        : (180 - b->dfWestLongitudeDeg) +
+                                              (b->dfEastLongitudeDeg - -180);
+                                const double dfYb = b->dfNorthLatitudeDeg -
+                                                    b->dfSouthLatitudeDeg;
+                                const double diffArea =
+                                    dfXa * dfYa - dfXb * dfYb;
+                                if (diffArea < 0)
+                                    return true;
+                                if (diffArea == 0)
+                                {
+                                    if (std::string_view(a->pszName) ==
+                                        b->pszName)
+                                    {
+                                        if (a->eType ==
+                                                OSR_CRS_TYPE_GEOGRAPHIC_2D &&
+                                            b->eType !=
+                                                OSR_CRS_TYPE_GEOGRAPHIC_2D)
+                                            return true;
+                                        if (a->eType ==
+                                                OSR_CRS_TYPE_GEOGRAPHIC_3D &&
+                                            b->eType == OSR_CRS_TYPE_GEOCENTRIC)
+                                            return true;
+                                        return false;
+                                    }
+                                    return std::string_view(a->pszCode) <
+                                           b->pszCode;
+                                }
+                                return false;
+                            });
+                    }
+
+                    for (const auto *entry : candidates)
+                    {
+                        std::string val = std::string(entry->pszCode)
+                                              .append(" -- ")
+                                              .append(entry->pszName);
+                        if (entry->eType == OSR_CRS_TYPE_GEOGRAPHIC_2D)
+                            val.append(" (geographic 2D)");
+                        else if (entry->eType == OSR_CRS_TYPE_GEOGRAPHIC_3D)
+                            val.append(" (geographic 3D)");
+                        else if (entry->eType == OSR_CRS_TYPE_GEOCENTRIC)
+                            val.append(" (geocentric)");
+                        oRet.push_back(std::move(val));
+                    }
                 }
             }
             if (currentValue.empty() || oRet.empty())
@@ -3672,7 +3824,8 @@ bool GDALAlgorithm::ValidateFormat(const GDALAlgorithmArg &arg,
             if (bStreamAllowed && EQUAL(val.c_str(), "stream"))
                 return true;
 
-            if (EQUAL(val.c_str(), "GDALG") && arg.IsOutput())
+            if (EQUAL(val.c_str(), "GDALG") &&
+                arg.GetName() == GDAL_ARG_NAME_OUTPUT_FORMAT)
             {
                 if (bGDALGAllowed)
                 {
@@ -4106,7 +4259,7 @@ bool GDALAlgorithm::ValidateBandArg() const
 {
     bool ret = true;
     const auto bandArg = GetArg(GDAL_ARG_NAME_BAND);
-    const auto inputDatasetArg = GetArg(GDAL_ARG_NAME_INPUT);
+    const auto inputDatasetArg = GetArg(GDAL_ARG_NAME_INPUT, false);
     if (bandArg && bandArg->IsExplicitlySet() && inputDatasetArg &&
         (inputDatasetArg->GetType() == GAAT_DATASET ||
          inputDatasetArg->GetType() == GAAT_DATASET_LIST) &&
@@ -4734,6 +4887,95 @@ GDALAlgorithm::AddAbsolutePathArg(bool *pValue, const char *helpMessage)
         MsgOrDefault(helpMessage, _("Whether the path to the input dataset "
                                     "should be stored as an absolute path")),
         pValue);
+}
+
+/************************************************************************/
+/*               GDALAlgorithm::AddPixelFunctionNameArg()               */
+/************************************************************************/
+
+GDALInConstructionAlgorithmArg &
+GDALAlgorithm::AddPixelFunctionNameArg(std::string *pValue,
+                                       const char *helpMessage)
+{
+
+    const auto pixelFunctionNames =
+        VRTDerivedRasterBand::GetPixelFunctionNames();
+    return AddArg(
+               "pixel-function", 0,
+               MsgOrDefault(
+                   helpMessage,
+                   _("Specify a pixel function to calculate output value from "
+                     "overlapping inputs")),
+               pValue)
+        .SetChoices(pixelFunctionNames);
+}
+
+/************************************************************************/
+/*               GDALAlgorithm::AddPixelFunctionArgsArg()               */
+/************************************************************************/
+
+GDALInConstructionAlgorithmArg &
+GDALAlgorithm::AddPixelFunctionArgsArg(std::vector<std::string> *pValue,
+                                       const char *helpMessage)
+{
+    auto &pixelFunctionArgArg =
+        AddArg("pixel-function-arg", 0,
+               MsgOrDefault(
+                   helpMessage,
+                   _("Specify argument(s) to pass to the pixel function")),
+               pValue)
+            .SetMetaVar("<NAME>=<VALUE>")
+            .SetRepeatedArgAllowed(true);
+    pixelFunctionArgArg.AddValidationAction(
+        [this, &pixelFunctionArgArg]()
+        { return ParseAndValidateKeyValue(pixelFunctionArgArg); });
+
+    pixelFunctionArgArg.SetAutoCompleteFunction(
+        [this](const std::string &currentValue)
+        {
+            std::string pixelFunction;
+            const auto pixelFunctionArg = GetArg("pixel-function");
+            if (pixelFunctionArg && pixelFunctionArg->GetType() == GAAT_STRING)
+            {
+                pixelFunction = pixelFunctionArg->Get<std::string>();
+            }
+
+            std::vector<std::string> ret;
+
+            if (!pixelFunction.empty())
+            {
+                const auto *pair = VRTDerivedRasterBand::GetPixelFunction(
+                    pixelFunction.c_str());
+                if (!pair)
+                {
+                    ret.push_back("**");
+                    // Non printable UTF-8 space, to avoid autocompletion to pickup on 'd'
+                    ret.push_back(std::string("\xC2\xA0"
+                                              "Invalid pixel function name"));
+                }
+                else if (pair->second.find("Argument name=") ==
+                         std::string::npos)
+                {
+                    ret.push_back("**");
+                    // Non printable UTF-8 space, to avoid autocompletion to pickup on 'd'
+                    ret.push_back(
+                        std::string(
+                            "\xC2\xA0"
+                            "No pixel function arguments for pixel function '")
+                            .append(pixelFunction)
+                            .append("'"));
+                }
+                else
+                {
+                    AddOptionsSuggestions(pair->second.c_str(), 0, currentValue,
+                                          ret);
+                }
+            }
+
+            return ret;
+        });
+
+    return pixelFunctionArgArg;
 }
 
 /************************************************************************/
@@ -5701,6 +5943,7 @@ GDALAlgorithm::GetAutoComplete(std::vector<std::string> &args,
                     ret.push_back(std::move(str));
             }
         }
+        std::sort(ret.begin(), ret.end());
     }
     else if (!option.empty())
     {
@@ -5717,6 +5960,10 @@ GDALAlgorithm::GetAutoComplete(std::vector<std::string> &args,
                     CPL_IGNORE_RET_VAL(ParseCommandLineArguments(args));
                 }
                 ret = arg->GetAutoCompleteChoices(value);
+            }
+            else
+            {
+                std::sort(ret.begin(), ret.end());
             }
             if (!ret.empty() && ret.back() == value)
             {
@@ -5740,6 +5987,10 @@ GDALAlgorithm::GetAutoComplete(std::vector<std::string> &args,
             auto subAlg = InstantiateSubAlgorithm(subAlgName);
             if (subAlg && !subAlg->IsHidden())
                 ret.push_back(subAlg->GetName());
+        }
+        if (!ret.empty())
+        {
+            std::sort(ret.begin(), ret.end());
         }
 
         // Try filenames

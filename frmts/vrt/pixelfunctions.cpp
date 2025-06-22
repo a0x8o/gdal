@@ -11,6 +11,7 @@
  * SPDX-License-Identifier: MIT
  *****************************************************************************/
 
+#include <array>
 #include <cmath>
 #include "gdal.h"
 #include "vrtdataset.h"
@@ -1654,9 +1655,16 @@ static CPLErr InvPixelFunc(void **papoSources, int nSources, void *pData,
 
                 if (!bHasNoData || !IsNoData(dfVal, dfNoData))
                 {
-                    dfPixVal = dfVal == 0
-                                   ? std::numeric_limits<double>::infinity()
-                                   : dfK / dfVal;
+                    dfPixVal =
+                        dfVal == 0
+                            ? std::numeric_limits<double>::infinity()
+                            : dfK /
+#ifdef __COVERITY__
+                                  (dfVal + std::numeric_limits<double>::min())
+#else
+                                  dfVal
+#endif
+                        ;
                 }
 
                 GDALCopyWords(&dfPixVal, GDT_Float64, 0,
@@ -2340,6 +2348,8 @@ static CPLErr NormDiffPixelFunc(void **papoSources, int nSources, void *pData,
 
 static const char pszMinMaxFuncMetadataNodata[] =
     "<PixelFunctionArgumentsList>"
+    "   <Argument name='k' description='Optional constant term' type='double' "
+    "default='nan' />"
     "   <Argument type='builtin' value='NoData' optional='true' />"
     "   <Argument name='propagateNoData' description='Whether the output value "
     "should be NoData as as soon as one source is NoData' type='boolean' "
@@ -2347,10 +2357,11 @@ static const char pszMinMaxFuncMetadataNodata[] =
     "</PixelFunctionArgumentsList>";
 
 template <class Comparator>
-static CPLErr MinOrMaxPixelFunc(void **papoSources, int nSources, void *pData,
-                                int nXSize, int nYSize, GDALDataType eSrcType,
-                                GDALDataType eBufType, int nPixelSpace,
-                                int nLineSpace, CSLConstList papszArgs)
+static CPLErr MinOrMaxPixelFunc(double dfK, void **papoSources, int nSources,
+                                void *pData, int nXSize, int nYSize,
+                                GDALDataType eSrcType, GDALDataType eBufType,
+                                int nPixelSpace, int nLineSpace,
+                                CSLConstList papszArgs)
 {
     /* ---- Init ---- */
     if (GDALDataTypeIsComplex(eSrcType))
@@ -2392,9 +2403,14 @@ static CPLErr MinOrMaxPixelFunc(void **papoSources, int nSources, void *pData,
                 }
             }
 
-            if (!bPropagateNoData && std::isnan(dfRes))
+            if (std::isnan(dfRes))
             {
-                dfRes = dfNoData;
+                if (!bPropagateNoData)
+                    dfRes = dfNoData;
+            }
+            else if (!std::isnan(dfK) && Comparator::compare(dfK, dfRes))
+            {
+                dfRes = dfK;
             }
 
             GDALCopyWords(&dfRes, GDT_Float64, 0,
@@ -2616,9 +2632,14 @@ static CPLErr MinPixelFunc(void **papoSources, int nSources, void *pData,
         }
     };
 
+    double dfK = std::numeric_limits<double>::quiet_NaN();
+    if (FetchDoubleArg(papszArgs, "k", &dfK, &dfK) != CE_None)
+        return CE_Failure;
+
 #ifdef USE_SSE2
     const bool bHasNoData = CSLFindName(papszArgs, "NoData") != -1;
-    if (nSources > 0 && !bHasNoData && eSrcType == eBufType &&
+    if (std::isnan(dfK) && nSources > 0 && !bHasNoData &&
+        eSrcType == eBufType &&
         nPixelSpace == GDALGetDataTypeSizeBytes(eSrcType))
     {
         if (eSrcType == GDT_Byte)
@@ -2654,8 +2675,8 @@ static CPLErr MinPixelFunc(void **papoSources, int nSources, void *pData,
     }
 #endif
 
-    return MinOrMaxPixelFunc<Comparator>(papoSources, nSources, pData, nXSize,
-                                         nYSize, eSrcType, eBufType,
+    return MinOrMaxPixelFunc<Comparator>(dfK, papoSources, nSources, pData,
+                                         nXSize, nYSize, eSrcType, eBufType,
                                          nPixelSpace, nLineSpace, papszArgs);
 }
 
@@ -2673,9 +2694,14 @@ static CPLErr MaxPixelFunc(void **papoSources, int nSources, void *pData,
         }
     };
 
+    double dfK = std::numeric_limits<double>::quiet_NaN();
+    if (FetchDoubleArg(papszArgs, "k", &dfK, &dfK) != CE_None)
+        return CE_Failure;
+
 #ifdef USE_SSE2
     const bool bHasNoData = CSLFindName(papszArgs, "NoData") != -1;
-    if (nSources > 0 && !bHasNoData && eSrcType == eBufType &&
+    if (std::isnan(dfK) && nSources > 0 && !bHasNoData &&
+        eSrcType == eBufType &&
         nPixelSpace == GDALGetDataTypeSizeBytes(eSrcType))
     {
         if (eSrcType == GDT_Byte)
@@ -2711,8 +2737,8 @@ static CPLErr MaxPixelFunc(void **papoSources, int nSources, void *pData,
     }
 #endif
 
-    return MinOrMaxPixelFunc<Comparator>(papoSources, nSources, pData, nXSize,
-                                         nYSize, eSrcType, eBufType,
+    return MinOrMaxPixelFunc<Comparator>(dfK, papoSources, nSources, pData,
+                                         nXSize, nYSize, eSrcType, eBufType,
                                          nPixelSpace, nLineSpace, papszArgs);
 }
 
@@ -2729,6 +2755,9 @@ static const char pszExprPixelFuncMetadata[] =
     "       <Value>muparser</Value>"
     "   </Argument>"
     "   <Argument type='builtin' value='source_names' />"
+    "   <Argument type='builtin' value='xoff' />"
+    "   <Argument type='builtin' value='yoff' />"
+    "   <Argument type='builtin' value='geotransform' />"
     "</PixelFunctionArgumentsList>";
 
 static CPLErr ExprPixelFunc(void **papoSources, int nSources, void *pData,
@@ -2778,6 +2807,47 @@ static CPLErr ExprPixelFunc(void **papoSources, int nSources, void *pData,
         return CE_Failure;
     }
 
+    int nXOff = 0;
+    int nYOff = 0;
+    std::array<double, 6> gt;
+    double dfCenterX = 0;
+    double dfCenterY = 0;
+
+    bool includeCenterCoords = false;
+    if (strstr(pszExpression, "_CENTER_X_") ||
+        strstr(pszExpression, "_CENTER_Y_"))
+    {
+        includeCenterCoords = true;
+
+        const char *pszXOff = CSLFetchNameValue(papszArgs, "xoff");
+        nXOff = std::atoi(pszXOff);
+
+        const char *pszYOff = CSLFetchNameValue(papszArgs, "yoff");
+        nYOff = std::atoi(pszYOff);
+
+        const char *pszGT = CSLFetchNameValue(papszArgs, "geotransform");
+        if (pszGT == nullptr)
+        {
+            CPLError(CE_Failure, CPLE_AppDefined,
+                     "To use _CENTER_X_ or _CENTER_Y_ in an expression, "
+                     "VRTDataset must have a <GeoTransform> element.");
+            return CE_Failure;
+        }
+
+        CPLStringList aosGeoTransform(
+            CSLTokenizeString2(pszGT, ",", CSLT_HONOURSTRINGS));
+        if (aosGeoTransform.size() != 6)
+        {
+            CPLError(CE_Failure, CPLE_AppDefined,
+                     "Invalid GeoTransform argument");
+            return CE_Failure;
+        }
+        for (int i = 0; i < 6; i++)
+        {
+            gt[i] = CPLAtof(aosGeoTransform[i]);
+        }
+    }
+
     {
         int iSource = 0;
         for (const auto &osName : aosSourceNames)
@@ -2785,6 +2855,12 @@ static CPLErr ExprPixelFunc(void **papoSources, int nSources, void *pData,
             poExpression->RegisterVariable(osName,
                                            &adfValuesForPixel[iSource++]);
         }
+    }
+
+    if (includeCenterCoords)
+    {
+        poExpression->RegisterVariable("_CENTER_X_", &dfCenterX);
+        poExpression->RegisterVariable("_CENTER_Y_", &dfCenterY);
     }
 
     if (strstr(pszExpression, "BANDS"))
@@ -2808,6 +2884,15 @@ static CPLErr ExprPixelFunc(void **papoSources, int nSources, void *pData,
                 // cppcheck-suppress unreadVariable
                 adfValuesForPixel[iSrc] =
                     GetSrcVal(papoSources[iSrc], eSrcType, ii);
+            }
+
+            if (includeCenterCoords)
+            {
+                // Add 0.5 to pixel / line to move from pixel corner to cell center
+                GDALApplyGeoTransform(gt.data(),
+                                      static_cast<double>(iCol + nXOff) + 0.5,
+                                      static_cast<double>(iLine + nYOff) + 0.5,
+                                      &dfCenterX, &dfCenterY);
             }
 
             if (auto eErr = poExpression->Evaluate(); eErr != CE_None)

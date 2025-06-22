@@ -84,7 +84,7 @@ CPLErr WriteRaster_internal( GDALRasterBandShadow *obj,
                              GIntBig pixel_space, GIntBig line_space,
                              GDALRasterIOExtraArg* psExtraArg )
 {
-    GIntBig min_buffer_size = ComputeBandRasterIOSize (buf_xsize, buf_ysize, GDALGetDataTypeSize( buf_type ) / 8,
+    GIntBig min_buffer_size = ComputeBandRasterIOSize (buf_xsize, buf_ysize, GDALGetDataTypeSizeBytes( buf_type ),
                                                    pixel_space, line_space, FALSE );
     if ( min_buffer_size == 0 )
       return CE_Failure;
@@ -720,6 +720,92 @@ CPLErr AdviseRead(  int xoff, int yoff, int xsize, int ysize,
       GDALEnablePixelTypeSignedByteWarning(self, b);
   }
 
+  %newobject UnaryOp;
+  GDALComputedRasterBandShadow* UnaryOp(GDALRasterAlgebraUnaryOperation op)
+  {
+      return GDALRasterBandUnaryOp(self, op);
+  }
+
+  %apply Pointer NONNULL {GDALRasterBandShadow* other};
+  %newobject BinaryOpBand;
+  GDALComputedRasterBandShadow* BinaryOpBand(GDALRasterAlgebraBinaryOperation op, GDALRasterBandShadow* other)
+  {
+      return GDALRasterBandBinaryOpBand(self, op, other);
+  }
+  %clear GDALRasterBandShadow* other;
+
+  %newobject BinaryOpDouble;
+  GDALComputedRasterBandShadow* BinaryOpDouble(GDALRasterAlgebraBinaryOperation op, double constant)
+  {
+      return GDALRasterBandBinaryOpDouble(self, op, constant);
+  }
+
+  %apply Pointer NONNULL {GDALRasterBandShadow* band};
+  %newobject BinaryOpDoubleToBand;
+  static GDALComputedRasterBandShadow* BinaryOpDoubleToBand(double constant, GDALRasterAlgebraBinaryOperation op, GDALRasterBandShadow* band)
+  {
+      return GDALRasterBandBinaryOpDoubleToBand(constant, op, band);
+  }
+  %clear GDALRasterBandShadow* band;
+
+  %apply Pointer NONNULL {GDALRasterBandShadow* condBand};
+  %apply Pointer NONNULL {GDALRasterBandShadow* thenBand};
+  %apply Pointer NONNULL {GDALRasterBandShadow* elseBand};
+  %newobject IfThenElse;
+  static GDALComputedRasterBandShadow* IfThenElse(GDALRasterBandShadow* condBand,
+                                                  GDALRasterBandShadow* thenBand,
+                                                  GDALRasterBandShadow* elseBand)
+  {
+      return GDALRasterBandIfThenElse(condBand, thenBand, elseBand);
+  }
+  %clear GDALRasterBandShadow* condBand;
+  %clear GDALRasterBandShadow* thenBand;
+  %clear GDALRasterBandShadow* elseBand;
+
+
+  %newobject AsType;
+  GDALComputedRasterBandShadow* AsType(GDALDataType dt)
+  {
+      return GDALRasterBandAsDataType(self, dt);
+  }
+
+  %newobject MaximumOfNBands;
+  %apply (int object_list_count, GDALRasterBandShadow **poObjects) {(int band_count, GDALRasterBandShadow **bands)};
+  static GDALComputedRasterBandShadow* MaximumOfNBands(int band_count, GDALRasterBandShadow** bands)
+  {
+     return GDALMaximumOfNBands(band_count, bands);
+  }
+  %clear (int band_count, GDALRasterBandShadow **bands);
+
+  %newobject MaxConstant;
+  GDALComputedRasterBandShadow* MaxConstant(double constant)
+  {
+      return GDALRasterBandMaxConstant(self, constant);
+  }
+
+  %newobject MinimumOfNBands;
+  %apply (int object_list_count, GDALRasterBandShadow **poObjects) {(int band_count, GDALRasterBandShadow **bands)};
+  static GDALComputedRasterBandShadow* MinimumOfNBands(int band_count, GDALRasterBandShadow** bands)
+  {
+     return GDALMinimumOfNBands(band_count, bands);
+  }
+  %clear (int band_count, GDALRasterBandShadow **bands);
+
+  %newobject MinConstant;
+  GDALComputedRasterBandShadow* MinConstant(double constant)
+  {
+      return GDALRasterBandMinConstant(self, constant);
+  }
+
+  %newobject MeanOfNBands;
+  %apply (int object_list_count, GDALRasterBandShadow **poObjects) {(int band_count, GDALRasterBandShadow **bands)};
+  static GDALComputedRasterBandShadow* MeanOfNBands(int band_count, GDALRasterBandShadow** bands)
+  {
+     return GDALMeanOfNBands(band_count, bands);
+  }
+  %clear (int band_count, GDALRasterBandShadow **bands);
+
+
 } /* %extend */
 
 };
@@ -735,3 +821,41 @@ int GDALRasterBandShadow_YSize_get( GDALRasterBandShadow *h ) {
   return GDALGetRasterBandYSize( h );
 }
 %}
+
+#if defined(SWIGPYTHON)
+%pythoncode %{
+del Band.UnaryOp
+del Band.BinaryOpBand
+del Band.BinaryOpDouble
+del Band.BinaryOpDoubleToBand
+del Band.AsType
+del Band.MinimumOfNBands
+del Band.MinConstant
+del Band.MaximumOfNBands
+del Band.MaxConstant
+del Band.MeanOfNBands
+del Band.IfThenElse
+%}
+#endif
+
+/************************************************************************
+ *
+ * Define the extensions for ComputedBand (GDALComputedRasterBandShadow)
+ *
+*************************************************************************/
+
+%rename (ComputedBand) GDALComputedRasterBandShadow;
+
+class GDALComputedRasterBandShadow : public GDALRasterBandShadow {
+private:
+  GDALComputedRasterBandShadow();
+public:
+%extend {
+
+  ~GDALComputedRasterBandShadow() {
+      GDALComputedRasterBandRelease(self);
+  }
+
+} /* %extend */
+
+};

@@ -26,14 +26,14 @@ GDALRasterWriteAlgorithm::GDALRasterWriteAlgorithm()
     : GDALRasterPipelineStepAlgorithm(NAME, DESCRIPTION, HELP_URL,
                                       /* standaloneStep =*/false)
 {
-    AddOutputArgs(/* hiddenForCLI = */ false);
+    AddRasterOutputArgs(/* hiddenForCLI = */ false);
 }
 
 /************************************************************************/
 /*                  GDALRasterWriteAlgorithm::RunStep()                 */
 /************************************************************************/
 
-bool GDALRasterWriteAlgorithm::RunStep(GDALRasterPipelineStepRunContext &ctxt)
+bool GDALRasterWriteAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
 {
     auto pfnProgress = ctxt.m_pfnProgress;
     auto pProgressData = ctxt.m_pProgressData;

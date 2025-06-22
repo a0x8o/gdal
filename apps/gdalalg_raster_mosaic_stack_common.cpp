@@ -39,6 +39,7 @@ GDALRasterMosaicStackCommonAlgorithm::GetConstructorOptions(bool standaloneStep)
         _("Input raster datasets (or specify a @<filename> to point to a "
           "file containing filenames)"));
     opts.SetAddDefaultArguments(false);
+    opts.SetInputDatasetMaxCount(INT_MAX);
     return opts;
 }
 
@@ -52,12 +53,12 @@ GDALRasterMosaicStackCommonAlgorithm::GDALRasterMosaicStackCommonAlgorithm(
     : GDALRasterPipelineStepAlgorithm(name, description, helpURL,
                                       GetConstructorOptions(bStandalone))
 {
-    AddInputArgs(/* openForMixedRasterVector = */ false,
-                 /* hiddenForCLI = */ false);
+    AddRasterInputArgs(/* openForMixedRasterVector = */ false,
+                       /* hiddenForCLI = */ false);
     if (bStandalone)
     {
         AddProgressArg();
-        AddOutputArgs(false);
+        AddRasterOutputArgs(false);
     }
 
     AddBandArg(&m_bands);
@@ -122,7 +123,7 @@ GDALRasterMosaicStackCommonAlgorithm::GDALRasterMosaicStackCommonAlgorithm(
 /************************************************************************/
 
 bool GDALRasterMosaicStackCommonAlgorithm::GetInputDatasetNames(
-    GDALRasterPipelineStepRunContext &ctxt,
+    GDALPipelineStepRunContext &ctxt,
     std::vector<GDALDatasetH> &ahInputDatasets,
     CPLStringList &aosInputDatasetNames, bool &foundByName)
 {
@@ -310,7 +311,7 @@ bool GDALRasterMosaicStackCommonAlgorithm::RunImpl(GDALProgressFunc pfnProgress,
     }
     else
     {
-        GDALRasterPipelineStepRunContext stepCtxt;
+        GDALPipelineStepRunContext stepCtxt;
         stepCtxt.m_pfnProgress = pfnProgress;
         stepCtxt.m_pProgressData = pProgressData;
         return RunStep(stepCtxt);
