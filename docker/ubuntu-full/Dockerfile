@@ -426,9 +426,9 @@ RUN --mount=type=cache,id=ubuntu-full-libjxl,target=$HOME/.cache \
     && rm -rf libjxl
 
 # Install Arrow C++
-ARG ARROW_VERSION=16.1.0-1
+ARG ARROW_VERSION=20.0.0-1
 # ARROW_SOVERSION to be updated in the "Build final image" section too
-ARG ARROW_SOVERSION=1600
+ARG ARROW_SOVERSION=2000
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     . /buildscripts/bh-set-envvars.sh \
@@ -517,7 +517,7 @@ FROM $TARGET_BASE_IMAGE AS runner
 USER root
 RUN date
 ARG JAVA_VERSION=17
-ARG ARROW_SOVERSION=1600
+ARG ARROW_SOVERSION=2000
 
 ARG TARGET_ARCH=
 # Update distro
@@ -581,11 +581,17 @@ RUN if test "$(uname -p)" = "x86_64"; then \
     fi
 
 # Install libduckdb
+ARG DUCKDB_VERSION=v1.3.1
 RUN if test "$(uname -p)" = "x86_64"; then \
-    curl -LO -fsS https://github.com/duckdb/duckdb/releases/download/v1.1.3/libduckdb-linux-amd64.zip \
+    curl -LO -fsS https://github.com/duckdb/duckdb/releases/download/${DUCKDB_VERSION}/libduckdb-linux-amd64.zip \
     && unzip libduckdb-linux-amd64.zip libduckdb.so \
     && mv libduckdb.so /usr/lib/x86_64-linux-gnu \
     && rm -f libduckdb-linux-amd64.zip; \
+    elif test "${TARGET_ARCH}" = "arm64"; then \
+    curl -LO -fsS https://github.com/duckdb/duckdb/releases/download/${DUCKDB_VERSION}/libduckdb-linux-arm64.zip \
+    && unzip libduckdb-linux-arm64.zip libduckdb.so \
+    && mv libduckdb.so /usr/lib/aarch64-linux-gnu \
+    && rm -f libduckdb-linux-arm64.zip; \
     fi
 
 ARG WITH_ORACLE=
@@ -622,9 +628,7 @@ COPY --from=builder  /build_gdal_version_changing/usr/ /usr/
 RUN ldconfig
 
 # Install duckdb_spatial
-RUN if test "$(uname -p)" = "x86_64"; then \
-    ogrinfo ADBC::memory: -oo ADBC_DRIVER=duckdb -oo PRELUDE_STATEMENTS="INSTALL spatial"; \
-    fi
+RUN ogrinfo ADBC::memory: -oo ADBC_DRIVER=libduckdb.so -oo PRELUDE_STATEMENTS="INSTALL spatial";
 
 RUN echo "source /usr/share/bash-completion/bash_completion" >> /root/.bashrc
 

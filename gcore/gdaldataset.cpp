@@ -1361,6 +1361,47 @@ CPLErr CPL_STDCALL GDALSetProjection(GDALDatasetH hDS,
  * space, and projection coordinates (Xp,Yp) space.
  *
  * \code
+ *   Xp = gt[0] + P*gt[1] + L*gt[2];
+ *   Yp = gt[3] + P*padfTransform[4] + L*gt[5];
+ * \endcode
+ *
+ * In a north up image, gt[1] is the pixel width, and
+ * gt[5] is the pixel height.  The upper left corner of the
+ * upper left pixel is at position (gt[0],gt[3]).
+ *
+ * The default transform is (0,1,0,0,0,1) and should be returned even when
+ * a CE_Failure error is returned, such as for formats that don't support
+ * transformation to projection coordinates.
+ *
+ * This method does the same thing as the C GDALGetGeoTransform() function.
+ *
+ * @param gt an existing six double buffer into which the
+ * transformation will be placed.
+ *
+ * @return CE_None on success, or CE_Failure if no transform can be fetched.
+ *
+ * @since 3.12
+ */
+
+CPLErr GDALDataset::GetGeoTransform(GDALGeoTransform &gt) const
+
+{
+    gt = GDALGeoTransform();
+
+    return CE_Failure;
+}
+
+/************************************************************************/
+/*                          GetGeoTransform()                           */
+/************************************************************************/
+
+/**
+ * \brief Fetch the affine transformation coefficients.
+ *
+ * Fetches the coefficients for transforming between pixel/line (P,L) raster
+ * space, and projection coordinates (Xp,Yp) space.
+ *
+ * \code
  *   Xp = padfTransform[0] + P*padfTransform[1] + L*padfTransform[2];
  *   Yp = padfTransform[3] + P*padfTransform[4] + L*padfTransform[5];
  * \endcode
@@ -1379,22 +1420,15 @@ CPLErr CPL_STDCALL GDALSetProjection(GDALDatasetH hDS,
  * transformation will be placed.
  *
  * @return CE_None on success, or CE_Failure if no transform can be fetched.
+ *
+ * @deprecated since 3.12. Use GetGeoTransform(GDALGeoTransform&) instead
  */
 
-CPLErr GDALDataset::GetGeoTransform(double *padfTransform)
+CPLErr GDALDataset::GetGeoTransform(double *padfTransform) const
 
 {
-    CPLAssert(padfTransform != nullptr);
-
-    padfTransform[0] = 0.0;  // X Origin (top left corner)
-    padfTransform[1] = 1.0;  // X Pixel size */
-    padfTransform[2] = 0.0;
-
-    padfTransform[3] = 0.0;  // Y Origin (top left corner)
-    padfTransform[4] = 0.0;
-    padfTransform[5] = 1.0;  // Y Pixel Size
-
-    return CE_Failure;
+    return GetGeoTransform(
+        *reinterpret_cast<GDALGeoTransform *>(padfTransform));
 }
 
 /************************************************************************/
@@ -1412,7 +1446,8 @@ CPLErr CPL_STDCALL GDALGetGeoTransform(GDALDatasetH hDS, double *padfTransform)
 {
     VALIDATE_POINTER1(hDS, "GDALGetGeoTransform", CE_Failure);
 
-    return GDALDataset::FromHandle(hDS)->GetGeoTransform(padfTransform);
+    return GDALDataset::FromHandle(hDS)->GetGeoTransform(
+        *reinterpret_cast<GDALGeoTransform *>(padfTransform));
 }
 
 /************************************************************************/
@@ -1420,7 +1455,37 @@ CPLErr CPL_STDCALL GDALGetGeoTransform(GDALDatasetH hDS, double *padfTransform)
 /************************************************************************/
 
 /**
- * \fn GDALDataset::SetGeoTransform(double*)
+ * \fn GDALDataset::SetGeoTransform(const GDALGeoTransform&)
+ * \brief Set the affine transformation coefficients.
+ *
+ * See GetGeoTransform() for details on the meaning of the padfTransform
+ * coefficients.
+ *
+ * This method does the same thing as the C GDALSetGeoTransform() function.
+ *
+ * @param gt the transformation coefficients to be written with the dataset.
+ *
+ * @return CE_None on success, or CE_Failure if this transform cannot be
+ * written.
+ *
+ * @since 3.12
+ */
+
+CPLErr GDALDataset::SetGeoTransform(CPL_UNUSED const GDALGeoTransform &gt)
+
+{
+    if (!(GetMOFlags() & GMO_IGNORE_UNIMPLEMENTED))
+        ReportError(CE_Failure, CPLE_NotSupported,
+                    "SetGeoTransform() not supported for this dataset.");
+
+    return CE_Failure;
+}
+
+/************************************************************************/
+/*                          SetGeoTransform()                           */
+/************************************************************************/
+
+/**
  * \brief Set the affine transformation coefficients.
  *
  * See GetGeoTransform() for details on the meaning of the padfTransform
@@ -1433,16 +1498,14 @@ CPLErr CPL_STDCALL GDALGetGeoTransform(GDALDatasetH hDS, double *padfTransform)
  *
  * @return CE_None on success, or CE_Failure if this transform cannot be
  * written.
+ *
+ * @deprecated since 3.12. Use SetGeoTransform(const GDALGeoTransform&) instead
  */
-
-CPLErr GDALDataset::SetGeoTransform(CPL_UNUSED double *padfTransform)
+CPLErr GDALDataset::SetGeoTransform(const double *padfTransform)
 
 {
-    if (!(GetMOFlags() & GMO_IGNORE_UNIMPLEMENTED))
-        ReportError(CE_Failure, CPLE_NotSupported,
-                    "SetGeoTransform() not supported for this dataset.");
-
-    return CE_Failure;
+    return SetGeoTransform(
+        *reinterpret_cast<const GDALGeoTransform *>(padfTransform));
 }
 
 /************************************************************************/
@@ -1455,12 +1518,15 @@ CPLErr GDALDataset::SetGeoTransform(CPL_UNUSED double *padfTransform)
  * @see GDALDataset::SetGeoTransform()
  */
 
-CPLErr CPL_STDCALL GDALSetGeoTransform(GDALDatasetH hDS, double *padfTransform)
+CPLErr CPL_STDCALL GDALSetGeoTransform(GDALDatasetH hDS,
+                                       const double *padfTransform)
 
 {
     VALIDATE_POINTER1(hDS, "GDALSetGeoTransform", CE_Failure);
+    VALIDATE_POINTER1(padfTransform, "GDALSetGeoTransform", CE_Failure);
 
-    return GDALDataset::FromHandle(hDS)->SetGeoTransform(padfTransform);
+    return GDALDataset::FromHandle(hDS)->SetGeoTransform(
+        *reinterpret_cast<const GDALGeoTransform *>(padfTransform));
 }
 
 /************************************************************************/
@@ -2090,7 +2156,7 @@ CPLErr GDALSetGCPs2(GDALDatasetH hDS, int nGCPCount, const GDAL_GCP *pasGCPList,
 /**
  * \brief Build raster overview(s)
  *
- * If the operation is unsupported for the indicated dataset, then
+ * If the operation is not supported for the indicated dataset, then
  * CE_Failure is returned, and CPLGetLastErrorNo() will return
  * CPLE_NotSupported.
  *
@@ -2267,6 +2333,54 @@ CPLErr GDALDataset::IBuildOverviews(const char *pszResampling, int nOverviews,
 }
 
 //! @endcond
+
+/************************************************************************/
+/*                            AddOverviews()                            */
+/*                                                                      */
+/*      Default implementation.                                         */
+/************************************************************************/
+
+/**
+ * \brief Add overview from existing dataset(s)
+ *
+ * This function creates new overview levels or refresh existing one from
+ * the list of provided overview datasets.
+ * Source overviews may come from any GDAL supported format, provided they
+ * have the same number of bands and geospatial extent than the target
+ * dataset.
+ *
+ * If the operation is not supported for the indicated dataset, then
+ * CE_Failure is returned, and CPLGetLastErrorNo() will return
+ * CPLE_NotSupported.
+ *
+ * At time of writing, this method is only implemented for internal overviews
+ * of GeoTIFF datasets and external overviews in GeoTIFF format.
+ *
+ * @param apoSrcOvrDS Vector of source overviews.
+ * @param pfnProgress a function to call to report progress, or NULL.
+ * @param pProgressData application data to pass to the progress function.
+ * @param papszOptions NULL terminated list of options as
+ *                     key=value pairs, or NULL. None currently
+ *
+ * @return CE_None on success or CE_Failure if the operation doesn't work.
+ * @since 3.12
+ */
+CPLErr GDALDataset::AddOverviews(const std::vector<GDALDataset *> &apoSrcOvrDS,
+                                 GDALProgressFunc pfnProgress,
+                                 void *pProgressData, CSLConstList papszOptions)
+{
+    if (oOvManager.IsInitialized())
+    {
+        return oOvManager.AddOverviews(nullptr, apoSrcOvrDS, pfnProgress,
+                                       pProgressData, papszOptions);
+    }
+    else
+    {
+        ReportError(CE_Failure, CPLE_NotSupported,
+                    "AddOverviews() not supported for this dataset.");
+        return CE_Failure;
+    }
+}
 
 /************************************************************************/
 /*                             IRasterIO()                              */
@@ -10494,8 +10608,8 @@ CPLErr GDALDataset::GetExtent(OGREnvelope *psExtent,
 
     *psExtent = OGREnvelope();
 
-    std::array<double, 6> adfGT;
-    const bool bHasGT = poThisDS->GetGeoTransform(adfGT.data()) == CE_None;
+    GDALGeoTransform gt;
+    const bool bHasGT = poThisDS->GetGeoTransform(gt) == CE_None;
     if (bHasGT)
     {
         auto poCT = std::unique_ptr<OGRCoordinateTransformation>(
@@ -10504,17 +10618,14 @@ CPLErr GDALDataset::GetExtent(OGREnvelope *psExtent,
         {
             constexpr int DENSIFY_POINT_COUNT = 21;
             OGREnvelope sEnvTmp;
-            double dfULX = adfGT[0];
-            double dfULY = adfGT[3];
+            double dfULX = gt[0];
+            double dfULY = gt[3];
             double dfURX = 0, dfURY = 0;
-            GDALApplyGeoTransform(adfGT.data(), nRasterXSize, 0, &dfURX,
-                                  &dfURY);
+            gt.Apply(nRasterXSize, 0, &dfURX, &dfURY);
             double dfLLX = 0, dfLLY = 0;
-            GDALApplyGeoTransform(adfGT.data(), 0, nRasterYSize, &dfLLX,
-                                  &dfLLY);
+            gt.Apply(0, nRasterYSize, &dfLLX, &dfLLY);
             double dfLRX = 0, dfLRY = 0;
-            GDALApplyGeoTransform(adfGT.data(), nRasterXSize, nRasterYSize,
-                                  &dfLRX, &dfLRY);
+            gt.Apply(nRasterXSize, nRasterYSize, &dfLRX, &dfLRY);
             const double xmin =
                 std::min(std::min(dfULX, dfURX), std::min(dfLLX, dfLRX));
             const double ymin =

@@ -147,7 +147,8 @@ void GDALRasterPipelineAlgorithm::RegisterAlgorithms(
 {
     GDALAlgorithmRegistry::AlgInfo algInfo;
 
-    const auto addSuffixIfNeeded = [forMixedPipeline](const char *name)
+    const auto addSuffixIfNeeded =
+        [forMixedPipeline](const char *name) -> std::string
     {
         return forMixedPipeline ? std::string(name).append(RASTER_SUFFIX)
                                 : std::string(name);
@@ -699,9 +700,9 @@ GDALRasterPipelineNonNativelyStreamingAlgorithm::CreateTemporaryDataset(
     if (poOutDS && poSrcDSForMetadata)
     {
         poOutDS->SetSpatialRef(poSrcDSForMetadata->GetSpatialRef());
-        std::array<double, 6> adfGT{};
-        if (poSrcDSForMetadata->GetGeoTransform(adfGT.data()) == CE_None)
-            poOutDS->SetGeoTransform(adfGT.data());
+        GDALGeoTransform gt;
+        if (poSrcDSForMetadata->GetGeoTransform(gt) == CE_None)
+            poOutDS->SetGeoTransform(gt);
         if (const int nGCPCount = poSrcDSForMetadata->GetGCPCount())
         {
             const auto apsGCPs = poSrcDSForMetadata->GetGCPs();

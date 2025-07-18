@@ -2584,20 +2584,13 @@ GDALVectorInfoOptionsNew(char **papszArgv,
 
         if (auto oSpat = argParser->present<std::vector<double>>("-spat"))
         {
-            OGRLinearRing oRing;
             const double dfMinX = (*oSpat)[0];
             const double dfMinY = (*oSpat)[1];
             const double dfMaxX = (*oSpat)[2];
             const double dfMaxY = (*oSpat)[3];
 
-            oRing.addPoint(dfMinX, dfMinY);
-            oRing.addPoint(dfMinX, dfMaxY);
-            oRing.addPoint(dfMaxX, dfMaxY);
-            oRing.addPoint(dfMaxX, dfMinY);
-            oRing.addPoint(dfMinX, dfMinY);
-
-            auto poPolygon = std::make_unique<OGRPolygon>();
-            poPolygon->addRing(&oRing);
+            auto poPolygon =
+                std::make_unique<OGRPolygon>(dfMinX, dfMinY, dfMaxX, dfMaxY);
             psOptions->poSpatialFilter.reset(poPolygon.release());
         }
 
@@ -2605,7 +2598,7 @@ GDALVectorInfoOptionsNew(char **papszArgv,
         {
             GByte *pabyRet = nullptr;
             if (VSIIngestFile(nullptr, psOptions->osWHERE.substr(1).c_str(),
-                              &pabyRet, nullptr, 1024 * 1024))
+                              &pabyRet, nullptr, 10 * 1024 * 1024))
             {
                 GDALRemoveBOM(pabyRet);
                 psOptions->osWHERE = reinterpret_cast<const char *>(pabyRet);
@@ -2625,7 +2618,7 @@ GDALVectorInfoOptionsNew(char **papszArgv,
             GByte *pabyRet = nullptr;
             if (VSIIngestFile(nullptr,
                               psOptions->osSQLStatement.substr(1).c_str(),
-                              &pabyRet, nullptr, 1024 * 1024))
+                              &pabyRet, nullptr, 10 * 1024 * 1024))
             {
                 GDALRemoveBOM(pabyRet);
                 char *pszSQLStatement = reinterpret_cast<char *>(pabyRet);

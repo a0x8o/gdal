@@ -12,7 +12,7 @@ OGRGeomCoordinatePrecision C++ API
 Include file
 ------------
 
-:file:`ogr_geomcoordinateprecision.h`
+:source_file:`ogr/ogr_geomcoordinateprecision.h`
 
 OGRGeomCoordinatePrecision struct
 ---------------------------------

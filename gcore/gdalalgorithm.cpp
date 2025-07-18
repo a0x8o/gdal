@@ -254,7 +254,7 @@ bool GDALAlgorithmArg::ProcessString(std::string &value) const
     {
         GByte *pabyData = nullptr;
         if (VSIIngestFile(nullptr, value.c_str() + 1, &pabyData, nullptr,
-                          1024 * 1024))
+                          10 * 1024 * 1024))
         {
             // Remove UTF-8 BOM
             size_t offset = 0;
@@ -1075,6 +1075,20 @@ bool GDALAlgorithmArg::Serialize(std::string &serializedArg) const
         }
     };
 
+    const auto AddListValueSeparator = [this, &ret]()
+    {
+        if (GetPackedValuesAllowed())
+        {
+            ret += ',';
+        }
+        else
+        {
+            ret += " --";
+            ret += GetName();
+            ret += ' ';
+        }
+    };
+
     ret += ' ';
     switch (GetType())
     {
@@ -1113,7 +1127,7 @@ bool GDALAlgorithmArg::Serialize(std::string &serializedArg) const
             for (size_t i = 0; i < vals.size(); ++i)
             {
                 if (i > 0)
-                    ret += ',';
+                    AddListValueSeparator();
                 AppendString(vals[i]);
             }
             break;
@@ -1124,7 +1138,7 @@ bool GDALAlgorithmArg::Serialize(std::string &serializedArg) const
             for (size_t i = 0; i < vals.size(); ++i)
             {
                 if (i > 0)
-                    ret += ',';
+                    AddListValueSeparator();
                 ret += CPLSPrintf("%d", vals[i]);
             }
             break;
@@ -1135,7 +1149,7 @@ bool GDALAlgorithmArg::Serialize(std::string &serializedArg) const
             for (size_t i = 0; i < vals.size(); ++i)
             {
                 if (i > 0)
-                    ret += ',';
+                    AddListValueSeparator();
                 ret += CPLSPrintf("%.17g", vals[i]);
             }
             break;
@@ -1146,7 +1160,7 @@ bool GDALAlgorithmArg::Serialize(std::string &serializedArg) const
             for (size_t i = 0; i < vals.size(); ++i)
             {
                 if (i > 0)
-                    ret += ',';
+                    AddListValueSeparator();
                 const auto &val = vals[i];
                 const auto &str = val.GetName();
                 if (str.empty())
@@ -2545,6 +2559,7 @@ bool GDALAlgorithm::ProcessDatasetArg(GDALAlgorithmArg *arg,
                     outputArg->Get<GDALArgDatasetValue>().Set(poDS);
                 }
             }
+            val.SetDatasetOpenedByAlgorithm();
             val.Set(poDS);
             poDS->ReleaseRef();
         }
@@ -4838,16 +4853,23 @@ GDALAlgorithm::AddNumThreadsArg(int *pValue, std::string *pStrValue,
                pStrValue);
     auto lambda = [this, &arg, pValue, pStrValue]
     {
-        int nNumCPUs = std::max(1, CPLGetNumCPUs());
+#ifdef DEBUG
+        const int nCPUCount = std::max(
+            1, atoi(CPLGetConfigOption("GDAL_DEBUG_CPU_COUNT",
+                                       CPLSPrintf("%d", CPLGetNumCPUs()))));
+#else
+        const int nCPUCount = std::max(1, CPLGetNumCPUs());
+#endif
+        int nNumThreads = nCPUCount;
         const char *pszThreads =
             CPLGetConfigOption("GDAL_NUM_THREADS", nullptr);
         if (pszThreads && !EQUAL(pszThreads, "ALL_CPUS"))
         {
-            nNumCPUs = std::clamp(atoi(pszThreads), 1, nNumCPUs);
+            nNumThreads = std::clamp(atoi(pszThreads), 1, nNumThreads);
         }
         if (EQUAL(pStrValue->c_str(), "ALL_CPUS"))
         {
-            *pValue = nNumCPUs;
+            *pValue = nNumThreads;
             return true;
         }
         else
@@ -4857,7 +4879,7 @@ GDALAlgorithm::AddNumThreadsArg(int *pValue, std::string *pStrValue,
             if (endptr == pStrValue->c_str() + pStrValue->size() && res >= 0 &&
                 res <= INT_MAX)
             {
-                *pValue = std::min(static_cast<int>(res), nNumCPUs);
+                *pValue = std::min(static_cast<int>(res), nNumThreads);
                 return true;
             }
             ReportError(CE_Failure, CPLE_IllegalArg,

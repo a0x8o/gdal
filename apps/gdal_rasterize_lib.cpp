@@ -180,7 +180,7 @@ GDALRasterizeOptionsGetParser(GDALRasterizeOptions *psOptions,
                     GByte *pabyRet = nullptr;
                     if (!sql.empty() && sql.at(0) == '@' &&
                         VSIIngestFile(nullptr, sql.substr(1).c_str(), &pabyRet,
-                                      nullptr, 1024 * 1024))
+                                      nullptr, 10 * 1024 * 1024))
                     {
                         GDALRemoveBOM(pabyRet);
                         char *pszSQLStatement =
@@ -711,9 +711,9 @@ static CPLErr ProcessLayer(OGRLayerH hSrcLayer, bool bSRSIsSet,
     {
         GDALDataset *poDS = GDALDataset::FromHandle(hDstDS);
         char **papszTransformerOptions = CSLDuplicate(papszTO);
-        double adfGeoTransform[6] = {0.0};
-        if (poDS->GetGeoTransform(adfGeoTransform) != CE_None &&
-            poDS->GetGCPCount() == 0 && poDS->GetMetadata("RPC") == nullptr)
+        GDALGeoTransform gt;
+        if (poDS->GetGeoTransform(gt) != CE_None && poDS->GetGCPCount() == 0 &&
+            poDS->GetMetadata("RPC") == nullptr)
         {
             papszTransformerOptions = CSLSetNameValue(
                 papszTransformerOptions, "DST_METHOD", "NO_GEOTRANSFORM");

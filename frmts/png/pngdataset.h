@@ -96,7 +96,7 @@ class PNGDataset final : public GDALPamDataset
     GDALColorTable *poColorTable{};
 
     int bGeoTransformValid{};
-    std::array<double, 6> adfGeoTransform = {0, 1, 0, 0, 0, 1};
+    GDALGeoTransform m_gt{};
 
     void CollectMetadata();
 
@@ -115,6 +115,7 @@ class PNGDataset final : public GDALPamDataset
     void LoadICCProfile();
 
     bool m_bByteOrderIsLittleEndian = false;
+    bool m_bHasRewind = false;
 
     static void WriteMetadataAsText(jmp_buf sSetJmpContext, png_structp hPNG,
                                     png_infop psPNGInfo, const char *pszKey,
@@ -136,7 +137,7 @@ class PNGDataset final : public GDALPamDataset
 
     virtual char **GetFileList(void) override;
 
-    virtual CPLErr GetGeoTransform(double *) override;
+    virtual CPLErr GetGeoTransform(GDALGeoTransform &gt) const override;
     virtual CPLErr FlushCache(bool bAtClosing) override;
 
     virtual char **GetMetadataDomainList() override;

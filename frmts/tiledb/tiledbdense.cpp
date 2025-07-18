@@ -1421,6 +1421,15 @@ GDALDataset *TileDBRasterDataset::OpenInternal(GDALOpenInfo *poOpenInfo,
         poDS->m_osArrayURI = CPLFormFilenameSafe(osURI.c_str(), "l_0", nullptr);
     }
 
+    if ((poOpenInfo->eAccess == GA_ReadOnly) &&
+        (!TileDBDataset::TileDBObjectExists(poDS->m_osArrayURI)))
+    {
+        CPLError(CE_Failure, CPLE_OpenFailed,
+                 "Failed to open %s as an array or group.",
+                 poOpenInfo->pszFilename);
+        return nullptr;
+    }
+
     const tiledb_query_type_t eMode =
         poOpenInfo->eAccess == GA_Update ? TILEDB_WRITE : TILEDB_READ;
 
@@ -3051,18 +3060,12 @@ CPLErr TileDBRasterDataset::IBuildOverviews(
 
             // Apply georeferencing from main dataset
             poOvrDS->SetSpatialRef(GetSpatialRef());
-            double adfGeoTransform[6];
-            if (GetGeoTransform(adfGeoTransform) == CE_None)
+            GDALGeoTransform gt;
+            if (GetGeoTransform(gt) == CE_None)
             {
-                adfGeoTransform[1] *=
-                    static_cast<double>(nRasterXSize) / nOXSize;
-                adfGeoTransform[2] *=
-                    static_cast<double>(nRasterXSize) / nOXSize;
-                adfGeoTransform[4] *=
-                    static_cast<double>(nRasterYSize) / nOYSize;
-                adfGeoTransform[5] *=
-                    static_cast<double>(nRasterYSize) / nOYSize;
-                poOvrDS->SetGeoTransform(adfGeoTransform);
+                gt.Rescale(static_cast<double>(nRasterXSize) / nOXSize,
+                           static_cast<double>(nRasterYSize) / nOYSize);
+                poOvrDS->SetGeoTransform(gt);
             }
 
             poOvrDS->DeferredCreate(/* bCreateArray = */ true);

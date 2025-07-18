@@ -83,12 +83,12 @@ class AAIGDataset CPL_NON_FINAL : public GDALPamDataset
 
   protected:
     GDALDataType eDataType;
-    double adfGeoTransform[6];
+    GDALGeoTransform m_gt{};
     bool bNoDataSet;
     double dfNoDataValue;
     CPLString osUnits{};
 
-    virtual int ParseHeader(const char *pszHeader, const char *pszDataType);
+    virtual bool ParseHeader(const char *pszHeader, const char *pszDataType);
 
   public:
     AAIGDataset();
@@ -109,7 +109,7 @@ class AAIGDataset CPL_NON_FINAL : public GDALPamDataset
                                    GDALProgressFunc pfnProgress,
                                    void *pProgressData);
 
-    CPLErr GetGeoTransform(double *) override;
+    CPLErr GetGeoTransform(GDALGeoTransform &gt) const override;
     const OGRSpatialReference *GetSpatialRef() const override;
 };
 
@@ -121,16 +121,10 @@ class AAIGDataset CPL_NON_FINAL : public GDALPamDataset
 
 class GRASSASCIIDataset final : public AAIGDataset
 {
-    int ParseHeader(const char *pszHeader, const char *pszDataType) override;
+    bool ParseHeader(const char *pszHeader, const char *pszDataType) override;
 
   public:
-    GRASSASCIIDataset() : AAIGDataset()
-    {
-    }
-
-    ~GRASSASCIIDataset() override
-    {
-    }
+    GRASSASCIIDataset() = default;
 
     static GDALDataset *Open(GDALOpenInfo *);
     static int Identify(GDALOpenInfo *);
@@ -144,12 +138,10 @@ class GRASSASCIIDataset final : public AAIGDataset
 
 class ISGDataset final : public AAIGDataset
 {
-    int ParseHeader(const char *pszHeader, const char *pszDataType) override;
+    bool ParseHeader(const char *pszHeader, const char *pszDataType) override;
 
   public:
-    ISGDataset() : AAIGDataset()
-    {
-    }
+    ISGDataset() = default;
 
     static GDALDataset *Open(GDALOpenInfo *);
     static int Identify(GDALOpenInfo *);

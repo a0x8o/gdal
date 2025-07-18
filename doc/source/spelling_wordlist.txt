@@ -237,6 +237,7 @@ blockings
 blocksize
 BlockSizeX
 BlockSizeY
+BlockWindows
 blocky
 bLookForCircular
 bLookForNonLinear
@@ -922,6 +923,7 @@ fld
 flippmoke
 floodfill
 flurstueck
+flushable
 Fonseca
 FootprintOptions
 fopen
@@ -1407,6 +1409,7 @@ igor
 IIP
 ij
 iLayer
+iLength
 ili
 imag
 imagefile
@@ -1471,6 +1474,7 @@ isdst
 IsEmpty
 IsNullable
 isspace
+iStartRow
 iSubGeom
 ISurface
 itemtypes
@@ -2358,6 +2362,7 @@ papszOptions
 papszOverride
 papszSiblingFiles
 papszSrcDSNames
+papszStrList
 papszURL
 papszVectorTranslateArguments
 papszWarpOptions
@@ -2365,7 +2370,9 @@ Paquet
 paradygm
 parallelisation
 parallelising
+Parallelization
 parallelize
+parallelized
 param
 parameterisation
 parametrized
@@ -2670,6 +2677,7 @@ pszDestFilename
 pszDomain
 pszDstFilename
 pszElement
+pszExt
 pszFile
 pszFilename
 pszFileName

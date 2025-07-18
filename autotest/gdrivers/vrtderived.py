@@ -1053,6 +1053,28 @@ def identity(in_ar, out_ar, *args, **kwargs):
 
 
 ###############################################################################
+#
+
+
+@gdaltest.enable_exceptions()
+def test_vrt_expression_missing_expression_arg():
+
+    ds = gdal.Open(
+        """<VRTDataset rasterXSize="20" rasterYSize="20">
+  <VRTRasterBand dataType="Float64" band="1" subClass="VRTDerivedRasterBand">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="0">data/byte.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+    </SimpleSource>
+    <PixelFunctionType>expression</PixelFunctionType>
+  </VRTRasterBand>
+</VRTDataset>"""
+    )
+    with pytest.raises(Exception, match="Missing 'expression' pixel function argument"):
+        ds.GetRasterBand(1).Checksum()
+
+
+###############################################################################
 # Test arbitrary expression pixel functions
 
 
@@ -1187,6 +1209,13 @@ def vrt_expression_xml(tmpdir, expression, dialect, sources):
             9,
             ["muparser"],
             id="muparser nan comparison is false in conditional",
+        ),
+        pytest.param(
+            "isnan(B3) ? B1 : B2",
+            (5, 9, float("nan")),
+            5,
+            ["muparser"],
+            id="muparser isnan",
         ),
         pytest.param(
             "if (B1 > 5) B1",
@@ -1546,6 +1575,12 @@ def test_vrt_pixelfn_reclassify_nan(tmp_vsimem):
 @pytest.mark.parametrize(
     "pixelfn,values,nodata_value,pixelfn_args,expected",
     [
+        ("argmax", [3, 7, 9, 2], 7, {}, 3),
+        ("argmax", [3, 7, 9], 7, {"propagateNoData": True}, 7),
+        ("argmax", [7, 7, 7], 7, {}, 7),
+        ("argmin", [3, 1, 7], 7, {}, 2),
+        ("argmin", [3, 1, 7], 7, {"propagateNoData": True}, 7),
+        ("argmin", [7, 7, 7], 7, {}, 7),
         ("dB", [7], 7, {}, 7),
         ("diff", [3, 7], 7, {}, 7),
         ("diff", [7, 3], 7, {}, 7),
@@ -1588,6 +1623,9 @@ def test_vrt_pixelfn_reclassify_nan(tmp_vsimem):
         ("min", [3, 7, 9], 7, {}, 3),
         ("min", [3, 7, 9], 7, {"k": 5}, 3),
         ("min", [3, 7, 9], 7, {"k": 2}, 2),
+        ("min", [7, 7, 7], 7, {"k": 2}, 2),
+        ("min", [7, 7, 7], 7, {"k": 2, "propagateNoData": True}, 7),
+        ("min", [7, 7, 7], 7, {}, 7),
         ("min", [3, float("nan"), 9], 7, {}, 3),
         ("min", [3, float("nan"), 9], 7, {"propagateNoData": True}, 7),  # should be 3?
         ("min", [3, 7, 9], 7, {"propagateNoData": True}, 7),
