@@ -8,7 +8,7 @@
 
 .. only:: html
 
-    Process a raster dataset.
+    Process a raster dataset applying several steps.
 
 .. Index:: gdal raster pipeline
 
@@ -26,8 +26,10 @@ Synopsis
 .. program-output:: gdal raster pipeline --help-doc=main
 
 A pipeline chains several steps, separated with the `!` (exclamation mark) character.
-The first step must be ``read``, ``calc``, ``mosaic`` or ``stack``, and the last one ``write``. Each step has its
-own positional or non-positional arguments. Apart from ``read``, ``calc``, ``mosaic``, ``stack`` and ``write``,
+The first step must be ``read``, ``calc``, ``mosaic`` or ``stack``,
+and the last one ``write``, ``info`` or ``tile``.
+Each step has its own positional or non-positional arguments.
+Apart from ``read``, ``calc``, ``mosaic``, ``stack``, ``info``, ``tile`` and ``write``,
 all other steps can potentially be used several times in a pipeline.
 
 Potential steps are:
@@ -192,6 +194,22 @@ Details for options can be found in :ref:`gdal_raster_unscale`.
 
 Details for options can be found in :ref:`gdal_raster_viewshed`.
 
+* info
+
+.. versionadded:: 3.12
+
+.. program-output:: gdal raster pipeline --help-doc=info
+
+Details for options can be found in :ref:`gdal_raster_info`.
+
+* tile
+
+.. versionadded:: 3.12
+
+.. program-output:: gdal raster pipeline --help-doc=tile
+
+Details for options can be found in :ref:`gdal_raster_tile`.
+
 * write
 
 .. program-output:: gdal raster pipeline --help-doc=write
@@ -226,6 +244,19 @@ The final ``write`` step can be added but if so it must explicitly specify the
     }
 
 
+Substitutions
+-------------
+
+.. versionadded:: 3.12
+
+It is possible to use :program:`gdal pipeline` to use a pipeline already
+serialized in a .gdal.json file, and customize its existing steps, typically
+changing an input filename, specifying an output filename, or adding/modifying arguments
+of steps.
+
+See :ref:`gdal_pipeline_substitutions`.
+
+
 Examples
 --------
 
@@ -234,15 +265,22 @@ Examples
 
    .. code-block:: bash
 
-        $ gdal raster pipeline --progress ! read in.tif ! reproject --dst-crs=EPSG:32632 ! edit --metadata AUTHOR=EvenR ! write out.tif --overwrite
+        $ gdal raster pipeline ! read in.tif ! reproject --dst-crs=EPSG:32632 ! edit --metadata AUTHOR=EvenR ! write out.tif --overwrite
 
 .. example::
    :title: Serialize the command of a reprojection of a GeoTIFF file in a GDALG file, and later read it
 
    .. code-block:: bash
 
-        $ gdal raster pipeline --progress ! read in.tif ! reproject --dst-crs=EPSG:32632 ! write in_epsg_32632.gdalg.json --overwrite
+        $ gdal raster pipeline ! read in.tif ! reproject --dst-crs=EPSG:32632 ! write in_epsg_32632.gdalg.json --overwrite
         $ gdal raster info in_epsg_32632.gdalg.json
+
+.. example::
+   :title: Mosaic on-the-fly several input files and tile that mosaic.
+
+   .. code-block:: bash
+
+      gdal raster pipeline ! mosaic input*.tif ! tile output_folder
 
 
 

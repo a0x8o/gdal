@@ -599,6 +599,14 @@ typedef enum
  */
 #define GDAL_DCAP_CREATECOPY "DCAP_CREATECOPY"
 
+/** Capability set by a driver that supports the \@CREATE_ONLY_VISIBLE_AT_CLOSE_TIME
+ * hidden creation option.
+ *
+ * @since GDAL 3.12
+ */
+#define GDAL_DCAP_CREATE_ONLY_VISIBLE_AT_CLOSE_TIME                            \
+    "DCAP_CREATE_ONLY_VISIBLE_AT_CLOSE_TIME"
+
 /** Capability set by a driver that implements the VectorTranslateFrom() API.
  *
  * @since GDAL 3.8
@@ -619,6 +627,16 @@ typedef enum
 
 /** Capability set by a driver that can copy over subdatasets. */
 #define GDAL_DCAP_SUBCREATECOPY "DCAP_SUBCREATECOPY"
+
+/** Capability set by a driver that supports the GDAL_OF_UPDATE flag and offers
+ * feature appending capabilities.
+ *
+ * Note: feature appending capability is also implied if GDAL_DCAP_UPDATE or
+ * GDAL_DCAP_CREATE_LAYER is set, in which case GDAL_DCAP_APPEND is not set.
+ *
+ * @since GDAL 3.12.
+ */
+#define GDAL_DCAP_APPEND "DCAP_APPEND"
 
 /** Capability set by a driver that supports the GDAL_OF_UPDATE flag and offers
  * at least some update capabilities.
@@ -1275,6 +1293,7 @@ void CPL_DLL CPL_STDCALL GDALSetDescription(GDALMajorObjectH, const char *);
 
 GDALDriverH CPL_DLL CPL_STDCALL GDALGetDatasetDriver(GDALDatasetH);
 char CPL_DLL **CPL_STDCALL GDALGetFileList(GDALDatasetH);
+void CPL_DLL GDALDatasetMarkSuppressOnClose(GDALDatasetH);
 CPLErr CPL_DLL CPL_STDCALL GDALClose(GDALDatasetH);
 int CPL_DLL CPL_STDCALL GDALGetRasterXSize(GDALDatasetH);
 int CPL_DLL CPL_STDCALL GDALGetRasterYSize(GDALDatasetH);
@@ -1960,6 +1979,14 @@ typedef enum
 {
     /** Logical not */
     GRAUO_LOGICAL_NOT,
+    /** Absolute value (module for complex data type) */
+    GRAUO_ABS,
+    /** Square root */
+    GRAUO_SQRT,
+    /** Natural logarithm (``ln``) */
+    GRAUO_LOG,
+    /** Logarithm base 10 */
+    GRAUO_LOG10,
 } GDALRasterAlgebraUnaryOperation;
 
 GDALComputedRasterBandH CPL_DLL GDALRasterBandUnaryOp(
@@ -1977,6 +2004,8 @@ typedef enum
     GRABO_MUL,
     /** Division */
     GRABO_DIV,
+    /** Power */
+    GRABO_POW,
     /** Strictly greater than test*/
     GRABO_GT,
     /** Greater or equal to test */

@@ -20,6 +20,7 @@
 #include "gdalalg_raster_edit.h"
 #include "gdalalg_raster_fill_nodata.h"
 #include "gdalalg_raster_hillshade.h"
+#include "gdalalg_raster_info.h"
 #include "gdalalg_raster_mosaic.h"
 #include "gdalalg_raster_nodata_to_alpha.h"
 #include "gdalalg_raster_pansharpen.h"
@@ -35,6 +36,7 @@
 #include "gdalalg_raster_sieve.h"
 #include "gdalalg_raster_slope.h"
 #include "gdalalg_raster_stack.h"
+#include "gdalalg_raster_tile.h"
 #include "gdalalg_raster_write.h"
 #include "gdalalg_raster_tpi.h"
 #include "gdalalg_raster_tri.h"
@@ -134,6 +136,9 @@ GDALRasterPipelineAlgorithm::GDALRasterPipelineAlgorithm(
         .SetPositional();
     AddRasterOutputArgs(/* hiddenForCLI = */ true);
 
+    AddOutputStringArg(&m_output).SetHiddenForCLI();
+    AddStdoutArg(&m_stdout);
+
     RegisterAlgorithms(m_stepRegistry, false);
 }
 
@@ -164,6 +169,11 @@ void GDALRasterPipelineAlgorithm::RegisterAlgorithms(
     algInfo.m_name = addSuffixIfNeeded(GDALRasterWriteAlgorithm::NAME);
     algInfo.m_creationFunc = []() -> std::unique_ptr<GDALAlgorithm>
     { return std::make_unique<GDALRasterWriteAlgorithm>(); };
+    registry.Register(algInfo);
+
+    algInfo.m_name = addSuffixIfNeeded(GDALRasterInfoAlgorithm::NAME);
+    algInfo.m_creationFunc = []() -> std::unique_ptr<GDALAlgorithm>
+    { return std::make_unique<GDALRasterInfoAlgorithm>(); };
     registry.Register(algInfo);
 
     registry.Register<GDALRasterAspectAlgorithm>();
@@ -208,6 +218,7 @@ void GDALRasterPipelineAlgorithm::RegisterAlgorithms(
     registry.Register<GDALRasterSieveAlgorithm>();
     registry.Register<GDALRasterSlopeAlgorithm>();
     registry.Register<GDALRasterStackAlgorithm>();
+    registry.Register<GDALRasterTileAlgorithm>();
     registry.Register<GDALRasterTPIAlgorithm>();
     registry.Register<GDALRasterTRIAlgorithm>();
     registry.Register<GDALRasterUnscaleAlgorithm>();
@@ -237,7 +248,7 @@ bool GDALRasterPipelineAlgorithm::ParseCommandLineArguments(
         if (arg.find("--pipeline") == 0)
             return GDALAlgorithm::ParseCommandLineArguments(args);
 
-        // gdal raster pipeline [--progress] "read in.tif ..."
+        // gdal raster pipeline [--quiet] "read in.tif ..."
         if (arg.find("read ") == 0)
             return GDALAlgorithm::ParseCommandLineArguments(args);
     }
@@ -264,6 +275,12 @@ bool GDALRasterPipelineAlgorithm::ParseCommandLineArguments(
         if (arg == "--progress")
         {
             m_progressBarRequested = true;
+            continue;
+        }
+        if (arg == "--quiet")
+        {
+            m_quiet = true;
+            m_progressBarRequested = false;
             continue;
         }
 
@@ -401,33 +418,20 @@ bool GDALRasterPipelineAlgorithm::ParseCommandLineArguments(
         return false;
     }
 
-    std::vector<GDALRasterPipelineStepAlgorithm *> stepAlgs;
-    for (const auto &step : steps)
-        stepAlgs.push_back(step.alg.get());
-    if (!CheckFirstStep(stepAlgs))
-        return false;
-
-    if (steps.back().alg->GetName() != GDALRasterWriteAlgorithm::NAME)
+    if (!steps.back().alg->CanBeLastStep())
     {
         if (helpRequested)
         {
             steps.back().alg->ParseCommandLineArguments(steps.back().args);
             return false;
         }
-        ReportError(CE_Failure, CPLE_AppDefined, "Last step should be '%s'",
-                    GDALRasterWriteAlgorithm::NAME);
-        return false;
     }
-    for (size_t i = 0; i < steps.size() - 1; ++i)
-    {
-        if (steps[i].alg->GetName() == GDALRasterWriteAlgorithm::NAME)
-        {
-            ReportError(CE_Failure, CPLE_AppDefined,
-                        "Only last step can be '%s'",
-                        GDALRasterWriteAlgorithm::NAME);
-            return false;
-        }
-    }
+
+    std::vector<GDALRasterPipelineStepAlgorithm *> stepAlgs;
+    for (const auto &step : steps)
+        stepAlgs.push_back(step.alg.get());
+    if (!CheckFirstAndLastStep(stepAlgs))
+        return false;  // CheckFirstAndLastStep emits an error
 
     for (auto &step : steps)
     {
@@ -444,7 +448,8 @@ bool GDALRasterPipelineAlgorithm::ParseCommandLineArguments(
             if (!arg->IsHidden())
             {
                 auto pipelineArg = GetArg(arg->GetName());
-                if (pipelineArg && pipelineArg->IsExplicitlySet())
+                if (pipelineArg && pipelineArg->IsExplicitlySet() &&
+                    pipelineArg->GetType() == arg->GetType())
                 {
                     arg->SetSkipIfAlreadySet(true);
                     arg->SetFrom(*pipelineArg);
@@ -461,7 +466,8 @@ bool GDALRasterPipelineAlgorithm::ParseCommandLineArguments(
             if (!arg->IsHidden())
             {
                 auto pipelineArg = GetArg(arg->GetName());
-                if (pipelineArg && pipelineArg->IsExplicitlySet())
+                if (pipelineArg && pipelineArg->IsExplicitlySet() &&
+                    pipelineArg->GetType() == arg->GetType())
                 {
                     arg->SetSkipIfAlreadySet(true);
                     arg->SetFrom(*pipelineArg);
@@ -536,8 +542,9 @@ std::string GDALRasterPipelineAlgorithm::GetUsageForCLI(
     if (shortUsage)
         return ret;
 
-    ret += "\n<PIPELINE> is of the form: read|mosaic|stack [READ-OPTIONS] "
-           "( ! <STEP-NAME> [STEP-OPTIONS] )* ! write [WRITE-OPTIONS]\n";
+    ret +=
+        "\n<PIPELINE> is of the form: read|mosaic|stack [READ-OPTIONS] "
+        "( ! <STEP-NAME> [STEP-OPTIONS] )* ! write|info|tile [WRITE-OPTIONS]\n";
 
     if (m_helpDocCategory == "main")
     {
@@ -582,7 +589,18 @@ std::string GDALRasterPipelineAlgorithm::GetUsageForCLI(
     {
         auto alg = GetStepAlg(name);
         assert(alg);
-        if (!alg->CanBeFirstStep() && !alg->IsHidden() &&
+        if (!alg->CanBeFirstStep() && !alg->CanBeLastStep() && !alg->IsHidden())
+        {
+            ret += '\n';
+            alg->SetCallPath({name});
+            ret += alg->GetUsageForCLI(shortUsage, stepUsageOptions);
+        }
+    }
+    for (const std::string &name : m_stepRegistry.GetNames())
+    {
+        auto alg = GetStepAlg(name);
+        assert(alg);
+        if (alg->CanBeLastStep() && !alg->IsHidden() &&
             name != GDALRasterWriteAlgorithm::NAME)
         {
             ret += '\n';
@@ -597,7 +615,6 @@ std::string GDALRasterPipelineAlgorithm::GetUsageForCLI(
         alg->SetCallPath({name});
         ret += alg->GetUsageForCLI(shortUsage, stepUsageOptions);
     }
-
     ret += GetUsageForCLIEnd();
 
     return ret;

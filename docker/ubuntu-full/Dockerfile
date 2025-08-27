@@ -394,6 +394,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     . /buildscripts/bh-set-envvars.sh \
     && apt-get update -y \
     && apt-get install -y --fix-missing --no-install-recommends libgflags-dev${APT_ARCH_SUFFIX}
+# FIXME: restore JXL_TREEISH=main, once https://github.com/libjxl/libjxl/issues/4410 is solved
+ARG JXL_TREEISH=a4e40af31ab4dd6d6b9ce893c4425b7180012916
 RUN --mount=type=cache,id=ubuntu-full-libjxl,target=$HOME/.cache \
     . /buildscripts/bh-set-envvars.sh \
     && git clone https://github.com/libjxl/libjxl.git --recursive \
@@ -406,6 +408,7 @@ RUN --mount=type=cache,id=ubuntu-full-libjxl,target=$HOME/.cache \
         ccache -M 100M; \
     fi \
     && cd libjxl \
+    && git checkout ${JXL_TREEISH} \
     && mkdir build \
     && cd build \
     && cmake -G Ninja $CCACHE_PARAM -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DJPEGXL_ENABLE_JPEGLI_LIBJPEG=OFF -DBUILD_TESTING=OFF -DJPEGXL_ENABLE_TOOLS=OFF -DJPEGXL_ENABLE_BENCHMARK=OFF .. \
@@ -426,9 +429,9 @@ RUN --mount=type=cache,id=ubuntu-full-libjxl,target=$HOME/.cache \
     && rm -rf libjxl
 
 # Install Arrow C++
-ARG ARROW_VERSION=20.0.0-1
+ARG ARROW_VERSION=21.0.0-1
 # ARROW_SOVERSION to be updated in the "Build final image" section too
-ARG ARROW_SOVERSION=2000
+ARG ARROW_SOVERSION=2100
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     . /buildscripts/bh-set-envvars.sh \
@@ -444,6 +447,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y -V libparquet-dev${APT_ARCH_SUFFIX}=${ARROW_VERSION} \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y -V libarrow-acero-dev${APT_ARCH_SUFFIX}=${ARROW_VERSION} \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y -V libarrow-dataset-dev${APT_ARCH_SUFFIX}=${ARROW_VERSION} \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y -V libarrow-compute-dev${APT_ARCH_SUFFIX}=${ARROW_VERSION} \
     && rm apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb
 
 # Manually install ADBC packages from Ubuntu 22.04 as there are no 24.04 packages at time of writing.
@@ -517,7 +521,7 @@ FROM $TARGET_BASE_IMAGE AS runner
 USER root
 RUN date
 ARG JAVA_VERSION=17
-ARG ARROW_SOVERSION=2000
+ARG ARROW_SOVERSION=2100
 
 ARG TARGET_ARCH=
 # Update distro
@@ -561,7 +565,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     && apt-get update \
     && apt-get install -y -V libarrow${ARROW_SOVERSION} \
     && apt-get install -y -V libparquet${ARROW_SOVERSION} \
-    && apt-get install -y -V libarrow-dataset${ARROW_SOVERSION}
+    && apt-get install -y -V libarrow-dataset${ARROW_SOVERSION} \
+    && apt-get install -y -V libarrow-compute${ARROW_SOVERSION}
 
 # Manually install ADBC packages from Ubuntu 22.04 as there are no 24.04 packages at time of writing.
 RUN if test "$(uname -p)" = "x86_64"; then \

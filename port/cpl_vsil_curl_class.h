@@ -23,6 +23,7 @@
 #include "cpl_string.h"
 #include "cpl_vsil_curl_priv.h"
 #include "cpl_mem_cache.h"
+#include "cpl_multiproc.h"
 
 #include "cpl_curl_priv.h"
 
@@ -50,8 +51,6 @@ void VSICurlStreamingClearCache(void);  // from cpl_vsil_curl_streaming.cpp
 
 struct curl_slist *VSICurlSetOptions(CURL *hCurlHandle, const char *pszURL,
                                      const char *const *papszOptions);
-struct curl_slist *VSICurlMergeHeaders(struct curl_slist *poDest,
-                                       struct curl_slist *poSrcToDestroy);
 
 struct curl_slist *VSICurlSetContentTypeFromExt(struct curl_slist *polist,
                                                 const char *pszPath);
@@ -243,9 +242,9 @@ class VSICurlFilesystemHandlerBase : public VSIFilesystemHandler
 
     static bool IsAllowedFilename(const char *pszFilename);
 
-    VSIVirtualHandle *Open(const char *pszFilename, const char *pszAccess,
-                           bool bSetError,
-                           CSLConstList /* papszOptions */) override;
+    VSIVirtualHandleUniquePtr Open(const char *pszFilename,
+                                   const char *pszAccess, bool bSetError,
+                                   CSLConstList /* papszOptions */) override;
 
     int Stat(const char *pszFilename, VSIStatBufL *pStatBuf,
              int nFlags) override;
@@ -273,7 +272,7 @@ class VSICurlFilesystemHandlerBase : public VSIFilesystemHandler
     virtual std::string GetFSPrefix() const = 0;
     virtual bool AllowCachedDataFor(const char *pszFilename);
 
-    virtual bool IsLocal(const char * /* pszPath */) override
+    virtual bool IsLocal(const char * /* pszPath */) const override
     {
         return false;
     }
@@ -443,11 +442,10 @@ class VSICurlHandle : public VSIVirtualHandle
     CURLM *m_hCurlMultiHandleForAdviseRead = nullptr;
 
   protected:
-    virtual struct curl_slist *
-    GetCurlHeaders(const std::string & /*osVerb*/,
-                   const struct curl_slist * /* psExistingHeaders */)
+    virtual struct curl_slist *GetCurlHeaders(const std::string & /*osVerb*/,
+                                              struct curl_slist *psHeaders)
     {
-        return nullptr;
+        return psHeaders;
     }
 
     virtual bool AllowAutomaticRedirection()
@@ -577,8 +575,9 @@ class VSICurlFilesystemHandlerBaseWritable : public VSICurlFilesystemHandlerBase
     CreateWriteHandle(const char *pszFilename, CSLConstList papszOptions) = 0;
 
   public:
-    VSIVirtualHandle *Open(const char *pszFilename, const char *pszAccess,
-                           bool bSetError, CSLConstList papszOptions) override;
+    VSIVirtualHandleUniquePtr Open(const char *pszFilename,
+                                   const char *pszAccess, bool bSetError,
+                                   CSLConstList /* papszOptions */) override;
 
     bool SupportsSequentialWrite(const char * /* pszPath */,
                                  bool /* bAllowLocalTempFile */) override
@@ -1029,6 +1028,8 @@ struct VSIDIRWithMissingDirSynthesis : public VSIDIR
 
 struct VSIDIRS3Like : public VSIDIRWithMissingDirSynthesis
 {
+    const std::string m_osDirName;
+
     int nRecurseDepth = 0;
 
     std::string osNextMarker{};
@@ -1048,12 +1049,14 @@ struct VSIDIRS3Like : public VSIDIRWithMissingDirSynthesis
     std::unique_ptr<VSIDIR, decltype(&VSICloseDir)> m_subdir{nullptr,
                                                              VSICloseDir};
 
-    explicit VSIDIRS3Like(IVSIS3LikeFSHandler *poFSIn)
-        : poFS(poFSIn), poS3FS(poFSIn)
+    VSIDIRS3Like(const std::string &osDirName, IVSIS3LikeFSHandler *poFSIn)
+        : m_osDirName(osDirName), poFS(poFSIn), poS3FS(poFSIn)
     {
     }
 
-    explicit VSIDIRS3Like(VSICurlFilesystemHandlerBase *poFSIn) : poFS(poFSIn)
+    VSIDIRS3Like(const std::string &osDirName,
+                 VSICurlFilesystemHandlerBase *poFSIn)
+        : m_osDirName(osDirName), poFS(poFSIn)
     {
     }
 

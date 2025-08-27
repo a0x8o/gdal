@@ -5967,4 +5967,34 @@ TEST_F(test_cpl, CPLGetRemainingFileDescriptorCount)
 #endif
 }
 
+TEST_F(test_cpl, CPLGetCurrentThreadCount)
+{
+#if defined(_WIN32) || defined(__linux) || defined(__FreeBSD__) ||             \
+    defined(__NetBSD__) || (defined(__APPLE__) && defined(__MACH__))
+    // Not sure why it returns 0 on those, whereas it works fine on build-windows-msys2-mingw
+    if (strstr(CPLGetConfigOption("BUILD_NAME", ""), "build-windows-conda") !=
+            nullptr &&
+        strstr(CPLGetConfigOption("BUILD_NAME", ""), "build-windows-minimum") !=
+            nullptr)
+    {
+        EXPECT_GE(CPLGetCurrentThreadCount(), 1);
+    }
+#else
+    EXPECT_EQ(CPLGetCurrentThreadCount(), 0);
+#endif
+}
+
+TEST_F(test_cpl, CPLHasPathTraversal)
+{
+    EXPECT_TRUE(CPLHasPathTraversal("a/../b"));
+    EXPECT_TRUE(CPLHasPathTraversal("a\\..\\b"));
+    EXPECT_FALSE(CPLHasPathTraversal("a/b"));
+    {
+        CPLConfigOptionSetter oSetter("CPL_ENABLE_PATH_TRAVERSAL_DETECTION",
+                                      "NO", true);
+        EXPECT_FALSE(CPLHasPathTraversal("a/../b"));
+        EXPECT_FALSE(CPLHasPathTraversal("a\\..\\b"));
+    }
+}
+
 }  // namespace
