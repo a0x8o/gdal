@@ -270,6 +270,11 @@ class GDALPipelineStepAlgorithm /* non final */ : public GDALAlgorithm
         return true;
     }
 
+    virtual bool SupportsInputMultiThreading() const
+    {
+        return false;
+    }
+
     virtual bool CanHandleNextStep(GDALPipelineStepAlgorithm *) const
     {
         return false;
@@ -293,6 +298,7 @@ class GDALPipelineStepAlgorithm /* non final */ : public GDALAlgorithm
     std::string m_output{};
     GDALArgDatasetValue m_outputDataset{};
     std::string m_format{};
+    std::vector<std::string> m_outputOpenOptions{};
     std::vector<std::string> m_creationOptions{};
     bool m_overwrite = false;
     std::string m_outputLayerName{};
@@ -773,7 +779,7 @@ bool GDALAbstractPipelineAlgorithm<StepAlgorithm>::RunStep(
 
     // Because of multiprocessing in gdal raster tile, make sure that all
     // steps before it are serialized in a .gdal.json file
-    if (m_steps.size() >= 2 && m_steps.back()->GetName() == "tile" &&
+    if (m_steps.size() >= 2 && m_steps.back()->SupportsInputMultiThreading() &&
         m_steps.back()
                 ->GetArg(GDAL_ARG_NAME_NUM_THREADS_INT_HIDDEN)
                 ->template Get<int>() > 1 &&
@@ -836,8 +842,9 @@ bool GDALAbstractPipelineAlgorithm<StepAlgorithm>::RunStep(
     if (countPipelinesWithProgress == 0)
         countPipelinesWithProgress = 1;
 
+    bool ret = true;
     GDALDataset *poCurDS = nullptr;
-    int iCurPipelineWithProgress = 0;
+    int iCurStepWithProgress = 0;
     for (size_t i = 0; i < m_steps.size(); ++i)
     {
         auto &step = m_steps[i];
@@ -879,12 +886,12 @@ bool GDALAbstractPipelineAlgorithm<StepAlgorithm>::RunStep(
             !step->IsNativelyStreamingCompatible())
         {
             pScaledData.reset(GDALCreateScaledProgress(
-                iCurPipelineWithProgress /
+                iCurStepWithProgress /
                     static_cast<double>(countPipelinesWithProgress),
-                (iCurPipelineWithProgress + 1) /
+                (iCurStepWithProgress + 1) /
                     static_cast<double>(countPipelinesWithProgress),
                 ctxt.m_pfnProgress, ctxt.m_pProgressData));
-            ++iCurPipelineWithProgress;
+            ++iCurStepWithProgress;
             stepCtxt.m_pfnProgress = pScaledData ? GDALScaledProgress : nullptr;
             stepCtxt.m_pProgressData = pScaledData.get();
         }
@@ -899,12 +906,14 @@ bool GDALAbstractPipelineAlgorithm<StepAlgorithm>::RunStep(
         }
         if (!step->ValidateArguments() || !step->RunStep(stepCtxt))
         {
-            return false;
+            ret = false;
+            break;
         }
         poCurDS = step->m_outputDataset.GetDatasetRef();
         if (!poCurDS && !(i + 1 == m_steps.size() &&
                           (!step->m_output.empty() ||
-                           step->GetArg(GDAL_ARG_NAME_STDOUT) != nullptr)))
+                           step->GetArg(GDAL_ARG_NAME_STDOUT) != nullptr ||
+                           step->GetName() == "compare")))
         {
             StepAlgorithm::ReportError(
                 CE_Failure, CPLE_AppDefined,
@@ -925,17 +934,22 @@ bool GDALAbstractPipelineAlgorithm<StepAlgorithm>::RunStep(
 
     if (!m_steps.back()->m_output.empty())
     {
-        auto outputStringArg =
-            StepAlgorithm::GetArg(GDAL_ARG_NAME_OUTPUT_STRING);
-        if (outputStringArg && outputStringArg->GetType() == GAAT_STRING)
-            outputStringArg->Set(m_steps.back()->m_output);
+        auto stepOutputStringArg =
+            m_steps.back()->GetArg(GDAL_ARG_NAME_OUTPUT_STRING);
+        if (stepOutputStringArg && stepOutputStringArg->IsOutput())
+        {
+            auto outputStringArg =
+                StepAlgorithm::GetArg(GDAL_ARG_NAME_OUTPUT_STRING);
+            if (outputStringArg && outputStringArg->GetType() == GAAT_STRING)
+                outputStringArg->Set(m_steps.back()->m_output);
+        }
     }
-    else if (!StepAlgorithm::m_outputDataset.GetDatasetRef())
+    else if (ret && !StepAlgorithm::m_outputDataset.GetDatasetRef())
     {
         StepAlgorithm::m_outputDataset.Set(poCurDS);
     }
 
-    return true;
+    return ret;
 }
 
 /************************************************************************/
