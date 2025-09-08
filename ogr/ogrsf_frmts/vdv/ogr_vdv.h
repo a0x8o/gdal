@@ -17,6 +17,7 @@
 #include <vector>
 #include <map>
 #include <mutex>
+#include <utility>
 
 class OGRVDVDataSource;
 
@@ -26,18 +27,18 @@ class OGRVDVDataSource;
 
 class OGRIDFDataSource final : public GDALDataset
 {
-    CPLString m_osFilename;
-    VSILFILE *m_fpL;
-    mutable bool m_bHasParsed;
-    mutable GDALDataset *m_poTmpDS;
+    CPLString m_osFilename{};
+    VSILFILE *m_fpL = nullptr;
+    mutable bool m_bHasParsed = false;
+    mutable GDALDataset *m_poTmpDS = nullptr;
     mutable bool m_bDestroyTmpDS = false;
     mutable std::mutex m_oMutex{};
 
-    void Parse() const;
+    std::pair<GDALDataset *, bool> Parse() const;
 
   public:
     explicit OGRIDFDataSource(const char *pszFilename, VSILFILE *fpL);
-    virtual ~OGRIDFDataSource();
+    ~OGRIDFDataSource() override;
 
     int GetLayerCount() const override;
     const OGRLayer *GetLayer(int) const override;
@@ -66,11 +67,11 @@ class OGRVDVLayer final : public OGRLayer
   public:
     OGRVDVLayer(GDALDataset *poDS, const CPLString &osTableName, VSILFILE *fpL,
                 bool bOwnFP, bool bRecodeFromLatin1, vsi_l_offset nStartOffset);
-    virtual ~OGRVDVLayer();
+    ~OGRVDVLayer() override;
 
-    virtual void ResetReading() override;
-    virtual OGRFeature *GetNextFeature() override;
-    virtual GIntBig GetFeatureCount(int bForce) override;
+    void ResetReading() override;
+    OGRFeature *GetNextFeature() override;
+    GIntBig GetFeatureCount(int bForce) override;
 
     const OGRFeatureDefn *GetLayerDefn() const override
     {
@@ -155,10 +156,10 @@ class OGRVDVWriterLayer final : public OGRLayer
                       OGRVDV452Table *poVDV452Table = nullptr,
                       const CPLString &osVDV452Lang = "",
                       bool bProfileStrict = false);
-    virtual ~OGRVDVWriterLayer();
+    ~OGRVDVWriterLayer() override;
 
-    virtual void ResetReading() override;
-    virtual OGRFeature *GetNextFeature() override;
+    void ResetReading() override;
+    OGRFeature *GetNextFeature() override;
 
     using OGRLayer::GetLayerDefn;
 
@@ -170,8 +171,8 @@ class OGRVDVWriterLayer final : public OGRLayer
     int TestCapability(const char *pszCap) const override;
     virtual OGRErr CreateField(const OGRFieldDefn *poFieldDefn,
                                int bApproxOK = TRUE) override;
-    virtual OGRErr ICreateFeature(OGRFeature *poFeature) override;
-    virtual GIntBig GetFeatureCount(int bForce = TRUE) override;
+    OGRErr ICreateFeature(OGRFeature *poFeature) override;
+    GIntBig GetFeatureCount(int bForce = TRUE) override;
 
     GDALDataset *GetDataset() override;
 
@@ -203,7 +204,7 @@ class OGRVDVDataSource final : public GDALDataset
   public:
     OGRVDVDataSource(const char *pszFilename, VSILFILE *fpL, bool bUpdate,
                      bool bSingleFile, bool bNew);
-    virtual ~OGRVDVDataSource();
+    ~OGRVDVDataSource() override;
 
     int GetLayerCount() const override;
     const OGRLayer *GetLayer(int) const override;

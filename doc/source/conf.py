@@ -498,6 +498,13 @@ man_pages = [
         1,
     ),
     (
+        "programs/gdal_raster_as_features",
+        "gdal-raster-as-features",
+        "Create features representing the pixels of a raster",
+        [author_dbaston],
+        1,
+    ),
+    (
         "programs/gdal_raster_calc",
         "gdal-raster-calc",
         "Perform pixel-wise calculations on a raster",
@@ -914,6 +921,13 @@ man_pages = [
         "programs/gdal_vector_layer_algebra",
         "gdal-vector-layer-algebra",
         "Perform algebraic operation between 2 layers",
+        [author_evenr],
+        1,
+    ),
+    (
+        "programs/gdal_vector_partition",
+        "gdal-vector-partition",
+        "Partition a vector dataset into multiple files",
         [author_evenr],
         1,
     ),

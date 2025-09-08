@@ -77,6 +77,7 @@ Raster commands
 
    gdal_raster
    gdal_raster_info
+   gdal_raster_as_features
    gdal_raster_aspect
    gdal_raster_calc
    gdal_raster_clean_collar
@@ -127,6 +128,7 @@ Raster commands
 
     - :ref:`gdal_raster`: Entry point for raster commands
     - :ref:`gdal_raster_info`: Get information on a raster dataset
+    - :reF:`gdal_raster_as_features`: Create features representing raster pixels
     - :ref:`gdal_raster_aspect`: Generate an aspect map.
     - :ref:`gdal_raster_calc`: Perform raster algebra
     - :ref:`gdal_raster_clean_collar`: Clean the collar of a raster dataset, removing noise
@@ -196,6 +198,7 @@ Vector commands
    gdal_vector_index
    gdal_vector_layer_algebra
    gdal_vector_make_valid
+   gdal_vector_partition
    gdal_vector_pipeline
    gdal_vector_rasterize
    gdal_vector_reproject
@@ -227,6 +230,7 @@ Vector commands
     - :ref:`gdal_vector_index`: Create a vector index of vector datasets
     - :ref:`gdal_vector_layer_algebra`: Perform algebraic operation between 2 layers.
     - :ref:`gdal_vector_make_valid`: Fix validity of geometries of a vector dataset
+    - :ref:`gdal_vector_partition`: Partition a vector dataset into multiple files
     - :ref:`gdal_vector_rasterize`: Burns vector geometries into a raster
     - :ref:`gdal_vector_reproject`: Reproject a vector dataset
     - :ref:`gdal_vector_segmentize`: Segmentize geometries of a vector dataset

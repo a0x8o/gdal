@@ -1158,6 +1158,53 @@ static int AverageFloatSSE2(int nDstXWidth, int nChunkXSize,
     return iDstPixel;
 }
 
+/************************************************************************/
+/*                        AverageDoubleSSE2()                           */
+/************************************************************************/
+
+static int
+AverageDoubleSSE2(int nDstXWidth, int nChunkXSize,
+                  const double *&CPL_RESTRICT pSrcScanlineShiftedInOut,
+                  double *CPL_RESTRICT pDstScanline)
+{
+    // Optimized implementation for average on Float64 by
+    // processing by group of output pixels.
+    const double *CPL_RESTRICT pSrcScanlineShifted = pSrcScanlineShiftedInOut;
+
+    int iDstPixel = 0;
+    const auto zeroDot25 = _mm_set1_pd(0.25);
+    constexpr int DEST_ELTS =
+        static_cast<int>(sizeof(zeroDot25) / sizeof(double));
+
+    for (; iDstPixel < nDstXWidth - (DEST_ELTS - 1); iDstPixel += DEST_ELTS)
+    {
+        // Load 4 * DEST_ELTS Float64 from each line
+        const auto firstLine0 = _mm_mul_pd(
+            _mm_loadu_pd(pSrcScanlineShifted + 0 * DEST_ELTS), zeroDot25);
+        const auto firstLine1 = _mm_mul_pd(
+            _mm_loadu_pd(pSrcScanlineShifted + 1 * DEST_ELTS), zeroDot25);
+        const auto secondLine0 = _mm_mul_pd(
+            _mm_loadu_pd(pSrcScanlineShifted + 0 * DEST_ELTS + nChunkXSize),
+            zeroDot25);
+        const auto secondLine1 = _mm_mul_pd(
+            _mm_loadu_pd(pSrcScanlineShifted + 1 * DEST_ELTS + nChunkXSize),
+            zeroDot25);
+
+        // Vertical addition
+        const auto tmp0 = _mm_add_pd(firstLine0, secondLine0);
+        const auto tmp1 = _mm_add_pd(firstLine1, secondLine1);
+
+        // Horizontal addition
+        const auto average0 = sse2_hadd_pd(tmp0, tmp1);
+
+        _mm_storeu_pd(&pDstScanline[iDstPixel + 0], average0);
+        pSrcScanlineShifted += DEST_ELTS * 2;
+    }
+
+    pSrcScanlineShiftedInOut = pSrcScanlineShifted;
+    return iDstPixel;
+}
+
 #endif
 
 #endif
@@ -1243,7 +1290,7 @@ GDALResampleChunk_AverageOrRMS_T(const GDALOverviewResampleArgs &args,
 
         // Force c4 of nodata entry to 0 so that GDALFindBestEntry() identifies
         // it as nodata value
-        if (bHasNoData && dfNoDataValue >= 0.0f &&
+        if (bHasNoData && dfNoDataValue >= 0.0 &&
             tNoDataValue < colorEntries.size())
             colorEntries[static_cast<int>(tNoDataValue)].c4 = 0;
 
@@ -1433,95 +1480,78 @@ GDALResampleChunk_AverageOrRMS_T(const GDALOverviewResampleArgs &args,
                                 pDstScanline);
                         }
                     }
+                    else
+                    {
+                        if constexpr (!bQuadraticMean)
+                        {
+                            iDstPixel = AverageDoubleSSE2(
+                                nDstXWidth, nChunkXSize, pSrcScanlineShifted,
+                                pDstScanline);
+                        }
+                    }
 #endif
 
                     for (; iDstPixel < nDstXWidth; ++iDstPixel)
                     {
                         T nVal;
-                        if constexpr (eWrkDataType == GDT_Float32 ||
-                                      eWrkDataType == GDT_Float64)
+
+                        if constexpr (bQuadraticMean)
                         {
-                            if constexpr (bQuadraticMean)
+                            // Avoid issues with large values by renormalizing
+                            const auto max = std::max(
+                                {std::fabs(pSrcScanlineShifted[0]),
+                                 std::fabs(pSrcScanlineShifted[1]),
+                                 std::fabs(pSrcScanlineShifted[nChunkXSize]),
+                                 std::fabs(
+                                     pSrcScanlineShifted[1 + nChunkXSize])});
+                            if (max == 0)
                             {
-                                // Avoid issues with large values by renormalizing
-                                const auto max = std::max(
-                                    {std::fabs(pSrcScanlineShifted[0]),
-                                     std::fabs(pSrcScanlineShifted[1]),
-                                     std::fabs(
-                                         pSrcScanlineShifted[nChunkXSize]),
-                                     std::fabs(
-                                         pSrcScanlineShifted[1 +
-                                                             nChunkXSize])});
-                                if (max == 0)
-                                {
-                                    nVal = 0;
-                                }
-                                else if (std::isinf(max))
-                                {
-                                    // If there is at least one infinity value,
-                                    // then just summing, and taking the abs
-                                    // value will give the expected result:
-                                    // * +inf if all values are +inf
-                                    // * +inf if all values are -inf
-                                    // * NaN otherwise
-                                    nVal = std::fabs(
-                                        pSrcScanlineShifted[0] +
-                                        pSrcScanlineShifted[1] +
-                                        pSrcScanlineShifted[nChunkXSize] +
-                                        pSrcScanlineShifted[1 + nChunkXSize]);
-                                }
-                                else
-                                {
-                                    const auto inv_max =
-                                        static_cast<T>(1.0) / max;
-                                    nVal = max *
-                                           std::sqrt(
-                                               static_cast<T>(0.25) *
-                                               (SQUARE(pSrcScanlineShifted[0] *
-                                                       inv_max) +
-                                                SQUARE(pSrcScanlineShifted[1] *
-                                                       inv_max) +
-                                                SQUARE(pSrcScanlineShifted
-                                                           [nChunkXSize] *
-                                                       inv_max) +
-                                                SQUARE(pSrcScanlineShifted
-                                                           [1 + nChunkXSize] *
-                                                       inv_max)));
-                                }
+                                nVal = 0;
+                            }
+                            else if (std::isinf(max))
+                            {
+                                // If there is at least one infinity value,
+                                // then just summing, and taking the abs
+                                // value will give the expected result:
+                                // * +inf if all values are +inf
+                                // * +inf if all values are -inf
+                                // * NaN otherwise
+                                nVal = std::fabs(
+                                    pSrcScanlineShifted[0] +
+                                    pSrcScanlineShifted[1] +
+                                    pSrcScanlineShifted[nChunkXSize] +
+                                    pSrcScanlineShifted[1 + nChunkXSize]);
                             }
                             else
                             {
-                                constexpr auto weight = static_cast<T>(0.25);
-                                // Multiply each value by weight to avoid
-                                // potential overflow
+                                const auto inv_max = static_cast<T>(1.0) / max;
                                 nVal =
-                                    (weight * pSrcScanlineShifted[0] +
-                                     weight * pSrcScanlineShifted[1] +
-                                     weight * pSrcScanlineShifted[nChunkXSize] +
-                                     weight *
-                                         pSrcScanlineShifted[1 + nChunkXSize]);
+                                    max *
+                                    std::sqrt(
+                                        static_cast<T>(0.25) *
+                                        (SQUARE(pSrcScanlineShifted[0] *
+                                                inv_max) +
+                                         SQUARE(pSrcScanlineShifted[1] *
+                                                inv_max) +
+                                         SQUARE(
+                                             pSrcScanlineShifted[nChunkXSize] *
+                                             inv_max) +
+                                         SQUARE(
+                                             pSrcScanlineShifted[1 +
+                                                                 nChunkXSize] *
+                                             inv_max)));
                             }
-                        }
-                        else if constexpr (bQuadraticMean)
-                        {
-                            // Cast to double to avoid overflows
-                            // (using std::hypot() is much slower)
-                            nVal = static_cast<T>(std::sqrt(
-                                0.25 *
-                                (SQUARE<double>(pSrcScanlineShifted[0]) +
-                                 SQUARE<double>(pSrcScanlineShifted[1]) +
-                                 SQUARE<double>(
-                                     pSrcScanlineShifted[nChunkXSize]) +
-                                 SQUARE<double>(
-                                     pSrcScanlineShifted[1 + nChunkXSize]))));
                         }
                         else
                         {
-                            nVal = static_cast<T>(
-                                0.25f * (pSrcScanlineShifted[0] +
-                                         pSrcScanlineShifted[1] +
-                                         pSrcScanlineShifted[nChunkXSize] +
-                                         pSrcScanlineShifted[1 + nChunkXSize]));
+                            constexpr auto weight = static_cast<T>(0.25);
+                            // Multiply each value by weight to avoid
+                            // potential overflow
+                            nVal =
+                                (weight * pSrcScanlineShifted[0] +
+                                 weight * pSrcScanlineShifted[1] +
+                                 weight * pSrcScanlineShifted[nChunkXSize] +
+                                 weight * pSrcScanlineShifted[1 + nChunkXSize]);
                         }
 
                         // No need to compare nVal against tNoDataValue as we
@@ -1580,7 +1610,7 @@ GDALResampleChunk_AverageOrRMS_T(const GDALOverviewResampleArgs &args,
                                             mulFactor,
                                             std::fabs(pChunkShifted[iX]));
                                 }
-                                dfMulFactor = mulFactor;
+                                dfMulFactor = double(mulFactor);
                                 dfInvMulFactor =
                                     dfMulFactor > 0 &&
                                             std::isfinite(dfMulFactor)
@@ -1609,7 +1639,7 @@ GDALResampleChunk_AverageOrRMS_T(const GDALOverviewResampleArgs &args,
                                 {
                                     const T val = pChunkShifted[nSrcXOff];
                                     dfTotalLine =
-                                        SQUARE(val * dfInvMulFactor) *
+                                        SQUARE(double(val) * dfInvMulFactor) *
                                         pasSrcX[iDstPixel].dfLeftWeight;
                                 }
 
@@ -1620,8 +1650,8 @@ GDALResampleChunk_AverageOrRMS_T(const GDALOverviewResampleArgs &args,
                                          iX < nSrcXOff2 - 1; ++iX)
                                     {
                                         const T val = pChunkShifted[iX];
-                                        dfTotalLine +=
-                                            SQUARE(val * dfInvMulFactor);
+                                        dfTotalLine += SQUARE(double(val) *
+                                                              dfInvMulFactor);
                                     }
 
                                     // Right pixel
@@ -1629,7 +1659,8 @@ GDALResampleChunk_AverageOrRMS_T(const GDALOverviewResampleArgs &args,
                                         const T val =
                                             pChunkShifted[nSrcXOff2 - 1];
                                         dfTotalLine +=
-                                            SQUARE(val * dfInvMulFactor) *
+                                            SQUARE(double(val) *
+                                                   dfInvMulFactor) *
                                             pasSrcX[iDstPixel].dfRightWeight;
                                     }
                                 }
@@ -1640,7 +1671,7 @@ GDALResampleChunk_AverageOrRMS_T(const GDALOverviewResampleArgs &args,
                                 {
                                     const T val = pChunkShifted[nSrcXOff];
                                     dfTotalLine =
-                                        val * dfInvMulFactor *
+                                        double(val) * dfInvMulFactor *
                                         pasSrcX[iDstPixel].dfLeftWeight;
                                 }
 
@@ -1651,7 +1682,8 @@ GDALResampleChunk_AverageOrRMS_T(const GDALOverviewResampleArgs &args,
                                          iX < nSrcXOff2 - 1; ++iX)
                                     {
                                         const T val = pChunkShifted[iX];
-                                        dfTotalLine += val * dfInvMulFactor;
+                                        dfTotalLine +=
+                                            double(val) * dfInvMulFactor;
                                     }
 
                                     // Right pixel
@@ -1659,7 +1691,7 @@ GDALResampleChunk_AverageOrRMS_T(const GDALOverviewResampleArgs &args,
                                         const T val =
                                             pChunkShifted[nSrcXOff2 - 1];
                                         dfTotalLine +=
-                                            val * dfInvMulFactor *
+                                            double(val) * dfInvMulFactor *
                                             pasSrcX[iDstPixel].dfRightWeight;
                                     }
                                 }
@@ -1701,9 +1733,9 @@ GDALResampleChunk_AverageOrRMS_T(const GDALOverviewResampleArgs &args,
                                     dfTotalWeightLine = dfWeightX;
                                     if constexpr (bQuadraticMean)
                                         dfTotalLine =
-                                            SQUARE<double>(val) * dfWeightX;
+                                            SQUARE(double(val)) * dfWeightX;
                                     else
-                                        dfTotalLine = val * dfWeightX;
+                                        dfTotalLine = double(val) * dfWeightX;
                                 }
                             }
 
@@ -1721,9 +1753,9 @@ GDALResampleChunk_AverageOrRMS_T(const GDALOverviewResampleArgs &args,
                                         nCount++;
                                         dfTotalWeightLine += 1;
                                         if constexpr (bQuadraticMean)
-                                            dfTotalLine += SQUARE<double>(val);
+                                            dfTotalLine += SQUARE(double(val));
                                         else
-                                            dfTotalLine += val;
+                                            dfTotalLine += double(val);
                                     }
                                 }
 
@@ -1741,9 +1773,10 @@ GDALResampleChunk_AverageOrRMS_T(const GDALOverviewResampleArgs &args,
                                         dfTotalWeightLine += dfWeightX;
                                         if constexpr (bQuadraticMean)
                                             dfTotalLine +=
-                                                SQUARE<double>(val) * dfWeightX;
+                                                SQUARE(double(val)) * dfWeightX;
                                         else
-                                            dfTotalLine += val * dfWeightX;
+                                            dfTotalLine +=
+                                                double(val) * dfWeightX;
                                     }
                                 }
                             }
@@ -2064,7 +2097,7 @@ static CPLErr GDALResampleChunk_Gauss(const GDALOverviewResampleArgs &args,
 
     // Force c4 of nodata entry to 0 so that GDALFindBestEntry() identifies
     // it as nodata value.
-    if (bHasNoData && dfNoDataValue >= 0.0f &&
+    if (bHasNoData && dfNoDataValue >= 0.0 &&
         dfNoDataValue < colorEntries.size())
         colorEntries[static_cast<int>(dfNoDataValue)].c4 = 0;
 
@@ -2724,15 +2757,15 @@ GDALResampleConvolutionHorizontal(const T *pChunk, const double *padfWeights,
 #if !defined(__INTEL_CLANG_COMPILER)
     for (; i < nSrcPixelCount - 3; i += 4)
     {
-        dfVal1 += pChunk[i] * padfWeights[i];
-        dfVal1 += pChunk[i + 1] * padfWeights[i + 1];
-        dfVal2 += pChunk[i + 2] * padfWeights[i + 2];
-        dfVal2 += pChunk[i + 3] * padfWeights[i + 3];
+        dfVal1 += double(pChunk[i + 0]) * padfWeights[i];
+        dfVal1 += double(pChunk[i + 1]) * padfWeights[i + 1];
+        dfVal2 += double(pChunk[i + 2]) * padfWeights[i + 2];
+        dfVal2 += double(pChunk[i + 3]) * padfWeights[i + 3];
     }
 #endif
     for (; i < nSrcPixelCount; ++i)
     {
-        dfVal1 += pChunk[i] * padfWeights[i];
+        dfVal1 += double(pChunk[i]) * padfWeights[i];
     }
     return dfVal1 + dfVal2;
 }
@@ -2751,16 +2784,16 @@ static inline void GDALResampleConvolutionHorizontalWithMask(
         const double dfWeight1 = padfWeights[i + 1] * pabyMask[i + 1];
         const double dfWeight2 = padfWeights[i + 2] * pabyMask[i + 2];
         const double dfWeight3 = padfWeights[i + 3] * pabyMask[i + 3];
-        dfVal += pChunk[i] * dfWeight0;
-        dfVal += pChunk[i + 1] * dfWeight1;
-        dfVal += pChunk[i + 2] * dfWeight2;
-        dfVal += pChunk[i + 3] * dfWeight3;
+        dfVal += double(pChunk[i + 0]) * dfWeight0;
+        dfVal += double(pChunk[i + 1]) * dfWeight1;
+        dfVal += double(pChunk[i + 2]) * dfWeight2;
+        dfVal += double(pChunk[i + 3]) * dfWeight3;
         dfWeightSum += dfWeight0 + dfWeight1 + dfWeight2 + dfWeight3;
     }
     for (; i < nSrcPixelCount; ++i)
     {
         const double dfWeight = padfWeights[i] * pabyMask[i];
-        dfVal += pChunk[i] * dfWeight;
+        dfVal += double(pChunk[i]) * dfWeight;
         dfWeightSum += dfWeight;
     }
 }
@@ -2780,24 +2813,24 @@ static inline void GDALResampleConvolutionHorizontal_3rows(
     int i = 0;  // Used after for.
     for (; i < nSrcPixelCount - 3; i += 4)
     {
-        dfVal1 += pChunkRow1[i] * padfWeights[i];
-        dfVal1 += pChunkRow1[i + 1] * padfWeights[i + 1];
-        dfVal2 += pChunkRow1[i + 2] * padfWeights[i + 2];
-        dfVal2 += pChunkRow1[i + 3] * padfWeights[i + 3];
-        dfVal3 += pChunkRow2[i] * padfWeights[i];
-        dfVal3 += pChunkRow2[i + 1] * padfWeights[i + 1];
-        dfVal4 += pChunkRow2[i + 2] * padfWeights[i + 2];
-        dfVal4 += pChunkRow2[i + 3] * padfWeights[i + 3];
-        dfVal5 += pChunkRow3[i] * padfWeights[i];
-        dfVal5 += pChunkRow3[i + 1] * padfWeights[i + 1];
-        dfVal6 += pChunkRow3[i + 2] * padfWeights[i + 2];
-        dfVal6 += pChunkRow3[i + 3] * padfWeights[i + 3];
+        dfVal1 += double(pChunkRow1[i + 0]) * padfWeights[i + 0];
+        dfVal1 += double(pChunkRow1[i + 1]) * padfWeights[i + 1];
+        dfVal2 += double(pChunkRow1[i + 2]) * padfWeights[i + 2];
+        dfVal2 += double(pChunkRow1[i + 3]) * padfWeights[i + 3];
+        dfVal3 += double(pChunkRow2[i + 0]) * padfWeights[i + 0];
+        dfVal3 += double(pChunkRow2[i + 1]) * padfWeights[i + 1];
+        dfVal4 += double(pChunkRow2[i + 2]) * padfWeights[i + 2];
+        dfVal4 += double(pChunkRow2[i + 3]) * padfWeights[i + 3];
+        dfVal5 += double(pChunkRow3[i + 0]) * padfWeights[i + 0];
+        dfVal5 += double(pChunkRow3[i + 1]) * padfWeights[i + 1];
+        dfVal6 += double(pChunkRow3[i + 2]) * padfWeights[i + 2];
+        dfVal6 += double(pChunkRow3[i + 3]) * padfWeights[i + 3];
     }
     for (; i < nSrcPixelCount; ++i)
     {
-        dfVal1 += pChunkRow1[i] * padfWeights[i];
-        dfVal3 += pChunkRow2[i] * padfWeights[i];
-        dfVal5 += pChunkRow3[i] * padfWeights[i];
+        dfVal1 += double(pChunkRow1[i]) * padfWeights[i];
+        dfVal3 += double(pChunkRow2[i]) * padfWeights[i];
+        dfVal5 += double(pChunkRow3[i]) * padfWeights[i];
     }
     dfRes1 = dfVal1 + dfVal2;
     dfRes2 = dfVal3 + dfVal4;
@@ -3432,12 +3465,12 @@ static CPLErr GDALResampleChunk_ConvolutionT(
         {
             if (bNoDataValueInt64Valid)
             {
-                const double fClampedRounded = std::round(fClamped);
+                const double fClampedRounded = double(std::round(fClamped));
                 if (fClampedRounded >=
-                        static_cast<Twork>(
-                            std::numeric_limits<int64_t>::min()) &&
-                    fClampedRounded <=
-                        static_cast<Twork>(9223372036854774784LL) &&
+                        static_cast<double>(static_cast<Twork>(
+                            std::numeric_limits<int64_t>::min())) &&
+                    fClampedRounded <= static_cast<double>(static_cast<Twork>(
+                                           9223372036854774784LL)) &&
                     nNodataValueInt64 ==
                         static_cast<GInt64>(std::round(fClamped)))
                 {
@@ -3446,7 +3479,7 @@ static CPLErr GDALResampleChunk_ConvolutionT(
                 }
             }
         }
-        else if (dfNoDataValue == fClamped)
+        else if (dfNoDataValue == static_cast<double>(fClamped))
         {
             // Do not use the nodata value
             return static_cast<Twork>(dfReplacementVal);
@@ -3941,9 +3974,11 @@ static CPLErr GDALResampleChunk_ConvolutionT(
                         {
                             return std::clamp(
                                        dfVal,
-                                       -std::numeric_limits<Twork>::max() /
+                                       static_cast<double>(
+                                           -std::numeric_limits<Twork>::max()) /
                                            mulFactor,
-                                       std::numeric_limits<Twork>::max() /
+                                       static_cast<double>(
+                                           std::numeric_limits<Twork>::max()) /
                                            mulFactor) *
                                    mulFactor;
                         }
@@ -4066,10 +4101,21 @@ static CPLErr GDALResampleChunk_ConvolutionT(
 
         if (fMaxVal != 0.0f)
         {
-            for (int i = 0; i < nDstXSize; ++i)
+            if constexpr (std::is_same_v<T, double>)
             {
-                if (pafDstScanline[i] > fMaxVal)
-                    pafDstScanline[i] = fMaxVal;
+                for (int i = 0; i < nDstXSize; ++i)
+                {
+                    if (pafDstScanline[i] > static_cast<double>(fMaxVal))
+                        pafDstScanline[i] = static_cast<double>(fMaxVal);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < nDstXSize; ++i)
+                {
+                    if (pafDstScanline[i] > fMaxVal)
+                        pafDstScanline[i] = fMaxVal;
+                }
             }
         }
 
@@ -4334,15 +4380,15 @@ static CPLErr GDALResampleChunkC32R(const int nSrcWidth, const int nSrcHeight,
                 {
                     for (int iX = nSrcXOff; iX < nSrcXOff2; ++iX)
                     {
-                        const double dfR =
+                        const double dfR = double(
                             pafSrcScanline[static_cast<size_t>(iX) * 2 +
                                            static_cast<size_t>(iY - nSrcYOff) *
-                                               nSrcWidth * 2];
-                        const double dfI =
+                                               nSrcWidth * 2]);
+                        const double dfI = double(
                             pafSrcScanline[static_cast<size_t>(iX) * 2 +
                                            static_cast<size_t>(iY - nSrcYOff) *
                                                nSrcWidth * 2 +
-                                           1];
+                                           1]);
                         dfTotalR += dfR;
                         dfTotalI += dfI;
                         dfTotalM += std::hypot(dfR, dfI);
@@ -4363,8 +4409,8 @@ static CPLErr GDALResampleChunkC32R(const int nSrcWidth, const int nSrcHeight,
                     pafDstScanline[iDstPixelSZ * 2 + 1] = static_cast<float>(
                         dfTotalI / static_cast<double>(nCount));
                     const double dfM =
-                        std::hypot(pafDstScanline[iDstPixelSZ * 2],
-                                   pafDstScanline[iDstPixelSZ * 2 + 1]);
+                        double(std::hypot(pafDstScanline[iDstPixelSZ * 2],
+                                          pafDstScanline[iDstPixelSZ * 2 + 1]));
                     const double dfDesiredM =
                         dfTotalM / static_cast<double>(nCount);
                     double dfRatio = 1.0;
@@ -4387,15 +4433,15 @@ static CPLErr GDALResampleChunkC32R(const int nSrcWidth, const int nSrcHeight,
                 {
                     for (int iX = nSrcXOff; iX < nSrcXOff2; ++iX)
                     {
-                        const double dfR =
+                        const double dfR = double(
                             pafSrcScanline[static_cast<size_t>(iX) * 2 +
                                            static_cast<size_t>(iY - nSrcYOff) *
-                                               nSrcWidth * 2];
-                        const double dfI =
+                                               nSrcWidth * 2]);
+                        const double dfI = double(
                             pafSrcScanline[static_cast<size_t>(iX) * 2 +
                                            static_cast<size_t>(iY - nSrcYOff) *
                                                nSrcWidth * 2 +
-                                           1];
+                                           1]);
 
                         dfTotalR += SQUARE(dfR);
                         dfTotalI += SQUARE(dfI);
@@ -4430,15 +4476,15 @@ static CPLErr GDALResampleChunkC32R(const int nSrcWidth, const int nSrcHeight,
                     for (int iX = nSrcXOff; iX < nSrcXOff2; ++iX)
                     {
                         // TODO(schwehr): Maybe use std::complex?
-                        dfTotalR +=
+                        dfTotalR += double(
                             pafSrcScanline[static_cast<size_t>(iX) * 2 +
                                            static_cast<size_t>(iY - nSrcYOff) *
-                                               nSrcWidth * 2];
-                        dfTotalI +=
+                                               nSrcWidth * 2]);
+                        dfTotalI += double(
                             pafSrcScanline[static_cast<size_t>(iX) * 2 +
                                            static_cast<size_t>(iY - nSrcYOff) *
                                                nSrcWidth * 2 +
-                                           1];
+                                           1]);
                         ++nCount;
                     }
                 }
@@ -5217,8 +5263,8 @@ CPLErr GDALRegenerateOverviewsEx(GDALRasterBandH hSrcBand, int nOverviewCount,
                 for (size_t i = 0;
                      i < static_cast<size_t>(nChunkYSizeQueried) * nWidth; i++)
                 {
-                    if (pafChunk[i] == 1.0)
-                        pafChunk[i] = 255.0;
+                    if (pafChunk[i] == 1.0f)
+                        pafChunk[i] = 255.0f;
                 }
             }
             else if (eWrkDataType == GDT_Byte)
@@ -5264,10 +5310,10 @@ CPLErr GDALRegenerateOverviewsEx(GDALRasterBandH hSrcBand, int nOverviewCount,
                 for (size_t i = 0;
                      i < static_cast<size_t>(nChunkYSizeQueried) * nWidth; i++)
                 {
-                    if (pafChunk[i] == 1.0)
-                        pafChunk[i] = 0.0;
-                    else if (pafChunk[i] == 0.0)
-                        pafChunk[i] = 255.0;
+                    if (pafChunk[i] == 1.0f)
+                        pafChunk[i] = 0.0f;
+                    else if (pafChunk[i] == 0.0f)
+                        pafChunk[i] = 255.0f;
                 }
             }
             else if (eWrkDataType == GDT_Byte)
@@ -6713,8 +6759,8 @@ CPLErr CPL_STDCALL GDALComputeBandStats(GDALRasterBandH hSrcBand,
                 fValue = pafData[iPixel];
             }
 
-            dfSum += fValue;
-            dfSum2 += static_cast<double>(fValue) * fValue;
+            dfSum += static_cast<double>(fValue);
+            dfSum2 += static_cast<double>(fValue) * static_cast<double>(fValue);
         }
 
         nSamples += nWidth;
@@ -6864,7 +6910,7 @@ CPLErr GDALOverviewMagnitudeCorrection(GDALRasterBandH hBaseBand,
                 else
                 {
                     pafData[iPixel] = static_cast<float>(
-                        (pafData[iPixel] - dfOverviewMean) * dfGain +
+                        (double(pafData[iPixel]) - dfOverviewMean) * dfGain +
                         dfOrigMean);
                 }
             }

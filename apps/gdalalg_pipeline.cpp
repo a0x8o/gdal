@@ -15,6 +15,9 @@
 #include "gdalalg_abstract_pipeline.h"
 #include "gdal_priv.h"
 
+#include "gdalalg_raster_pipeline.h"
+#include "gdalalg_vector_pipeline.h"
+
 #include "gdalalg_raster_read.h"
 #include "gdalalg_raster_mosaic.h"
 #include "gdalalg_raster_stack.h"
@@ -25,6 +28,7 @@
 #include "gdalalg_vector_sql.h"
 #include "gdalalg_vector_write.h"
 
+#include "gdalalg_raster_as_features.h"
 #include "gdalalg_raster_compare.h"
 #include "gdalalg_raster_contour.h"
 #include "gdalalg_raster_footprint.h"
@@ -440,11 +444,42 @@ bool GDALPipelineStepAlgorithm::CheckSafeForStreamOutput()
 }
 
 /************************************************************************/
+/*                      GDALAlgorithmStepRegistry                       */
+/************************************************************************/
+
+class GDALAlgorithmStepRegistry final : public GDALRasterAlgorithmStepRegistry,
+                                        public GDALVectorAlgorithmStepRegistry
+{
+  public:
+    GDALAlgorithmStepRegistry() = default;
+    ~GDALAlgorithmStepRegistry() override;
+
+    /** Register the algorithm of type MyAlgorithm.
+     */
+    template <class MyAlgorithm>
+    bool Register(const std::string &name = std::string())
+    {
+        static_assert(std::is_base_of_v<GDALPipelineStepAlgorithm, MyAlgorithm>,
+                      "Algorithm is not a GDALPipelineStepAlgorithm");
+
+        AlgInfo info;
+        info.m_name = name.empty() ? MyAlgorithm::NAME : name;
+        info.m_aliases = MyAlgorithm::GetAliasesStatic();
+        info.m_creationFunc = []() -> std::unique_ptr<GDALAlgorithm>
+        { return std::make_unique<MyAlgorithm>(); };
+        return GDALAlgorithmRegistry::Register(info);
+    }
+};
+
+GDALAlgorithmStepRegistry::~GDALAlgorithmStepRegistry() = default;
+
+/************************************************************************/
 /*                       GDALPipelineAlgorithm                          */
 /************************************************************************/
 
 class GDALPipelineAlgorithm final
-    : public GDALAbstractPipelineAlgorithm<GDALPipelineStepAlgorithm>
+    : public GDALAbstractPipelineAlgorithm<GDALPipelineStepAlgorithm,
+                                           GDALAlgorithmStepRegistry>
 
 {
   public:
@@ -484,6 +519,7 @@ class GDALPipelineAlgorithm final
 
         GDALRasterPipelineAlgorithm::RegisterAlgorithms(m_stepRegistry, true);
         GDALVectorPipelineAlgorithm::RegisterAlgorithms(m_stepRegistry, true);
+        m_stepRegistry.Register<GDALRasterAsFeaturesAlgorithm>();
         m_stepRegistry.Register<GDALRasterContourAlgorithm>();
         m_stepRegistry.Register<GDALRasterFootprintAlgorithm>();
         m_stepRegistry.Register<GDALRasterPolygonizeAlgorithm>();

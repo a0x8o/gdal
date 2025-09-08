@@ -299,8 +299,8 @@ class PythonPluginLayer final : public OGRLayer
     mutable PyObject *m_poLayer = nullptr;
     mutable OGRFeatureDefn *m_poFeatureDefn = nullptr;
     mutable CPLString m_osName{};
-    CPLString m_osFIDColumn{};
-    bool m_bHasFIDColumn = false;
+    mutable CPLString m_osFIDColumn{};
+    mutable bool m_bHasFIDColumn = false;
     std::map<CPLString, CPLStringList> m_oMapMD{};
     PyObject *m_pyFeatureByIdMethod = nullptr;
     bool m_bIteratorHonourSpatialFilter = false;
@@ -322,7 +322,7 @@ class PythonPluginLayer final : public OGRLayer
 
   public:
     explicit PythonPluginLayer(PyObject *poLayer);
-    ~PythonPluginLayer();
+    ~PythonPluginLayer() override;
 
     const char *GetName() const override;
     void ResetReading() override;
@@ -332,7 +332,7 @@ class PythonPluginLayer final : public OGRLayer
     const OGRFeatureDefn *GetLayerDefn() const override;
 
     GIntBig GetFeatureCount(int bForce) override;
-    const char *GetFIDColumn() override;
+    const char *GetFIDColumn() const override;
     OGRErr SetAttributeFilter(const char *) override;
 
     OGRErr ISetSpatialFilter(int iGeomField, const OGRGeometry *) override;
@@ -582,7 +582,7 @@ int PythonPluginLayer::TestCapability(const char *pszCap) const
 /*                         GetFIDColumn()                               */
 /************************************************************************/
 
-const char *PythonPluginLayer::GetFIDColumn()
+const char *PythonPluginLayer::GetFIDColumn() const
 {
     if (!m_bHasFIDColumn)
     {
@@ -1418,7 +1418,7 @@ class PythonPluginDataset final : public GDALDataset
 
   public:
     PythonPluginDataset(GDALOpenInfo *poOpenInfo, PyObject *poDataset);
-    ~PythonPluginDataset();
+    ~PythonPluginDataset() override;
 
     int GetLayerCount() const override;
     OGRLayer *GetLayer(int) const override;
@@ -1554,7 +1554,7 @@ char **PythonPluginDataset::GetMetadata(const char *pszDomain)
 /*                          PythonPluginDriver                          */
 /************************************************************************/
 
-class PythonPluginDriver : public GDALDriver
+class PythonPluginDriver final : public GDALDriver
 {
     CPLMutex *m_hMutex = nullptr;
     CPLString m_osFilename;
@@ -1574,7 +1574,7 @@ class PythonPluginDriver : public GDALDriver
   public:
     PythonPluginDriver(const char *pszFilename, const char *pszPluginName,
                        char **papszMD);
-    ~PythonPluginDriver();
+    ~PythonPluginDriver() override;
 };
 
 /************************************************************************/

@@ -76,13 +76,16 @@ class OGRMiraMonLayer final
                     const OGRSpatialReference *poSRS, int bUpdate,
                     CSLConstList papszOpenOptions,
                     struct MiraMonVectMapInfo *MMMap);
-    virtual ~OGRMiraMonLayer();
+    ~OGRMiraMonLayer() override;
 
     void ResetReading() override;
     DEFINE_GET_NEXT_FEATURE_THROUGH_RAW(OGRMiraMonLayer)
 
     OGRErr TranslateFieldsToMM();
     OGRErr TranslateFieldsValuesToMM(OGRFeature *poFeature);
+    static int MM_SprintfDoubleSignifFigures(char *szChain, size_t size_szChain,
+                                             int nSignifFigures,
+                                             double dfRealValue);
     OGRErr IGetExtent(int iGeomField, OGREnvelope *psExtent,
                       bool bForce) override;
 
@@ -115,7 +118,7 @@ class OGRMiraMonDataSource final : public GDALDataset
 
   public:
     OGRMiraMonDataSource();
-    ~OGRMiraMonDataSource();
+    ~OGRMiraMonDataSource() override;
 
     bool Open(const char *pszFilename, VSILFILE *fp,
               const OGRSpatialReference *poSRS, CSLConstList papszOpenOptions);

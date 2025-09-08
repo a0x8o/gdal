@@ -37,9 +37,9 @@ class OGRJSONFGMemLayer final : public OGRMemLayer
   public:
     OGRJSONFGMemLayer(GDALDataset *poDS, const char *pszName,
                       OGRSpatialReference *poSRS, OGRwkbGeometryType eGType);
-    ~OGRJSONFGMemLayer();
+    ~OGRJSONFGMemLayer() override;
 
-    const char *GetFIDColumn() override
+    const char *GetFIDColumn() const override
     {
         return osFIDColumn_.c_str();
     }
@@ -85,7 +85,7 @@ class OGRJSONFGStreamedLayer final
     OGRJSONFGStreamedLayer(GDALDataset *poDS, const char *pszName,
                            OGRSpatialReference *poSRS,
                            OGRwkbGeometryType eGType);
-    ~OGRJSONFGStreamedLayer();
+    ~OGRJSONFGStreamedLayer() override;
 
     // BEGIN specific public API
 
@@ -116,7 +116,7 @@ class OGRJSONFGStreamedLayer final
 
     // END specific public API
 
-    const char *GetFIDColumn() override
+    const char *GetFIDColumn() const override
     {
         return osFIDColumn_.c_str();
     }
@@ -180,7 +180,7 @@ class OGRJSONFGWriteLayer final : public OGRLayer
         std::unique_ptr<OGRCoordinateTransformation> &&poCTToWGS84,
         const std::string &osCoordRefSys, OGRwkbGeometryType eGType,
         CSLConstList papszOptions, OGRJSONFGDataset *poDS);
-    ~OGRJSONFGWriteLayer();
+    ~OGRJSONFGWriteLayer() override;
 
     //
     // OGRLayer Interface
@@ -238,7 +238,7 @@ class OGRJSONFGDataset final : public GDALDataset
 {
   public:
     OGRJSONFGDataset() = default;
-    ~OGRJSONFGDataset();
+    ~OGRJSONFGDataset() override;
 
     bool Open(GDALOpenInfo *poOpenInfo, GeoJSONSourceType nSrcType);
     bool Create(const char *pszName, CSLConstList papszOptions);
@@ -543,7 +543,7 @@ class OGRJSONFGStreamingParser final : public OGRJSONCollectionStreamingParser
 
   public:
     OGRJSONFGStreamingParser(OGRJSONFGReader &oReader, bool bFirstPass);
-    ~OGRJSONFGStreamingParser();
+    ~OGRJSONFGStreamingParser() override;
 
     void SetRequestedLayer(const char *pszRequestedLayer)
     {

@@ -181,7 +181,7 @@ class CPL_DLL OGRLayer : public GDALMajorObject
 
   public:
     OGRLayer();
-    virtual ~OGRLayer();
+    ~OGRLayer() override;
 
     /** Return begin of feature iterator.
      *
@@ -308,8 +308,8 @@ class CPL_DLL OGRLayer : public GDALMajorObject
     virtual void FinishRollbackTransaction(const std::string &osSavepointName);
     //! @endcond
 
-    virtual const char *GetFIDColumn();
-    virtual const char *GetGeometryColumn();
+    virtual const char *GetFIDColumn() const;
+    virtual const char *GetGeometryColumn() const;
 
     virtual OGRErr SetIgnoredFields(CSLConstList papszFields);
 
@@ -603,7 +603,7 @@ class CPL_DLL OGRSFDriver : public GDALDriver
 {
   public:
     //! @cond Doxygen_Suppress
-    virtual ~OGRSFDriver();
+    ~OGRSFDriver() override;
 
     virtual const char *GetName()
         OGR_DEPRECATED("Use GDALDriver class instead") = 0;

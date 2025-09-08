@@ -303,6 +303,7 @@ constexpr static const char* const apszKnownConfigOptions[] =
    "GDAL_HTTP_MULTIRANGE", // from cpl_vsil_curl.cpp
    "GDAL_HTTP_NETRC", // from cpl_http.cpp
    "GDAL_HTTP_NETRC_FILE", // from cpl_http.cpp
+   "GDAL_HTTP_PATH_VERBATIM", // from cpl_http.cpp, cpl_vsil_s3.cpp
    "GDAL_HTTP_PROXY", // from cpl_http.cpp
    "GDAL_HTTP_PROXYUSERPWD", // from cpl_http.cpp
    "GDAL_HTTP_RETRY_CODES", // from cpl_http.cpp
@@ -988,6 +989,7 @@ constexpr static const char* const apszKnownConfigOptions[] =
    "RMF_SET_VERTCS", // from rmfdataset.cpp
    "RPC_INVERSE_LOG", // from gdal_rpc.cpp
    "RPC_INVERSE_VERBOSE", // from gdal_rpc.cpp
+   "RPF_SHOW_ALL_ATTRIBUTES", // from nitfimage.c
    "RPFTOC_FORCE_RGBA", // from rpftocdataset.cpp
    "RPFTOC_MAX_FRAME_COUNT", // from rpftocfile.cpp
    "S57_CSV", // from s57classregistrar.cpp
