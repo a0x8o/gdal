@@ -172,6 +172,7 @@ bak
 bAllowPromotingToCurves
 bAllowResizeOutptr
 bandblockcache
+BandMetadataItem
 BandN
 BandsCount
 bAnglesInPackedDMSFormat
@@ -297,6 +298,8 @@ buildbot
 Buildbot
 BuildVRT
 BuildVRTOptions
+bulleted
+Bulleted
 bumpmap
 BUnits
 bUnlinkAndSeize
@@ -379,6 +382,7 @@ ClassificationCode
 Clayers
 CleanTimeout
 clearerr
+CLI
 clib
 clipdst
 clipdstlayer
@@ -422,6 +426,7 @@ Coeff
 Coefs
 colname
 colorinterp
+ColorInterpretation
 colormap
 colormapped
 colorspace
@@ -456,6 +461,8 @@ connectedness
 const
 constexpr
 contensts
+contextlib
+contextmanager
 ContourOptions
 Contrarty
 conv
@@ -527,6 +534,7 @@ cvs
 Cxx
 Cygwin
 dall
+Damerau
 dan
 DanB
 DanielM
@@ -941,6 +949,7 @@ fpRawL
 fprintf
 fpSource
 fputc
+frac
 franca
 france
 FrankW
@@ -994,6 +1003,8 @@ gdalabstractbandblockcache
 gdaladdo
 gdalalljni
 gdalallregister
+GDALArgDatasetValue
+GDALArgDatasetValue
 gdalarraybandblockcache
 gdalasyncread
 GDALAsyncReader
@@ -1141,6 +1152,7 @@ GetFieldAsDateTime
 GetFieldCount
 GetFieldDefn
 GetFieldSubTypeName
+GetFileList
 GetGeomFieldCount
 GetGeomFieldDefn
 GetLayerDefn
@@ -1206,6 +1218,7 @@ gnot
 Gohlke
 Golang
 Golomb
+Goode
 goog
 googleapis
 gpkg
@@ -1256,6 +1269,7 @@ gz
 gzip
 GZip
 gzipped
+Hadoop
 Haff
 Halasz
 hana
@@ -1318,6 +1332,7 @@ hMaskBand
 hMutex
 hNewSubGeom
 hObject
+hOutDS
 hobu
 hoc
 holded
@@ -1371,6 +1386,7 @@ hypercubes
 hyperspectral
 hypsometric
 Hypsometric
+hZonesDS
 iAxis
 iBand
 iChild
@@ -1580,6 +1596,7 @@ leftfov
 LegalConstraints
 len
 Leveller
+Levenshtein
 lf
 libaom
 libarchive
@@ -1737,6 +1754,7 @@ mapbox
 Mapbox
 Maperitive
 mapFieldType
+Mapfile
 mapinfo
 Mapinfo
 maplist
@@ -1774,6 +1792,7 @@ MaxX
 maxy
 maxY
 MaxY
+maxz
 MaxZ
 mbtiles
 mbtowc
@@ -1802,6 +1821,7 @@ Miara
 MiB
 Microstation
 mif
+MikeS
 millimetric
 mimetype
 miniconda
@@ -1823,6 +1843,7 @@ minX
 miny
 minY
 MinY
+minz
 MinZ
 Mipmaps
 MiraD
@@ -1847,6 +1868,7 @@ Mollweide
 Mongo
 MONGOCXX
 mongocxxv
+MongoDB
 monoblock
 Monospace
 Morissette
@@ -1892,6 +1914,7 @@ multilines
 multilinestring
 multilinestrings
 Multipage
+multipart
 multipatch
 Multiplatform
 multipoint
@@ -2280,6 +2303,7 @@ outptr
 outputBounds
 outputer
 outputSchema
+outString
 Oversample
 OverviewCount
 ovf
@@ -2509,6 +2533,7 @@ poFeatureDefn
 poFieldDefn
 poFilterGeom
 poGCP
+poGeom
 poGeomFieldDefn
 PointFromColumns
 PointOnSurface
@@ -2591,6 +2616,7 @@ precompiled
 precompute
 predefine
 predelete
+preinstalled
 prelimenary
 preload
 premultiplication
@@ -2760,8 +2786,8 @@ rasterization
 rasterize
 Rasterize
 rasterized
-rasterizes
 RasterizeOptions
+rasterizes
 rasterizing
 rasterlite
 Rasterlite
@@ -3094,6 +3120,7 @@ StartTransaction
 stat'ed
 stateful
 stderr
+stdev
 stdin
 stdout
 stealInteriorRing
@@ -3132,6 +3159,8 @@ Struve
 styleurl
 styleurls
 su
+subalgorithm
+subalgorithms
 subarcs
 subarray
 subbottom
@@ -3584,6 +3613,8 @@ webmercator
 WebP
 WEBP
 webviewer
+weighted_frac
+weighted_stdev
 wellformedness
 Westervelt
 westing

@@ -29,6 +29,7 @@
 
 #include <cwchar>
 #include <type_traits>
+#include <filesystem>
 
 /************************************************************************/
 /* ==================================================================== */
@@ -115,6 +116,7 @@ class VSIWin32Handle final : public VSIVirtualHandle
     bool m_bWriteThrough = false;
 
     bool m_bCancelCreation = false;
+    std::string m_osFilename{};
     std::string m_osFilenameToSetAtCloseTime{};
 
     VSIWin32Handle() = default;
@@ -348,8 +350,17 @@ int VSIWin32Handle::Close()
         ret = ret2;
     hFile = nullptr;
 
-    if (m_bCancelCreation && !m_osFilenameToSetAtCloseTime.empty())
-        VSIUnlink(m_osFilenameToSetAtCloseTime.c_str());
+    if (m_bCancelCreation && m_osFilenameToSetAtCloseTime.empty())
+        ret = VSIUnlink(m_osFilename.c_str());
+    else if (m_bCancelCreation && !m_osFilenameToSetAtCloseTime.empty())
+    {
+        ret = VSIUnlink((m_osFilenameToSetAtCloseTime + ".tmp_hidden").c_str());
+        VSIStatBufL sStatBuf;
+        if (ret != 0 &&
+            VSIStatL((m_osFilenameToSetAtCloseTime + ".tmp_hidden").c_str(),
+                     &sStatBuf) != 0)
+            ret = 0;
+    }
 
     return ret;
 }
@@ -964,6 +975,7 @@ VSIWin32FilesystemHandler::Open(const char *pszFilename, const char *pszAccess,
     auto poHandle = std::make_unique<VSIWin32Handle>();
 
     poHandle->hFile = hFile;
+    poHandle->m_osFilename = pszFilename;
     poHandle->m_bWriteThrough = bWriteThrough;
 
     if (strchr(pszAccess, 'a') != nullptr)
@@ -1207,6 +1219,7 @@ VSIWin32FilesystemHandler::CreateOnlyVisibleAtCloseTime(
 
             poHandle->hFile = hFile;
             poHandle->m_bWriteThrough = bWriteThrough;
+            poHandle->m_osFilename = pszFilename;
             poHandle->m_osFilenameToSetAtCloseTime = osFullFilename;
 
             return VSIVirtualHandleUniquePtr(poHandle.release());
@@ -1324,22 +1337,18 @@ int VSIWin32FilesystemHandler::Rename(const char *oldpath, const char *newpath,
                                       GDALProgressFunc, void *)
 
 {
+    std::error_code ec{};
     if (CPLTestBool(CPLGetConfigOption("GDAL_FILENAME_IS_UTF8", "YES")))
     {
-        wchar_t *pwszOldPath =
-            CPLRecodeToWChar(oldpath, CPL_ENC_UTF8, CPL_ENC_UCS2);
-        wchar_t *pwszNewPath =
-            CPLRecodeToWChar(newpath, CPL_ENC_UTF8, CPL_ENC_UCS2);
-
-        const int nResult = _wrename(pwszOldPath, pwszNewPath);
-        CPLFree(pwszOldPath);
-        CPLFree(pwszNewPath);
-        return nResult;
+        std::filesystem::rename(std::filesystem::u8path(oldpath),
+                                std::filesystem::u8path(newpath), ec);
     }
     else
     {
-        return rename(oldpath, newpath);
+        std::filesystem::rename(std::filesystem::path(oldpath),
+                                std::filesystem::path(newpath), ec);
     }
+    return ec ? -1 : 0;
 }
 
 /************************************************************************/

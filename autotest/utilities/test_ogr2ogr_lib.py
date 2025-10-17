@@ -921,12 +921,17 @@ def get_sqlite_version():
     get_sqlite_version() < (3, 24, 0),
     reason="sqlite >= 3.24 needed",
 )
-def test_ogr2ogr_upsert(tmp_vsimem):
+@pytest.mark.parametrize("output_format", ["GPKG", "SQLite"])
+def test_ogr2ogr_upsert(tmp_vsimem, output_format):
 
-    filename = tmp_vsimem / "test_ogr_gpkg_upsert_without_fid.gpkg"
+    filename = tmp_vsimem / (
+        "test_ogr_gpkg_upsert_without_fid." + output_format.lower()
+    )
 
     def create_gpkg_file():
-        ds = gdal.GetDriverByName("GPKG").Create(filename, 0, 0, 0, gdal.GDT_Unknown)
+        ds = gdal.GetDriverByName(output_format).Create(
+            filename, 0, 0, 0, gdal.GDT_Unknown
+        )
         lyr = ds.CreateLayer("foo")
         assert lyr.CreateField(ogr.FieldDefn("other", ogr.OFTString)) == ogr.OGRERR_NONE
         unique_field = ogr.FieldDefn("unique_field", ogr.OFTString)
@@ -959,19 +964,21 @@ def test_ogr2ogr_upsert(tmp_vsimem):
         lyr.CreateFeature(f)
         return srcDS
 
-    assert (
-        gdal.VectorTranslate(filename, create_src_file(), accessMode="upsert")
-        is not None
-    )
+    if output_format == "SQLite":
+        with pytest.raises(Exception, match="SQLite driver doest not support upsert"):
+            gdal.VectorTranslate(filename, create_src_file(), accessMode="upsert")
+    else:
+        assert (
+            gdal.VectorTranslate(filename, create_src_file(), accessMode="upsert")
+            is not None
+        )
 
-    ds = ogr.Open(filename)
-    lyr = ds.GetLayer(0)
-    f = lyr.GetFeature(2)
-    assert f["unique_field"] == "2"
-    assert f["other"] == "foo"
-    assert f.GetGeometryRef().ExportToWkt() == "POINT (10 10)"
-    ds = None
-    gdal.Unlink(filename)
+        ds = ogr.Open(filename)
+        lyr = ds.GetLayer(0)
+        f = lyr.GetFeature(2)
+        assert f["unique_field"] == "2"
+        assert f["other"] == "foo"
+        assert f.GetGeometryRef().ExportToWkt() == "POINT (10 10)"
 
 
 ###############################################################################
@@ -3282,3 +3289,74 @@ def test_ogr2ogr_lib_progress_huge_feature_count():
         callback=mycallback,
         callback_data=tab,
     )
+
+
+###############################################################################
+
+
+@pytest.mark.require_geos
+def test_ogr2ogr_lib_clip_promote_poly_to_multipoly():
+
+    src_ds = gdaltest.wkt_ds(
+        "MULTIPOLYGON(((0 0,0 10,10 10,10 0,0 0)))", geom_type=ogr.wkbMultiPolygon
+    )
+    out_ds = gdal.VectorTranslate(
+        "", src_ds, format="MEM", clipSrc="POLYGON((1 1,2 1,2 2,1 2,1 1))"
+    )
+    out_lyr = out_ds.GetLayer(0)
+    f = out_lyr.GetNextFeature()
+    assert f.GetGeometryRef().GetGeometryType() == ogr.wkbMultiPolygon
+
+
+###############################################################################
+
+
+@pytest.mark.require_geos
+def test_ogr2ogr_lib_clip_promote_poly_to_geometry_collection():
+
+    src_ds = gdaltest.wkt_ds(
+        "MULTIPOLYGON(((0 0,0 10,10 10,10 0,0 0)))", geom_type=ogr.wkbGeometryCollection
+    )
+    out_ds = gdal.VectorTranslate(
+        "", src_ds, format="MEM", clipSrc="POLYGON((1 1,2 1,2 2,1 2,1 1))"
+    )
+    out_lyr = out_ds.GetLayer(0)
+    f = out_lyr.GetNextFeature()
+    assert f.GetGeometryRef().GetGeometryType() == ogr.wkbGeometryCollection
+    assert f.GetGeometryRef().GetGeometryRef(0).GetGeometryType() == ogr.wkbPolygon
+
+
+###############################################################################
+
+
+@pytest.mark.require_geos
+def test_ogr2ogr_lib_clip_demote_multipoly_to_poly():
+
+    src_ds = gdaltest.wkt_ds(
+        "MULTIPOLYGON(((0 0,0 10,10 10,10 0,0 0)))", geom_type=ogr.wkbPolygon
+    )
+    out_ds = gdal.VectorTranslate(
+        "", src_ds, format="MEM", clipSrc="POLYGON((1 1,2 1,2 2,1 2,1 1))"
+    )
+    out_lyr = out_ds.GetLayer(0)
+    f = out_lyr.GetNextFeature()
+    assert f.GetGeometryRef().GetGeometryType() == ogr.wkbPolygon
+
+
+###############################################################################
+
+
+@pytest.mark.require_geos
+def test_ogr2ogr_lib_clip_promote_poly_to_geometry_collection_bis():
+
+    src_ds = gdaltest.wkt_ds(
+        "GEOMETRYCOLLECTION(POINT(0 0),POINT(10 10))",
+        geom_type=ogr.wkbGeometryCollection,
+    )
+    out_ds = gdal.VectorTranslate(
+        "", src_ds, format="MEM", clipSrc="POLYGON((0 0,0 10,10 10,10 0,0 0))"
+    )
+    out_lyr = out_ds.GetLayer(0)
+    f = out_lyr.GetNextFeature()
+    assert f.GetGeometryRef().GetGeometryType() == ogr.wkbGeometryCollection
+    assert f.GetGeometryRef().GetGeometryCount() == 2

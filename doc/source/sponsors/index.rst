@@ -51,6 +51,13 @@ the health of the project:
            :width: 240 px
            :target: https://www.safe.com
 
+    .. container:: horizontal-logo
+
+        .. image:: ../../images/sponsors/logo-google.png
+           :class: img-logos
+           :width: 240 px
+           :target: https://google.com
+
 
 
 - Bronze level:
@@ -83,10 +90,10 @@ the health of the project:
 
     .. container:: horizontal-logo
 
-        .. image:: ../../images/sponsors/logo-maxar.png
+        .. image:: ../../images/sponsors/logo-vantor.png
            :class: img-logos
            :width: 150 px
-           :target: https://www.maxar.com
+           :target: https://www.vantor.com
 
 
 - Supporter level:

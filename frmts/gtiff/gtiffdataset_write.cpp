@@ -36,7 +36,8 @@
 #include "cpl_vsi_virtual.h"
 #include "cpl_worker_thread_pool.h"
 #include "fetchbufferdirectio.h"
-#include "gdal_mdreader.h"          // GDALWriteRPCTXTFile()
+#include "gdal_mdreader.h"  // GDALWriteRPCTXTFile()
+#include "gdal_priv.h"
 #include "gdal_priv_templates.hpp"  // GDALIsValueInRange<>
 #include "gdal_thread_pool.h"       // GDALGetGlobalThreadPool()
 #include "geovalues.h"              // RasterPixelIsPoint
@@ -2087,7 +2088,7 @@ void GTiffDataset::Crystalize()
 
     // TODO: libtiff writes extended tags in the order they are specified
     // and not in increasing order.
-    WriteMetadata(this, m_hTIFF, true, m_eProfile, m_pszFilename,
+    WriteMetadata(this, m_hTIFF, true, m_eProfile, m_osFilename.c_str(),
                   m_papszCreationOptions);
     WriteGeoTIFFInfo();
     if (m_bNoDataSet)
@@ -2259,8 +2260,8 @@ CPLErr GTiffDataset::FlushDirectory()
         if (m_bMetadataChanged)
         {
             m_bNeedsRewrite =
-                WriteMetadata(this, m_hTIFF, true, m_eProfile, m_pszFilename,
-                              m_papszCreationOptions);
+                WriteMetadata(this, m_hTIFF, true, m_eProfile,
+                              m_osFilename.c_str(), m_papszCreationOptions);
             m_bMetadataChanged = false;
 
             if (m_bForceUnsetRPC)
@@ -2277,8 +2278,11 @@ CPLErr GTiffDataset::FlushDirectory()
                     m_bNeedsRewrite = true;
                 }
 
-                GDALWriteRPCTXTFile(m_pszFilename, nullptr);
-                GDALWriteRPBFile(m_pszFilename, nullptr);
+                if (m_poBaseDS == nullptr)
+                {
+                    GDALWriteRPCTXTFile(m_osFilename.c_str(), nullptr);
+                    GDALWriteRPBFile(m_osFilename.c_str(), nullptr);
+                }
             }
         }
 
@@ -2584,7 +2588,8 @@ CPLErr GTiffDataset::RegisterNewOverviewDataset(toff_t nOverviewOffset,
 
     GTiffDataset *poODS = new GTiffDataset();
     poODS->ShareLockWithParentDataset(this);
-    poODS->m_pszFilename = CPLStrdup(m_pszFilename);
+    poODS->eAccess = GA_Update;
+    poODS->m_osFilename = m_osFilename;
     const char *pszSparseOK = GetOptionValue("SPARSE_OK", "SPARSE_OK_OVERVIEW");
     if (pszSparseOK && CPLTestBool(pszSparseOK))
     {
@@ -2999,8 +3004,9 @@ CPLErr GTiffDataset::CreateInternalMaskOverviews(int nOvrBlockXSize,
                 }
 
                 GTiffDataset *poODS = new GTiffDataset();
+                poODS->eAccess = GA_Update;
                 poODS->ShareLockWithParentDataset(this);
-                poODS->m_pszFilename = CPLStrdup(m_pszFilename);
+                poODS->m_osFilename = m_osFilename;
                 if (poODS->OpenOffset(VSI_TIFFOpenChild(m_hTIFF),
                                       nOverviewOffset, GA_Update) != CE_None)
                 {
@@ -3975,11 +3981,14 @@ void GTiffDataset::WriteGeoTIFFInfo()
                 TIFFSetField(m_hTIFF, TIFFTAG_GEOTRANSMATRIX, 16, adfMatrix);
         }
 
-        // Do we need a world file?
-        if (CPLFetchBool(m_papszCreationOptions, "TFW", false))
-            GDALWriteWorldFile(m_pszFilename, "tfw", m_gt.data());
-        else if (CPLFetchBool(m_papszCreationOptions, "WORLDFILE", false))
-            GDALWriteWorldFile(m_pszFilename, "wld", m_gt.data());
+        if (m_poBaseDS == nullptr)
+        {
+            // Do we need a world file?
+            if (CPLFetchBool(m_papszCreationOptions, "TFW", false))
+                GDALWriteWorldFile(m_osFilename.c_str(), "tfw", m_gt.data());
+            else if (CPLFetchBool(m_papszCreationOptions, "WORLDFILE", false))
+                GDALWriteWorldFile(m_osFilename.c_str(), "wld", m_gt.data());
+        }
     }
     else if (GetGCPCount() > 0 && GetGCPCount() <= knMAX_GCP_COUNT &&
              m_eProfile != GTiffProfile::BASELINE)
@@ -4367,10 +4376,11 @@ bool GTiffDataset::WriteMetadata(GDALDataset *poSrcDS, TIFF *l_hTIFF,
     char **papszSrcMDD =
         CSLFetchNameValueMultiple(papszCreationOptions, "SRC_MDD");
 
-    if (bSrcIsGeoTIFF)
+    GTiffDataset *poSrcDSGTiff =
+        bSrcIsGeoTIFF ? cpl::down_cast<GTiffDataset *>(poSrcDS) : nullptr;
+
+    if (poSrcDSGTiff)
     {
-        GTiffDataset *poSrcDSGTiff = cpl::down_cast<GTiffDataset *>(poSrcDS);
-        assert(poSrcDSGTiff);
         WriteMDMetadata(&poSrcDSGTiff->m_oGTiffMDMD, l_hTIFF, &psRoot, &psTail,
                         0, eProfile);
     }
@@ -4426,7 +4436,8 @@ bool GTiffDataset::WriteMetadata(GDALDataset *poSrcDS, TIFF *l_hTIFF,
         }
     }
 
-    if (!bExcludeRPBandIMGFileWriting)
+    if (!bExcludeRPBandIMGFileWriting &&
+        (!poSrcDSGTiff || poSrcDSGTiff->m_poBaseDS == nullptr))
     {
         WriteRPC(poSrcDS, l_hTIFF, bSrcIsGeoTIFF, eProfile, pszTIFFFilename,
                  papszCreationOptions);
@@ -4683,17 +4694,19 @@ bool GTiffDataset::WriteMetadata(GDALDataset *poSrcDS, TIFF *l_hTIFF,
             else
             {
                 fDistance = GTiffGetJXLDistance(papszCreationOptions);
-                AppendMetadataItem(&psRoot, &psTail, "JXL_DISTANCE",
-                                   CPLSPrintf("%f", fDistance), 0, nullptr,
-                                   "IMAGE_STRUCTURE");
+                AppendMetadataItem(
+                    &psRoot, &psTail, "JXL_DISTANCE",
+                    CPLSPrintf("%f", static_cast<double>(fDistance)), 0,
+                    nullptr, "IMAGE_STRUCTURE");
             }
             const float fAlphaDistance =
                 GTiffGetJXLAlphaDistance(papszCreationOptions);
             if (fAlphaDistance >= 0.0f && fAlphaDistance != fDistance)
             {
-                AppendMetadataItem(&psRoot, &psTail, "JXL_ALPHA_DISTANCE",
-                                   CPLSPrintf("%f", fAlphaDistance), 0, nullptr,
-                                   "IMAGE_STRUCTURE");
+                AppendMetadataItem(
+                    &psRoot, &psTail, "JXL_ALPHA_DISTANCE",
+                    CPLSPrintf("%f", static_cast<double>(fAlphaDistance)), 0,
+                    nullptr, "IMAGE_STRUCTURE");
             }
             AppendMetadataItem(
                 &psRoot, &psTail, "JXL_EFFORT",
@@ -4966,7 +4979,7 @@ void GTiffDataset::SaveICCProfile(GTiffDataset *pDS, TIFF *l_hTIFF,
                 if (j == 2)
                 {
                     // Last term of xyY color must be 1.0.
-                    if (v != 1.0)
+                    if (v != 1.0f)
                     {
                         bOutputCHR = false;
                         break;
@@ -5011,7 +5024,7 @@ void GTiffDataset::SaveICCProfile(GTiffDataset *pDS, TIFF *l_hTIFF,
                     if (j == 2)
                     {
                         // Last term of xyY color must be 1.0.
-                        if (v != 1.0)
+                        if (v != 1.0f)
                         {
                             bOutputWhitepoint = false;
                             break;
@@ -5963,8 +5976,10 @@ TIFF *GTiffDataset::CreateLL(const char *pszFilename, int nXSize, int nYSize,
     VSIErrorReset();
     const bool bOnlyVisibleAtCloseTime = CPLTestBool(CSLFetchNameValueDef(
         papszParamList, "@CREATE_ONLY_VISIBLE_AT_CLOSE_TIME", "NO"));
+    const bool bSuppressASAP = CPLTestBool(
+        CSLFetchNameValueDef(papszParamList, "@SUPPRESS_ASAP", "NO"));
     auto l_fpL =
-        bOnlyVisibleAtCloseTime && !bAppend
+        (bOnlyVisibleAtCloseTime || bSuppressASAP) && !bAppend
             ? VSIFileManager::GetHandler(pszFilename)
                   ->CreateOnlyVisibleAtCloseTime(pszFilename, true, nullptr)
                   .release()
@@ -5980,6 +5995,12 @@ TIFF *GTiffDataset::CreateLL(const char *pszFilename, int nXSize, int nYSize,
                                  .c_str());
         return nullptr;
     }
+
+    if (bSuppressASAP)
+    {
+        l_fpL->CancelCreation();
+    }
+
     TIFF *l_hTIFF = VSI_TIFFOpen(pszFilename, szOpeningFlag, l_fpL);
     if (l_hTIFF == nullptr)
     {
@@ -6308,8 +6329,10 @@ TIFF *GTiffDataset::CreateLL(const char *pszFilename, int nXSize, int nYSize,
         TIFFSetField(l_hTIFF, TIFFTAG_JXL_LOSSYNESS,
                      l_bJXLLossless ? JXL_LOSSLESS : JXL_LOSSY);
         TIFFSetField(l_hTIFF, TIFFTAG_JXL_EFFORT, l_nJXLEffort);
-        TIFFSetField(l_hTIFF, TIFFTAG_JXL_DISTANCE, l_fJXLDistance);
-        TIFFSetField(l_hTIFF, TIFFTAG_JXL_ALPHA_DISTANCE, l_fJXLAlphaDistance);
+        TIFFSetField(l_hTIFF, TIFFTAG_JXL_DISTANCE,
+                     static_cast<double>(l_fJXLDistance));
+        TIFFSetField(l_hTIFF, TIFFTAG_JXL_ALPHA_DISTANCE,
+                     static_cast<double>(l_fJXLAlphaDistance));
     }
 #endif
     if (l_nCompression == COMPRESSION_WEBP)
@@ -6755,6 +6778,10 @@ GDALDataset *GTiffDataset::Create(const char *pszFilename, int nXSize,
     GTiffDataset *poDS = new GTiffDataset();
     poDS->m_hTIFF = l_hTIFF;
     poDS->m_fpL = l_fpL;
+    const bool bSuppressASAP = CPLTestBool(
+        CSLFetchNameValueDef(papszParamList, "@SUPPRESS_ASAP", "NO"));
+    if (bSuppressASAP)
+        poDS->MarkSuppressOnClose();
     if (bStreaming)
     {
         poDS->m_bStreamingOut = true;
@@ -6775,7 +6802,7 @@ GDALDataset *GTiffDataset::Create(const char *pszFilename, int nXSize,
 
     poDS->m_bCrystalized = false;
     poDS->m_nSamplesPerPixel = static_cast<uint16_t>(l_nBands);
-    poDS->m_pszFilename = CPLStrdup(pszFilename);
+    poDS->m_osFilename = pszFilename;
 
     // Don't try to load external metadata files (#6597).
     poDS->m_bIMDRPCMetadataLoaded = true;
@@ -8166,9 +8193,13 @@ GDALDataset *GTiffDataset::CreateCopy(const char *pszFilename,
     /*      Create a corresponding GDALDataset.                             */
     /* -------------------------------------------------------------------- */
     GTiffDataset *poDS = new GTiffDataset();
+    const bool bSuppressASAP =
+        CPLTestBool(CSLFetchNameValueDef(papszOptions, "@SUPPRESS_ASAP", "NO"));
+    if (bSuppressASAP)
+        poDS->MarkSuppressOnClose();
     poDS->SetDescription(pszFilename);
     poDS->eAccess = GA_Update;
-    poDS->m_pszFilename = CPLStrdup(pszFilename);
+    poDS->m_osFilename = pszFilename;
     poDS->m_fpL = l_fpL;
     poDS->m_bIMDRPCMetadataLoaded = true;
     poDS->m_nColorTableMultiplier = nColorTableMultiplier;
@@ -8435,9 +8466,10 @@ GDALDataset *GTiffDataset::CreateCopy(const char *pszFilename,
         TIFFSetField(l_hTIFF, TIFFTAG_JXL_LOSSYNESS,
                      poDS->m_bJXLLossless ? JXL_LOSSLESS : JXL_LOSSY);
         TIFFSetField(l_hTIFF, TIFFTAG_JXL_EFFORT, poDS->m_nJXLEffort);
-        TIFFSetField(l_hTIFF, TIFFTAG_JXL_DISTANCE, poDS->m_fJXLDistance);
+        TIFFSetField(l_hTIFF, TIFFTAG_JXL_DISTANCE,
+                     static_cast<double>(poDS->m_fJXLDistance));
         TIFFSetField(l_hTIFF, TIFFTAG_JXL_ALPHA_DISTANCE,
-                     poDS->m_fJXLAlphaDistance);
+                     static_cast<double>(poDS->m_fJXLAlphaDistance));
     }
 #endif
     if (l_nCompression == COMPRESSION_WEBP)
@@ -8911,17 +8943,22 @@ GDALDataset *GTiffDataset::CreateCopy(const char *pszFilename,
 
     if (eErr == CE_Failure)
     {
-        l_fpL->CancelCreation();
-        delete poDS;
-        poDS = nullptr;
-
         if (CPLTestBool(CPLGetConfigOption("GTIFF_DELETE_ON_ERROR", "YES")))
         {
+            l_fpL->CancelCreation();
+            delete poDS;
+            poDS = nullptr;
+
             if (!bStreaming)
             {
                 // Should really delete more carefully.
                 VSIUnlink(pszFilename);
             }
+        }
+        else
+        {
+            delete poDS;
+            poDS = nullptr;
         }
     }
 
@@ -9371,9 +9408,11 @@ CPLErr GTiffDataset::CreateMaskBand(int nFlagsIn)
             return CE_Failure;
 
         m_poMaskDS = new GTiffDataset();
+        m_poMaskDS->eAccess = GA_Update;
         m_poMaskDS->m_poBaseDS = this;
         m_poMaskDS->m_poImageryDS = this;
         m_poMaskDS->ShareLockWithParentDataset(this);
+        m_poMaskDS->m_osFilename = m_osFilename;
         m_poMaskDS->m_bPromoteTo8Bits = CPLTestBool(
             CPLGetConfigOption("GDAL_TIFF_INTERNAL_MASK_TO_8BIT", "YES"));
         if (m_poMaskDS->OpenOffset(VSI_TIFFOpenChild(m_hTIFF), nOffset,

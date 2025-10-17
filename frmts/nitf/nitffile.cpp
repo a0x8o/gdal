@@ -450,9 +450,10 @@ retry_read_header:
 /*                             NITFClose()                              */
 /************************************************************************/
 
-void NITFClose(NITFFile *psFile)
+bool NITFClose(NITFFile *psFile)
 
 {
+    bool ret = true;
     int iSegment;
 
     for (iSegment = 0; iSegment < psFile->nSegmentCount; iSegment++)
@@ -474,7 +475,7 @@ void NITFClose(NITFFile *psFile)
 
     CPLFree(psFile->pasSegmentInfo);
     if (psFile->fp != nullptr)
-        CPL_IGNORE_RET_VAL(VSIFCloseL(psFile->fp));
+        ret = VSIFCloseL(psFile->fp) == 0;
     CPLFree(psFile->pachHeader);
     CSLDestroy(psFile->papszMetadata);
     CPLFree(psFile->pachTRE);
@@ -483,6 +484,7 @@ void NITFClose(NITFFile *psFile)
         CPLDestroyXMLNode(psFile->psNITFSpecNode);
 
     CPLFree(psFile);
+    return ret;
 }
 
 static bool NITFGotoOffset(VSILFILE *fp, GUIntBig nLocation)
@@ -2745,7 +2747,6 @@ static char **NITFGenericMetadataReadTREInternal(
             }
             if (pszName != nullptr && nLength > 0)
             {
-                char *pszMDItemName;
                 char **papszTmp = nullptr;
                 char *pszValue = nullptr;
 
@@ -2761,8 +2762,8 @@ static char **NITFGenericMetadataReadTREInternal(
                     break;
                 }
 
-                pszMDItemName =
-                    CPLStrdup(CPLSPrintf("%s%s", pszMDPrefix, pszName));
+                const std::string osMDItemName =
+                    CPLSPrintf("%s%s", pszMDPrefix, pszName);
 
                 if (strcmp(pszType, "IEEE754_Float32_BigEndian") == 0)
                 {
@@ -2774,8 +2775,8 @@ static char **NITFGenericMetadataReadTREInternal(
                         CPL_MSBPTR32(&f);
                         pszValue = static_cast<char *>(CPLMalloc(nBufferSize));
                         CPLsnprintf(pszValue, nBufferSize, "%f", f);
-                        papszTmp =
-                            CSLSetNameValue(papszTmp, pszMDItemName, pszValue);
+                        papszTmp = CSLSetNameValue(
+                            papszTmp, osMDItemName.c_str(), pszValue);
                     }
                     else
                     {
@@ -2798,8 +2799,8 @@ static char **NITFGenericMetadataReadTREInternal(
                         const int nBufferSize = 24;
                         pszValue = static_cast<char *>(CPLMalloc(nBufferSize));
                         CPLsnprintf(pszValue, nBufferSize, "%.17g", df);
-                        papszTmp =
-                            CSLSetNameValue(papszTmp, pszMDItemName, pszValue);
+                        papszTmp = CSLSetNameValue(
+                            papszTmp, osMDItemName.c_str(), pszValue);
                     }
                     else
                     {
@@ -2832,8 +2833,8 @@ static char **NITFGenericMetadataReadTREInternal(
                         pszValue = static_cast<char *>(CPLMalloc(nBufferSize));
                         CPLsnprintf(pszValue, nBufferSize, CPL_FRMT_GUIB,
                                     static_cast<GUIntBig>(nVal));
-                        papszTmp =
-                            CSLSetNameValue(papszTmp, pszMDItemName, pszValue);
+                        papszTmp = CSLSetNameValue(
+                            papszTmp, osMDItemName.c_str(), pszValue);
                     }
                     else
                     {
@@ -2849,16 +2850,16 @@ static char **NITFGenericMetadataReadTREInternal(
                 else if (strcmp(pszType, "ISO8859-1") == 0)
                 {
                     NITFExtractMetadata(&papszTmp, pachTRE, *pnTreOffset,
-                                        nLength, pszMDItemName);
+                                        nLength, osMDItemName.c_str());
 
-                    pszValue =
-                        CPLStrdup(CSLFetchNameValue(papszTmp, pszMDItemName));
+                    pszValue = CPLStrdup(
+                        CSLFetchNameValue(papszTmp, osMDItemName.c_str()));
                 }
                 else
                 {
-                    NITFExtractAndRecodeMetadata(&papszTmp, pachTRE,
-                                                 *pnTreOffset, nLength,
-                                                 pszMDItemName, CPL_ENC_UTF8);
+                    NITFExtractAndRecodeMetadata(
+                        &papszTmp, pachTRE, *pnTreOffset, nLength,
+                        osMDItemName.c_str(), CPL_ENC_UTF8);
 
                     pszValue = CPLStrdup(strchr(papszTmp[0], '=') + 1);
                 }
@@ -2987,7 +2988,6 @@ static char **NITFGenericMetadataReadTREInternal(
                     }
                 }
 
-                CPLFree(pszMDItemName);
                 CPLFree(pszValue);
 
                 *pnTreOffset += nLength;

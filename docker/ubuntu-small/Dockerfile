@@ -52,7 +52,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     && apt-get update -y \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --fix-missing --no-install-recommends \
             build-essential ca-certificates ccache \
-            git make ninja-build cmake wget unzip libtool automake \
+            git make ninja-build cmake unzip libtool automake \
             zlib1g-dev${APT_ARCH_SUFFIX} libsqlite3-dev${APT_ARCH_SUFFIX} pkg-config sqlite3 libcurl4-openssl-dev${APT_ARCH_SUFFIX} \
             libtiff-dev${APT_ARCH_SUFFIX} \
             patchelf \
@@ -91,7 +91,7 @@ ARG PROJ_VERSION=master
 RUN --mount=type=cache,id=ubuntu-small-proj,target=$HOME/.cache \
     . /buildscripts/bh-set-envvars.sh \
     && mkdir proj \
-    && wget -q https://github.com/OSGeo/PROJ/archive/${PROJ_VERSION}.tar.gz -O - \
+    && curl -Lo - -fsS https://github.com/OSGeo/PROJ/archive/${PROJ_VERSION}.tar.gz \
         | tar xz -C proj --strip-components=1 \
     && export PROJ_DB_CACHE_PARAM="" \
     && cd proj \
@@ -160,7 +160,7 @@ RUN --mount=type=cache,id=ubuntu-small-gdal,target=$HOME/.cache \
         export GDAL_CMAKE_EXTRA_OPTS=""; \
     fi \
     && mkdir gdal \
-    && wget -q https://github.com/${GDAL_REPOSITORY}/archive/${GDAL_VERSION}.tar.gz -O - \
+    && curl -Lo - -fsS https://github.com/${GDAL_REPOSITORY}/archive/${GDAL_VERSION}.tar.gz \
         | tar xz -C gdal --strip-components=1 \
     && cd gdal \
     && if test "${RSYNC_REMOTE:-}" != ""; then \
@@ -244,6 +244,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         libdeflate0 \
         libzstd1 bash libpq5 libssl3 libopenjp2-7 libspatialite8 \
         libmuparser2v5 \
+        libtcmalloc-minimal4 \
     && apt-get install -y python-is-python3
 
 # Order layers starting with less frequently varying ones
@@ -267,5 +268,8 @@ COPY --from=builder  /build_gdal_version_changing/usr/ /usr/
 RUN ldconfig
 
 RUN echo "source /usr/share/bash-completion/bash_completion" >> /root/.bashrc
+
+# Set tcmalloc as the allocator to improve multi-threaded performance
+ENV LD_PRELOAD=libtcmalloc_minimal.so.4
 
 CMD ["/bin/bash", "-l"]

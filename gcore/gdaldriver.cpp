@@ -28,6 +28,7 @@
 #include "cpl_conv.h"
 #include "cpl_error.h"
 #include "cpl_minixml.h"
+#include "cpl_multiproc.h"
 #include "cpl_progress.h"
 #include "cpl_string.h"
 #include "cpl_vsi.h"
@@ -172,7 +173,7 @@ GDALDataset *GDALDriver::Open(GDALOpenInfo *poOpenInfo, bool bSetOpenOptions)
  * file handle, but also ensures that all the data and metadata has been written
  * to the dataset (GDALFlushCache() is not sufficient for that purpose).
  *
- * In GDAL 2, the arguments nXSize, nYSize and nBands can be passed to 0 when
+ * The arguments nXSize, nYSize and nBands can be passed to 0 when
  * creating a vector-only dataset for a compatible driver.
  *
  * Equivalent of the C function GDALCreate().
@@ -1682,26 +1683,67 @@ CPLErr GDALDriver::Delete(const char *pszFilename)
         return CE_Failure;
     }
 
-    char **papszFileList = GDALGetFileList(hDS);
+    const CPLStringList aosFileList(GDALGetFileList(hDS));
 
     GDALClose(hDS);
     hDS = nullptr;
 
-    if (CSLCount(papszFileList) == 0)
+    if (aosFileList.empty())
     {
         CPLError(CE_Failure, CPLE_NotSupported,
                  "Unable to determine files associated with %s, "
                  "delete fails.",
                  pszFilename);
-        CSLDestroy(papszFileList);
         return CE_Failure;
+    }
+
+    return Delete(nullptr, aosFileList.List());
+}
+
+/************************************************************************/
+/*                               Delete()                               */
+/************************************************************************/
+
+/**
+ * \brief Delete a currently opened dataset
+ *
+ * The driver will attempt to delete the passed dataset in a driver specific
+ * fashion.  Full featured drivers will delete all associated files,
+ * database objects, or whatever is appropriate.  The default behavior when
+ * no driver specific behavior is provided is to attempt to delete all the
+ * files that are returned by GDALGetFileList() on the dataset handle.
+ *
+ * Note that this will generally not work on Windows systems that don't accept
+ * deleting opened files.
+ *
+ * At least one of poDS or papszFileList must not be NULL
+ *
+ * @param poDS dataset to delete, or NULL
+ * @param papszFileList File list to delete, typically obtained with
+ *                      poDS->GetFileList(), or NULL
+ *
+ * @return CE_None on success, or CE_Failure if the operation fails.
+ *
+ * @since 3.12
+ */
+
+CPLErr GDALDriver::Delete(GDALDataset *poDS, CSLConstList papszFileList)
+
+{
+    if (poDS)
+    {
+        pfnDelete = GetDeleteCallback();
+        if (pfnDelete != nullptr)
+            return pfnDelete(poDS->GetDescription());
+        else if (pfnDeleteDataSource != nullptr)
+            return pfnDeleteDataSource(this, poDS->GetDescription());
     }
 
     /* -------------------------------------------------------------------- */
     /*      Delete all files.                                               */
     /* -------------------------------------------------------------------- */
     CPLErr eErr = CE_None;
-    for (int i = 0; papszFileList[i] != nullptr; ++i)
+    for (int i = 0; papszFileList && papszFileList[i]; ++i)
     {
         if (VSIUnlink(papszFileList[i]) != 0)
         {
@@ -1710,8 +1752,6 @@ CPLErr GDALDriver::Delete(const char *pszFilename)
             eErr = CE_Failure;
         }
     }
-
-    CSLDestroy(papszFileList);
 
     return eErr;
 }
@@ -2694,8 +2734,6 @@ GDALDriverH CPL_STDCALL GDALIdentifyDriver(const char *pszFilename,
  *
  * @return A GDALDriverH handle or NULL on failure.  For C++ applications
  * this handle can be cast to a GDALDriver *.
- *
- * @since GDAL 2.2
  */
 
 GDALDriverH CPL_STDCALL GDALIdentifyDriverEx(
@@ -3033,13 +3071,13 @@ static bool IsOnlyExpectedGDBDrivers(const CPLStringList &aosDriverNames)
  * provided output file name.
  *
  * @param pszDestDataset Output dataset name (might not exist).
- * @param nFlagRasterVector GDAL_OF_RASTER, GDAL_OF_VECTOR or
- *                          binary-or'ed combination of both
+ * @param nDatasetTypeFlag GDAL_OF_RASTER, GDAL_OF_VECTOR, GDAL_OF_MULTIDIM_RASTER
+ *                         or a binary-or'ed combination of them
  * @param bSingleMatch Whether a single match is desired, that is to say the
  *                     returned list will contain at most one item, which will
  *                     be the first driver in the order they are registered to
  *                     match the output dataset name. Note that in this mode, if
- *                     nFlagRasterVector==GDAL_OF_RASTER and pszDestDataset has
+ *                     nDatasetTypeFlag==GDAL_OF_RASTER and pszDestDataset has
  *                     no extension, GTiff will be selected.
  * @param bEmitWarning Whether a warning should be emitted when bSingleMatch is
  *                     true and there are more than 2 candidates.
@@ -3048,7 +3086,7 @@ static bool IsOnlyExpectedGDBDrivers(const CPLStringList &aosDriverNames)
  * @since 3.9
  */
 char **GDALGetOutputDriversForDatasetName(const char *pszDestDataset,
-                                          int nFlagRasterVector,
+                                          int nDatasetTypeFlag,
                                           bool bSingleMatch, bool bEmitWarning)
 {
     CPLStringList aosDriverNames;
@@ -3085,15 +3123,17 @@ char **GDALGetOutputDriversForDatasetName(const char *pszDestDataset,
         if ((poDriver->GetMetadataItem(GDAL_DCAP_CREATE) != nullptr ||
              poDriver->GetMetadataItem(GDAL_DCAP_CREATECOPY) != nullptr ||
              poDriver->GetMetadataItem(GDAL_DCAP_UPDATE) != nullptr) &&
-            (((nFlagRasterVector & GDAL_OF_RASTER) &&
+            (((nDatasetTypeFlag & GDAL_OF_RASTER) &&
               poDriver->GetMetadataItem(GDAL_DCAP_RASTER) != nullptr) ||
-             ((nFlagRasterVector & GDAL_OF_VECTOR) &&
-              poDriver->GetMetadataItem(GDAL_DCAP_VECTOR) != nullptr)))
+             ((nDatasetTypeFlag & GDAL_OF_VECTOR) &&
+              poDriver->GetMetadataItem(GDAL_DCAP_VECTOR) != nullptr) ||
+             ((nDatasetTypeFlag & GDAL_OF_MULTIDIM_RASTER) &&
+              poDriver->GetMetadataItem(GDAL_DCAP_MULTIDIM_RASTER) != nullptr)))
         {
             bOk = true;
         }
         else if (poDriver->GetMetadataItem(GDAL_DCAP_VECTOR_TRANSLATE_FROM) &&
-                 (nFlagRasterVector & GDAL_OF_VECTOR) != 0)
+                 (nDatasetTypeFlag & GDAL_OF_VECTOR) != 0)
         {
             bOk = true;
         }
@@ -3143,7 +3183,7 @@ char **GDALGetOutputDriversForDatasetName(const char *pszDestDataset,
 
     if (bSingleMatch)
     {
-        if (nFlagRasterVector == GDAL_OF_RASTER)
+        if (nDatasetTypeFlag == GDAL_OF_RASTER)
         {
             if (aosDriverNames.empty())
             {

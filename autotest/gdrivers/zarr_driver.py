@@ -3516,9 +3516,7 @@ def test_zarr_create_append_subdataset(tmp_vsimem):
     check()
 
 
-@pytest.mark.parametrize(
-    "blocksize", ["1,2", "2,2,0", "4000000000,4000000000,4000000000"]
-)
+@pytest.mark.parametrize("blocksize", ["1,2", "4000000000,4000000000,4000000000"])
 def test_zarr_create_array_invalid_blocksize(tmp_vsimem, blocksize):
     def create():
         ds = gdal.GetDriverByName("ZARR").CreateMultiDimensional(
@@ -5816,3 +5814,56 @@ def test_zarr_write_vsizip(tmp_vsimem, format):
 
     ds = gdal.Open(out_filename)
     assert ds.GetMetadata() == {"AREA_OR_POINT": "Area"}
+
+
+###############################################################################
+#
+
+
+@gdaltest.enable_exceptions()
+def test_zarr_read_ossfuzz_444714656():
+
+    ds = gdal.OpenEx("/vsitar/data/zarr/ossfuzz_444714656.tar", gdal.OF_MULTIDIM_RASTER)
+    rg = ds.GetRootGroup()
+    assert rg.GetGroupNames() == ["x"]
+
+
+###############################################################################
+#
+
+
+@gdaltest.enable_exceptions()
+def test_zarr_read_zarr_with_stac_proj_epsg():
+
+    ds = gdal.Open("data/zarr/zarr_with_stac_proj_epsg.zarr")
+    assert ds.GetSpatialRef().GetAuthorityCode(None) == "26711"
+
+
+###############################################################################
+#
+
+
+@gdaltest.enable_exceptions()
+def test_zarr_read_zarr_with_stac_proj_wkt2():
+
+    ds = gdal.Open("data/zarr/zarr_with_stac_proj_wkt2.zarr")
+    assert ds.GetSpatialRef().GetAuthorityCode(None) == "26711"
+
+
+###############################################################################
+#
+
+
+@pytest.mark.parametrize(
+    "file_path",
+    [
+        ("data/zarr/array_attrs.zarr/.zarray"),
+        ("data/zarr/group.zarr/.zgroup"),
+        ("data/zarr/group_with_zmetadata.zarr/.zmetadata"),
+        ("data/zarr/v3/test.zr3/zarr.json"),
+    ],
+)
+@gdaltest.enable_exceptions()
+def test_zarr_identify_file_extensions(file_path):
+    ds = gdal.Open(file_path)
+    ds.GetRasterBand(1).Checksum()

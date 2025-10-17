@@ -132,10 +132,11 @@ build_gdal_specialized_fuzzer(roipac GDALRegister_ROIPAC "/vsimem/test.tar" "/vs
 build_gdal_specialized_fuzzer(rraster GDALRegister_RRASTER "/vsimem/test.tar" "/vsitar//vsimem/test.tar/my.grd")
 build_gdal_specialized_fuzzer(aig GDALRegister_AIGrid "/vsimem/test.tar" "/vsitar//vsimem/test.tar/hdr.adf")
 # mrf can use indirectly the GTiff driver
-build_gdal_specialized_fuzzer(mrf "GDALRegister_mrf();GDALRegister_GTiff" "/vsimem/test.tar"
+build_gdal_specialized_fuzzer(mrf "GDALRegister_MRF();GDALRegister_GTiff" "/vsimem/test.tar"
                               "/vsitar//vsimem/test.tar/byte.mrf")
 build_gdal_specialized_fuzzer(gdal_vrt GDALAllRegister "/vsimem/test.tar" "/vsitar//vsimem/test.tar/test.vrt")
 build_gdal_specialized_fuzzer(ers GDALRegister_ERS "/vsimem/test.tar" "/vsitar//vsimem/test.tar/test.ers")
+build_gdal_specialized_fuzzer(gdal_miramon "GDALRegister_MiraMon" "/vsimem/test.tar" "/vsitar//vsimem/test.tar/byte_2x3_6_categs_RLEI.rel")
 
 build_fuzzer(
     NAME

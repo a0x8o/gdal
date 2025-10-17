@@ -39,6 +39,7 @@
 #include "commonutils.h"
 #include "cpl_conv.h"
 #include "cpl_error.h"
+#include "cpl_multiproc.h"
 #include "cpl_progress.h"
 #include "cpl_string.h"
 #include "cpl_time.h"
@@ -2950,6 +2951,17 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
                                            psOptions->osNewLayerName.c_str());
         }
     }
+    else
+    {
+        if (psOptions->bUpsert &&
+            poDriver->GetMetadataItem(GDAL_DCAP_UPSERT) == nullptr)
+        {
+            CPLError(CE_Failure, CPLE_NotSupported,
+                     "%s driver doest not support upsert",
+                     poODS->GetDriver()->GetDescription());
+            return nullptr;
+        }
+    }
 
     // Automatically close poODS on error, if it has been created by this
     // method.
@@ -4855,6 +4867,29 @@ SetupTargetLayer::Setup(OGRLayer *poSrcLayer, const char *pszNewLayerName,
             }
 
             oCoordPrec.dfMResolution = psOptions->dfMRes;
+        }
+
+        // For JSONFG
+        CSLConstList papszMeasures = poSrcLayer->GetMetadata("MEASURES");
+        if (papszMeasures && pszDestCreationOptions)
+        {
+            for (const char *pszItem : {"UNIT", "DESCRIPTION"})
+            {
+                const char *pszValue =
+                    CSLFetchNameValue(papszMeasures, pszItem);
+                if (pszValue)
+                {
+                    const std::string osOptionName =
+                        std::string("MEASURE_").append(pszItem);
+                    if (strstr(pszDestCreationOptions, osOptionName.c_str()) &&
+                        CSLFetchNameValue(m_papszLCO, osOptionName.c_str()) ==
+                            nullptr)
+                    {
+                        papszLCOTemp = CSLSetNameValue(
+                            papszLCOTemp, osOptionName.c_str(), pszValue);
+                    }
+                }
+            }
         }
 
         auto poSrcDriver = m_poSrcDS->GetDriver();
@@ -6969,7 +7004,9 @@ bool LayerTranslator::Translate(
                             goto end_loop;
                         }
 
-                        poDstGeometry = std::move(poClipped);
+                        poDstGeometry = OGRGeometryFactory::makeCompatibleWith(
+                            std::move(poClipped),
+                            poDstFDefn->GetGeomFieldDefn(iGeom)->GetType());
                     }
                 }
 
@@ -7184,7 +7221,11 @@ bool LayerTranslator::Translate(
                                 goto end_loop;
                             }
 
-                            poDstGeometry = std::move(poClipped);
+                            poDstGeometry =
+                                OGRGeometryFactory::makeCompatibleWith(
+                                    std::move(poClipped),
+                                    poDstFDefn->GetGeomFieldDefn(iGeom)
+                                        ->GetType());
                         }
                     }
 

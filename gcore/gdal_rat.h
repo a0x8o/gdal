@@ -13,8 +13,25 @@
 #ifndef GDAL_RAT_H_INCLUDED
 #define GDAL_RAT_H_INCLUDED
 
+#if !defined(GDAL_COMPILATION) &&                                              \
+    !defined(GDAL_RAT_SKIP_OTHER_GDAL_HEADERS) && !defined(GDAL_4_0_COMPAT)
+
 #include "cpl_minixml.h"
 #include "gdal_priv.h"
+
+#else
+
+#include "cpl_port.h"
+#include "cpl_error.h"
+#include "cpl_string.h"
+#include "gdal.h"
+
+#endif
+
+#include <memory>
+#include <vector>
+
+class GDALColorTable;
 
 // Clone and Serialize are allowed to fail if GetRowCount()*GetColCount()
 // greater than this number
@@ -228,7 +245,6 @@ class CPL_DLL GDALRasterAttributeTable
      *
      * Set whether the RAT is thematic or athematic (continuous).
      *
-     * @since GDAL 2.4
      */
     virtual CPLErr SetTableType(const GDALRATTableType eInTableType) = 0;
 
@@ -237,7 +253,6 @@ class CPL_DLL GDALRasterAttributeTable
      *
      * Indicates whether the RAT is thematic or athematic (continuous).
      *
-     * @since GDAL 2.4
      * @return table type
      */
     virtual GDALRATTableType GetTableType() const = 0;
@@ -275,7 +290,6 @@ class CPL_DLL GDALRasterAttributeTable
     virtual void DumpReadable(FILE * = nullptr);
 
     /** Convert a GDALRasterAttributeTable* to a GDALRasterAttributeTableH.
-     * @since GDAL 2.3
      */
     static inline GDALRasterAttributeTableH
     ToHandle(GDALRasterAttributeTable *poRAT)
@@ -284,7 +298,6 @@ class CPL_DLL GDALRasterAttributeTable
     }
 
     /** Convert a GDALRasterAttributeTableH to a GDALRasterAttributeTable*.
-     * @since GDAL 2.3
      */
     static inline GDALRasterAttributeTable *
     FromHandle(GDALRasterAttributeTableH hRAT)
@@ -295,7 +308,6 @@ class CPL_DLL GDALRasterAttributeTable
     /**
      * \brief Remove statistics from the RAT.
      *
-     * @since GDAL 2.4
      */
     virtual void RemoveStatistics() = 0;
 

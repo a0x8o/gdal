@@ -12279,6 +12279,32 @@ def test_tiff_createcopy_only_visible_at_close_time_win32_specific(tmp_path):
 ###############################################################################
 
 
+def test_tiff_create_copy_SUPPRESS_ASAP(tmp_path):
+
+    src_ds = gdal.Open("data/byte.tif")
+    out_filename = tmp_path / "tmp.tif"
+
+    def my_callback(pct, msg, user_data):
+        if sys.platform != "win32":
+            assert gdal.VSIStatL(out_filename) is None
+        return True
+
+    drv = gdal.GetDriverByName("GTIFF")
+    ds = drv.CreateCopy(
+        out_filename,
+        src_ds,
+        options=["@SUPPRESS_ASAP=YES"],
+        callback=my_callback,
+    )
+    assert ds.GetRasterBand(1).Checksum() == 4672
+    ds.Close()
+
+    assert gdal.VSIStatL(out_filename) is None
+
+
+###############################################################################
+
+
 def test_tiff_create_suppress_on_close(tmp_path):
 
     out_filename = tmp_path / "tmp.tif"
@@ -12428,3 +12454,23 @@ def test_tiff_create_suppress_on_close_only_visible_at_close_time_vsimem(tmp_vsi
     assert gdal.VSIStatL(out_filename) is None
     ds.Close()
     assert gdal.VSIStatL(out_filename) is None
+
+
+###############################################################################
+# Test that this does not crash
+
+
+def test_tiff_write_create_mask_band_and_set_color_interp(tmp_vsimem):
+
+    with gdal.GetDriverByName("GTiff").Create(tmp_vsimem / "out.tif", 1, 1) as ds:
+        band = ds.GetRasterBand(1)
+        band.CreateMaskBand(gdal.GMF_PER_DATASET)
+        mask_band = band.GetMaskBand()
+        mask_band.SetColorInterpretation(gdal.GCI_RedBand)  # ignored
+        mask_band.SetColorInterpretation(gdal.GCI_Undefined)
+        mask_band.SetMetadataItem("foo", "bar")
+        mask_band.SetNoDataValue(0)
+
+    with gdal.Open(tmp_vsimem / "out.tif") as ds:
+        assert ds.GetRasterBand(1).GetMaskBand().GetMetadataItem("foo") == "bar"
+        assert ds.GetRasterBand(1).GetMaskBand().GetNoDataValue() == 0

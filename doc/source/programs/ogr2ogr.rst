@@ -32,8 +32,7 @@ output coordinate system or even reprojecting the features during translation.
 .. option:: -of <format_name>, -f <format_name>
 
     Output file format name, e.g. ``ESRI Shapefile``, ``MapInfo File``,
-    ``PostgreSQL``.  Starting with GDAL 2.3, if not specified, the format is
-    guessed from the extension (previously was ESRI Shapefile).
+    ``PostgreSQL``. If not specified, the format is guessed from the extension.
 
 .. option:: -append
 
@@ -49,7 +48,9 @@ output coordinate system or even reprojecting the features during translation.
     :cpp:func:`OGRLayer::CreateFeature`.
 
     This is currently implemented only in a few drivers:
-    :ref:`vector.gpkg` and :ref:`vector.mongodbv3`.
+    :ref:`vector.gpkg`, :ref:`vector.elasticsearch` and :ref:`vector.mongodbv3`
+    (drivers that implement upsert expose the :c:macro:`GDAL_DCAP_UPSERT`
+    capability).
 
     The upsert operation uses the FID of the input feature, when it is set
     and is a "significant" (that is the FID column name is not the empty string),
@@ -106,7 +107,7 @@ output coordinate system or even reprojecting the features during translation.
 .. option:: -sql <sql_statement>|@<filename>
 
     SQL statement to execute. The resulting table/layer will be saved to the
-    output. Starting with GDAL 2.1, the ``@filename`` syntax can be used to
+    output. The ``@filename`` syntax can be used to
     indicate that the content is in the pointed filename. (Cannot be used with :option:`-spat_srs`.)
 
 .. option:: -dialect <dialect>
@@ -118,7 +119,7 @@ output coordinate system or even reprojecting the features during translation.
 
 .. option:: -where <restricted_where>|@<filename>
 
-    Attribute query (like SQL WHERE). Starting with GDAL 2.1, the ``@filename``
+    Attribute query (like SQL WHERE). The ``@filename``
     syntax can be used to indicate that the content is in the pointed filename.
 
 .. option:: -skipfailures
@@ -186,7 +187,7 @@ output coordinate system or even reprojecting the features during translation.
     ``XY`` and ``3`` is an alias for ``XYZ``). This affects both the layer
     geometry type, and feature geometries. The value can be set to ``layer_dim``
     to instruct feature geometries to be promoted to the coordinate dimension
-    declared by the layer. Support for M was added in GDAL 2.1.
+    declared by the layer.
 
 .. option:: -a_srs <srs_def>
 
@@ -627,8 +628,6 @@ output coordinate system or even reprojecting the features during translation.
     To disable copying of native data, i.e. details of source format not
     captured by OGR abstraction, that are otherwise preserved by some drivers
     (like GeoJSON) when converting to same format.
-
-    .. versionadded:: 2.1
 
 .. option:: <dst_dataset_name>
 

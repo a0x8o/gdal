@@ -13,6 +13,7 @@
 #include "cpl_port.h"
 
 #include "gdal_priv.h"
+#include "gdal_frmts.h"
 #include "gtiff.h"
 #include "gt_overview.h"
 #include "gdal_utils.h"
@@ -28,8 +29,6 @@
 #include <vector>
 
 static bool gbHasLZW = false;
-
-extern "C" CPL_DLL void GDALRegister_COG();
 
 /************************************************************************/
 /*                        HasZSTDCompression()                          */
@@ -1385,6 +1384,8 @@ GDALDataset *GDALCOGCreator::Create(const char *pszFilename,
     }
 
     aosOptions.SetNameValue("@FLUSHCACHE", "YES");
+    aosOptions.SetNameValue("@SUPPRESS_ASAP",
+                            CSLFetchNameValue(papszOptions, "@SUPPRESS_ASAP"));
 
     CPLDebug("COG", "Generating final product: start");
     auto poRet =
@@ -1685,6 +1686,7 @@ void GDALRegister_COG()
     poDriver->SetMetadataItem(GDAL_DCAP_VIRTUALIO, "YES");
     poDriver->SetMetadataItem(GDAL_DCAP_CREATE_ONLY_VISIBLE_AT_CLOSE_TIME,
                               "YES");
+    poDriver->SetMetadataItem(GDAL_DCAP_CAN_READ_AFTER_DELETE, "YES");
 
     poDriver->SetMetadataItem(GDAL_DCAP_COORDINATE_EPOCH, "YES");
 

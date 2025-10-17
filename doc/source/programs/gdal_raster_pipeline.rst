@@ -20,6 +20,12 @@ perform various processing steps that accept raster and generate raster.
 
 For pipelines mixing raster and vector, consult :ref:`gdal_pipeline`.
 
+Most steps proceed in on-demand evaluation of raster blocks,
+unless otherwise stated in their documentation, without "materializing" the
+resulting dataset of the operation of each step. It may be desirable sometimes
+for performance purposes to proceed to materializing an intermediate dataset
+to disk using :ref:`gdal_raster_materialize`.
+
 Synopsis
 --------
 
@@ -62,6 +68,12 @@ Details for options can be found in :ref:`gdal_raster_stack`.
 
 Details for options can be found in :ref:`gdal_raster_aspect`.
 
+* blend
+
+.. program-output:: gdal raster pipeline --help-doc=blend
+
+Details for options can be found in :ref:`gdal_raster_blend`.
+
 * clip
 
 .. program-output:: gdal raster pipeline --help-doc=clip
@@ -73,12 +85,6 @@ Details for options can be found in :ref:`gdal_raster_clip`.
 .. program-output:: gdal raster pipeline --help-doc=color-map
 
 Details for options can be found in :ref:`gdal_raster_color_map`.
-
-* color-merge
-
-.. program-output:: gdal raster pipeline --help-doc=color-merge
-
-Details for options can be found in :ref:`gdal_raster_color_merge`.
 
 * edit
 
@@ -97,6 +103,18 @@ Details for options can be found in :ref:`gdal_raster_fill_nodata`.
 .. program-output:: gdal raster pipeline --help-doc=hillshade
 
 Details for options can be found in :ref:`gdal_raster_hillshade`.
+
+* materialize
+
+.. program-output:: gdal raster pipeline --help-doc=materialize
+
+Details for options can be found in :ref:`gdal_raster_materialize`.
+
+* neighbors
+
+.. program-output:: gdal raster pipeline --help-doc=neighbors
+
+Details for options can be found in :ref:`gdal_raster_neighbors`.
 
 * nodata-to-alpha
 
@@ -200,6 +218,12 @@ Details for options can be found in :ref:`gdal_raster_unscale`.
 
 Details for options can be found in :ref:`gdal_raster_viewshed`.
 
+* tee
+
+.. program-output:: gdal raster pipeline --help-doc=tee
+
+Details for options can be found in :ref:`gdal_output_nested_pipeline`.
+
 * info
 
 .. versionadded:: 3.12
@@ -269,6 +293,16 @@ changing an input filename, specifying an output filename, or adding/modifying a
 of steps.
 
 See :ref:`gdal_pipeline_substitutions`.
+
+
+Nested pipeline
+---------------
+
+.. versionadded:: 3.12
+
+.. include:: gdal_cli_include/gdal_nested_pipeline_intro.rst
+
+See :ref:`gdal_nested_pipeline`.
 
 
 Examples
