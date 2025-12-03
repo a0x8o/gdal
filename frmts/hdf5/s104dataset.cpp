@@ -148,6 +148,21 @@ GDALDataset *S104Dataset::Open(GDALOpenInfo *poOpenInfo)
 
     const auto &poRootGroup = poDS->m_poRootGroup;
 
+    auto poVerticalCS = poRootGroup->GetAttribute("verticalCS");
+    if (poVerticalCS && poVerticalCS->GetDataType().GetClass() == GEDTC_NUMERIC)
+    {
+        const int nVerticalCS = poVerticalCS->ReadAsInt();
+        if (nVerticalCS == 6498)
+            poDS->GDALDataset::SetMetadataItem(
+                "VERTICAL_CS_MEANING", "depth, meters, orientation down");
+        else if (nVerticalCS == 6499)
+            poDS->GDALDataset::SetMetadataItem(
+                "VERTICAL_CS_MEANING", "height, meters, orientation up");
+
+        poDS->GDALDataset::SetMetadataItem("verticalCS",
+                                           std::to_string(nVerticalCS).c_str());
+    }
+
     auto poWaterLevel = poRootGroup->OpenGroup("WaterLevel");
     if (!poWaterLevel)
     {
@@ -442,7 +457,7 @@ GDALDataset *S104Dataset::Open(GDALOpenInfo *poOpenInfo)
             oComponents[0]->GetName() != "waterLevelHeight" ||
             oComponents[0]->GetType().GetNumericDataType() != GDT_Float32 ||
             oComponents[1]->GetName() != "waterLevelTrend" ||
-            (oComponents[1]->GetType().GetNumericDataType() != GDT_Byte &&
+            (oComponents[1]->GetType().GetNumericDataType() != GDT_UInt8 &&
              // In theory should be Byte, but 104US00_ches_dcf2_20190606T12Z.h5 uses Int32
              oComponents[1]->GetType().GetNumericDataType() != GDT_Int32))
         {

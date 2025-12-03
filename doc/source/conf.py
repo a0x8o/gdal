@@ -48,6 +48,12 @@ def check_python_bindings():
             os.path.dirname(__file__), os.pardir, os.pardir, "VERSION"
         )
         doc_version = open(version_file).read().strip()
+        doc_version_stripped = doc_version
+        for suffix in ["dev", "beta"]:
+            pos_suffix = doc_version_stripped.find(suffix)
+            if pos_suffix > 0:
+                doc_version_stripped = doc_version_stripped[0:pos_suffix]
+
         gdal_version = gdal.__version__
         gdal_version_stripped = gdal_version
         for suffix in ["dev", "beta"]:
@@ -55,9 +61,9 @@ def check_python_bindings():
             if pos_suffix > 0:
                 gdal_version_stripped = gdal_version_stripped[0:pos_suffix]
 
-        if doc_version.strip() != gdal_version_stripped:
+        if doc_version_stripped != gdal_version_stripped:
             logger.warn(
-                f"Building documentation for GDAL {doc_version} but osgeo.gdal module has version {gdal_version}. Python API documentation may be incorrect."
+                f"Building documentation for GDAL {doc_version_stripped} but osgeo.gdal module has version {gdal_version_stripped}. Python API documentation may be incorrect."
             )
 
 
@@ -377,6 +383,9 @@ html_static_path = ["_static"]
 
 # For generated content and robots.txt
 html_extra_path = [os.path.join(build_dir, "html_extra"), "extra_path"]
+
+html_js_files = ["announcement.js"]
+html_css_files = ["announcement.css"]
 
 # If true, links to the reST sources are added to the pages.
 html_show_sourcelink = False
@@ -865,7 +874,7 @@ man_pages = [
     ),
     (
         "programs/gdal_vector_concat",
-        "gdal-vector_concat",
+        "gdal-vector-concat",
         "Concatenate vector datasets",
         [author_evenr],
         1,
@@ -936,7 +945,7 @@ man_pages = [
     (
         "programs/gdal_vector_swap_xy",
         "gdal-vector-swap-xy",
-        "Swap X and Y coordinates of geometries of a vector datasett",
+        "Swap X and Y coordinates of geometries of a vector dataset",
         [author_evenr],
         1,
     ),
@@ -948,9 +957,9 @@ man_pages = [
         1,
     ),
     (
-        "programs/gdal_index_index",
-        "gdal-index-index",
-        "Create a vector index of index datasets",
+        "programs/gdal_vector_index",
+        "gdal-vector-index",
+        "Create a vector index of vector datasets",
         [author_evenr],
         1,
     ),
@@ -1007,6 +1016,13 @@ man_pages = [
         "programs/gdal_vector_sql",
         "gdal-vector-sql",
         "Apply SQL statement(s) to a dataset",
+        [author_evenr],
+        1,
+    ),
+    (
+        "programs/gdal_vector_update",
+        "gdal-vector-update",
+        "Update an existing vector dataset with an input vector dataset",
         [author_evenr],
         1,
     ),

@@ -513,7 +513,7 @@ class CPL_DLL GDALAlgorithmArgDecl final
         return *this;
     }
 
-    /** Declares whether, for list type of arguments, several values, space
+    /** Declares whether, for list type of arguments, several values, comma
      * separated, may be specified. That is "--foo=bar,baz".
      * The default is true.
      */
@@ -2568,6 +2568,9 @@ class CPL_DLL GDALAlgorithmRegistry
         return m_calledFromCommandLine;
     }
 
+    /** Whether the algorithm generates an output string */
+    virtual bool HasOutputString() const;
+
     /** Save command line in a .gdalg.json file.
      * If filename is empty, outString will contain the serialized JSON content.
      */
@@ -2833,8 +2836,7 @@ class CPL_DLL GDALAlgorithmRegistry
 
     /** Register an auto complete function for a layer name argument */
     static void SetAutoCompleteFunctionForLayerName(
-        GDALInConstructionAlgorithmArg &layerArg,
-        GDALInConstructionAlgorithmArg &datasetArg);
+        GDALInConstructionAlgorithmArg &layerArg, GDALAlgorithmArg &datasetArg);
 
     /** Register an auto complete function for a field name argument */
     static void SetAutoCompleteFunctionForFieldName(

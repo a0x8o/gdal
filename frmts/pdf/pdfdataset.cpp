@@ -492,7 +492,7 @@ PDFRasterBand::PDFRasterBand(PDFDataset *poDSIn, int nBandIn,
     poDS = poDSIn;
     nBand = nBandIn;
 
-    eDataType = GDT_Byte;
+    eDataType = GDT_UInt8;
 
     if (nResolutionLevel > 0)
     {
@@ -2144,7 +2144,7 @@ CPLErr PDFDataset::ReadPixels(int nReqXOff, int nReqYOff, int nReqXSize,
                 {
                     eErr = poDS->RasterIO(GF_Read, 0, 0, nReqXSize, nReqYSize,
                                           pabyData, nReqXSize, nReqYSize,
-                                          GDT_Byte, 3, nullptr, nPixelSpace,
+                                          GDT_UInt8, 3, nullptr, nPixelSpace,
                                           nLineSpace, nBandSpace, nullptr);
                 }
             }
@@ -2689,7 +2689,7 @@ CPLErr PDFDataset::IRasterIO(GDALRWFlag eRWFlag, int nXOff, int nYOff,
     if (m_aiTiles.empty() && eRWFlag == GF_Read && nXSize == nBufXSize &&
         nYSize == nBufYSize &&
         (nBufXSize > nBandBlockXSize || nBufYSize > nBandBlockYSize) &&
-        eBufType == GDT_Byte && nBandCount == nBands &&
+        eBufType == GDT_UInt8 && nBandCount == nBands &&
         IsAllBands(nBandCount, panBandMap))
     {
         bReadPixels = TRUE;
@@ -2705,7 +2705,7 @@ CPLErr PDFDataset::IRasterIO(GDALRWFlag eRWFlag, int nXOff, int nYOff,
         return ReadPixels(nXOff, nYOff, nXSize, nYSize, nPixelSpace, nLineSpace,
                           nBandSpace, static_cast<GByte *>(pData));
 
-    if (nBufXSize != nXSize || nBufYSize != nYSize || eBufType != GDT_Byte)
+    if (nBufXSize != nXSize || nBufYSize != nYSize || eBufType != GDT_UInt8)
     {
         m_bCacheBlocksForOtherBands = true;
     }
@@ -2741,7 +2741,7 @@ CPLErr PDFRasterBand::IRasterIO(GDALRWFlag eRWFlag, int nXOff, int nYOff,
             return eErr;
     }
 
-    if (nBufXSize != nXSize || nBufYSize != nYSize || eBufType != GDT_Byte)
+    if (nBufXSize != nXSize || nBufYSize != nYSize || eBufType != GDT_UInt8)
     {
         poGDS->m_bCacheBlocksForOtherBands = true;
     }
@@ -3575,10 +3575,13 @@ void PDFDataset::AddLayer(const std::string &osName, int iPage)
 }
 
 /************************************************************************/
-/*                           CreateLayerList()                          */
+/*                            SortLayerList()                           */
 /************************************************************************/
 
-void PDFDataset::CreateLayerList()
+// recent libc++ std::sort() involve unsigned integer overflow in some
+// situation
+CPL_NOSANITIZE_UNSIGNED_INT_OVERFLOW
+void PDFDataset::SortLayerList()
 {
     // Sort layers by prioritizing page number and then insertion index
     std::sort(m_oLayerNameSet.begin(), m_oLayerNameSet.end(),
@@ -3590,6 +3593,15 @@ void PDFDataset::CreateLayerList()
                       return false;
                   return a.nInsertIdx < b.nInsertIdx;
               });
+}
+
+/************************************************************************/
+/*                           CreateLayerList()                          */
+/************************************************************************/
+
+void PDFDataset::CreateLayerList()
+{
+    SortLayerList();
 
     if (m_oLayerNameSet.size() >= 100)
     {
@@ -5149,8 +5161,9 @@ PDFDataset *PDFDataset::Open(GDALOpenInfo *poOpenInfo)
     if (bUseLib.test(PDFLIB_PODOFO))
     {
         CPLAssert(poPagePodofo);
-#if PODOFO_VERSION_MAJOR > 0 ||                                                \
-    (PODOFO_VERSION_MAJOR == 0 && PODOFO_VERSION_MINOR >= 10)
+#if PODOFO_VERSION_MAJOR >= 1
+        poPagePodofo->TryGetRotationRaw(dfRotation);
+#elif (PODOFO_VERSION_MAJOR == 0 && PODOFO_VERSION_MINOR >= 10)
         dfRotation = poPagePodofo->GetRotationRaw();
 #else
         dfRotation = poPagePodofo->GetRotation();

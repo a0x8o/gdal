@@ -180,6 +180,11 @@ class GDALTest:
                 # Copy all files in /vsimem/
                 mainfile_dirname = os.path.dirname(fl[0])
                 for filename in fl:
+
+                    # Avoid the ENVI driver to trigger when copying a unrelated .hdr file
+                    if self.drivername.lower() == "gtiff" and filename.endswith(".hdr"):
+                        continue
+
                     target_filename = (
                         "/vsimem/tmp_testOpen/" + filename[len(mainfile_dirname) + 1 :]
                     )
@@ -2175,9 +2180,13 @@ def wkt_ds(wkts, *, geom_type=None, epsg=None):
 
     ds = gdal.GetDriverByName("MEM").CreateVector("")
 
+    srs = osr.SpatialReference(epsg=epsg) if epsg else None
+    if srs:
+        srs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+
     lyr = ds.CreateLayer(
         "polys",
-        osr.SpatialReference(epsg=epsg) if epsg else None,
+        srs=srs,
         geom_type=geom_type if geom_type else ogr.wkbUnknown,
     )
 

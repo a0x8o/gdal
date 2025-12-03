@@ -6167,4 +6167,226 @@ TEST_F(test_gdal, GDALRasterBand_window_iterator)
     }
 }
 
+TEST_F(test_gdal, GDALMDArrayRawBlockInfo)
+{
+    GDALMDArrayRawBlockInfo info;
+    {
+        GDALMDArrayRawBlockInfo info2(info);
+        EXPECT_EQ(info2.nOffset, 0);
+        EXPECT_EQ(info2.nSize, 0);
+        EXPECT_EQ(info2.pszFilename, nullptr);
+        EXPECT_EQ(info2.papszInfo, nullptr);
+        EXPECT_EQ(info2.pabyInlineData, nullptr);
+    }
+
+    {
+        GDALMDArrayRawBlockInfo info2;
+        info2 = info;
+        EXPECT_EQ(info2.nOffset, 0);
+        EXPECT_EQ(info2.nSize, 0);
+        EXPECT_EQ(info2.pszFilename, nullptr);
+        EXPECT_EQ(info2.papszInfo, nullptr);
+        EXPECT_EQ(info2.pabyInlineData, nullptr);
+
+        info2 = std::move(info);
+        EXPECT_EQ(info2.nOffset, 0);
+        EXPECT_EQ(info2.nSize, 0);
+        EXPECT_EQ(info2.pszFilename, nullptr);
+        EXPECT_EQ(info2.papszInfo, nullptr);
+        EXPECT_EQ(info2.pabyInlineData, nullptr);
+
+        const auto pinfo2 = &info2;
+        info2 = *pinfo2;
+        EXPECT_EQ(info2.nOffset, 0);
+        EXPECT_EQ(info2.nSize, 0);
+        EXPECT_EQ(info2.pszFilename, nullptr);
+        EXPECT_EQ(info2.papszInfo, nullptr);
+        EXPECT_EQ(info2.pabyInlineData, nullptr);
+    }
+
+    {
+        GDALMDArrayRawBlockInfo info2(std::move(info));
+        EXPECT_EQ(info2.nOffset, 0);
+        EXPECT_EQ(info2.nSize, 0);
+        EXPECT_EQ(info2.pszFilename, nullptr);
+        EXPECT_EQ(info2.papszInfo, nullptr);
+        EXPECT_EQ(info2.pabyInlineData, nullptr);
+    }
+
+    info.nOffset = 1;
+    info.nSize = 2;
+    info.pszFilename = CPLStrdup("filename");
+    info.papszInfo = CSLSetNameValue(nullptr, "key", "value");
+    info.pabyInlineData =
+        static_cast<GByte *>(CPLMalloc(static_cast<size_t>(info.nSize)));
+    info.pabyInlineData[0] = 1;
+    info.pabyInlineData[1] = 2;
+
+    {
+        GDALMDArrayRawBlockInfo info2;
+        info2 = info;
+        EXPECT_EQ(info2.nOffset, info.nOffset);
+        EXPECT_EQ(info2.nSize, info.nSize);
+        EXPECT_STREQ(info2.pszFilename, info.pszFilename);
+        EXPECT_TRUE(info2.papszInfo != nullptr);
+        EXPECT_STREQ(info2.papszInfo[0], "key=value");
+        EXPECT_TRUE(info2.papszInfo[1] == nullptr);
+        ASSERT_NE(info2.pabyInlineData, nullptr);
+        EXPECT_EQ(info2.pabyInlineData[0], 1);
+        EXPECT_EQ(info2.pabyInlineData[1], 2);
+    }
+
+    {
+        GDALMDArrayRawBlockInfo info2(info);
+        EXPECT_EQ(info2.nOffset, info.nOffset);
+        EXPECT_EQ(info2.nSize, info.nSize);
+        EXPECT_STREQ(info2.pszFilename, info.pszFilename);
+        EXPECT_TRUE(info2.papszInfo != nullptr);
+        EXPECT_STREQ(info2.papszInfo[0], "key=value");
+        EXPECT_TRUE(info2.papszInfo[1] == nullptr);
+        ASSERT_NE(info2.pabyInlineData, nullptr);
+        EXPECT_EQ(info2.pabyInlineData[0], 1);
+        EXPECT_EQ(info2.pabyInlineData[1], 2);
+    }
+
+    {
+        GDALMDArrayRawBlockInfo info2;
+        info2 = info;
+        EXPECT_EQ(info2.nOffset, info.nOffset);
+        EXPECT_EQ(info2.nSize, info.nSize);
+        EXPECT_STREQ(info2.pszFilename, info.pszFilename);
+        EXPECT_TRUE(info2.papszInfo != nullptr);
+        EXPECT_STREQ(info2.papszInfo[0], "key=value");
+        EXPECT_TRUE(info2.papszInfo[1] == nullptr);
+        ASSERT_NE(info2.pabyInlineData, nullptr);
+        EXPECT_EQ(info2.pabyInlineData[0], 1);
+        EXPECT_EQ(info2.pabyInlineData[1], 2);
+
+        const auto pinfo2 = &info2;
+        info2 = *pinfo2;
+        EXPECT_EQ(info2.nOffset, info.nOffset);
+        EXPECT_EQ(info2.nSize, info.nSize);
+        EXPECT_STREQ(info2.pszFilename, info.pszFilename);
+        EXPECT_TRUE(info2.papszInfo != nullptr);
+        EXPECT_STREQ(info2.papszInfo[0], "key=value");
+        EXPECT_TRUE(info2.papszInfo[1] == nullptr);
+        ASSERT_NE(info2.pabyInlineData, nullptr);
+        EXPECT_EQ(info2.pabyInlineData[0], 1);
+        EXPECT_EQ(info2.pabyInlineData[1], 2);
+    }
+
+    {
+        GDALMDArrayRawBlockInfo infoCopy(info);
+        GDALMDArrayRawBlockInfo info2(std::move(info));
+        info = infoCopy;
+
+        // to avoid Coverity warng that the above copy assignment could be a
+        // moved one...
+        infoCopy.nOffset = 1;
+        CPL_IGNORE_RET_VAL(infoCopy.nOffset);
+
+        EXPECT_EQ(info2.nOffset, info.nOffset);
+        EXPECT_EQ(info2.nSize, info.nSize);
+        EXPECT_STREQ(info2.pszFilename, info.pszFilename);
+        EXPECT_TRUE(info2.papszInfo != nullptr);
+        EXPECT_STREQ(info2.papszInfo[0], "key=value");
+        EXPECT_TRUE(info2.papszInfo[1] == nullptr);
+        ASSERT_NE(info2.pabyInlineData, nullptr);
+        EXPECT_EQ(info2.pabyInlineData[0], 1);
+        EXPECT_EQ(info2.pabyInlineData[1], 2);
+    }
+
+    {
+        GDALMDArrayRawBlockInfo infoCopy(info);
+        GDALMDArrayRawBlockInfo info2;
+        info2 = std::move(info);
+        info = infoCopy;
+
+        // to avoid Coverity warng that the above copy assignment could be a
+        // moved one...
+        infoCopy.nOffset = 1;
+        CPL_IGNORE_RET_VAL(infoCopy.nOffset);
+
+        EXPECT_EQ(info2.nOffset, info.nOffset);
+        EXPECT_EQ(info2.nSize, info.nSize);
+        EXPECT_STREQ(info2.pszFilename, info.pszFilename);
+        EXPECT_TRUE(info2.papszInfo != nullptr);
+        EXPECT_STREQ(info2.papszInfo[0], "key=value");
+        EXPECT_TRUE(info2.papszInfo[1] == nullptr);
+        ASSERT_NE(info2.pabyInlineData, nullptr);
+        EXPECT_EQ(info2.pabyInlineData[0], 1);
+        EXPECT_EQ(info2.pabyInlineData[1], 2);
+    }
+}
+
+TEST_F(test_gdal, GDALGeoTransform)
+{
+    GDALGeoTransform gt{5, 6, 0, 7, 0, -8};
+
+    OGREnvelope initEnv;
+    initEnv.MinX = -1;
+    initEnv.MinY = -2;
+    initEnv.MaxX = 3;
+    initEnv.MaxY = 4;
+
+    {
+        GDALRasterWindow window;
+        EXPECT_TRUE(gt.Apply(initEnv, window));
+        EXPECT_EQ(window.nXOff, -1);
+        EXPECT_EQ(window.nYOff, -25);
+        EXPECT_EQ(window.nXSize, 24);
+        EXPECT_EQ(window.nYSize, 48);
+    }
+
+    {
+        gt[5] = -gt[5];
+        GDALRasterWindow window;
+        EXPECT_TRUE(gt.Apply(initEnv, window));
+        gt[5] = -gt[5];
+        EXPECT_EQ(window.nXOff, -1);
+        EXPECT_EQ(window.nYOff, -9);
+        EXPECT_EQ(window.nXSize, 24);
+        EXPECT_EQ(window.nYSize, 48);
+    }
+
+    {
+        gt[1] = -gt[1];
+        GDALRasterWindow window;
+        EXPECT_TRUE(gt.Apply(initEnv, window));
+        gt[1] = -gt[1];
+        EXPECT_EQ(window.nXOff, -13);
+        EXPECT_EQ(window.nYOff, -25);
+        EXPECT_EQ(window.nXSize, 24);
+        EXPECT_EQ(window.nYSize, 48);
+    }
+
+    {
+        OGREnvelope env(initEnv);
+        env.MinX *= 1e10;
+        GDALRasterWindow window;
+        EXPECT_FALSE(gt.Apply(env, window));
+    }
+
+    {
+        OGREnvelope env(initEnv);
+        env.MinY *= 1e10;
+        GDALRasterWindow window;
+        EXPECT_FALSE(gt.Apply(env, window));
+    }
+
+    {
+        OGREnvelope env(initEnv);
+        env.MaxX *= 1e10;
+        GDALRasterWindow window;
+        EXPECT_FALSE(gt.Apply(env, window));
+    }
+
+    {
+        OGREnvelope env(initEnv);
+        env.MaxY *= 1e10;
+        GDALRasterWindow window;
+        EXPECT_FALSE(gt.Apply(env, window));
+    }
+}
+
 }  // namespace

@@ -16,6 +16,7 @@ RUN apt-get update && \
     g++ \
     git \
     gpsbabel \
+    jq \
     libblosc-dev \
     libboost-dev \
     libcairo2-dev \
@@ -216,3 +217,4 @@ RUN wget -q https://github.com/rouault/pdfium_build_gdal_3_12/releases/download/
   && mv install/lib/* /usr/lib/ \
   && mv install/include/* /usr/include/ \
   && rm -rf install-ubuntu2004-rev7391.tar.gz install
+

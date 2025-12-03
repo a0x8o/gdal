@@ -25,6 +25,7 @@
 #include "cpl_vsi_virtual.h"
 #include "fetchbufferdirectio.h"
 #include "gdal_priv.h"
+#include "gdal_mdreader.h"
 #include "gtiff.h"
 #include "tifvsi.h"
 
@@ -291,7 +292,7 @@ int GTiffRasterBand::DirectIO(GDALRWFlag eRWFlag, int nXOff, int nYOff,
     {
         const bool bOneByteCopy =
             (eDataType == eBufType &&
-             (eDataType == GDT_Byte || eDataType == GDT_Int8));
+             (eDataType == GDT_UInt8 || eDataType == GDT_Int8));
         for (int iY = 0; iY < nBufYSize; ++iY)
         {
             const int iSrcY = nBufYSize <= nYSize
@@ -851,7 +852,7 @@ CPLErr GTiffRasterBand::IReadBlock(int nBlockXOff, int nBlockYOff, void *pImage)
         if (nBand == 1 && !m_poGDS->m_bLoadingOtherBands &&
             eAccess == GA_ReadOnly &&
             (m_poGDS->nBands == 3 || m_poGDS->nBands == 4) &&
-            ((eDataType == GDT_Byte && m_poGDS->m_nBitsPerSample == 8) ||
+            ((eDataType == GDT_UInt8 && m_poGDS->m_nBitsPerSample == 8) ||
              (eDataType == GDT_Int16 && m_poGDS->m_nBitsPerSample == 16) ||
              (eDataType == GDT_UInt16 && m_poGDS->m_nBitsPerSample == 16)) &&
             static_cast<GPtrDiff_t>(nBlockXSize) * nBlockYSize *
@@ -1062,6 +1063,8 @@ char **GTiffRasterBand::GetMetadataDomainList()
 {
     m_poGDS->LoadGeoreferencingAndPamIfNeeded();
 
+    m_poGDS->LoadENVIHdrIfNeeded();
+
     return CSLDuplicate(m_oGTiffMDMD.GetDomainList());
 }
 
@@ -1075,6 +1078,12 @@ char **GTiffRasterBand::GetMetadata(const char *pszDomain)
     if (pszDomain == nullptr || !EQUAL(pszDomain, "IMAGE_STRUCTURE"))
     {
         m_poGDS->LoadGeoreferencingAndPamIfNeeded();
+
+        m_poGDS->LoadENVIHdrIfNeeded();
+    }
+    else if (EQUAL(pszDomain, MD_DOMAIN_IMAGERY))
+    {
+        m_poGDS->LoadENVIHdrIfNeeded();
     }
 
     return m_oGTiffMDMD.GetMetadata(pszDomain);
@@ -1091,6 +1100,12 @@ const char *GTiffRasterBand::GetMetadataItem(const char *pszName,
     if (pszDomain == nullptr || !EQUAL(pszDomain, "IMAGE_STRUCTURE"))
     {
         m_poGDS->LoadGeoreferencingAndPamIfNeeded();
+
+        m_poGDS->LoadENVIHdrIfNeeded();
+    }
+    else if (EQUAL(pszDomain, MD_DOMAIN_IMAGERY))
+    {
+        m_poGDS->LoadENVIHdrIfNeeded();
     }
 
     if (pszName != nullptr && pszDomain != nullptr && EQUAL(pszDomain, "TIFF"))
@@ -1175,7 +1190,7 @@ const char *GTiffRasterBand::GetMetadataItem(const char *pszName,
 
     const char *pszRet = m_oGTiffMDMD.GetMetadataItem(pszName, pszDomain);
 
-    if (pszRet == nullptr && eDataType == GDT_Byte && pszName && pszDomain &&
+    if (pszRet == nullptr && eDataType == GDT_UInt8 && pszName && pszDomain &&
         EQUAL(pszDomain, "IMAGE_STRUCTURE") && EQUAL(pszName, "PIXELTYPE"))
     {
         // to get a chance of emitting the warning about this legacy usage

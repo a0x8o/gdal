@@ -36,7 +36,7 @@ jobs:
       cache-name: cmake-ubuntu-jammy
     steps:
     - name: Checkout GDAL
-      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
     - name: Setup cache
       uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
       id: cache
@@ -317,7 +317,7 @@ jobs:
         run: |
           git config --global core.autocrlf false
       - name: Checkout GDAL
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
       - name: Install development packages
         uses: msys2/setup-msys2@fb197b72ce45fb24f17bf3f807a388985654d1f2 # v2.29.0
         with:
@@ -412,7 +412,7 @@ jobs:
       run: |
         git config --global core.autocrlf false
     - name: Checkout GDAL
-      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
     - uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
     - name: populate JAVA_HOME
       shell: pwsh
@@ -528,7 +528,7 @@ jobs:
       run: |
         git config --global core.autocrlf false
     - name: Checkout GDAL
-      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
     - uses: conda-incubator/setup-miniconda@835234971496cad1653abb28a638a281cf32541f # v3.2.0
       with:
         activate-environment: gdalenv
@@ -539,16 +539,23 @@ jobs:
     - name: Install dependency
       shell: bash -l {0}
       run: |
-        conda install --yes --quiet proj pytest pytest-env pytest-benchmark filelock lxml cmake setuptools
+        conda install --yes --quiet proj python=3.12 swig pytest pytest-env pytest-benchmark filelock lxml cmake setuptools
     - name: Check CMake version
       shell: bash -l {0}
       run: |
         cmake --version
+
+    - name: Remove conflicting libraries
+      shell: bash -l {0}
+      run: |
+          rm -rf C:/Strawberry || /bin/true
+          rm -rf "C:/Program Files/OpenSSL/lib" || /bin/true
+
     - name: Configure
       shell: bash -l {0}
       run: |
         mkdir -p $GITHUB_WORKSPACE/build
-        cmake -A ${architecture} -G "${generator}" "-DCMAKE_PREFIX_PATH=${CONDA}/envs/gdalenv" -Werror=dev "-DCMAKE_CXX_COMPILER_LAUNCHER=clcache" -DCMAKE_UNITY_BUILD=${CMAKE_UNITY_BUILD} -S "$GITHUB_WORKSPACE" -B "$GITHUB_WORKSPACE/build" -DCMAKE_C_FLAGS=" /WX" -DCMAKE_CXX_FLAGS=" /WX" -DGDAL_USE_EXTERNAL_LIBS:BOOL=OFF -DWERROR_DEV_FLAG="-Werror=dev"
+        cmake -A ${architecture} -G "${generator}" "-DCMAKE_PREFIX_PATH=${CONDA}/envs/gdalenv" -Werror=dev "-DCMAKE_CXX_COMPILER_LAUNCHER=clcache" -DCMAKE_UNITY_BUILD=${CMAKE_UNITY_BUILD} -S "$GITHUB_WORKSPACE" -B "$GITHUB_WORKSPACE/build" -DCMAKE_C_FLAGS=" /WX" -DCMAKE_CXX_FLAGS=" /WX" -DGDAL_USE_EXTERNAL_LIBS:BOOL=OFF -DWERROR_DEV_FLAG="-Werror=dev" -DCMAKE_CXX_STANDARD=20
     - name: Build
       shell: bash -l {0}
       run: cmake --build $GITHUB_WORKSPACE/build --config RelWithDebInfo -j 2
@@ -612,7 +619,7 @@ jobs:
       with:
         xcode-version: '15.4.0'
     - name: Checkout GDAL
-      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
     - name: Setup cache
       uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
       id: cache
@@ -699,7 +706,7 @@ jobs:
       run: |
         git config --global core.autocrlf false
     - name: Checkout GDAL
-      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
     - uses: conda-incubator/setup-miniconda@835234971496cad1653abb28a638a281cf32541f # v3.2.0
       with:
         activate-environment: gdalenv

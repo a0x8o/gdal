@@ -47,25 +47,27 @@ CPL_C_START
 typedef enum
 {
     /*! Unknown or unspecified type */ GDT_Unknown = 0,
-    /*! Eight bit unsigned integer */ GDT_Byte = 1,
+    /*! 8-bit unsigned integer (GDT_Byte in GDAL < 3.13) */ GDT_UInt8 = 1,
     /*! 8-bit signed integer (GDAL >= 3.7) */ GDT_Int8 = 14,
-    /*! Sixteen bit unsigned integer */ GDT_UInt16 = 2,
-    /*! Sixteen bit signed integer */ GDT_Int16 = 3,
-    /*! Thirty two bit unsigned integer */ GDT_UInt32 = 4,
-    /*! Thirty two bit signed integer */ GDT_Int32 = 5,
+    /*! 16-bit unsigned integer */ GDT_UInt16 = 2,
+    /*! 16-bit signed integer */ GDT_Int16 = 3,
+    /*! 32-bit unsigned integer */ GDT_UInt32 = 4,
+    /*! 32-bit signed integer */ GDT_Int32 = 5,
     /*! 64 bit unsigned integer (GDAL >= 3.5)*/ GDT_UInt64 = 12,
     /*! 64 bit signed integer  (GDAL >= 3.5)*/ GDT_Int64 = 13,
-    /*! Sixteen bit floating point */ GDT_Float16 = 15,
-    /*! Thirty two bit floating point */ GDT_Float32 = 6,
-    /*! Sixty four bit floating point */ GDT_Float64 = 7,
+    /*! 16-bit floating point */ GDT_Float16 = 15,
+    /*! 32-bit floating point */ GDT_Float32 = 6,
+    /*! 64-bit floating point */ GDT_Float64 = 7,
     /*! Complex Int16 */ GDT_CInt16 = 8,
     /*! Complex Int32 */ GDT_CInt32 = 9,
-    /* TODO?(#6879): GDT_CInt64 */
     /*! Complex Float16 */ GDT_CFloat16 = 16,
     /*! Complex Float32 */ GDT_CFloat32 = 10,
     /*! Complex Float64 */ GDT_CFloat64 = 11,
     GDT_TypeCount = 17 /* maximum type # + 1 */
 } GDALDataType;
+
+/** GDT_Byte is the name used before GDAL 3.13 for GDT_UInt8 */
+#define GDT_Byte GDT_UInt8
 
 int CPL_DLL CPL_STDCALL GDALGetDataTypeSize(GDALDataType)
     /*! @cond Doxygen_Suppress */
@@ -1576,7 +1578,7 @@ void CPL_DLL GDALDestroySubdatasetInfo(GDALSubdatasetInfoH hInfo);
  *          a pixel from a source buffer.
  */
 #define SRCVAL(papoSource, eSrcType, ii) \
-    (eSrcType == GDT_Byte ? CPL_REINTERPRET_CAST(const GByte *, papoSource)[ii] : \
+    (eSrcType == GDT_UInt8 ? CPL_REINTERPRET_CAST(const GByte *, papoSource)[ii] : \
      eSrcType == GDT_Int8 ? CPL_REINTERPRET_CAST(const GInt8 *, papoSource)[ii] : \
      eSrcType == GDT_UInt16 ? CPL_REINTERPRET_CAST(const GUInt16 *, papoSource)[ii] : \
      eSrcType == GDT_Int16 ? CPL_REINTERPRET_CAST(const GInt16 *, papoSource)[ii] : \
@@ -2810,6 +2812,74 @@ GDALMDArrayH CPL_DLL *
 GDALMDArrayGetMeshGrid(const GDALMDArrayH *pahInputArrays,
                        size_t nCountInputArrays, size_t *pnCountOutputArrays,
                        CSLConstList papszOptions) CPL_WARN_UNUSED_RESULT;
+
+#ifdef __cplusplus
+extern "C++"
+{
+#endif
+
+    /** Information on a raw block of a GDALMDArray
+     *
+     * @since 3.12
+     */
+    struct
+#ifdef __cplusplus
+        CPL_DLL
+#endif
+            GDALMDArrayRawBlockInfo
+    {
+        /** Filename into which the raw block is found */
+        char *pszFilename;
+        /** File offset within pszFilename of the start of the raw block */
+        uint64_t nOffset;
+        /** Size in bytes of the raw block */
+        uint64_t nSize;
+        /** NULL or Null-terminated list of driver specific information on the
+         * raw block */
+        char **papszInfo;
+        /** In-memory buffer of nSize bytes. When this is set, pszFilename and
+         * nOffset are set to NULL.
+         *
+         * When using C++ copy constructor or copy-assignment operator, if
+         * a memory allocation fails, a CPLError() will be emitted and this
+         * field will be NULL, but nSize not zero.
+         */
+        GByte *pabyInlineData;
+
+#ifdef __cplusplus
+        /*! @cond Doxygen_Suppress */
+        inline GDALMDArrayRawBlockInfo()
+            : pszFilename(nullptr), nOffset(0), nSize(0), papszInfo(nullptr),
+              pabyInlineData(nullptr)
+        {
+        }
+
+        ~GDALMDArrayRawBlockInfo();
+
+        void clear();
+
+        GDALMDArrayRawBlockInfo(const GDALMDArrayRawBlockInfo &);
+        GDALMDArrayRawBlockInfo &operator=(const GDALMDArrayRawBlockInfo &);
+        GDALMDArrayRawBlockInfo(GDALMDArrayRawBlockInfo &&);
+        GDALMDArrayRawBlockInfo &operator=(GDALMDArrayRawBlockInfo &&);
+        /*! @endcond */
+#endif
+    };
+
+#ifdef __cplusplus
+}
+#endif
+
+/*! @cond Doxygen_Suppress */
+typedef struct GDALMDArrayRawBlockInfo GDALMDArrayRawBlockInfo;
+/*! @endcond */
+
+GDALMDArrayRawBlockInfo CPL_DLL *GDALMDArrayRawBlockInfoCreate(void);
+void CPL_DLL
+GDALMDArrayRawBlockInfoRelease(GDALMDArrayRawBlockInfo *psBlockInfo);
+bool CPL_DLL GDALMDArrayGetRawBlockInfo(GDALMDArrayH hArray,
+                                        const uint64_t *panBlockCoordinates,
+                                        GDALMDArrayRawBlockInfo *psBlockInfo);
 
 void CPL_DLL GDALReleaseArrays(GDALMDArrayH *arrays, size_t nCount);
 int CPL_DLL GDALMDArrayCache(GDALMDArrayH hArray, CSLConstList papszOptions);

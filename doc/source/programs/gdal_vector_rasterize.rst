@@ -24,6 +24,29 @@ Description
 
 Since GDAL 3.12, this algorithm can be part of a :ref:`gdal_pipeline`.
 
+.. only:: html
+
+   .. list-table::
+      :widths: 50 50
+      :width: 70%
+      :header-rows: 0
+
+      * - .. figure:: ../../images/programs/gdal_vector_rasterize.png
+             :width: 100%
+
+             Rasterization result using default settings.
+
+        - .. figure:: ../../images/programs/gdal_vector_rasterize_all_touching.png
+             :width: 100%
+
+             Rasterization result using :option:`--all-touched`.
+
+The left figure illustrates the default rasterization behavior, where only pixels on the line render
+path are included.
+
+The right figure shows the effect of :option:`--all-touched`, where every pixel that touches the input polygons is
+included.
+
 The following options are available:
 
 Standard options
@@ -115,6 +138,7 @@ Standard options
 .. option:: --size <xsize>,<ysize>
 
     Set output file size in pixels and lines. Note that `--size` cannot be used with `--resolution`.
+    If one of the two values is set to 0, it will be computed from the other value in order to preserve the aspect ratio of the extent.
 
 .. option:: --ot, --datatype, --output-data-type <OUTPUT-DATA-TYPE>
 

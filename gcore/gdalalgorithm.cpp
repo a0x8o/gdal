@@ -1950,9 +1950,12 @@ bool GDALAlgorithm::ParseArgument(
             }
             else
             {
-                const CPLStringList aosTokens(CSLTokenizeString2(
-                    value.c_str(), ",",
-                    CSLT_HONOURSTRINGS | CSLT_PRESERVEQUOTES));
+                const CPLStringList aosTokens(
+                    arg->GetPackedValuesAllowed()
+                        ? CSLTokenizeString2(value.c_str(), ",",
+                                             CSLT_HONOURSTRINGS |
+                                                 CSLT_STRIPLEADSPACES)
+                        : CSLAddString(nullptr, value.c_str()));
                 for (const char *v : aosTokens)
                 {
                     valueVector.push_back(GDALArgDatasetValue(v));
@@ -3130,6 +3133,16 @@ bool GDALAlgorithm::IsKnownOutputRelatedBooleanArgName(std::string_view osName)
 }
 
 /************************************************************************/
+/*                      GDALAlgorithm::HasOutputString()                */
+/************************************************************************/
+
+bool GDALAlgorithm::HasOutputString() const
+{
+    auto outputStringArg = GetArg(GDAL_ARG_NAME_OUTPUT_STRING);
+    return outputStringArg && outputStringArg->IsOutput();
+}
+
+/************************************************************************/
 /*                      GDALAlgorithm::GetArg()                         */
 /************************************************************************/
 
@@ -3613,12 +3626,14 @@ GDALInConstructionAlgorithmArg &GDALAlgorithm::AddInputDatasetArg(
     std::vector<GDALArgDatasetValue> *pValue, GDALArgDatasetType type,
     bool positionalAndRequired, const char *helpMessage)
 {
-    auto &arg = AddArg(
-        GDAL_ARG_NAME_INPUT, 'i',
-        MsgOrDefault(helpMessage,
-                     CPLSPrintf("Input %s datasets",
-                                GDALAlgorithmArgDatasetTypeName(type).c_str())),
-        pValue, type);
+    auto &arg =
+        AddArg(GDAL_ARG_NAME_INPUT, 'i',
+               MsgOrDefault(
+                   helpMessage,
+                   CPLSPrintf("Input %s datasets",
+                              GDALAlgorithmArgDatasetTypeName(type).c_str())),
+               pValue, type)
+            .SetPackedValuesAllowed(false);
     if (positionalAndRequired)
         arg.SetPositional().SetRequired();
 
@@ -4399,9 +4414,10 @@ GDALAlgorithm::AddOutputDataTypeArg(std::string *pValue,
             .AddAlias("ot")
             .AddAlias("datatype")
             .AddMetadataItem("type", {"GDALDataType"})
-            .SetChoices("Byte", "Int8", "UInt16", "Int16", "UInt32", "Int32",
+            .SetChoices("UInt8", "Int8", "UInt16", "Int16", "UInt32", "Int32",
                         "UInt64", "Int64", "CInt16", "CInt32", "Float16",
-                        "Float32", "Float64", "CFloat32", "CFloat64");
+                        "Float32", "Float64", "CFloat32", "CFloat64")
+            .SetHiddenChoices("Byte");
     return arg;
 }
 
@@ -4689,8 +4705,7 @@ GDALAlgorithm::AddGeometryTypeArg(std::string *pValue, const char *helpMessage)
 
 /* static */
 void GDALAlgorithm::SetAutoCompleteFunctionForLayerName(
-    GDALInConstructionAlgorithmArg &layerArg,
-    GDALInConstructionAlgorithmArg &datasetArg)
+    GDALInConstructionAlgorithmArg &layerArg, GDALAlgorithmArg &datasetArg)
 {
     CPLAssert(datasetArg.GetType() == GAAT_DATASET ||
               datasetArg.GetType() == GAAT_DATASET_LIST);

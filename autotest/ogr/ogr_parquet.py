@@ -3841,6 +3841,29 @@ def test_ogr_parquet_sort_by_bbox(tmp_vsimem):
 
 
 ###############################################################################
+
+
+@gdaltest.enable_exceptions()
+@pytest.mark.require_driver("GPKG")
+def test_ogr_parquet_sort_by_bbox__empty_layer(tmp_vsimem):
+    """Test fix for https://github.com/OSGeo/gdal/issues/13328"""
+
+    outfilename = str(tmp_vsimem / "test_ogr_parquet_sort_by_bbox_empty_layer.parquet")
+    ds = ogr.GetDriverByName("Parquet").CreateDataSource(outfilename)
+
+    ds.CreateLayer(
+        "test",
+        geom_type=ogr.wkbPoint,
+        options=["SORT_BY_BBOX=YES", "FID=fid"],
+    )
+    ds = None
+
+    ds = ogr.Open(outfilename)
+    lyr = ds.GetLayer(0)
+    assert lyr.GetFeatureCount() == 0
+
+
+###############################################################################
 # Check GeoArrow struct encoding
 
 
@@ -3864,7 +3887,9 @@ def test_ogr_parquet_sort_by_bbox(tmp_vsimem):
     ],
 )
 @pytest.mark.parametrize("check_with_pyarrow", [True, False])
-@pytest.mark.parametrize("covering_bbox", [True, False])
+@pytest.mark.parametrize(
+    "covering_bbox,covering_bbox_name", [(True, None), (True, "bbox"), (False, None)]
+)
 @gdaltest.enable_exceptions()
 def test_ogr_parquet_geoarrow(
     tmp_vsimem,
@@ -3872,6 +3897,7 @@ def test_ogr_parquet_geoarrow(
     wkt,
     check_with_pyarrow,
     covering_bbox,
+    covering_bbox_name,
     with_arrow_dataset_or_not,
 ):
 
@@ -3885,13 +3911,16 @@ def test_ogr_parquet_geoarrow(
 
     ds = ogr.GetDriverByName("Parquet").CreateDataSource(filename)
 
+    options = {
+        "GEOMETRY_ENCODING": "GEOARROW",
+        "WRITE_COVERING_BBOX": "YES" if covering_bbox else "NO",
+    }
+    if covering_bbox_name:
+        options["COVERING_BBOX_NAME"] = covering_bbox_name
     lyr = ds.CreateLayer(
         "test",
         geom_type=geom.GetGeometryType(),
-        options=[
-            "GEOMETRY_ENCODING=GEOARROW",
-            "WRITE_COVERING_BBOX=" + ("YES" if covering_bbox else "NO"),
-        ],
+        options=options,
     )
     lyr.CreateField(ogr.FieldDefn("foo"))
 
@@ -3960,6 +3989,14 @@ def test_ogr_parquet_geoarrow(
     ds = ogr.Open(filename_to_open)
     lyr = ds.GetLayer(0)
     check(lyr)
+
+    if covering_bbox and not with_arrow_dataset_or_not:
+        geo = lyr.GetMetadataItem("geo", "_PARQUET_METADATA_")
+        assert geo is not None
+        j = json.loads(geo)
+        assert j["columns"]["geometry"]["covering"]["bbox"]["xmin"][0] == (
+            covering_bbox_name if covering_bbox_name else "geometry_bbox"
+        )
 
     if (
         covering_bbox
@@ -4616,3 +4653,73 @@ def test_ogr_parquet_update_with_creation_options_explicit(tmp_path):
         assert f["str"] == "bar"
         assert f["int"] == 456
         assert f.GetGeometryRef().ExportToWkt() == "POINT (3 4)"
+
+
+###############################################################################
+
+
+def test_ogr_parquet_arrow_stream_list_of_struct_ignored_fields():
+    pytest.importorskip("pyarrow")
+
+    ds = ogr.Open("data/parquet/test_list_of_struct.parquet")
+    lyr = ds.GetLayer(0)
+    lyr.SetIgnoredFields(["OGR_GEOMETRY"])
+    stream = lyr.GetArrowStreamAsPyArrow()
+    batches = [batch for batch in stream]
+    assert len(batches) == 1
+    assert len(batches[0].field("col_flat")) == 3
+    assert len(batches[0].field("col_nested")) == 3
+    assert batches[0].field("col_flat")[0].as_py() == 0
+    assert batches[0].field("col_flat")[1].as_py() == 1
+    assert batches[0].field("col_flat")[2].as_py() == 2
+    assert batches[0].field("col_nested")[0].as_py() == [
+        {"a": 1, "b": 2},
+        {"a": 1, "b": 2},
+    ]
+    assert batches[0].field("col_nested")[1].as_py() == [
+        {"a": 1, "b": 2},
+        {"a": 1, "b": 2},
+    ]
+    assert batches[0].field("col_nested")[2].as_py() == [
+        {"a": 1, "b": 2},
+        {"a": 1, "b": 2},
+    ]
+
+
+###############################################################################
+
+
+def test_ogr_parquet_lists_as_string_json():
+
+    ds = gdal.OpenEx(
+        "data/parquet/test.parquet", open_options=["LISTS_AS_STRING_JSON=YES"]
+    )
+    lyr = ds.GetLayer(0)
+    lyr_defn = lyr.GetLayerDefn()
+    assert (
+        lyr_defn.GetFieldDefn(lyr_defn.GetFieldIndex("list_boolean")).GetType()
+        == ogr.OFTString
+    )
+    assert (
+        lyr_defn.GetFieldDefn(lyr_defn.GetFieldIndex("list_boolean")).GetSubType()
+        == ogr.OFSTJSON
+    )
+    assert (
+        lyr_defn.GetFieldDefn(
+            lyr_defn.GetFieldIndex("fixed_size_list_float64")
+        ).GetType()
+        == ogr.OFTString
+    )
+    assert (
+        lyr_defn.GetFieldDefn(
+            lyr_defn.GetFieldIndex("fixed_size_list_float64")
+        ).GetSubType()
+        == ogr.OFSTJSON
+    )
+    f = lyr.GetFeature(4)
+    assert f["list_boolean"] == "[null,false,true,false]"
+    assert f["list_uint8"] == "[null,7,8,9]"
+    assert f["list_int64"] == "[null,7,8,9]"
+    assert f["list_float64"] == "[null,7.5,8.5,9.5]"
+    assert f["list_string"] == "[null]"
+    assert f["fixed_size_list_float64"] == "[8.0,9.0]"
