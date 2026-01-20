@@ -60,7 +60,7 @@ class WEBPDataset final : public GDALPamDataset
                      GDALRasterIOExtraArg *psExtraArg) override;
 
     char **GetMetadataDomainList() override;
-    char **GetMetadata(const char *pszDomain = "") override;
+    CSLConstList GetMetadata(const char *pszDomain = "") override;
 
     CPLStringList GetCompressionFormats(int nXOff, int nYOff, int nXSize,
                                         int nYSize, int nBandCount,
@@ -262,7 +262,7 @@ char **WEBPDataset::GetMetadataDomainList()
 /*                           GetMetadata()                              */
 /************************************************************************/
 
-char **WEBPDataset::GetMetadata(const char *pszDomain)
+CSLConstList WEBPDataset::GetMetadata(const char *pszDomain)
 {
     if ((pszDomain != nullptr && EQUAL(pszDomain, "xml:XMP")) &&
         !bHasReadXMPMetadata)
@@ -296,7 +296,8 @@ char **WEBPDataset::GetMetadata(const char *pszDomain)
                 if ((l_nFlags & 8) == 0)
                     break;
 
-                VSIFSeekL(fpImage, nChunkSize - 4, SEEK_CUR);
+                VSIFSeekL(fpImage, static_cast<vsi_l_offset>(nChunkSize - 4),
+                          SEEK_CUR);
 
                 bFirst = false;
             }
@@ -331,7 +332,8 @@ char **WEBPDataset::GetMetadata(const char *pszDomain)
                 break;
             }
             else
-                VSIFSeekL(fpImage, nChunkSize, SEEK_CUR);
+                VSIFSeekL(fpImage, static_cast<vsi_l_offset>(nChunkSize),
+                          SEEK_CUR);
         }
     }
 
@@ -737,7 +739,7 @@ GDALDataset *WEBPDataset::CreateCopy(const char *pszFilename,
                                static_cast<const GByte *>(pWEBPContent) +
                                    nWEBPContent);
 
-                char **papszXMP = poSrcDS->GetMetadata("xml:XMP");
+                CSLConstList papszXMP = poSrcDS->GetMetadata("xml:XMP");
                 if (papszXMP && papszXMP[0])
                 {
                     GByte abyChunkHeader[8];
@@ -749,8 +751,10 @@ GDALDataset *WEBPDataset::CreateCopy(const char *pszFilename,
                     abyData.insert(abyData.end(), abyChunkHeader,
                                    abyChunkHeader + sizeof(abyChunkHeader));
                     abyData.insert(
-                        abyData.end(), reinterpret_cast<GByte *>(papszXMP[0]),
-                        reinterpret_cast<GByte *>(papszXMP[0]) + nXMPSize);
+                        abyData.end(),
+                        reinterpret_cast<const GByte *>(papszXMP[0]),
+                        reinterpret_cast<const GByte *>(papszXMP[0]) +
+                            nXMPSize);
                     if ((abyData.size() % 2) != 0)  // Payload padding if needed
                         abyData.push_back(0);
 
@@ -876,7 +880,7 @@ GDALDataset *WEBPDataset::CreateCopy(const char *pszFilename,
     {
         CPLError((bStrict) ? CE_Failure : CE_Warning, CPLE_NotSupported,
                  "WEBP driver doesn't support data type %s. "
-                 "Only eight bit byte bands supported.",
+                 "Only UInt8 bands supported.",
                  GDALGetDataTypeName(
                      poSrcDS->GetRasterBand(1)->GetRasterDataType()));
 

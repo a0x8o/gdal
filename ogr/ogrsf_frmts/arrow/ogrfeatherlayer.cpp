@@ -202,7 +202,10 @@ void OGRFeatherLayer::EstablishFeatureDefn()
 
         bool bRegularField = true;
         auto oIter = m_oMapGeometryColumns.find(fieldName);
-        if (oIter != m_oMapGeometryColumns.end() || !osExtensionName.empty())
+        if (oIter != m_oMapGeometryColumns.end() ||
+            (osExtensionName != EXTENSION_NAME_ARROW_JSON &&
+             osExtensionName != EXTENSION_NAME_ARROW_TIMESTAMP_WITH_OFFSET &&
+             !osExtensionName.empty()))
         {
             CPLJSONObject oJSONDef;
             if (oIter != m_oMapGeometryColumns.end())
@@ -833,7 +836,7 @@ const char *OGRFeatherLayer::GetMetadataItem(const char *pszName,
 /*                           GetMetadata()                              */
 /************************************************************************/
 
-char **OGRFeatherLayer::GetMetadata(const char *pszDomain)
+CSLConstList OGRFeatherLayer::GetMetadata(const char *pszDomain)
 {
     // Mostly for unit test purposes
     if (pszDomain != nullptr && EQUAL(pszDomain, "_ARROW_METADATA_"))

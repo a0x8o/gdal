@@ -19,6 +19,7 @@
 #include <mutex>
 #include <queue>
 
+#include "cpl_json.h"
 #include "cpl_mem_cache.h"
 #include "cpl_worker_thread_pool.h"  // CPLJobQueue, CPLWorkerThreadPool
 #include "fetchbufferdirectio.h"
@@ -157,6 +158,9 @@ class GTiffDataset final : public GDALPamDataset
     char *m_pszGeorefFilename = nullptr;
     char *m_pszXMLFilename = nullptr;
 
+    CPLJSONObject m_oISIS3Metadata{};
+    std::map<std::string, std::string> m_oMapISIS3MetadataItems{};
+
     GDALGeoTransform m_gt{};
     double m_dfMaxZError = 0.0;
     double m_dfMaxZErrorOverview = 0.0;
@@ -184,6 +188,29 @@ class GTiffDataset final : public GDALPamDataset
     int m_nLastWrittenBlockId = -1;  // used for m_bStreamingOut
     int m_nRefBaseMapping = 0;
     int m_nDisableMultiThreadedRead = 0;
+
+    struct JPEGOverviewVisibilitySetter
+    {
+        signed char &nCounter_;
+
+        explicit JPEGOverviewVisibilitySetter(signed char &nCounter)
+            : nCounter_(nCounter)
+        {
+            ++nCounter_;
+        }
+
+        ~JPEGOverviewVisibilitySetter()
+        {
+            --nCounter_;
+        }
+    };
+
+    std::unique_ptr<JPEGOverviewVisibilitySetter>
+    MakeJPEGOverviewVisible() CPL_WARN_UNUSED_RESULT
+    {
+        return std::make_unique<JPEGOverviewVisibilitySetter>(
+            m_nJPEGOverviewVisibilityCounter);
+    }
 
   public:
     static constexpr int DEFAULT_COLOR_TABLE_MULTIPLIER_257 = 257;
@@ -529,8 +556,8 @@ class GTiffDataset final : public GDALPamDataset
     CPLErr FlushCache(bool bAtClosing) override;
 
     char **GetMetadataDomainList() override;
-    CPLErr SetMetadata(char **, const char * = "") override;
-    char **GetMetadata(const char *pszDomain = "") override;
+    CPLErr SetMetadata(CSLConstList, const char * = "") override;
+    CSLConstList GetMetadata(const char *pszDomain = "") override;
     CPLErr SetMetadataItem(const char *, const char *,
                            const char * = "") override;
     virtual const char *GetMetadataItem(const char *pszName,

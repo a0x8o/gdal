@@ -3510,7 +3510,9 @@ static bool GTIFFMakeBufferedStream(GDALOpenInfo *poOpenInfo)
     if (fpTemp == nullptr)
         return false;
     // The seek is needed for /vsistdin/ that has some rewind capabilities.
-    if (VSIFSeekL(poOpenInfo->fpL, poOpenInfo->nHeaderBytes, SEEK_SET) != 0)
+    if (VSIFSeekL(poOpenInfo->fpL,
+                  static_cast<vsi_l_offset>(poOpenInfo->nHeaderBytes),
+                  SEEK_SET) != 0)
     {
         CPL_IGNORE_RET_VAL(VSIFCloseL(fpTemp));
         return false;
@@ -6299,7 +6301,7 @@ char **GTiffDataset::GetMetadataDomainList()
 /*                            GetMetadata()                             */
 /************************************************************************/
 
-char **GTiffDataset::GetMetadata(const char *pszDomain)
+CSLConstList GTiffDataset::GetMetadata(const char *pszDomain)
 
 {
     if (pszDomain != nullptr && EQUAL(pszDomain, "IMAGE_STRUCTURE"))
@@ -6575,6 +6577,39 @@ const char *GTiffDataset::GetMetadataItem(const char *pszName,
         }
     }
 
+    else if (pszName && pszDomain && EQUAL(pszDomain, "json:ISIS3"))
+    {
+        auto oIter = m_oMapISIS3MetadataItems.find(pszName);
+        if (oIter != m_oMapISIS3MetadataItems.end())
+        {
+            return oIter->second.c_str();
+        }
+        else
+        {
+            if (!m_oISIS3Metadata.IsValid())
+            {
+                CSLConstList papszMD = m_oGTiffMDMD.GetMetadata(pszDomain);
+                if (papszMD && papszMD[0])
+                {
+                    CPLJSONDocument oDoc;
+                    if (oDoc.LoadMemory(papszMD[0]))
+                    {
+                        m_oISIS3Metadata = oDoc.GetRoot();
+                    }
+                }
+            }
+            CPLJSONObject obj = m_oISIS3Metadata[pszName];
+            if (obj.IsValid())
+            {
+                return m_oMapISIS3MetadataItems
+                    .insert(std::pair<std::string, std::string>(pszName,
+                                                                obj.ToString()))
+                    .first->second.c_str();
+            }
+            return nullptr;
+        }
+    }
+
     return m_oGTiffMDMD.GetMetadataItem(pszName, pszDomain);
 }
 
@@ -6599,24 +6634,24 @@ void GTiffDataset::LoadEXIFMetadata()
     const bool bSwabflag = bLittleEndian != bLeastSignificantBit;  // != is XOR.
 
     char **papszMetadata = nullptr;
-    toff_t nOffset = 0;  // TODO(b/28199387): Refactor to simplify casting.
+    toff_t nOffset = 0;
 
     if (TIFFGetField(m_hTIFF, TIFFTAG_EXIFIFD, &nOffset))
     {
-        int nExifOffset = static_cast<int>(nOffset);
-        int nInterOffset = 0;
-        int nGPSOffset = 0;
-        EXIFExtractMetadata(papszMetadata, fp, static_cast<int>(nOffset),
+        uint32_t nExifOffset = static_cast<uint32_t>(nOffset);
+        uint32_t nInterOffset = 0;
+        uint32_t nGPSOffset = 0;
+        EXIFExtractMetadata(papszMetadata, fp, static_cast<uint32_t>(nOffset),
                             bSwabflag, 0, nExifOffset, nInterOffset,
                             nGPSOffset);
     }
 
     if (TIFFGetField(m_hTIFF, TIFFTAG_GPSIFD, &nOffset))
     {
-        int nExifOffset = 0;  // TODO(b/28199387): Refactor to simplify casting.
-        int nInterOffset = 0;
-        int nGPSOffset = static_cast<int>(nOffset);
-        EXIFExtractMetadata(papszMetadata, fp, static_cast<int>(nOffset),
+        uint32_t nExifOffset = 0;
+        uint32_t nInterOffset = 0;
+        uint32_t nGPSOffset = static_cast<uint32_t>(nOffset);
+        EXIFExtractMetadata(papszMetadata, fp, static_cast<uint32_t>(nOffset),
                             bSwabflag, 0, nExifOffset, nInterOffset,
                             nGPSOffset);
     }

@@ -592,16 +592,16 @@ bool GDALAVIFDataset::Init(GDALOpenInfo *poOpenInfo)
         VSILFILE *fpEXIF =
             VSIFileFromMemBuffer(nullptr, m_decoder->image->exif.data,
                                  m_decoder->image->exif.size, false);
-        int nExifOffset = 0;
-        int nInterOffset = 0;
-        int nGPSOffset = 0;
+        uint32_t nExifOffset = 0;
+        uint32_t nInterOffset = 0;
+        uint32_t nGPSOffset = 0;
         char **papszEXIFMetadata = nullptr;
 #ifdef CPL_LSB
         const bool bSwab = m_decoder->image->exif.data[0] == 0x4d;
 #else
         const bool bSwab = m_decoder->image->exif.data[0] == 0x49;
 #endif
-        constexpr int nTIFFHEADER = 0;
+        constexpr uint32_t nTIFFHEADER = 0;
         uint32_t nTiffDirStart;
         memcpy(&nTiffDirStart, m_decoder->image->exif.data + 4,
                sizeof(uint32_t));
@@ -958,7 +958,7 @@ GDALDataset *GDALAVIFDataset::CreateCopy(const char *pszFilename,
     if (CPLTestBool(
             CSLFetchNameValueDef(papszOptions, "WRITE_EXIF_METADATA", "YES")))
     {
-        char **papszEXIFMD = poSrcDS->GetMetadata("EXIF");
+        CSLConstList papszEXIFMD = poSrcDS->GetMetadata("EXIF");
         if (papszEXIFMD)
         {
             GUInt32 nDataSize = 0;
@@ -1095,7 +1095,7 @@ class GDALAVIFDriver final : public GDALDriver
     const char *GetMetadataItem(const char *pszName,
                                 const char *pszDomain = "") override;
 
-    char **GetMetadata(const char *pszDomain) override
+    CSLConstList GetMetadata(const char *pszDomain) override
     {
         std::lock_guard oLock(m_oMutex);
         InitMetadata();

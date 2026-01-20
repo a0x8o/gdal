@@ -86,6 +86,7 @@ extensions = [
     "doctestplus_gdal",
     "source_file",
     "sphinx.ext.napoleon",
+    "sphinxcontrib.cairosvgconverter",
     "sphinxcontrib.jquery",
     "sphinxcontrib_programoutput_gdal",
     "sphinxcontrib.spelling",
@@ -386,9 +387,6 @@ html_static_path = ["_static"]
 # For generated content and robots.txt
 html_extra_path = [os.path.join(build_dir, "html_extra"), "extra_path"]
 
-html_js_files = ["announcement.js"]
-html_css_files = ["announcement.css"]
-
 # If true, links to the reST sources are added to the pages.
 html_show_sourcelink = False
 
@@ -444,6 +442,13 @@ man_pages = [
         "programs/gdal_dataset_identify",
         "gdal-dataset-identify",
         "Identify driver opening dataset(s)",
+        [author_evenr],
+        1,
+    ),
+    (
+        "programs/gdal_dataset_check",
+        "gdal-dataset-check",
+        "Check whether there are errors when reading the content of a dataset",
         [author_evenr],
         1,
     ),
@@ -1444,6 +1449,12 @@ latex_documents = [
 latex_toplevel_sectioning = "chapter"
 
 latex_logo = "../images/gdalicon_big.png"
+# Disable module and domain indices in PDF output.
+# Python API documentation is not included in the PDF, so keeping them
+# results in a dummy and confusing "Python Module Index" section.
+latex_use_modindex = False
+latex_domain_indices = False
+
 
 # If true, show URL addresses after external links.
 # man_show_urls = False

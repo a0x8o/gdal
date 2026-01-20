@@ -940,7 +940,7 @@ void GDALDriver::DefaultCopyMetadata(GDALDataset *poSrcDS, GDALDataset *poDstDS,
             if ((!papszSrcMDD || CSLFindString(papszSrcMDD, pszDomain) >= 0) &&
                 CSLFindString(papszExcludedDomains, pszDomain) < 0)
             {
-                char **papszMD = poSrcDS->GetMetadata(pszDomain);
+                CSLConstList papszMD = poSrcDS->GetMetadata(pszDomain);
                 if (papszMD)
                     poDstDS->SetMetadata(papszMD, pszDomain);
             }
@@ -1672,7 +1672,8 @@ CPLErr GDALDriver::Delete(const char *pszFilename)
     /* -------------------------------------------------------------------- */
     /*      Collect file list.                                              */
     /* -------------------------------------------------------------------- */
-    GDALDatasetH hDS = GDALOpenEx(pszFilename, 0, nullptr, nullptr, nullptr);
+    GDALDatasetH hDS = GDALOpenEx(pszFilename, GDAL_OF_VERBOSE_ERROR, nullptr,
+                                  nullptr, nullptr);
 
     if (hDS == nullptr)
     {

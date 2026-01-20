@@ -70,6 +70,18 @@ int JP2OPJLikeRasterBand<CODEC, BASE>::HasArbitraryOverviews()
 }
 
 /************************************************************************/
+/*                  MayMultiBlockReadingBeMultiThreaded()               */
+/************************************************************************/
+
+template <typename CODEC, typename BASE>
+bool JP2OPJLikeRasterBand<CODEC, BASE>::MayMultiBlockReadingBeMultiThreaded()
+    const
+{
+    auto poGDS = cpl::down_cast<JP2OPJLikeDataset<CODEC, BASE> *>(poDS);
+    return poGDS->GetNumThreads() > 1;
+}
+
+/************************************************************************/
 /*                      ~JP2OPJLikeRasterBand()                         */
 /************************************************************************/
 
@@ -1177,7 +1189,7 @@ CPLErr JP2OPJLikeDataset<CODEC, BASE>::SetGCPs(int nGCPCountIn,
 /************************************************************************/
 
 template <typename CODEC, typename BASE>
-CPLErr JP2OPJLikeDataset<CODEC, BASE>::SetMetadata(char **papszMetadata,
+CPLErr JP2OPJLikeDataset<CODEC, BASE>::SetMetadata(CSLConstList papszMetadata,
                                                    const char *pszDomain)
 {
     if (eAccess == GA_Update)
@@ -1207,7 +1219,8 @@ CPLErr JP2OPJLikeDataset<CODEC, BASE>::SetMetadataItem(const char *pszName,
         this->bRewrite = TRUE;
         if (pszDomain == nullptr || EQUAL(pszDomain, ""))
         {
-            m_papszMainMD = CSLSetNameValue(GetMetadata(), pszName, pszValue);
+            GetMetadata();  // update m_papszMainMD
+            m_papszMainMD = CSLSetNameValue(m_papszMainMD, pszName, pszValue);
         }
         return GDALDataset::SetMetadataItem(pszName, pszValue, pszDomain);
     }
