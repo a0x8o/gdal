@@ -29,6 +29,7 @@
 #include "cpl_mem_cache.h"
 #include "cpl_minixml.h"
 #include "cpl_quad_tree.h"
+#include "cpl_worker_thread_pool.h"
 #include "vrtdataset.h"
 #include "vrt_priv.h"
 #include "ogrsf_frmts.h"
@@ -150,7 +151,7 @@ constexpr const char *GTI_XML_COLORTABLE = "ColorTable";
 constexpr const char *GTI_XML_RAT = "GDALRasterAttributeTable";
 
 /************************************************************************/
-/*                           ENDS_WITH_CI()                             */
+/*                            ENDS_WITH_CI()                            */
 /************************************************************************/
 
 static inline bool ENDS_WITH_CI(const char *a, const char *b)
@@ -159,7 +160,7 @@ static inline bool ENDS_WITH_CI(const char *a, const char *b)
 }
 
 /************************************************************************/
-/*                       GDALTileIndexDataset                           */
+/*                         GDALTileIndexDataset                         */
 /************************************************************************/
 
 class GDALTileIndexBand;
@@ -427,7 +428,7 @@ class GDALTileIndexDataset final : public GDALPamDataset
 };
 
 /************************************************************************/
-/*                            GDALTileIndexBand                          */
+/*                          GDALTileIndexBand                           */
 /************************************************************************/
 
 class GDALTileIndexBand final : public GDALPamRasterBand
@@ -576,7 +577,7 @@ class GDALTileIndexBand final : public GDALPamRasterBand
 };
 
 /************************************************************************/
-/*                        IsSameNaNAware()                              */
+/*                           IsSameNaNAware()                           */
 /************************************************************************/
 
 static inline bool IsSameNaNAware(double a, double b)
@@ -585,7 +586,7 @@ static inline bool IsSameNaNAware(double a, double b)
 }
 
 /************************************************************************/
-/*                         GDALTileIndexDataset()                        */
+/*                        GDALTileIndexDataset()                        */
 /************************************************************************/
 
 GDALTileIndexDataset::GDALTileIndexDataset()
@@ -634,7 +635,7 @@ static std::string GetAbsoluteFileName(const char *pszTileName,
 }
 
 /************************************************************************/
-/*                    GTIDoPaletteExpansionIfNeeded()                   */
+/*                   GTIDoPaletteExpansionIfNeeded()                    */
 /************************************************************************/
 
 //! Do palette -> RGB(A) expansion
@@ -2416,7 +2417,7 @@ bool GDALTileIndexDataset::Open(GDALOpenInfo *poOpenInfo)
 }
 
 /************************************************************************/
-/*                        GetMetadataItem()                             */
+/*                          GetMetadataItem()                           */
 /************************************************************************/
 
 const char *GDALTileIndexDataset::GetMetadataItem(const char *pszName,
@@ -2441,7 +2442,7 @@ const char *GDALTileIndexDataset::GetMetadataItem(const char *pszName,
 }
 
 /************************************************************************/
-/*                TileIndexSupportsEditingLayerMetadata()               */
+/*               TileIndexSupportsEditingLayerMetadata()                */
 /************************************************************************/
 
 bool GDALTileIndexDataset::TileIndexSupportsEditingLayerMetadata() const
@@ -2451,7 +2452,7 @@ bool GDALTileIndexDataset::TileIndexSupportsEditingLayerMetadata() const
 }
 
 /************************************************************************/
-/*                        SetMetadataItem()                             */
+/*                          SetMetadataItem()                           */
 /************************************************************************/
 
 CPLErr GDALTileIndexDataset::SetMetadataItem(const char *pszName,
@@ -2475,7 +2476,7 @@ CPLErr GDALTileIndexDataset::SetMetadataItem(const char *pszName,
 }
 
 /************************************************************************/
-/*                           SetMetadata()                              */
+/*                            SetMetadata()                             */
 /************************************************************************/
 
 CPLErr GDALTileIndexDataset::SetMetadata(CSLConstList papszMD,
@@ -2531,7 +2532,7 @@ CPLErr GDALTileIndexDataset::SetMetadata(CSLConstList papszMD,
 }
 
 /************************************************************************/
-/*                     GDALTileIndexDatasetIdentify()                   */
+/*                    GDALTileIndexDatasetIdentify()                    */
 /************************************************************************/
 
 static int GDALTileIndexDatasetIdentify(GDALOpenInfo *poOpenInfo)
@@ -2580,7 +2581,7 @@ static int GDALTileIndexDatasetIdentify(GDALOpenInfo *poOpenInfo)
 }
 
 /************************************************************************/
-/*                      GDALTileIndexDatasetOpen()                       */
+/*                      GDALTileIndexDatasetOpen()                      */
 /************************************************************************/
 
 static GDALDataset *GDALTileIndexDatasetOpen(GDALOpenInfo *poOpenInfo)
@@ -2594,7 +2595,7 @@ static GDALDataset *GDALTileIndexDatasetOpen(GDALOpenInfo *poOpenInfo)
 }
 
 /************************************************************************/
-/*                          ~GDALTileIndexDataset()                      */
+/*                       ~GDALTileIndexDataset()                        */
 /************************************************************************/
 
 GDALTileIndexDataset::~GDALTileIndexDataset()
@@ -2606,7 +2607,7 @@ GDALTileIndexDataset::~GDALTileIndexDataset()
 }
 
 /************************************************************************/
-/*                              FlushCache()                            */
+/*                             FlushCache()                             */
 /************************************************************************/
 
 CPLErr GDALTileIndexDataset::FlushCache(bool bAtClosing)
@@ -2751,7 +2752,7 @@ CPLErr GDALTileIndexDataset::FlushCache(bool bAtClosing)
 }
 
 /************************************************************************/
-/*                            LoadOverviews()                           */
+/*                           LoadOverviews()                            */
 /************************************************************************/
 
 void GDALTileIndexDataset::LoadOverviews()
@@ -2851,7 +2852,7 @@ int GDALTileIndexBand::GetOverviewCount()
 }
 
 /************************************************************************/
-/*                             GetOverview()                            */
+/*                            GetOverview()                             */
 /************************************************************************/
 
 GDALRasterBand *GDALTileIndexBand::GetOverview(int iOvr)
@@ -2877,7 +2878,7 @@ GDALRasterBand *GDALTileIndexBand::GetOverview(int iOvr)
 }
 
 /************************************************************************/
-/*                           GetGeoTransform()                          */
+/*                          GetGeoTransform()                           */
 /************************************************************************/
 
 CPLErr GDALTileIndexDataset::GetGeoTransform(GDALGeoTransform &gt) const
@@ -2887,7 +2888,7 @@ CPLErr GDALTileIndexDataset::GetGeoTransform(GDALGeoTransform &gt) const
 }
 
 /************************************************************************/
-/*                            GetSpatialRef()                           */
+/*                           GetSpatialRef()                            */
 /************************************************************************/
 
 const OGRSpatialReference *GDALTileIndexDataset::GetSpatialRef() const
@@ -2896,7 +2897,7 @@ const OGRSpatialReference *GDALTileIndexDataset::GetSpatialRef() const
 }
 
 /************************************************************************/
-/*                           GDALTileIndexBand()                         */
+/*                         GDALTileIndexBand()                          */
 /************************************************************************/
 
 GDALTileIndexBand::GDALTileIndexBand(GDALTileIndexDataset *poDSIn, int nBandIn,
@@ -2954,7 +2955,7 @@ CPLErr GDALTileIndexBand::IRasterIO(GDALRWFlag eRWFlag, int nXOff, int nYOff,
 }
 
 /************************************************************************/
-/*                         IGetDataCoverageStatus()                     */
+/*                       IGetDataCoverageStatus()                       */
 /************************************************************************/
 
 #ifndef HAVE_GEOS
@@ -3120,7 +3121,7 @@ int GDALTileIndexBand::IGetDataCoverageStatus(int nXOff, int nYOff, int nXSize,
 #endif  // HAVE_GEOS
 
 /************************************************************************/
-/*                      GetMetadataDomainList()                         */
+/*                       GetMetadataDomainList()                        */
 /************************************************************************/
 
 char **GDALTileIndexBand::GetMetadataDomainList()
@@ -3230,7 +3231,7 @@ const char *GDALTileIndexBand::GetMetadataItem(const char *pszName,
 }
 
 /************************************************************************/
-/*                        SetMetadataItem()                             */
+/*                          SetMetadataItem()                           */
 /************************************************************************/
 
 CPLErr GDALTileIndexBand::SetMetadataItem(const char *pszName,
@@ -3255,7 +3256,7 @@ CPLErr GDALTileIndexBand::SetMetadataItem(const char *pszName,
 }
 
 /************************************************************************/
-/*                           SetMetadata()                              */
+/*                            SetMetadata()                             */
 /************************************************************************/
 
 CPLErr GDALTileIndexBand::SetMetadata(CSLConstList papszMD,
@@ -3315,7 +3316,7 @@ CPLErr GDALTileIndexBand::SetMetadata(CSLConstList papszMD,
 }
 
 /************************************************************************/
-/*                         GetSrcDstWin()                               */
+/*                            GetSrcDstWin()                            */
 /************************************************************************/
 
 static bool GetSrcDstWin(const GDALGeoTransform &tileGT, int nTileXSize,
@@ -3394,7 +3395,7 @@ static bool GetSrcDstWin(const GDALGeoTransform &tileGT, int nTileXSize,
 }
 
 /************************************************************************/
-/*                   GDALDatasetCastToGTIDataset()                    */
+/*                    GDALDatasetCastToGTIDataset()                     */
 /************************************************************************/
 
 GDALTileIndexDataset *GDALDatasetCastToGTIDataset(GDALDataset *poDS)
@@ -3403,7 +3404,7 @@ GDALTileIndexDataset *GDALDatasetCastToGTIDataset(GDALDataset *poDS)
 }
 
 /************************************************************************/
-/*                   GTIGetSourcesMoreRecentThan()                    */
+/*                    GTIGetSourcesMoreRecentThan()                     */
 /************************************************************************/
 
 std::vector<GTISourceDesc>
@@ -3413,7 +3414,7 @@ GTIGetSourcesMoreRecentThan(GDALTileIndexDataset *poDS, int64_t mTime)
 }
 
 /************************************************************************/
-/*                       GetSourcesMoreRecentThan()                     */
+/*                      GetSourcesMoreRecentThan()                      */
 /************************************************************************/
 
 std::vector<GTISourceDesc>
@@ -3488,7 +3489,7 @@ GDALTileIndexDataset::GetSourcesMoreRecentThan(int64_t mTime)
 }
 
 /************************************************************************/
-/*                         GetSourceDesc()                              */
+/*                           GetSourceDesc()                            */
 /************************************************************************/
 
 bool GDALTileIndexDataset::GetSourceDesc(const std::string &osTileName,
@@ -3753,19 +3754,12 @@ int GDALTileIndexDataset::GetNumThreads() const
         CSLFetchNameValueDef(GetOpenOptions(), "NUM_THREADS", nullptr);
     if (!pszNumThreads)
         pszNumThreads = CPLGetConfigOption("GTI_NUM_THREADS", nullptr);
-    if (!pszNumThreads)
-        pszNumThreads = CPLGetConfigOption("GDAL_NUM_THREADS", "ALL_CPUS");
-    if (EQUAL(pszNumThreads, "0") || EQUAL(pszNumThreads, "1"))
-        return atoi(pszNumThreads);
-    const int nMaxPoolSize = GDALGetMaxDatasetPoolSize();
-    const int nLimit = std::min(CPLGetNumCPUs(), nMaxPoolSize);
-    if (EQUAL(pszNumThreads, "ALL_CPUS"))
-        return nLimit;
-    return std::min(atoi(pszNumThreads), nLimit);
+    return GDALGetNumThreads(pszNumThreads, GDALGetMaxDatasetPoolSize(),
+                             /* bDefaultAllCPUs = */ true);
 }
 
 /************************************************************************/
-/*                        CollectSources()                              */
+/*                           CollectSources()                           */
 /************************************************************************/
 
 bool GDALTileIndexDataset::CollectSources(double dfXOff, double dfYOff,
@@ -4049,7 +4043,7 @@ bool GDALTileIndexDataset::CollectSources(double dfXOff, double dfYOff,
 }
 
 /************************************************************************/
-/*                          SortSourceDesc()                            */
+/*                           SortSourceDesc()                           */
 /************************************************************************/
 
 void GDALTileIndexDataset::SortSourceDesc()
@@ -4134,7 +4128,7 @@ void GDALTileIndexDataset::SortSourceDesc()
 }
 
 /************************************************************************/
-/*                   CompositeSrcWithMaskIntoDest()                     */
+/*                    CompositeSrcWithMaskIntoDest()                    */
 /************************************************************************/
 
 static void
@@ -4221,7 +4215,7 @@ CompositeSrcWithMaskIntoDest(const int nOutXSize, const int nOutYSize,
 }
 
 /************************************************************************/
-/*                         NeedInitBuffer()                             */
+/*                           NeedInitBuffer()                           */
 /************************************************************************/
 
 // Must be called after CollectSources()
@@ -4256,7 +4250,7 @@ bool GDALTileIndexDataset::NeedInitBuffer(int nBandCount,
 }
 
 /************************************************************************/
-/*                            InitBuffer()                              */
+/*                             InitBuffer()                             */
 /************************************************************************/
 
 void GDALTileIndexDataset::InitBuffer(void *pData, int nBufXSize, int nBufYSize,
@@ -4896,7 +4890,7 @@ CPLErr GDALTileIndexDataset::IRasterIO(
 }
 
 /************************************************************************/
-/*                 GDALTileIndexDataset::RasterIOJob::Func()            */
+/*              GDALTileIndexDataset::RasterIOJob::Func()               */
 /************************************************************************/
 
 void GDALTileIndexDataset::RasterIOJob::Func(void *pData)
@@ -4979,7 +4973,7 @@ void GDALTileIndexDataset::RasterIOJob::Func(void *pData)
 #ifdef GDAL_ENABLE_ALGORITHMS
 
 /************************************************************************/
-/*                     GDALGTICreateAlgorithm                           */
+/*                        GDALGTICreateAlgorithm                        */
 /************************************************************************/
 
 class GDALGTICreateAlgorithm final : public GDALRasterIndexAlgorithm
@@ -5010,7 +5004,7 @@ class GDALGTICreateAlgorithm final : public GDALRasterIndexAlgorithm
 };
 
 /************************************************************************/
-/*          GDALGTICreateAlgorithm::GDALGTICreateAlgorithm()            */
+/*           GDALGTICreateAlgorithm::GDALGTICreateAlgorithm()           */
 /************************************************************************/
 
 GDALGTICreateAlgorithm::GDALGTICreateAlgorithm()
@@ -5099,7 +5093,7 @@ GDALGTICreateAlgorithm::GDALGTICreateAlgorithm()
 }
 
 /************************************************************************/
-/*            GDALGTICreateAlgorithm::AddExtraOptions()                 */
+/*              GDALGTICreateAlgorithm::AddExtraOptions()               */
 /************************************************************************/
 
 bool GDALGTICreateAlgorithm::AddExtraOptions(CPLStringList &aosOptions)
@@ -5211,7 +5205,7 @@ GDALTileIndexInstantiateAlgorithm(const std::vector<std::string> &aosPath)
 #endif
 
 /************************************************************************/
-/*                         GDALRegister_GTI()                           */
+/*                          GDALRegister_GTI()                          */
 /************************************************************************/
 
 void GDALRegister_GTI()

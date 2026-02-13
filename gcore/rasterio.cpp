@@ -72,7 +72,7 @@ static void GDALFastCopyByte(const GByte *CPL_RESTRICT pSrcData,
                              int nDstPixelStride, GPtrDiff_t nWordCount);
 
 /************************************************************************/
-/*                    DownsamplingIntegerXFactor()                      */
+/*                     DownsamplingIntegerXFactor()                     */
 /************************************************************************/
 
 template <bool bSameDataType, int DATA_TYPE_SIZE>
@@ -974,7 +974,7 @@ CPLErr GDALRasterBand::IRasterIO(GDALRWFlag eRWFlag, int nXOff, int nYOff,
 }
 
 /************************************************************************/
-/*                         GDALRasterIOTransformer()                    */
+/*                      GDALRasterIOTransformer()                       */
 /************************************************************************/
 
 struct GDALRasterIOTransformerStruct
@@ -1013,7 +1013,7 @@ static int GDALRasterIOTransformer(void *pTransformerArg, int bDstToSrc,
 }
 
 /************************************************************************/
-/*                          RasterIOResampled()                         */
+/*                         RasterIOResampled()                          */
 /************************************************************************/
 
 //! @cond Doxygen_Suppress
@@ -1509,7 +1509,7 @@ CPLErr GDALRasterBand::RasterIOResampled(
 }
 
 /************************************************************************/
-/*                          RasterIOResampled()                         */
+/*                         RasterIOResampled()                          */
 /************************************************************************/
 
 CPLErr GDALDataset::RasterIOResampled(
@@ -2109,7 +2109,7 @@ void CPL_STDCALL GDALSwapWords(void *pData, int nWordSize, int nWordCount,
 }
 
 /************************************************************************/
-/*                           GDALSwapWordsEx()                          */
+/*                          GDALSwapWordsEx()                           */
 /************************************************************************/
 
 /**
@@ -3123,7 +3123,7 @@ CPL_NOINLINE void GDALCopyWordsT(const double *const CPL_RESTRICT pSrcData,
 }
 
 /************************************************************************/
-/*                   GDALCopyWordsComplexT()                            */
+/*                       GDALCopyWordsComplexT()                        */
 /************************************************************************/
 /**
  * Template function, used to copy data from pSrcData into buffer
@@ -3165,7 +3165,7 @@ inline void GDALCopyWordsComplexT(const Tin *const CPL_RESTRICT pSrcData,
 }
 
 /************************************************************************/
-/*                   GDALCopyWordsComplexOutT()                         */
+/*                      GDALCopyWordsComplexOutT()                      */
 /************************************************************************/
 /**
  * Template function, used to copy data from pSrcData into buffer
@@ -3210,7 +3210,7 @@ inline void GDALCopyWordsComplexOutT(const Tin *const CPL_RESTRICT pSrcData,
 }
 
 /************************************************************************/
-/*                           GDALCopyWordsFromT()                       */
+/*                         GDALCopyWordsFromT()                         */
 /************************************************************************/
 /**
  * Template driver function. Given the input type T, call the appropriate
@@ -3373,7 +3373,7 @@ inline void GDALCopyWordsFromT(const T *const CPL_RESTRICT pSrcData,
 }  // end anonymous namespace
 
 /************************************************************************/
-/*                          GDALReplicateWord()                         */
+/*                         GDALReplicateWord()                          */
 /************************************************************************/
 
 template <class T>
@@ -3505,16 +3505,16 @@ static void GDALReplicateWord(const void *CPL_RESTRICT pSrcData,
 }
 
 /************************************************************************/
-/*                        GDALUnrolledCopy()                            */
+/*                          GDALUnrolledCopy()                          */
 /************************************************************************/
 
 template <class T, int srcStride, int dstStride>
 #if defined(__GNUC__) && defined(__AVX2__)
 __attribute__((optimize("tree-vectorize")))
 #endif
-static inline void
-GDALUnrolledCopyGeneric(T *CPL_RESTRICT pDest, const T *CPL_RESTRICT pSrc,
-                        GPtrDiff_t nIters)
+static inline void GDALUnrolledCopyGeneric(T *CPL_RESTRICT pDest,
+                                           const T *CPL_RESTRICT pSrc,
+                                           GPtrDiff_t nIters)
 {
 #if !(defined(__GNUC__) && defined(__AVX2__))
     if (nIters >= 16)
@@ -3794,7 +3794,7 @@ void GDALUnrolledCopy<GByte, 4, 1>(GByte *CPL_RESTRICT pDest,
 #endif  // HAVE_SSE2
 
 /************************************************************************/
-/*                         GDALFastCopy()                               */
+/*                            GDALFastCopy()                            */
 /************************************************************************/
 
 template <class T>
@@ -3871,7 +3871,7 @@ static inline void GDALFastCopy(T *CPL_RESTRICT pDest, int nDestStride,
 }
 
 /************************************************************************/
-/*                         GDALFastCopyByte()                           */
+/*                          GDALFastCopyByte()                          */
 /************************************************************************/
 
 static void GDALFastCopyByte(const GByte *CPL_RESTRICT pSrcData,
@@ -4429,7 +4429,7 @@ CPLErr GDALRasterBand::OverviewRasterIO(
 }
 
 /************************************************************************/
-/*                      TryOverviewRasterIO()                           */
+/*                        TryOverviewRasterIO()                         */
 /************************************************************************/
 
 CPLErr GDALRasterBand::TryOverviewRasterIO(
@@ -4468,7 +4468,7 @@ CPLErr GDALRasterBand::TryOverviewRasterIO(
 }
 
 /************************************************************************/
-/*                      TryOverviewRasterIO()                           */
+/*                        TryOverviewRasterIO()                         */
 /************************************************************************/
 
 CPLErr GDALDataset::TryOverviewRasterIO(
@@ -5554,7 +5554,7 @@ CPLErr CPL_STDCALL GDALDatasetCopyWholeRaster(GDALDatasetH hSrcDS,
 }
 
 /************************************************************************/
-/*                     GDALRasterBandCopyWholeRaster()                  */
+/*                   GDALRasterBandCopyWholeRaster()                    */
 /************************************************************************/
 
 /**
@@ -5719,7 +5719,7 @@ CPLErr CPL_STDCALL GDALRasterBandCopyWholeRaster(
 }
 
 /************************************************************************/
-/*                      GDALCopyRasterIOExtraArg ()                     */
+/*                     GDALCopyRasterIOExtraArg ()                      */
 /************************************************************************/
 
 void GDALCopyRasterIOExtraArg(GDALRasterIOExtraArg *psDestArg,
@@ -5748,7 +5748,7 @@ void GDALCopyRasterIOExtraArg(GDALRasterIOExtraArg *psDestArg,
 }
 
 /************************************************************************/
-/*                         HasOnlyNoData()                              */
+/*                           HasOnlyNoData()                            */
 /************************************************************************/
 
 template <class T> static inline bool IsEqualToNoData(T value, T noDataValue)
@@ -5817,7 +5817,7 @@ static bool HasOnlyNoDataT(const T *pBuffer, T noDataValue, size_t nWidth,
 }
 
 /************************************************************************/
-/*                    GDALBufferHasOnlyNoData()                         */
+/*                      GDALBufferHasOnlyNoData()                       */
 /************************************************************************/
 
 bool GDALBufferHasOnlyNoData(const void *pBuffer, double dfNoDataValue,
@@ -6110,17 +6110,16 @@ bool GDALBufferHasOnlyNoData(const void *pBuffer, double dfNoDataValue,
 #ifdef HAVE_SSE2
 
 /************************************************************************/
-/*                    GDALDeinterleave3Byte()                           */
+/*                       GDALDeinterleave3Byte()                        */
 /************************************************************************/
 
 #if defined(__GNUC__) && !defined(__clang__)
 __attribute__((optimize("no-tree-vectorize")))
 #endif
-static void
-GDALDeinterleave3Byte(const GByte *CPL_RESTRICT pabySrc,
-                      GByte *CPL_RESTRICT pabyDest0,
-                      GByte *CPL_RESTRICT pabyDest1,
-                      GByte *CPL_RESTRICT pabyDest2, size_t nIters)
+static void GDALDeinterleave3Byte(const GByte *CPL_RESTRICT pabySrc,
+                                  GByte *CPL_RESTRICT pabyDest0,
+                                  GByte *CPL_RESTRICT pabyDest1,
+                                  GByte *CPL_RESTRICT pabyDest2, size_t nIters)
 #ifdef USE_NEON_OPTIMIZATIONS
 {
     return GDALDeinterleave3Byte_SSSE3(pabySrc, pabyDest0, pabyDest1, pabyDest2,
@@ -6177,13 +6176,13 @@ GDALDeinterleave3Byte(const GByte *CPL_RESTRICT pabySrc,
 #endif
 
 /************************************************************************/
-/*                    GDALDeinterleave4Byte()                           */
+/*                       GDALDeinterleave4Byte()                        */
 /************************************************************************/
 
 #if !defined(__GNUC__) || defined(__clang__)
 
 /************************************************************************/
-/*                         deinterleave()                               */
+/*                            deinterleave()                            */
 /************************************************************************/
 
 template <bool SHIFT, bool MASK>
@@ -6305,7 +6304,7 @@ __attribute__((optimize("tree-vectorize"))) static void GDALDeinterleave4Byte(
 #else
 
 /************************************************************************/
-/*                    GDALDeinterleave3Byte()                           */
+/*                       GDALDeinterleave3Byte()                        */
 /************************************************************************/
 
 // TODO: Enabling below could help on non-Intel architectures where GCC knows
@@ -6327,7 +6326,7 @@ static void GDALDeinterleave3Byte(const GByte *CPL_RESTRICT pabySrc,
 }
 
 /************************************************************************/
-/*                    GDALDeinterleave4Byte()                           */
+/*                       GDALDeinterleave4Byte()                        */
 /************************************************************************/
 
 // TODO: Enabling below could help on non-Intel architectures where gcc knows
@@ -6353,7 +6352,7 @@ static void GDALDeinterleave4Byte(const GByte *CPL_RESTRICT pabySrc,
 #endif
 
 /************************************************************************/
-/*                      GDALDeinterleave()                              */
+/*                          GDALDeinterleave()                          */
 /************************************************************************/
 
 /*! Copy values from a pixel-interleave buffer to multiple per-component
@@ -6466,7 +6465,7 @@ void GDALDeinterleave(const void *pSourceBuffer, GDALDataType eSourceDT,
 }
 
 /************************************************************************/
-/*                    GDALTranspose2DSingleToSingle()                   */
+/*                   GDALTranspose2DSingleToSingle()                    */
 /************************************************************************/
 /**
  * Transpose a 2D array of non-complex values, in a efficient (cache-oblivious) way.
@@ -6503,7 +6502,7 @@ void GDALTranspose2DSingleToSingle(const SRC *CPL_RESTRICT pSrc,
 }
 
 /************************************************************************/
-/*                   GDALTranspose2DComplexToComplex()                  */
+/*                  GDALTranspose2DComplexToComplex()                   */
 /************************************************************************/
 /**
  * Transpose a 2D array of complex values into an array of complex values,
@@ -6542,7 +6541,7 @@ void GDALTranspose2DComplexToComplex(const SRC *CPL_RESTRICT pSrc,
 }
 
 /************************************************************************/
-/*                   GDALTranspose2DComplexToSingle()                  */
+/*                   GDALTranspose2DComplexToSingle()                   */
 /************************************************************************/
 /**
  * Transpose a 2D array of complex values into an array of non-complex values,
@@ -6579,7 +6578,7 @@ void GDALTranspose2DComplexToSingle(const SRC *CPL_RESTRICT pSrc,
 }
 
 /************************************************************************/
-/*                   GDALTranspose2DSingleToComplex()                  */
+/*                   GDALTranspose2DSingleToComplex()                   */
 /************************************************************************/
 /**
  * Transpose a 2D array of non-complex values into an array of complex values,
@@ -6617,7 +6616,7 @@ void GDALTranspose2DSingleToComplex(const SRC *CPL_RESTRICT pSrc,
 }
 
 /************************************************************************/
-/*                        GDALTranspose2D()                             */
+/*                          GDALTranspose2D()                           */
 /************************************************************************/
 
 template <class DST, bool DST_IS_COMPLEX>
@@ -6687,7 +6686,7 @@ static void GDALTranspose2D(const void *pSrc, GDALDataType eSrcType, DST *pDst,
 }
 
 /************************************************************************/
-/*                      GDALInterleave2Byte()                           */
+/*                        GDALInterleave2Byte()                         */
 /************************************************************************/
 
 #if defined(HAVE_SSE2) &&                                                      \
@@ -6698,9 +6697,8 @@ static void GDALTranspose2D(const void *pSrc, GDALDataType eSrcType, DST *pDst,
 #if defined(__GNUC__)
 __attribute__((noinline))
 #endif
-static void
-GDALInterleave2Byte(const uint8_t *CPL_RESTRICT pSrc,
-                    uint8_t *CPL_RESTRICT pDst, size_t nIters)
+static void GDALInterleave2Byte(const uint8_t *CPL_RESTRICT pSrc,
+                                uint8_t *CPL_RESTRICT pDst, size_t nIters)
 {
     size_t i = 0;
     constexpr size_t VALS_PER_ITER = 16;
@@ -6739,9 +6737,8 @@ __attribute__((noinline))
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpass-failed"
 #endif
-static void
-GDALInterleave2Byte(const uint8_t *CPL_RESTRICT pSrc,
-                    uint8_t *CPL_RESTRICT pDst, size_t nIters)
+static void GDALInterleave2Byte(const uint8_t *CPL_RESTRICT pSrc,
+                                uint8_t *CPL_RESTRICT pDst, size_t nIters)
 {
 #if defined(__clang__) && !defined(__INTEL_CLANG_COMPILER)
 #pragma clang loop vectorize(enable)
@@ -6759,7 +6756,7 @@ GDALInterleave2Byte(const uint8_t *CPL_RESTRICT pSrc,
 #endif
 
 /************************************************************************/
-/*                      GDALInterleave4Byte()                           */
+/*                        GDALInterleave4Byte()                         */
 /************************************************************************/
 
 #if defined(HAVE_SSE2) &&                                                      \
@@ -6770,9 +6767,8 @@ GDALInterleave2Byte(const uint8_t *CPL_RESTRICT pSrc,
 #if defined(__GNUC__)
 __attribute__((noinline))
 #endif
-static void
-GDALInterleave4Byte(const uint8_t *CPL_RESTRICT pSrc,
-                    uint8_t *CPL_RESTRICT pDst, size_t nIters)
+static void GDALInterleave4Byte(const uint8_t *CPL_RESTRICT pSrc,
+                                uint8_t *CPL_RESTRICT pDst, size_t nIters)
 {
     size_t i = 0;
     constexpr size_t VALS_PER_ITER = 16;
@@ -6842,9 +6838,8 @@ __attribute__((noinline))
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpass-failed"
 #endif
-static void
-GDALInterleave4Byte(const uint8_t *CPL_RESTRICT pSrc,
-                    uint8_t *CPL_RESTRICT pDst, size_t nIters)
+static void GDALInterleave4Byte(const uint8_t *CPL_RESTRICT pSrc,
+                                uint8_t *CPL_RESTRICT pDst, size_t nIters)
 {
 #if defined(__clang__) && !defined(__INTEL_CLANG_COMPILER)
 #pragma clang loop vectorize(enable)
@@ -6864,7 +6859,7 @@ GDALInterleave4Byte(const uint8_t *CPL_RESTRICT pSrc,
 #endif
 
 /************************************************************************/
-/*                        GDALTranspose2D()                             */
+/*                          GDALTranspose2D()                           */
 /************************************************************************/
 
 /**
@@ -6970,7 +6965,7 @@ static inline GByte ExtractBitAndConvertTo255(GByte byVal, int nBit)
 #endif
 
 /************************************************************************/
-/*                   ExpandEightPackedBitsToByteAt255()                 */
+/*                  ExpandEightPackedBitsToByteAt255()                  */
 /************************************************************************/
 
 static inline void ExpandEightPackedBitsToByteAt255(GByte byVal,
@@ -6987,7 +6982,7 @@ static inline void ExpandEightPackedBitsToByteAt255(GByte byVal,
 }
 
 /************************************************************************/
-/*                GDALExpandPackedBitsToByteAt0Or255()                  */
+/*                 GDALExpandPackedBitsToByteAt0Or255()                 */
 /************************************************************************/
 
 /** Expand packed-bits (ordered from most-significant bit to least one)
@@ -7098,7 +7093,7 @@ static inline void ExpandEightPackedBitsToByteAt1(GByte byVal,
 }
 
 /************************************************************************/
-/*                GDALExpandPackedBitsToByteAt0Or1()                    */
+/*                  GDALExpandPackedBitsToByteAt0Or1()                  */
 /************************************************************************/
 
 /** Expand packed-bits (ordered from most-significant bit to least one)

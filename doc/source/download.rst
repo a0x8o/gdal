@@ -18,12 +18,12 @@ Source Code
 Current Release
 ...............
 
-* **2025-12-18** `gdal-3.12.1.tar.gz`_ `3.12.1 Release Notes`_ (`3.12.1 md5`_, `3.12.1 sig`_)
+* **2026-02-09** `gdal-3.12.2.tar.gz`_ `3.12.2 Release Notes`_ (`3.12.2 md5`_, `3.12.2 sig`_)
 
-.. _`3.12.1 Release Notes`: https://github.com/OSGeo/gdal/blob/v3.12.1/NEWS.md
-.. _`gdal-3.12.1.tar.gz`: https://github.com/OSGeo/gdal/releases/download/v3.12.1/gdal-3.12.1.tar.gz
-.. _`3.12.1 md5`: https://github.com/OSGeo/gdal/releases/download/v3.12.1/gdal-3.12.1.tar.gz.md5
-.. _`3.12.1 sig`: https://github.com/OSGeo/gdal/releases/download/v3.12.1/gdal-3.12.1.tar.gz.sig
+.. _`3.12.2 Release Notes`: https://github.com/OSGeo/gdal/blob/v3.12.2/NEWS.md
+.. _`gdal-3.12.2.tar.gz`: https://github.com/OSGeo/gdal/releases/download/v3.12.2/gdal-3.12.2.tar.gz
+.. _`3.12.2 md5`: https://github.com/OSGeo/gdal/releases/download/v3.12.2/gdal-3.12.2.tar.gz.md5
+.. _`3.12.2 sig`: https://github.com/OSGeo/gdal/releases/download/v3.12.2/gdal-3.12.2.tar.gz.sig
 
 The GPG signing key is:
 
@@ -235,8 +235,21 @@ build can be installed with the following command:
 
     conda install -c gdal-master -c conda-forge gdal-master::gdal
 
-As with released versions of GDAL, additional drivers can be installed using `gdal-master::libgdal-{driver_name}`.
+As with released versions of GDAL, additional drivers can be installed using ``gdal-master::libgdal-{driver_name}``.
 
+If you already have a GDAL master build installed in an environment, you can update it to the latest master version using the commands below.
+GDAL subpackages may need to be updated individually, because the master version numbers (e.g. ``3.12.99``) do not change with every nightly build.
+
+::
+
+    # check currently installed GDAL components and versions
+    conda list gdal
+    gdal --version
+    # update GDAL
+    conda install -c gdal-master gdal --force-reinstall --yes
+    # update libgdal-core to the latest master build
+    conda install -c gdal-master libgdal-core --force-reinstall --yes
+    gdal --version
 
 .. _pixi:
 

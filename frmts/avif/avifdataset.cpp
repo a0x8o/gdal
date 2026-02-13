@@ -18,6 +18,7 @@
 #include "avifdrivercore.h"
 #include "gdalexif.h"
 #include "memdataset.h"
+#include "gdal_thread_pool.h"
 
 #include <avif/avif.h>
 
@@ -33,7 +34,7 @@ constexpr const char *DEFAULT_QUALITY_ALPHA_STR = "100";
 constexpr const char *DEFAULT_SPEED_STR = "6";
 
 /************************************************************************/
-/*                         GDALAVIFDataset                              */
+/*                           GDALAVIFDataset                            */
 /************************************************************************/
 
 class GDALAVIFDataset final : public GDALPamDataset
@@ -80,7 +81,7 @@ class GDALAVIFDataset final : public GDALPamDataset
     }
 
     static GDALDataset *CreateCopy(const char *, GDALDataset *, int,
-                                   char **papszOptions,
+                                   CSLConstList papszOptions,
                                    GDALProgressFunc pfnProgress,
                                    void *pProgressData);
 
@@ -94,7 +95,7 @@ class GDALAVIFDataset final : public GDALPamDataset
 };
 
 /************************************************************************/
-/*                       GDALAVIFRasterBand                             */
+/*                          GDALAVIFRasterBand                          */
 /************************************************************************/
 
 class GDALAVIFRasterBand final : public MEMRasterBand
@@ -127,7 +128,7 @@ class GDALAVIFRasterBand final : public MEMRasterBand
 };
 
 /************************************************************************/
-/*                           GDALAVIFIO                                 */
+/*                              GDALAVIFIO                              */
 /************************************************************************/
 
 class GDALAVIFIO
@@ -150,7 +151,7 @@ class GDALAVIFIO
 };
 
 /************************************************************************/
-/*                         ~GDALAVIFDataset()                           */
+/*                          ~GDALAVIFDataset()                          */
 /************************************************************************/
 
 GDALAVIFDataset::~GDALAVIFDataset()
@@ -159,7 +160,7 @@ GDALAVIFDataset::~GDALAVIFDataset()
 }
 
 /************************************************************************/
-/*                                Close()                               */
+/*                               Close()                                */
 /************************************************************************/
 
 CPLErr GDALAVIFDataset::Close(GDALProgressFunc, void *)
@@ -181,7 +182,7 @@ CPLErr GDALAVIFDataset::Close(GDALProgressFunc, void *)
 }
 
 /************************************************************************/
-/*                        GDALAVIFDataset::Decode()                     */
+/*                      GDALAVIFDataset::Decode()                       */
 /************************************************************************/
 
 bool GDALAVIFDataset::Decode()
@@ -264,7 +265,7 @@ GDALAVIFRasterBand::GDALAVIFRasterBand(GDALAVIFDataset *poDSIn, int nBandIn,
 }
 
 /************************************************************************/
-/*                               SetData()                              */
+/*                              SetData()                               */
 /************************************************************************/
 
 void GDALAVIFRasterBand::SetData(GByte *pabyDataIn, int nPixelOffsetIn,
@@ -276,7 +277,7 @@ void GDALAVIFRasterBand::SetData(GByte *pabyDataIn, int nPixelOffsetIn,
 }
 
 /************************************************************************/
-/*                            IReadBlock()                              */
+/*                             IReadBlock()                             */
 /************************************************************************/
 
 CPLErr GDALAVIFRasterBand::IReadBlock(int nBlockXOff, int nBlockYOff,
@@ -326,7 +327,7 @@ GDALAVIFIO::GDALAVIFIO(VSIVirtualHandleUniquePtr fpIn) : fp(std::move(fpIn))
 }
 
 /************************************************************************/
-/*                       GDALAVIFIO::Destroy()                          */
+/*                        GDALAVIFIO::Destroy()                         */
 /************************************************************************/
 
 /* static */ void GDALAVIFIO::Destroy(struct avifIO *io)
@@ -336,7 +337,7 @@ GDALAVIFIO::GDALAVIFIO(VSIVirtualHandleUniquePtr fpIn) : fp(std::move(fpIn))
 }
 
 /************************************************************************/
-/*                       GDALAVIFIO::Read()                             */
+/*                          GDALAVIFIO::Read()                          */
 /************************************************************************/
 
 /* static */ avifResult GDALAVIFIO::Read(struct avifIO *io, uint32_t readFlags,
@@ -387,7 +388,7 @@ GDALAVIFIO::GDALAVIFIO(VSIVirtualHandleUniquePtr fpIn) : fp(std::move(fpIn))
 
 #ifdef AVIF_HAS_OPAQUE_PROPERTIES
 /************************************************************************/
-/*                          GetSpatialRef()                             */
+/*                           GetSpatialRef()                            */
 /************************************************************************/
 const OGRSpatialReference *GDALAVIFDataset::GetSpatialRef() const
 {
@@ -480,7 +481,7 @@ const OGRSpatialReference *GDALAVIFDataset::GetGCPSpatialRef() const
 #endif
 
 /************************************************************************/
-/*                              Init()                                  */
+/*                                Init()                                */
 /************************************************************************/
 
 bool GDALAVIFDataset::Init(GDALOpenInfo *poOpenInfo)
@@ -671,7 +672,7 @@ bool GDALAVIFDataset::Init(GDALOpenInfo *poOpenInfo)
 }
 
 /************************************************************************/
-/*                          OpenStaticPAM()                             */
+/*                           OpenStaticPAM()                            */
 /************************************************************************/
 
 /* static */
@@ -699,11 +700,10 @@ GDALPamDataset *GDALAVIFDataset::OpenStaticPAM(GDALOpenInfo *poOpenInfo)
 /************************************************************************/
 
 /* static */
-GDALDataset *GDALAVIFDataset::CreateCopy(const char *pszFilename,
-                                         GDALDataset *poSrcDS,
-                                         int /* bStrict */, char **papszOptions,
-                                         GDALProgressFunc pfnProgress,
-                                         void *pProgressData)
+GDALDataset *
+GDALAVIFDataset::CreateCopy(const char *pszFilename, GDALDataset *poSrcDS,
+                            int /* bStrict */, CSLConstList papszOptions,
+                            GDALProgressFunc pfnProgress, void *pProgressData)
 {
     auto poDrv = GetGDALDriverManager()->GetDriverByName(DRIVER_NAME);
     if (poDrv && poDrv->GetMetadataItem(GDAL_DMD_CREATIONOPTIONLIST) == nullptr)
@@ -930,13 +930,9 @@ GDALDataset *GDALAVIFDataset::CreateCopy(const char *pszFilename,
             avifCodecChoiceFromName(CPLString(pszCodec).tolower().c_str());
     }
 
-    const char *pszThreads = CSLFetchNameValueDef(
-        papszOptions, "NUM_THREADS",
-        CPLGetConfigOption("GDAL_NUM_THREADS", "ALL_CPUS"));
-    if (pszThreads && !EQUAL(pszThreads, "ALL_CPUS"))
-        encoder->maxThreads = atoi(pszThreads);
-    else
-        encoder->maxThreads = CPLGetNumCPUs();
+    encoder->maxThreads = GDALGetNumThreads(papszOptions, "NUM_THREADS",
+                                            GDAL_DEFAULT_MAX_THREAD_COUNT,
+                                            /* bDefaultToAllCPUs = */ true);
 
 #if AVIF_VERSION_MAJOR >= 1
     encoder->quality = nQuality;
@@ -1082,7 +1078,7 @@ GDALDataset *GDALAVIFDataset::CreateCopy(const char *pszFilename,
 }
 
 /************************************************************************/
-/*                         GDALAVIFDriver                               */
+/*                            GDALAVIFDriver                            */
 /************************************************************************/
 
 class GDALAVIFDriver final : public GDALDriver
@@ -1258,7 +1254,7 @@ void GDALAVIFDriver::InitMetadata()
 }
 
 /************************************************************************/
-/*                       GDALRegister_AVIF()                            */
+/*                         GDALRegister_AVIF()                          */
 /************************************************************************/
 
 void GDALRegister_AVIF()

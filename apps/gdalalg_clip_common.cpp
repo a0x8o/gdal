@@ -21,13 +21,13 @@
 #endif
 
 /************************************************************************/
-/*                           ~GDALClipCommon()                          */
+/*                          ~GDALClipCommon()                           */
 /************************************************************************/
 
 GDALClipCommon::~GDALClipCommon() = default;
 
 /************************************************************************/
-/*                           LoadGeometry()                             */
+/*                            LoadGeometry()                            */
 /************************************************************************/
 
 std::pair<std::unique_ptr<OGRGeometry>, std::string>
@@ -97,7 +97,7 @@ GDALClipCommon::LoadGeometry()
 }
 
 /************************************************************************/
-/*                           GetClipGeometry()                          */
+/*                          GetClipGeometry()                           */
 /************************************************************************/
 
 std::pair<std::unique_ptr<OGRGeometry>, std::string>
@@ -191,8 +191,8 @@ GDALClipCommon::GetClipGeometry()
                         poLikeDS->GetDescription())};
             }
             auto poLikeSRS = poLikeDS->GetSpatialRef();
-            const double dfTLX = gt[0];
-            const double dfTLY = gt[3];
+            const double dfTLX = gt.xorig;
+            const double dfTLY = gt.yorig;
 
             double dfTRX = 0;
             double dfTRY = 0;

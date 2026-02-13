@@ -32,7 +32,10 @@ GDALVectorCheckGeometryAlgorithm::GDALVectorCheckGeometryAlgorithm(
                                       standaloneStep)
 {
     AddArg("include-field", 0,
-           _("Fields from input layer to include in output"), &m_includeFields);
+           _("Fields from input layer to include in output (special values: "
+             "ALL and NONE)"),
+           &m_includeFields)
+        .SetDefault("NONE");
 
     AddArg("include-valid", 0,
            _("Include valid inputs in output, with empty geometry"),
@@ -64,7 +67,7 @@ class GDALInvalidLocationLayer final : public GDALVectorPipelineOutputLayer
           m_srcGeomField(srcGeomField), m_skipValid(skipValid)
     {
         m_defn->Reference();
-        m_defn->SetGeomType(wkbPoint);
+        m_defn->SetGeomType(wkbMultiPoint);
 
         if (!srcFieldIndices.empty())
         {
@@ -162,7 +165,11 @@ class GDALInvalidLocationLayer final : public GDALVectorPipelineOutputLayer
                         {
                             auto poPoint = std::make_unique<OGRPoint>();
                             poRing->StartPoint(poPoint.get());
-                            poErrorFeature->SetGeometry(std::move(poPoint));
+                            auto poMultiPoint =
+                                std::make_unique<OGRMultiPoint>();
+                            poMultiPoint->addGeometry(std::move(poPoint));
+                            poErrorFeature->SetGeometry(
+                                std::move(poMultiPoint));
                         }
                         else
                         {
@@ -237,6 +244,15 @@ class GDALInvalidLocationLayer final : public GDALVectorPipelineOutputLayer
                                 OGRGeometryFactory::createFromGEOS(
                                     m_geosContext, location));
                             GEOSGeom_destroy_r(m_geosContext, location);
+
+                            if (poErrorGeom->getGeometryType() == wkbPoint)
+                            {
+                                auto poMultiPoint =
+                                    std::make_unique<OGRMultiPoint>();
+                                poMultiPoint->addGeometry(
+                                    std::move(poErrorGeom));
+                                poErrorGeom = std::move(poMultiPoint);
+                            }
 
                             poErrorGeom->assignSpatialReference(
                                 m_srcLayer.GetLayerDefn()
@@ -335,19 +351,11 @@ bool GDALVectorCheckGeometryAlgorithm::RunStep(GDALPipelineStepRunContext &)
             }
 
             std::vector<int> includeFieldIndices;
-            for (const auto &fieldName : m_includeFields)
+            if (!GetFieldIndices(m_includeFields,
+                                 OGRLayer::ToHandle(poSrcLayer),
+                                 includeFieldIndices))
             {
-                auto iSrcField =
-                    poSrcLayerDefn->GetFieldIndex(fieldName.c_str());
-                if (iSrcField == -1)
-                {
-                    ReportError(
-                        CE_Failure, CPLE_AppDefined,
-                        "Specified field '%s' does not exist in layer '%s'",
-                        fieldName.c_str(), poSrcLayer->GetDescription());
-                    return false;
-                }
-                includeFieldIndices.push_back(iSrcField);
+                return false;
             }
 
             outDS->AddLayer(*poSrcLayer,

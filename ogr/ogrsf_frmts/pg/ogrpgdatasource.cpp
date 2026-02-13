@@ -78,7 +78,7 @@ OGRPGDataSource::~OGRPGDataSource()
 }
 
 /************************************************************************/
-/*                              FlushCache()                            */
+/*                             FlushCache()                             */
 /************************************************************************/
 
 OGRErr OGRPGDataSource::FlushCacheWithRet(bool /* bAtClosing */)
@@ -100,7 +100,7 @@ CPLErr OGRPGDataSource::FlushCache(bool bAtClosing)
 }
 
 /************************************************************************/
-/*                         GetCurrentSchema()                           */
+/*                          GetCurrentSchema()                          */
 /************************************************************************/
 
 CPLString OGRPGDataSource::GetCurrentSchema()
@@ -255,11 +255,16 @@ static PGTableEntry *OGRPGAddTableEntry(CPLHashSet *hSetTables,
 /************************************************************************/
 
 int OGRPGDataSource::Open(const char *pszNewName, int bUpdate, int bTestOpen,
-                          char **papszOpenOptionsIn)
+                          CSLConstList papszOpenOptionsIn)
 
 {
     CPLAssert(nLayers == 0);
     papszOpenOptions = CSLDuplicate(papszOpenOptionsIn);
+
+    m_bSpatialFilterIntersectionIsLocal =
+        EQUAL(CSLFetchNameValueDef(papszOpenOptions,
+                                   "SPATIAL_FILTER_INTERSECTION", "LOCAL"),
+              "LOCAL");
 
     const char *pszPreludeStatements =
         CSLFetchNameValue(papszOpenOptions, "PRELUDE_STATEMENTS");
@@ -903,7 +908,7 @@ int OGRPGDataSource::Open(const char *pszNewName, int bUpdate, int bTestOpen,
 }
 
 /************************************************************************/
-/*                            LoadTables()                              */
+/*                             LoadTables()                             */
 /************************************************************************/
 
 void OGRPGDataSource::LoadTables()
@@ -1522,7 +1527,7 @@ OGRErr OGRPGDataSource::DeleteLayer(int iLayer)
 }
 
 /************************************************************************/
-/*                           ICreateLayer()                             */
+/*                            ICreateLayer()                            */
 /************************************************************************/
 
 OGRLayer *OGRPGDataSource::ICreateLayer(const char *pszLayerName,
@@ -2812,7 +2817,7 @@ OGRErr OGRPGDataSource::FlushSoftTransaction()
 }
 
 /************************************************************************/
-/*                          DoTransactionCommand()                      */
+/*                        DoTransactionCommand()                        */
 /************************************************************************/
 
 OGRErr OGRPGDataSource::DoTransactionCommand(const char *pszCommand)
@@ -2835,7 +2840,7 @@ OGRErr OGRPGDataSource::DoTransactionCommand(const char *pszCommand)
 }
 
 /************************************************************************/
-/*                     OGRPGNoResetResultLayer                          */
+/*                       OGRPGNoResetResultLayer                        */
 /************************************************************************/
 
 class OGRPGNoResetResultLayer final : public OGRPGLayer
@@ -2867,7 +2872,7 @@ class OGRPGNoResetResultLayer final : public OGRPGLayer
 };
 
 /************************************************************************/
-/*                     OGRPGNoResetResultLayer()                        */
+/*                      OGRPGNoResetResultLayer()                       */
 /************************************************************************/
 
 OGRPGNoResetResultLayer::OGRPGNoResetResultLayer(OGRPGDataSource *poDSIn,
@@ -2882,7 +2887,7 @@ OGRPGNoResetResultLayer::OGRPGNoResetResultLayer(OGRPGDataSource *poDSIn,
 }
 
 /************************************************************************/
-/*                   ~OGRPGNoResetResultLayer()                         */
+/*                      ~OGRPGNoResetResultLayer()                      */
 /************************************************************************/
 
 OGRPGNoResetResultLayer::~OGRPGNoResetResultLayer()
@@ -2918,7 +2923,7 @@ OGRFeature *OGRPGNoResetResultLayer::GetNextFeature()
 }
 
 /************************************************************************/
-/*                      OGRPGMemLayerWrapper                            */
+/*                         OGRPGMemLayerWrapper                         */
 /************************************************************************/
 
 class OGRPGMemLayerWrapper final : public OGRLayer
@@ -2966,7 +2971,7 @@ OGRPGMemLayerWrapper::~OGRPGMemLayerWrapper()
 }
 
 /************************************************************************/
-/*                           GetMetadataItem()                          */
+/*                          GetMetadataItem()                           */
 /************************************************************************/
 
 const char *OGRPGDataSource::GetMetadataItem(const char *pszKey,
@@ -3121,7 +3126,7 @@ OGRLayer *OGRPGDataSource::ExecuteSQL(const char *pszSQLCommand,
 }
 
 /************************************************************************/
-/*                          AbortSQL()                                  */
+/*                              AbortSQL()                              */
 /************************************************************************/
 
 OGRErr OGRPGDataSource::AbortSQL()
@@ -3181,7 +3186,7 @@ OGRErr OGRPGDataSource::EndCopy()
 }
 
 /************************************************************************/
-/*                     CreateMetadataTableIfNeeded()                    */
+/*                    CreateMetadataTableIfNeeded()                     */
 /************************************************************************/
 
 bool OGRPGDataSource::CreateMetadataTableIfNeeded()
@@ -3349,7 +3354,7 @@ bool OGRPGDataSource::CreateMetadataTableIfNeeded()
 }
 
 /************************************************************************/
-/*                               IsSuperUser()                          */
+/*                            IsSuperUser()                             */
 /************************************************************************/
 
 bool OGRPGDataSource::IsSuperUser()
@@ -3364,7 +3369,7 @@ bool OGRPGDataSource::IsSuperUser()
 }
 
 /************************************************************************/
-/*                  OGRSystemTablesEventTriggerExists()                 */
+/*                 OGRSystemTablesEventTriggerExists()                  */
 /************************************************************************/
 
 bool OGRPGDataSource::OGRSystemTablesEventTriggerExists()
@@ -3378,7 +3383,7 @@ bool OGRPGDataSource::OGRSystemTablesEventTriggerExists()
 }
 
 /************************************************************************/
-/*                    HasOgrSystemTablesMetadataTable()                 */
+/*                  HasOgrSystemTablesMetadataTable()                   */
 /************************************************************************/
 
 bool OGRPGDataSource::HasOgrSystemTablesMetadataTable()
@@ -3435,7 +3440,7 @@ bool OGRPGDataSource::HasOgrSystemTablesMetadataTable()
 }
 
 /************************************************************************/
-/*                   HasWritePermissionsOnMetadataTable()               */
+/*                 HasWritePermissionsOnMetadataTable()                 */
 /************************************************************************/
 
 bool OGRPGDataSource::HasWritePermissionsOnMetadataTable()

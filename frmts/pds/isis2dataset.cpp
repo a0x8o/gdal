@@ -84,7 +84,7 @@ ISIS2Dataset::ISIS2Dataset()
 }
 
 /************************************************************************/
-/*                            ~ISIS2Dataset()                            */
+/*                           ~ISIS2Dataset()                            */
 /************************************************************************/
 
 ISIS2Dataset::~ISIS2Dataset()
@@ -94,7 +94,7 @@ ISIS2Dataset::~ISIS2Dataset()
 }
 
 /************************************************************************/
-/*                              Close()                                 */
+/*                               Close()                                */
 /************************************************************************/
 
 CPLErr ISIS2Dataset::Close(GDALProgressFunc, void *)
@@ -131,7 +131,7 @@ char **ISIS2Dataset::GetFileList()
 }
 
 /************************************************************************/
-/*                         GetSpatialRef()                              */
+/*                           GetSpatialRef()                            */
 /************************************************************************/
 
 const OGRSpatialReference *ISIS2Dataset::GetSpatialRef() const
@@ -710,12 +710,12 @@ GDALDataset *ISIS2Dataset::Open(GDALOpenInfo *poOpenInfo)
     if (dfULXMap != 0.5 || dfULYMap != 0.5 || dfXDim != 1.0 || dfYDim != 1.0)
     {
         poDS->bGotTransform = TRUE;
-        poDS->m_gt[0] = dfULXMap;
-        poDS->m_gt[1] = dfXDim;
-        poDS->m_gt[2] = 0.0;
-        poDS->m_gt[3] = dfULYMap;
-        poDS->m_gt[4] = 0.0;
-        poDS->m_gt[5] = dfYDim;
+        poDS->m_gt.xorig = dfULXMap;
+        poDS->m_gt.xscale = dfXDim;
+        poDS->m_gt.xrot = 0.0;
+        poDS->m_gt.yorig = dfULYMap;
+        poDS->m_gt.yrot = 0.0;
+        poDS->m_gt.yscale = dfYDim;
     }
 
     if (!poDS->bGotTransform)
@@ -752,7 +752,7 @@ const char *ISIS2Dataset::GetKeyword(const char *pszPath,
 }
 
 /************************************************************************/
-/*                            GetKeywordSub()                           */
+/*                           GetKeywordSub()                            */
 /************************************************************************/
 
 const char *ISIS2Dataset::GetKeywordSub(const char *pszPath, int iSubscript,

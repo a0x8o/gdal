@@ -33,7 +33,7 @@
 static bool gbHasLZW = false;
 
 /************************************************************************/
-/*                        HasZSTDCompression()                          */
+/*                         HasZSTDCompression()                         */
 /************************************************************************/
 
 static bool HasZSTDCompression()
@@ -76,7 +76,7 @@ static CPLString GetTmpFilename(const char *pszFilename, const char *pszExt)
 }
 
 /************************************************************************/
-/*                             GetResampling()                          */
+/*                           GetResampling()                            */
 /************************************************************************/
 
 static const char *GetResampling(GDALDataset *poSrcDS)
@@ -89,7 +89,7 @@ static const char *GetResampling(GDALDataset *poSrcDS)
 }
 
 /************************************************************************/
-/*                             GetPredictor()                          */
+/*                            GetPredictor()                            */
 /************************************************************************/
 static const char *GetPredictor(GDALDataset *poSrcDS, const char *pszPredictor)
 {
@@ -117,7 +117,7 @@ static const char *GetPredictor(GDALDataset *poSrcDS, const char *pszPredictor)
 }
 
 /************************************************************************/
-/*                            COGGetTargetSRS()                         */
+/*                          COGGetTargetSRS()                           */
 /************************************************************************/
 
 static bool COGGetTargetSRS(const char *const *papszOptions,
@@ -197,7 +197,7 @@ std::string COGGetResampling(GDALDataset *poSrcDS,
 }
 
 /************************************************************************/
-/*                     COGGetWarpingCharacteristics()                   */
+/*                    COGGetWarpingCharacteristics()                    */
 /************************************************************************/
 
 static bool COGGetWarpingCharacteristics(
@@ -289,13 +289,12 @@ static bool COGGetWarpingCharacteristics(
 
     GDALTransformerInfo *psInfo =
         static_cast<GDALTransformerInfo *>(hTransformArg);
-    double adfGeoTransform[6];
+    GDALGeoTransform gt;
     double adfExtent[4];
 
     if (GDALSuggestedWarpOutput2(poTmpDS ? poTmpDS.get() : poSrcDS,
-                                 psInfo->pfnTransform, hTransformArg,
-                                 adfGeoTransform, &nXSize, &nYSize, adfExtent,
-                                 0) != CE_None)
+                                 psInfo->pfnTransform, hTransformArg, gt.data(),
+                                 &nXSize, &nYSize, adfExtent, 0) != CE_None)
     {
         GDALDestroyGenImgProjTransformer(hTransformArg);
         return false;
@@ -309,7 +308,7 @@ static bool COGGetWarpingCharacteristics(
     dfMinY = adfExtent[1];
     dfMaxX = adfExtent[2];
     dfMaxY = adfExtent[3];
-    dfRes = adfGeoTransform[1];
+    dfRes = gt.xscale;
 
     const CPLString osExtent(CSLFetchNameValueDef(papszOptions, "EXTENT", ""));
     const CPLString osRes(CSLFetchNameValueDef(papszOptions, "RES", ""));
@@ -366,7 +365,7 @@ static bool COGGetWarpingCharacteristics(
         }
         else
         {
-            double dfComputedRes = adfGeoTransform[1];
+            double dfComputedRes = gt.xscale;
             double dfPrevRes = 0.0;
             for (; nZoomLevel < static_cast<int>(tmList.size()); nZoomLevel++)
             {
@@ -678,11 +677,12 @@ static std::unique_ptr<GDALDataset> CreateReprojectedDS(
     std::unique_ptr<CPLConfigOptionSetter> poWarpThreadSetter;
     if (pszNumThreads)
     {
-        poWarpThreadSetter.reset(new CPLConfigOptionSetter(
-            "GDAL_NUM_THREADS", pszNumThreads, false));
+        poWarpThreadSetter = std::make_unique<CPLConfigOptionSetter>(
+            "GDAL_NUM_THREADS", pszNumThreads, false);
     }
 
     auto hRet = GDALWarp(osTmpFile, nullptr, 1, &hSrcDS, psOptions, nullptr);
+    CPL_IGNORE_RET_VAL(poWarpThreadSetter);
     GDALWarpAppOptionsFree(psOptions);
     CPLDebug("COG", "Reprojecting source dataset: end");
 
@@ -713,7 +713,7 @@ struct GDALCOGCreator final
 };
 
 /************************************************************************/
-/*                    GDALCOGCreator::~GDALCOGCreator()                 */
+/*                  GDALCOGCreator::~GDALCOGCreator()                   */
 /************************************************************************/
 
 GDALCOGCreator::~GDALCOGCreator()
@@ -745,7 +745,7 @@ GDALCOGCreator::~GDALCOGCreator()
 }
 
 /************************************************************************/
-/*                    GDALCOGCreator::Create()                          */
+/*                       GDALCOGCreator::Create()                       */
 /************************************************************************/
 
 std::unique_ptr<GDALDataset>
@@ -1402,11 +1402,11 @@ GDALCOGCreator::Create(const char *pszFilename, GDALDataset *const poSrcDS,
 }
 
 /************************************************************************/
-/*                            COGCreateCopy()                           */
+/*                           COGCreateCopy()                            */
 /************************************************************************/
 
 static GDALDataset *COGCreateCopy(const char *pszFilename, GDALDataset *poSrcDS,
-                                  int /*bStrict*/, char **papszOptions,
+                                  int /*bStrict*/, CSLConstList papszOptions,
                                   GDALProgressFunc pfnProgress,
                                   void *pProgressData)
 {
@@ -1416,7 +1416,7 @@ static GDALDataset *COGCreateCopy(const char *pszFilename, GDALDataset *poSrcDS,
 }
 
 /************************************************************************/
-/*                              COGProxyDataset                         */
+/*                           COGProxyDataset                            */
 /************************************************************************/
 
 class COGProxyDataset final : public GDALProxyDataset
@@ -1469,7 +1469,7 @@ class COGProxyDataset final : public GDALProxyDataset
 };
 
 /************************************************************************/
-/*                    COGProxyDataset::~COGProxyDataset()               */
+/*                 COGProxyDataset::~COGProxyDataset()                  */
 /************************************************************************/
 
 COGProxyDataset::~COGProxyDataset()
@@ -1478,7 +1478,7 @@ COGProxyDataset::~COGProxyDataset()
 }
 
 /************************************************************************/
-/*                              Close()                                 */
+/*                               Close()                                */
 /************************************************************************/
 
 CPLErr COGProxyDataset::Close(GDALProgressFunc pfnProgress, void *pProgressData)
@@ -1511,12 +1511,12 @@ CPLErr COGProxyDataset::Close(GDALProgressFunc pfnProgress, void *pProgressData)
 }
 
 /************************************************************************/
-/*                              COGCreate()                             */
+/*                             COGCreate()                              */
 /************************************************************************/
 
 static GDALDataset *COGCreate(const char *pszFilename, int nXSize, int nYSize,
                               int nBands, GDALDataType eType,
-                              char **papszOptions)
+                              CSLConstList papszOptions)
 {
     const std::string osTmpFile(GetTmpFilename(pszFilename, "create.tif"));
     CPLStringList aosOptions;

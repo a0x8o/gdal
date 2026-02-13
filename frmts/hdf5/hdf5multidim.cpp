@@ -24,7 +24,7 @@ namespace GDAL
 {
 
 /************************************************************************/
-/*                               HDF5Group                              */
+/*                              HDF5Group                               */
 /************************************************************************/
 
 class HDF5Group final : public GDALGroup
@@ -114,7 +114,7 @@ class HDF5Group final : public GDALGroup
 };
 
 /************************************************************************/
-/*                             HDF5Dimension                            */
+/*                            HDF5Dimension                             */
 /************************************************************************/
 
 class HDF5Dimension final : public GDALDimension
@@ -232,7 +232,7 @@ BuildDataType(hid_t hDataType, bool &bHasString, bool &bNonNativeDataType,
 }
 
 /************************************************************************/
-/*                    GetDataTypesInGroup()                             */
+/*                        GetDataTypesInGroup()                         */
 /************************************************************************/
 
 static void
@@ -266,7 +266,7 @@ GetDataTypesInGroup(hid_t hHDF5, const std::string &osGroupFullName,
 }
 
 /************************************************************************/
-/*                            HDF5Array                                 */
+/*                              HDF5Array                               */
 /************************************************************************/
 
 class HDF5Array final : public GDALMDArray
@@ -399,7 +399,7 @@ class HDF5Array final : public GDALMDArray
 };
 
 /************************************************************************/
-/*                           HDF5Attribute                              */
+/*                            HDF5Attribute                             */
 /************************************************************************/
 
 class HDF5Attribute final : public GDALAttribute
@@ -527,7 +527,7 @@ HDF5SharedResources::~HDF5SharedResources()
 }
 
 /************************************************************************/
-/*                          Create()                                    */
+/*                               Create()                               */
 /************************************************************************/
 
 std::shared_ptr<HDF5SharedResources>
@@ -540,7 +540,7 @@ HDF5SharedResources::Create(const std::string &osFilename)
 }
 
 /************************************************************************/
-/*                           GetRootGroup()                             */
+/*                            GetRootGroup()                            */
 /************************************************************************/
 
 std::shared_ptr<HDF5Group> HDF5SharedResources::GetRootGroup()
@@ -564,7 +564,7 @@ std::shared_ptr<HDF5Group> HDF5SharedResources::GetRootGroup()
 }
 
 /************************************************************************/
-/*                         GetDimensions()                              */
+/*                           GetDimensions()                            */
 /************************************************************************/
 
 std::vector<std::shared_ptr<GDALDimension>>
@@ -670,8 +670,8 @@ HDF5Group::GetDimensions(CSLConstList) const
             poHDF5EOSParser->GetGridMetadata(GetName(), oGridMetadata))
         {
             GDALGeoTransform gt;
-            const bool bHasGT =
-                oGridMetadata.GetGeoTransform(gt) && gt[2] == 0 && gt[4] == 0;
+            const bool bHasGT = oGridMetadata.GetGeoTransform(gt) &&
+                                gt.xrot == 0 && gt.yrot == 0;
             for (auto &oDim : oGridMetadata.aoDimensions)
             {
                 auto iterInDimMap = data.oDimMap.find(oDim.osName);
@@ -699,7 +699,7 @@ HDF5Group::GetDimensions(CSLConstList) const
                                     "HDF5",
                                     "XDim FirstX: (from XDim array:%.17g,) "
                                     "from HDF5EOS metadata:%.17g",
-                                    dfFirstVal, gt[0]);
+                                    dfFirstVal, gt.xorig);
                             }
 
                             const GUInt64 anArrayStartIdx1[] = {
@@ -714,7 +714,8 @@ HDF5Group::GetDimensions(CSLConstList) const
                                 CPLDebug("HDF5",
                                          "XDim LastX: (from XDim array:%.17g,) "
                                          "from HDF5EOS metadata:%.17g",
-                                         dfLastVal, gt[0] + oDim.nSize * gt[1]);
+                                         dfLastVal,
+                                         gt.xorig + oDim.nSize * gt.xscale);
                             }
                         }
                         else if (oDim.osName == "YDim" && bHasGT &&
@@ -735,7 +736,7 @@ HDF5Group::GetDimensions(CSLConstList) const
                                     "HDF5",
                                     "YDim FirstY: (from YDim array:%.17g,) "
                                     "from HDF5EOS metadata:%.17g",
-                                    dfFirstVal, gt[3]);
+                                    dfFirstVal, gt.yorig);
                             }
 
                             const GUInt64 anArrayStartIdx1[] = {
@@ -750,7 +751,8 @@ HDF5Group::GetDimensions(CSLConstList) const
                                 CPLDebug("HDF5",
                                          "YDim LastY: (from YDim array:%.17g,) "
                                          "from HDF5EOS metadata:%.17g",
-                                         dfLastVal, gt[3] + oDim.nSize * gt[5]);
+                                         dfLastVal,
+                                         gt.yorig + oDim.nSize * gt.yscale);
                             }
                         }
                     }
@@ -764,8 +766,8 @@ HDF5Group::GetDimensions(CSLConstList) const
                         GetFullName(), oDim.osName, GDAL_DIM_TYPE_HORIZONTAL_X,
                         std::string(), oDim.nSize);
                     auto poIndexingVar = GDALMDArrayRegularlySpaced::Create(
-                        GetFullName(), oDim.osName, poDim, gt[0] + gt[1] / 2,
-                        gt[1], 0);
+                        GetFullName(), oDim.osName, poDim,
+                        gt.xorig + gt.xscale / 2, gt.xscale, 0);
                     poDim->SetIndexingVariable(poIndexingVar);
                     m_poXIndexingArray = poIndexingVar;
                     m_poShared->KeepRef(poIndexingVar);
@@ -779,8 +781,8 @@ HDF5Group::GetDimensions(CSLConstList) const
                         GetFullName(), oDim.osName, GDAL_DIM_TYPE_HORIZONTAL_Y,
                         std::string(), oDim.nSize);
                     auto poIndexingVar = GDALMDArrayRegularlySpaced::Create(
-                        GetFullName(), oDim.osName, poDim, gt[3] + gt[5] / 2,
-                        gt[5], 0);
+                        GetFullName(), oDim.osName, poDim,
+                        gt.yorig + gt.yscale / 2, gt.yscale, 0);
                     poDim->SetIndexingVariable(poIndexingVar);
                     m_poYIndexingArray = poIndexingVar;
                     m_poShared->KeepRef(poIndexingVar);
@@ -835,7 +837,7 @@ HDF5Group::GetDimensions(CSLConstList) const
 }
 
 /************************************************************************/
-/*                          GetGroupNamesCallback()                     */
+/*                       GetGroupNamesCallback()                        */
 /************************************************************************/
 
 herr_t HDF5Group::GetGroupNamesCallback(hid_t hGroup, const char *pszObjName,
@@ -867,7 +869,7 @@ herr_t HDF5Group::GetGroupNamesCallback(hid_t hGroup, const char *pszObjName,
 }
 
 /************************************************************************/
-/*                            GetGroupNames()                           */
+/*                           GetGroupNames()                            */
 /************************************************************************/
 
 std::vector<std::string> HDF5Group::GetGroupNames(CSLConstList) const
@@ -912,7 +914,7 @@ std::shared_ptr<GDALGroup> HDF5Group::OpenGroup(const std::string &osName,
 }
 
 /************************************************************************/
-/*                          GetArrayNamesCallback()                     */
+/*                       GetArrayNamesCallback()                        */
 /************************************************************************/
 
 herr_t HDF5Group::GetArrayNamesCallback(hid_t hGroup, const char *pszObjName,
@@ -953,7 +955,7 @@ herr_t HDF5Group::GetArrayNamesCallback(hid_t hGroup, const char *pszObjName,
 }
 
 /************************************************************************/
-/*                         GetMDArrayNames()                            */
+/*                          GetMDArrayNames()                           */
 /************************************************************************/
 
 std::vector<std::string> HDF5Group::GetMDArrayNames(CSLConstList) const
@@ -974,7 +976,7 @@ std::vector<std::string> HDF5Group::GetMDArrayNames(CSLConstList) const
 }
 
 /************************************************************************/
-/*                           OpenMDArray()                              */
+/*                            OpenMDArray()                             */
 /************************************************************************/
 
 std::shared_ptr<GDALMDArray> HDF5Group::OpenMDArray(const std::string &osName,
@@ -1004,7 +1006,7 @@ std::shared_ptr<GDALMDArray> HDF5Group::OpenMDArray(const std::string &osName,
 }
 
 /************************************************************************/
-/*                          GetAttributesCallback()                     */
+/*                       GetAttributesCallback()                        */
 /************************************************************************/
 
 herr_t HDF5Group::GetAttributesCallback(hid_t hGroup, const char *pszObjName,
@@ -1047,7 +1049,7 @@ HDF5Group::GetAttributes(CSLConstList papszOptions) const
 }
 
 /************************************************************************/
-/*                               ~HDF5Array()                           */
+/*                             ~HDF5Array()                             */
 /************************************************************************/
 
 HDF5Array::~HDF5Array()
@@ -1063,7 +1065,7 @@ HDF5Array::~HDF5Array()
 }
 
 /************************************************************************/
-/*                                HDF5Array()                           */
+/*                             HDF5Array()                              */
 /************************************************************************/
 
 HDF5Array::HDF5Array(const std::string &osParentName, const std::string &osName,
@@ -1384,7 +1386,7 @@ HDF5Array::HDF5Array(const std::string &osParentName, const std::string &osName,
 }
 
 /************************************************************************/
-/*                        InstantiateDimensions()                       */
+/*                       InstantiateDimensions()                        */
 /************************************************************************/
 
 void HDF5Array::InstantiateDimensions(const std::string &osParentName,
@@ -1715,7 +1717,7 @@ void HDF5Array::InstantiateDimensions(const std::string &osParentName,
 }
 
 /************************************************************************/
-/*                      GetCoordinateVariables()                        */
+/*                       GetCoordinateVariables()                       */
 /************************************************************************/
 
 std::vector<std::shared_ptr<GDALMDArray>>
@@ -1767,7 +1769,7 @@ HDF5Array::GetCoordinateVariables() const
 }
 
 /************************************************************************/
-/*                            GetFilterInfo()                           */
+/*                           GetFilterInfo()                            */
 /************************************************************************/
 
 static CPLStringList GetFilterInfo(hid_t hArray, unsigned nFilterMask)
@@ -1843,7 +1845,7 @@ static CPLStringList GetFilterInfo(hid_t hArray, unsigned nFilterMask)
 }
 
 /************************************************************************/
-/*                        HDF5Array::GetRawBlockInfo()                  */
+/*                     HDF5Array::GetRawBlockInfo()                     */
 /************************************************************************/
 
 bool HDF5Array::GetRawBlockInfo(const uint64_t *panBlockCoordinates,
@@ -1995,7 +1997,7 @@ bool HDF5Array::GetRawBlockInfo(const uint64_t *panBlockCoordinates,
 }
 
 /************************************************************************/
-/*                          GetAttributesCallback()                     */
+/*                       GetAttributesCallback()                        */
 /************************************************************************/
 
 herr_t HDF5Array::GetAttributesCallback(hid_t hArray, const char *pszObjName,
@@ -2108,7 +2110,7 @@ herr_t HDF5Array::GetAttributesCallback(hid_t hArray, const char *pszObjName,
 }
 
 /************************************************************************/
-/*                       GetAttributeFromAttributes()                   */
+/*                     GetAttributeFromAttributes()                     */
 /************************************************************************/
 
 /** Possible fallback implementation for GetAttribute() using GetAttributes().
@@ -2145,7 +2147,7 @@ HDF5Array::GetAttributes(CSLConstList papszOptions) const
 }
 
 /************************************************************************/
-/*                           GetBlockSize()                             */
+/*                            GetBlockSize()                            */
 /************************************************************************/
 
 std::vector<GUInt64> HDF5Array::GetBlockSize() const
@@ -2195,7 +2197,7 @@ CSLConstList HDF5Array::GetStructuralInfo() const
 }
 
 /************************************************************************/
-/*                           CopyBuffer()                               */
+/*                             CopyBuffer()                             */
 /************************************************************************/
 
 static void CopyBuffer(size_t nDims, const size_t *count,
@@ -2257,7 +2259,7 @@ lbl_next_depth:
 }
 
 /************************************************************************/
-/*                             ReadSlow()                               */
+/*                              ReadSlow()                              */
 /************************************************************************/
 
 bool HDF5Array::ReadSlow(const GUInt64 *arrayStartIdx, const size_t *count,
@@ -2417,7 +2419,7 @@ lbl_next_depth:
 }
 
 /************************************************************************/
-/*                    IngestFixedLengthStrings()                        */
+/*                      IngestFixedLengthStrings()                      */
 /************************************************************************/
 
 static void IngestFixedLengthStrings(void *pDstBuffer, const void *pTemp,
@@ -2474,7 +2476,7 @@ lbl_next_depth:
 }
 
 /************************************************************************/
-/*                   GetHDF5DataTypeFromGDALDataType()                  */
+/*                  GetHDF5DataTypeFromGDALDataType()                   */
 /************************************************************************/
 
 static hid_t
@@ -2543,7 +2545,7 @@ GetHDF5DataTypeFromGDALDataType(const GDALExtendedDataType &dt, hid_t hNativeDT,
 }
 
 /************************************************************************/
-/*                        FreeDynamicMemory()                           */
+/*                         FreeDynamicMemory()                          */
 /************************************************************************/
 
 static void FreeDynamicMemory(GByte *pabyPtr, hid_t hDataType)
@@ -2606,7 +2608,7 @@ CreateMapTargetComponentsToSrc(hid_t hSrcDataType,
 }
 
 /************************************************************************/
-/*                            CopyValue()                               */
+/*                             CopyValue()                              */
 /************************************************************************/
 
 static void CopyValue(const GByte *pabySrcBuffer, hid_t hSrcDataType,
@@ -2738,7 +2740,7 @@ static void CopyValue(const GByte *pabySrcBuffer, hid_t hSrcDataType,
 }
 
 /************************************************************************/
-/*                        CopyToFinalBuffer()                           */
+/*                         CopyToFinalBuffer()                          */
 /************************************************************************/
 
 static void CopyToFinalBuffer(void *pDstBuffer, const void *pTemp, size_t nDims,
@@ -3231,7 +3233,7 @@ bool HDF5Attribute::IRead(const GUInt64 *arrayStartIdx, const size_t *count,
 }
 
 /************************************************************************/
-/*                         GetIndexingVariable()                        */
+/*                        GetIndexingVariable()                         */
 /************************************************************************/
 
 std::shared_ptr<GDALMDArray> HDF5Dimension::GetIndexingVariable() const
@@ -3268,7 +3270,7 @@ std::shared_ptr<GDALMDArray> HDF5Dimension::GetIndexingVariable() const
 }  // namespace GDAL
 
 /************************************************************************/
-/*                           OpenMultiDim()                             */
+/*                            OpenMultiDim()                            */
 /************************************************************************/
 
 GDALDataset *HDF5Dataset::OpenMultiDim(GDALOpenInfo *poOpenInfo)
@@ -3307,7 +3309,7 @@ GDALDataset *HDF5Dataset::OpenMultiDim(GDALOpenInfo *poOpenInfo)
 }
 
 /************************************************************************/
-/*                            OpenGroup()                               */
+/*                             OpenGroup()                              */
 /************************************************************************/
 
 std::shared_ptr<GDALGroup> HDF5Dataset::OpenGroup(

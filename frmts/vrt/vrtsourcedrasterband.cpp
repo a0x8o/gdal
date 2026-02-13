@@ -36,6 +36,7 @@
 #include "cpl_quad_tree.h"
 #include "cpl_string.h"
 #include "cpl_vsi.h"
+#include "cpl_worker_thread_pool.h"
 #include "gdal.h"
 #include "gdalantirecursion.h"
 #include "gdal_priv.h"
@@ -118,7 +119,7 @@ VRTSourcedRasterBand::~VRTSourcedRasterBand()
 }
 
 /************************************************************************/
-/*                  CanIRasterIOBeForwardedToEachSource()               */
+/*                CanIRasterIOBeForwardedToEachSource()                 */
 /************************************************************************/
 
 bool VRTSourcedRasterBand::CanIRasterIOBeForwardedToEachSource(
@@ -273,7 +274,7 @@ bool VRTSourcedRasterBand::CanIRasterIOBeForwardedToEachSource(
 }
 
 /************************************************************************/
-/*                      CanMultiThreadRasterIO()                        */
+/*                       CanMultiThreadRasterIO()                       */
 /************************************************************************/
 
 bool VRTSourcedRasterBand::CanMultiThreadRasterIO(
@@ -382,7 +383,7 @@ bool VRTSourcedRasterBand::CanMultiThreadRasterIO(
 }
 
 /************************************************************************/
-/*                 VRTSourcedRasterBandRasterIOJob                      */
+/*                   VRTSourcedRasterBandRasterIOJob                    */
 /************************************************************************/
 
 /** Structure used to declare a threaded job to satisfy IRasterIO()
@@ -413,7 +414,7 @@ struct VRTSourcedRasterBandRasterIOJob
 };
 
 /************************************************************************/
-/*                 VRTSourcedRasterBandRasterIOJob::Func()              */
+/*               VRTSourcedRasterBandRasterIOJob::Func()                */
 /************************************************************************/
 
 void VRTSourcedRasterBandRasterIOJob::Func(void *pData)
@@ -458,7 +459,7 @@ void VRTSourcedRasterBandRasterIOJob::Func(void *pData)
 }
 
 /************************************************************************/
-/*                  MayMultiBlockReadingBeMultiThreaded()               */
+/*                MayMultiBlockReadingBeMultiThreaded()                 */
 /************************************************************************/
 
 bool VRTSourcedRasterBand::MayMultiBlockReadingBeMultiThreaded() const
@@ -478,6 +479,71 @@ bool VRTSourcedRasterBand::MayMultiBlockReadingBeMultiThreaded() const
            CanMultiThreadRasterIO(0, 0, nRasterXSize, nRasterYSize,
                                   nContributingSources) &&
            nContributingSources > 1 && VRTDataset::GetNumThreads(l_poDS) > 1;
+}
+
+/************************************************************************/
+/*            VRTSourcedRasterBand::InitializeOutputBuffer()            */
+/************************************************************************/
+
+void VRTSourcedRasterBand::InitializeOutputBuffer(void *pData, int nBufXSize,
+                                                  int nBufYSize,
+                                                  GDALDataType eBufType,
+                                                  GSpacing nPixelSpace,
+                                                  GSpacing nLineSpace) const
+{
+    if (nPixelSpace == GDALGetDataTypeSizeBytes(eBufType) &&
+        !(m_bNoDataValueSet && m_dfNoDataValue != 0.0) &&
+        !(m_bNoDataSetAsInt64 && m_nNoDataValueInt64 != 0) &&
+        !(m_bNoDataSetAsUInt64 && m_nNoDataValueUInt64 != 0))
+    {
+        if (nLineSpace == nBufXSize * nPixelSpace)
+        {
+            memset(pData, 0, static_cast<size_t>(nBufYSize * nLineSpace));
+        }
+        else
+        {
+            for (int iLine = 0; iLine < nBufYSize; iLine++)
+            {
+                memset(static_cast<GByte *>(pData) +
+                           static_cast<GIntBig>(iLine) * nLineSpace,
+                       0, static_cast<size_t>(nBufXSize * nPixelSpace));
+            }
+        }
+    }
+    else if (m_bNoDataSetAsInt64)
+    {
+        for (int iLine = 0; iLine < nBufYSize; iLine++)
+        {
+            GDALCopyWords(&m_nNoDataValueInt64, GDT_Int64, 0,
+                          static_cast<GByte *>(pData) +
+                              static_cast<GIntBig>(nLineSpace) * iLine,
+                          eBufType, static_cast<int>(nPixelSpace), nBufXSize);
+        }
+    }
+    else if (m_bNoDataSetAsUInt64)
+    {
+        for (int iLine = 0; iLine < nBufYSize; iLine++)
+        {
+            GDALCopyWords(&m_nNoDataValueUInt64, GDT_UInt64, 0,
+                          static_cast<GByte *>(pData) +
+                              static_cast<GIntBig>(nLineSpace) * iLine,
+                          eBufType, static_cast<int>(nPixelSpace), nBufXSize);
+        }
+    }
+    else
+    {
+        double dfWriteValue = 0.0;
+        if (m_bNoDataValueSet)
+            dfWriteValue = m_dfNoDataValue;
+
+        for (int iLine = 0; iLine < nBufYSize; iLine++)
+        {
+            GDALCopyWords(&dfWriteValue, GDT_Float64, 0,
+                          static_cast<GByte *>(pData) +
+                              static_cast<GIntBig>(nLineSpace) * iLine,
+                          eBufType, static_cast<int>(nPixelSpace), nBufXSize);
+        }
+    }
 }
 
 /************************************************************************/
@@ -587,62 +653,10 @@ CPLErr VRTSourcedRasterBand::IRasterIO(
     /*      Initialize the buffer to some background value. Use the         */
     /*      nodata value if available.                                      */
     /* -------------------------------------------------------------------- */
-    if (SkipBufferInitialization())
+    if (!SkipBufferInitialization())
     {
-        // Do nothing
-    }
-    else if (nPixelSpace == GDALGetDataTypeSizeBytes(eBufType) &&
-             !(m_bNoDataValueSet && m_dfNoDataValue != 0.0) &&
-             !(m_bNoDataSetAsInt64 && m_nNoDataValueInt64 != 0) &&
-             !(m_bNoDataSetAsUInt64 && m_nNoDataValueUInt64 != 0))
-    {
-        if (nLineSpace == nBufXSize * nPixelSpace)
-        {
-            memset(pData, 0, static_cast<size_t>(nBufYSize * nLineSpace));
-        }
-        else
-        {
-            for (int iLine = 0; iLine < nBufYSize; iLine++)
-            {
-                memset(static_cast<GByte *>(pData) +
-                           static_cast<GIntBig>(iLine) * nLineSpace,
-                       0, static_cast<size_t>(nBufXSize * nPixelSpace));
-            }
-        }
-    }
-    else if (m_bNoDataSetAsInt64)
-    {
-        for (int iLine = 0; iLine < nBufYSize; iLine++)
-        {
-            GDALCopyWords(&m_nNoDataValueInt64, GDT_Int64, 0,
-                          static_cast<GByte *>(pData) +
-                              static_cast<GIntBig>(nLineSpace) * iLine,
-                          eBufType, static_cast<int>(nPixelSpace), nBufXSize);
-        }
-    }
-    else if (m_bNoDataSetAsUInt64)
-    {
-        for (int iLine = 0; iLine < nBufYSize; iLine++)
-        {
-            GDALCopyWords(&m_nNoDataValueUInt64, GDT_UInt64, 0,
-                          static_cast<GByte *>(pData) +
-                              static_cast<GIntBig>(nLineSpace) * iLine,
-                          eBufType, static_cast<int>(nPixelSpace), nBufXSize);
-        }
-    }
-    else
-    {
-        double dfWriteValue = 0.0;
-        if (m_bNoDataValueSet)
-            dfWriteValue = m_dfNoDataValue;
-
-        for (int iLine = 0; iLine < nBufYSize; iLine++)
-        {
-            GDALCopyWords(&dfWriteValue, GDT_Float64, 0,
-                          static_cast<GByte *>(pData) +
-                              static_cast<GIntBig>(nLineSpace) * iLine,
-                          eBufType, static_cast<int>(nPixelSpace), nBufXSize);
-        }
+        InitializeOutputBuffer(pData, nBufXSize, nBufYSize, eBufType,
+                               nPixelSpace, nLineSpace);
     }
 
     /* -------------------------------------------------------------------- */
@@ -800,7 +814,7 @@ CPLErr VRTSourcedRasterBand::IRasterIO(
 }
 
 /************************************************************************/
-/*                         IGetDataCoverageStatus()                     */
+/*                       IGetDataCoverageStatus()                       */
 /************************************************************************/
 
 int VRTSourcedRasterBand::IGetDataCoverageStatus(int nXOff, int nYOff,
@@ -985,7 +999,7 @@ CPLErr VRTSourcedRasterBand::IReadBlock(int nBlockXOff, int nBlockYOff,
 }
 
 /************************************************************************/
-/*                        CPLGettimeofday()                             */
+/*                          CPLGettimeofday()                           */
 /************************************************************************/
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
@@ -1016,7 +1030,7 @@ static int CPLGettimeofday(struct CPLTimeVal *tp, void * /* timezonep*/)
 #endif
 
 /************************************************************************/
-/*                    CanUseSourcesMinMaxImplementations()              */
+/*                 CanUseSourcesMinMaxImplementations()                 */
 /************************************************************************/
 
 bool VRTSourcedRasterBand::CanUseSourcesMinMaxImplementations()
@@ -1236,7 +1250,7 @@ double VRTSourcedRasterBand::GetMaximum(int *pbSuccess)
 }
 
 /************************************************************************/
-/* IsMosaicOfNonOverlappingSimpleSourcesOfFullRasterNoResAndTypeChange() */
+/*IsMosaicOfNonOverlappingSimpleSourcesOfFullRasterNoResAndTypeChange() */
 /************************************************************************/
 
 /* Returns true if the VRT raster band consists of non-overlapping simple
@@ -1351,7 +1365,7 @@ bool VRTSourcedRasterBand::
 }
 
 /************************************************************************/
-/*                       ComputeRasterMinMax()                          */
+/*                        ComputeRasterMinMax()                         */
 /************************************************************************/
 
 CPLErr VRTSourcedRasterBand::ComputeRasterMinMax(int bApproxOK,
@@ -2273,7 +2287,7 @@ CPLErr VRTSourcedRasterBand::AddSource(std::unique_ptr<VRTSource> poNewSource)
 /*! @endcond */
 
 /************************************************************************/
-/*                              VRTAddSource()                          */
+/*                            VRTAddSource()                            */
 /************************************************************************/
 
 /**
@@ -2402,7 +2416,7 @@ CPLXMLNode *VRTSourcedRasterBand::SerializeToXML(const char *pszVRTPath,
 }
 
 /************************************************************************/
-/*                     SkipBufferInitialization()                       */
+/*                      SkipBufferInitialization()                      */
 /************************************************************************/
 
 bool VRTSourcedRasterBand::SkipBufferInitialization()
@@ -2720,7 +2734,7 @@ CPLErr VRTSourcedRasterBand::AddComplexSource(
 /*! @endcond */
 
 /************************************************************************/
-/*                         VRTAddComplexSource()                        */
+/*                        VRTAddComplexSource()                         */
 /************************************************************************/
 
 /**
@@ -2791,7 +2805,7 @@ CPLErr CPL_STDCALL VRTAddFuncSource(VRTSourcedRasterBandH hVRTBand,
 /*! @cond Doxygen_Suppress */
 
 /************************************************************************/
-/*                      GetMetadataDomainList()                         */
+/*                       GetMetadataDomainList()                        */
 /************************************************************************/
 
 char **VRTSourcedRasterBand::GetMetadataDomainList()
@@ -3123,7 +3137,7 @@ CPLErr VRTSourcedRasterBand::SetMetadata(CSLConstList papszNewMD,
 }
 
 /************************************************************************/
-/*                             GetFileList()                            */
+/*                            GetFileList()                             */
 /************************************************************************/
 
 void VRTSourcedRasterBand::GetFileList(char ***ppapszFileList, int *pnSize,
@@ -3138,7 +3152,7 @@ void VRTSourcedRasterBand::GetFileList(char ***ppapszFileList, int *pnSize,
 }
 
 /************************************************************************/
-/*                        CloseDependentDatasets()                      */
+/*                       CloseDependentDatasets()                       */
 /************************************************************************/
 
 int VRTSourcedRasterBand::CloseDependentDatasets()
@@ -3154,7 +3168,7 @@ int VRTSourcedRasterBand::CloseDependentDatasets()
 }
 
 /************************************************************************/
-/*                               FlushCache()                           */
+/*                             FlushCache()                             */
 /************************************************************************/
 
 CPLErr VRTSourcedRasterBand::FlushCache(bool bAtClosing)
@@ -3168,7 +3182,7 @@ CPLErr VRTSourcedRasterBand::FlushCache(bool bAtClosing)
 }
 
 /************************************************************************/
-/*                           RemoveCoveredSources()                     */
+/*                        RemoveCoveredSources()                        */
 /************************************************************************/
 
 /** Remove sources that are covered by other sources.

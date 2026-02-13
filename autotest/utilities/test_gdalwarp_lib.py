@@ -147,6 +147,31 @@ def test_gdalwarp_lib_6(testgdalwarp_gcp_tif):
 
 
 ###############################################################################
+# Test warping from GCPs with SRC_METHOD=GCP_POLYNOMIAL and MAX_GCP_ORDER=-1
+
+
+def test_gdalwarp_lib_6_bis(testgdalwarp_gcp_tif):
+
+    ds1 = gdal.Open(testgdalwarp_gcp_tif)
+    dstDS = gdal.Warp(
+        "",
+        ds1,
+        format="MEM",
+        transformerOptions=["SRC_METHOD=GCP_POLYNOMIAL", "MAX_GCP_ORDER=-1"],
+    )
+
+    assert dstDS.GetRasterBand(1).Checksum() == 4672, "Bad checksum"
+
+    gdaltest.check_geotransform(
+        gdal.Open("../gcore/data/byte.tif").GetGeoTransform(),
+        dstDS.GetGeoTransform(),
+        1e-9,
+    )
+
+    dstDS = None
+
+
+###############################################################################
 # Test -tr
 
 
@@ -2472,7 +2497,7 @@ def test_gdalwarp_lib_ct():
         options='-r cubic -f MEM -t_srs EPSG:4326 -ct "proj=pipeline step inv proj=utm zone=11 ellps=clrk66 step proj=unitconvert xy_in=rad xy_out=deg step proj=axisswap order=2,1"',
     )
 
-    assert dstDS.GetRasterBand(1).Checksum() == 4705, "Bad checksum"
+    assert dstDS.GetRasterBand(1).Checksum() == 4772
 
 
 def test_gdalwarp_lib_ct_wkt():
@@ -2621,7 +2646,7 @@ def test_gdalwarp_lib_ct_wkt():
         coordinateOperation=wkt,
     )
 
-    assert dstDS.GetRasterBand(1).Checksum() == 4705, "Bad checksum"
+    assert dstDS.GetRasterBand(1).Checksum() == 4772
 
 
 ###############################################################################
@@ -4195,7 +4220,8 @@ def test_gdalwarp_lib_conflicting_source_metadata(tmp_vsimem):
 
 def test_target_extent_consistent_size():
     """Test issue GH #9467 where the output size is not consistent when using target extent
-    with different input datasets having the same resolution and CRS but different extent."""
+    with different input datasets having the same resolution and CRS but different extent.
+    """
 
     # Create a source dataset with CRS 32613
     src_ds_1 = gdal.GetDriverByName("MEM").Create("", 10980, 10980)
@@ -4731,8 +4757,7 @@ def test_gdalwarp_te_srs_check_extent():
 
 def test_gdalwarplib_on_huge_raster():
 
-    src_ds = gdal.Open(
-        """<VRTDataset rasterXSize="1073741766" rasterYSize="1070224430">
+    src_ds = gdal.Open("""<VRTDataset rasterXSize="1073741766" rasterYSize="1070224430">
   <SRS dataAxisToSRSAxisMapping="1,2">PROJCS["WGS 84 / Pseudo-Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],EXTENSION["PROJ4","+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs"],AUTHORITY["EPSG","3857"]]</SRS>
   <GeoTransform> -2.0037507260426737e+07,  3.7322767705947384e-02,  0.0000000000000000e+00,  1.9971868903190855e+07,  0.0000000000000000e+00, -3.7322767705947384e-02</GeoTransform>
   <VRTRasterBand dataType="Byte" band="1">
@@ -4741,8 +4766,7 @@ def test_gdalwarplib_on_huge_raster():
       <SourceBand>1</SourceBand>
     </SimpleSource>
   </VRTRasterBand>
-</VRTDataset>"""
-    )
+</VRTDataset>""")
 
     out_ds = gdal.Warp(
         "",
@@ -4837,4 +4861,4 @@ def test_gdalwarp_lib_RESET_DEST_PIXELS(dstNodata):
     if dstNodata is None:
         assert out_ds.ReadRaster() == b"\x00\x00\x00\x00\x02\x03\x00\x00\x00"
     else:
-        assert out_ds.ReadRaster() == b"\xFF\xFF\xFF\xFF\x02\x03\xFF\xFF\xFF"
+        assert out_ds.ReadRaster() == b"\xff\xff\xff\xff\x02\x03\xff\xff\xff"

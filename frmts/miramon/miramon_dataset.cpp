@@ -11,6 +11,8 @@
  * SPDX-License-Identifier: MIT
  ****************************************************************************/
 
+#include <algorithm>
+
 #include "miramon_dataset.h"
 #include "miramon_rasterband.h"
 #include "miramon_band.h"  // Per a MMRBand
@@ -20,7 +22,7 @@
 #include "../miramon_common/mm_gdal_functions.h"  // For MMCheck_REL_FILE()
 
 /************************************************************************/
-/*                GDALRegister_MiraMon()                                */
+/*                        GDALRegister_MiraMon()                        */
 /************************************************************************/
 void GDALRegister_MiraMon()
 
@@ -40,6 +42,20 @@ void GDALRegister_MiraMon()
     poDriver->SetMetadataItem(GDAL_DCAP_VIRTUALIO, "YES");
     poDriver->SetMetadataItem(GDAL_DMD_SUBDATASETS, "YES");
 
+    poDriver->SetMetadataItem(GDAL_DCAP_OPEN, "YES");
+
+    poDriver->SetMetadataItem(
+        GDAL_DMD_OPENOPTIONLIST,
+        "<OpenOptionList>\n"
+        "   <Option name='RAT_OR_CT' type='string-select' "
+        "description='Controls whether the Raster Attribute Table (RAT) "
+        "and/or the Color Table (CT) are exposed.' default='ALL'>\n"
+        "       <Value>ALL</Value>\n"
+        "       <Value>RAT</Value>\n"
+        "       <Value>CT</Value>\n"
+        "   </Option>\n"
+        "</OpenOptionList>\n");
+
     poDriver->pfnOpen = MMRDataset::Open;
     poDriver->pfnIdentify = MMRDataset::Identify;
 
@@ -47,7 +63,7 @@ void GDALRegister_MiraMon()
 }
 
 /************************************************************************/
-/*                            MMRDataset()                              */
+/*                             MMRDataset()                             */
 /************************************************************************/
 
 MMRDataset::MMRDataset(GDALOpenInfo *poOpenInfo)
@@ -86,10 +102,20 @@ MMRDataset::MMRDataset(GDALOpenInfo *poOpenInfo)
     ReadProjection();
     nBands = 0;
 
-    // Assign every band to a subdataset (if any)
-    // If all bands should go to a one single Subdataset, then,
-    // no subdataset will be created and all bands will go to this
-    // dataset.
+    // Getting the open option that determines how to expose subdatasets.
+    // To avoid recusivity subdatasets are exposed as they are.
+    const char *pszDataType =
+        CSLFetchNameValue(poOpenInfo->papszOpenOptions, "RAT_OR_CT");
+    if (pszDataType != nullptr)
+    {
+        if (EQUAL(pszDataType, "RAT"))
+            nRatOrCT = RAT_OR_CT::RAT;
+        else if (EQUAL(pszDataType, "ALL"))
+            nRatOrCT = RAT_OR_CT::ALL;
+        else if (EQUAL(pszDataType, "CT"))
+            nRatOrCT = RAT_OR_CT::CT;
+    }
+
     AssignBandsToSubdataSets();
 
     // Create subdatasets or add bands, as needed
@@ -121,7 +147,7 @@ MMRDataset::MMRDataset(GDALOpenInfo *poOpenInfo)
 }
 
 /************************************************************************/
-/*                           ~MMRDataset()                              */
+/*                            ~MMRDataset()                             */
 /************************************************************************/
 
 MMRDataset::~MMRDataset()
@@ -245,7 +271,7 @@ void MMRDataset::ReadProjection()
 }
 
 /************************************************************************/
-/*                           SUBDATASETS                                */
+/*                             SUBDATASETS                              */
 /************************************************************************/
 // Assigns every band to a subdataset
 void MMRDataset::AssignBandsToSubdataSets()
@@ -254,30 +280,35 @@ void MMRDataset::AssignBandsToSubdataSets()
     if (!m_pMMRRel.get())
         return;
 
-    m_nNSubdataSets = 1;
     int nIBand = 0;
-    MMRBand *pBand = m_pMMRRel->GetBand(nIBand);
-    if (!pBand)
-        return;
+    int nIBand2 = 0;
 
-    pBand->AssignSubDataSet(m_nNSubdataSets);
-    MMRBand *pNextBand;
-    for (; nIBand < m_pMMRRel->GetNBands() - 1; nIBand++)
+    MMRBand *pBand;
+    MMRBand *pOtherBand;
+    for (; nIBand < m_pMMRRel->GetNBands(); nIBand++)
     {
-        if (IsNextBandInANewDataSet(nIBand))
+        pBand = m_pMMRRel->GetBand(nIBand);
+        if (!pBand)
+            continue;
+
+        if (pBand->GetAssignedSubDataSet() != 0)
+            continue;
+
+        m_nNSubdataSets++;
+        pBand->AssignSubDataSet(m_nNSubdataSets);
+
+        // Let's put all suitable bands in the same subdataset
+        for (nIBand2 = nIBand + 1; nIBand2 < m_pMMRRel->GetNBands(); nIBand2++)
         {
-            m_nNSubdataSets++;
-            pNextBand = m_pMMRRel->GetBand(nIBand + 1);
-            if (!pNextBand)
-                return;
-            pNextBand->AssignSubDataSet(m_nNSubdataSets);
-        }
-        else
-        {
-            pNextBand = m_pMMRRel->GetBand(nIBand + 1);
-            if (!pNextBand)
-                return;
-            pNextBand->AssignSubDataSet(m_nNSubdataSets);
+            pOtherBand = m_pMMRRel->GetBand(nIBand2);
+            if (!pOtherBand)
+                continue;
+
+            if (pOtherBand->GetAssignedSubDataSet() != 0)
+                continue;
+
+            if (BandInTheSameDataset(nIBand, nIBand2))
+                pOtherBand->AssignSubDataSet(m_nNSubdataSets);
         }
     }
 
@@ -357,51 +388,99 @@ void MMRDataset::CreateSubdatasetsFromBands()
     }
 }
 
-bool MMRDataset::IsNextBandInANewDataSet(int nIBand) const
+bool MMRDataset::BandInTheSameDataset(int nIBand1, int nIBand2) const
 {
-    if (nIBand < 0)
-        return false;
+    if (nIBand1 < 0 || nIBand2 < 0)
+        return true;
 
-    if (nIBand + 1 >= m_pMMRRel->GetNBands())
-        return false;
+    if (nIBand1 >= m_pMMRRel->GetNBands() || nIBand2 >= m_pMMRRel->GetNBands())
+        return true;
 
-    MMRBand *pThisBand = m_pMMRRel->GetBand(nIBand);
-    MMRBand *pNextBand = m_pMMRRel->GetBand(nIBand + 1);
-    if (!pThisBand || !pNextBand)
-        return false;
+    MMRBand *pThisBand = m_pMMRRel->GetBand(nIBand1);
+    MMRBand *pOtherBand = m_pMMRRel->GetBand(nIBand2);
+    if (!pThisBand || !pOtherBand)
+        return true;
 
     // Two images with different numbers of columns are assigned to different subdatasets
-    if (pThisBand->GetWidth() != pNextBand->GetWidth())
-        return true;
+    if (pThisBand->GetWidth() != pOtherBand->GetWidth())
+        return false;
 
     // Two images with different numbers of rows are assigned to different subdatasets
-    if (pThisBand->GetHeight() != pNextBand->GetHeight())
-        return true;
+    if (pThisBand->GetHeight() != pOtherBand->GetHeight())
+        return false;
+
+    // Two images with different data type are assigned to different subdatasets
+    if (pThisBand->GeteMMNCDataType() != pOtherBand->GeteMMNCDataType())
+        return false;
 
     // Two images with different bounding box are assigned to different subdatasets
-    if (pThisBand->GetBoundingBoxMinX() != pNextBand->GetBoundingBoxMinX())
-        return true;
-    if (pThisBand->GetBoundingBoxMaxX() != pNextBand->GetBoundingBoxMaxX())
-        return true;
-    if (pThisBand->GetBoundingBoxMinY() != pNextBand->GetBoundingBoxMinY())
-        return true;
-    if (pThisBand->GetBoundingBoxMaxY() != pNextBand->GetBoundingBoxMaxY())
-        return true;
+    if (pThisBand->GetBoundingBoxMinX() != pOtherBand->GetBoundingBoxMinX())
+        return false;
+    if (pThisBand->GetBoundingBoxMaxX() != pOtherBand->GetBoundingBoxMaxX())
+        return false;
+    if (pThisBand->GetBoundingBoxMinY() != pOtherBand->GetBoundingBoxMinY())
+        return false;
+    if (pThisBand->GetBoundingBoxMaxY() != pOtherBand->GetBoundingBoxMaxY())
+        return false;
+
+    // Two images with different simbolization are assigned to different subdatasets
+    if (!EQUAL(pThisBand->GetColor_Const(), pOtherBand->GetColor_Const()))
+        return false;
+    if (pThisBand->GetConstantColorRGB().c1 !=
+        pOtherBand->GetConstantColorRGB().c1)
+        return false;
+    if (pThisBand->GetConstantColorRGB().c2 !=
+        pOtherBand->GetConstantColorRGB().c2)
+        return false;
+    if (pThisBand->GetConstantColorRGB().c3 !=
+        pOtherBand->GetConstantColorRGB().c3)
+        return false;
+    if (!EQUAL(pThisBand->GetColor_Paleta(), pOtherBand->GetColor_Paleta()))
+        return false;
+    if (!EQUAL(pThisBand->GetColor_TractamentVariable(),
+               pOtherBand->GetColor_TractamentVariable()))
+        return false;
+    if (!EQUAL(pThisBand->GetTractamentVariable(),
+               pOtherBand->GetTractamentVariable()))
+        return false;
+    if (!EQUAL(pThisBand->GetColor_EscalatColor(),
+               pOtherBand->GetColor_EscalatColor()))
+        return false;
+    if (!EQUAL(pThisBand->GetColor_N_SimbolsALaTaula(),
+               pOtherBand->GetColor_N_SimbolsALaTaula()))
+        return false;
+    if (pThisBand->IsCategorical() != pOtherBand->IsCategorical())
+        return false;
+    if (pThisBand->IsCategorical())
+    {
+        if (pThisBand->GetMaxSet() != pOtherBand->GetMaxSet())
+            return false;
+        if (pThisBand->GetMaxSet())
+        {
+            if (pThisBand->GetMax() != pOtherBand->GetMax())
+                return false;
+        }
+    }
+
+    // Two images with different RATs are assigned to different subdatasets
+    if (!EQUAL(pThisBand->GetShortRATName(), pOtherBand->GetShortRATName()) ||
+        !EQUAL(pThisBand->GetAssociateREL(), pOtherBand->GetAssociateREL()))
+        return false;
 
     // One image has NoData values and the other does not;
     // they are assigned to different subdatasets
-    if (pThisBand->BandHasNoData() != pNextBand->BandHasNoData())
-        return true;
+    if (pThisBand->BandHasNoData() != pOtherBand->BandHasNoData())
+        return false;
 
     // Two images with different NoData values are assigned to different subdatasets
-    if (pThisBand->GetNoDataValue() != pNextBand->GetNoDataValue())
-        return true;
+    if (pThisBand->GetNoDataValue() != pOtherBand->GetNoDataValue())
+        return false;
 
-    return false;
+    return true;
 }
 
 /************************************************************************/
-/*                          UpdateGeoTransform()                     */
+/*                         UpdateGeoTransform()                         */
 /************************************************************************/
 int MMRDataset::UpdateGeoTransform()
 {
@@ -416,8 +495,8 @@ int MMRDataset::UpdateGeoTransform()
         osMinX.empty())
         return 1;
 
-    if (1 != CPLsscanf(osMinX, "%lf", &(m_gt[0])))
-        m_gt[0] = 0.0;
+    if (1 != CPLsscanf(osMinX, "%lf", &(m_gt.xorig)))
+        m_gt.xorig = 0.0;
 
     int nNCols = m_pMMRRel->GetColumnsNumberFromREL();
     if (nNCols <= 0)
@@ -432,8 +511,8 @@ int MMRDataset::UpdateGeoTransform()
     if (1 != CPLsscanf(osMaxX, "%lf", &dfMaxX))
         dfMaxX = 1.0;
 
-    m_gt[1] = (dfMaxX - m_gt[0]) / nNCols;
-    m_gt[2] = 0.0;  // No rotation in MiraMon rasters
+    m_gt.xscale = (dfMaxX - m_gt.xorig) / nNCols;
+    m_gt.xrot = 0.0;  // No rotation in MiraMon rasters
 
     CPLString osMinY;
     if (!m_pMMRRel->GetMetadataValue(SECTION_EXTENT, "MinY", osMinY) ||
@@ -453,13 +532,13 @@ int MMRDataset::UpdateGeoTransform()
     if (1 != CPLsscanf(osMaxY, "%lf", &dfMaxY))
         dfMaxY = 1.0;
 
-    m_gt[3] = dfMaxY;
-    m_gt[4] = 0.0;
+    m_gt.yorig = dfMaxY;
+    m_gt.yrot = 0.0;
 
     double dfMinY;
     if (1 != CPLsscanf(osMinY, "%lf", &dfMinY))
         dfMinY = 0.0;
-    m_gt[5] = (dfMinY - m_gt[3]) / nNRows;
+    m_gt.yscale = (dfMinY - m_gt.yorig) / nNRows;
 
     return 0;
 }
@@ -471,8 +550,8 @@ const OGRSpatialReference *MMRDataset::GetSpatialRef() const
 
 CPLErr MMRDataset::GetGeoTransform(GDALGeoTransform &gt) const
 {
-    if (m_gt[0] != 0.0 || m_gt[1] != 1.0 || m_gt[2] != 0.0 || m_gt[3] != 0.0 ||
-        m_gt[4] != 0.0 || m_gt[5] != 1.0)
+    if (m_gt.xorig != 0.0 || m_gt.xscale != 1.0 || m_gt.xrot != 0.0 ||
+        m_gt.yorig != 0.0 || m_gt.yrot != 0.0 || m_gt.yscale != 1.0)
     {
         gt = m_gt;
         return CE_None;

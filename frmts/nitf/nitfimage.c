@@ -1278,7 +1278,7 @@ static void NITFUncompressVQTile(NITFImage *psImage, GByte *pabyVQBuf,
                 memcpy(pabyTarget + 4, psImage->apanVQLUT[t] + val2, 4);
             }
         } /* for j */
-    }     /* for i */
+    } /* for i */
 }
 
 /************************************************************************/
@@ -2822,7 +2822,7 @@ int NITFReadRPC00B(NITFImage *psImage, NITFRPC00BInfo *psRPC)
 }
 
 /************************************************************************/
-/*                          NITFDeserializeRPC00B()                     */
+/*                       NITFDeserializeRPC00B()                        */
 /************************************************************************/
 
 int NITFDeserializeRPC00B(const GByte *pabyTRE, NITFRPC00BInfo *psRPC,
@@ -3567,7 +3567,7 @@ static void NITFLoadAttributeSection(NITFImage *psImage)
 }
 
 /************************************************************************/
-/*                       NITFLoadColormapSubSection()                   */
+/*                     NITFLoadColormapSubSection()                     */
 /************************************************************************/
 
 /* This function is directly inspired by function parse_clut coming from
@@ -3729,7 +3729,7 @@ static void NITFLoadColormapSubSection(NITFImage *psImage)
 }
 
 /************************************************************************/
-/*                       NITFLoadSubframeMaskTable()                        */
+/*                     NITFLoadSubframeMaskTable()                      */
 /************************************************************************/
 
 /* Fixes bug #913 */
@@ -3850,7 +3850,7 @@ static GUInt32 NITFReadMSBGUInt32(VSILFILE *fp, int *pbSuccess)
 }
 
 /************************************************************************/
-/*                     NITFReadRPFLocationTable()                       */
+/*                      NITFReadRPFLocationTable()                      */
 /************************************************************************/
 
 NITFLocation *NITFReadRPFLocationTable(VSILFILE *fp, int *pnLocCount)

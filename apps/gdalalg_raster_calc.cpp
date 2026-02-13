@@ -183,6 +183,7 @@ struct SourceProperties
     int nBands{0};
     int nX{0};
     int nY{0};
+    bool hasGT{false};
     GDALGeoTransform gt{};
     std::unique_ptr<OGRSpatialReference, OGRSpatialReferenceReleaser> srs{
         nullptr};
@@ -257,27 +258,30 @@ UpdateSourceProperties(SourceProperties &out, const std::string &dsn,
         dimensionMismatch = true;
     }
 
-    if (source.gt[0] != out.gt[0] || source.gt[2] != out.gt[2] ||
-        source.gt[3] != out.gt[3] || source.gt[4] != out.gt[4])
+    if (source.gt.xorig != out.gt.xorig || source.gt.xrot != out.gt.xrot ||
+        source.gt.yorig != out.gt.yorig || source.gt.yrot != out.gt.yrot)
     {
         extentMismatch = true;
     }
-    if (source.gt[1] != out.gt[1] || source.gt[5] != out.gt[5])
+    if (source.gt.xscale != out.gt.xscale || source.gt.yscale != out.gt.yscale)
     {
         // Resolutions are different. Are the extents the same?
-        double xmaxOut = out.gt[0] + out.nX * out.gt[1] + out.nY * out.gt[2];
-        double yminOut = out.gt[3] + out.nX * out.gt[4] + out.nY * out.gt[5];
+        double xmaxOut =
+            out.gt.xorig + out.nX * out.gt.xscale + out.nY * out.gt.xrot;
+        double yminOut =
+            out.gt.yorig + out.nX * out.gt.yrot + out.nY * out.gt.yscale;
 
-        double xmax =
-            source.gt[0] + source.nX * source.gt[1] + source.nY * source.gt[2];
-        double ymin =
-            source.gt[3] + source.nX * source.gt[4] + source.nY * source.gt[5];
+        double xmax = source.gt.xorig + source.nX * source.gt.xscale +
+                      source.nY * source.gt.xrot;
+        double ymin = source.gt.yorig + source.nX * source.gt.yrot +
+                      source.nY * source.gt.yscale;
 
         // Max allowable extent misalignment, expressed as fraction of a pixel
         constexpr double EXTENT_RTOL = 1e-3;
 
-        if (std::abs(xmax - xmaxOut) > EXTENT_RTOL * std::abs(source.gt[1]) ||
-            std::abs(ymin - yminOut) > EXTENT_RTOL * std::abs(source.gt[5]))
+        if (std::abs(xmax - xmaxOut) >
+                EXTENT_RTOL * std::abs(source.gt.xscale) ||
+            std::abs(ymin - yminOut) > EXTENT_RTOL * std::abs(source.gt.yscale))
         {
             extentMismatch = true;
         }
@@ -300,7 +304,7 @@ UpdateSourceProperties(SourceProperties &out, const std::string &dsn,
     // Find a common resolution
     if (source.nX > out.nX)
     {
-        auto dx = CPLGreatestCommonDivisor(out.gt[1], source.gt[1]);
+        auto dx = CPLGreatestCommonDivisor(out.gt.xscale, source.gt.xscale);
         if (dx == 0)
         {
             CPLError(CE_Failure, CPLE_AppDefined,
@@ -308,12 +312,12 @@ UpdateSourceProperties(SourceProperties &out, const std::string &dsn,
             return std::nullopt;
         }
         out.nX = static_cast<int>(
-            std::round(static_cast<double>(out.nX) * out.gt[1] / dx));
-        out.gt[1] = dx;
+            std::round(static_cast<double>(out.nX) * out.gt.xscale / dx));
+        out.gt.xscale = dx;
     }
     if (source.nY > out.nY)
     {
-        auto dy = CPLGreatestCommonDivisor(out.gt[5], source.gt[5]);
+        auto dy = CPLGreatestCommonDivisor(out.gt.yscale, source.gt.yscale);
         if (dy == 0)
         {
             CPLError(CE_Failure, CPLE_AppDefined,
@@ -321,8 +325,8 @@ UpdateSourceProperties(SourceProperties &out, const std::string &dsn,
             return std::nullopt;
         }
         out.nY = static_cast<int>(
-            std::round(static_cast<double>(out.nY) * out.gt[5] / dy));
-        out.gt[5] = dy;
+            std::round(static_cast<double>(out.nY) * out.gt.yscale / dy));
+        out.gt.yscale = dy;
     }
 
     if (srsMismatch)
@@ -777,7 +781,7 @@ static std::unique_ptr<GDALDataset> GDALCalcCreateVRTDerived(
         out.nBands = 1;
         out.srs.reset(ds->GetSpatialRef() ? ds->GetSpatialRef()->Clone()
                                           : nullptr);
-        ds->GetGeoTransform(out.gt);
+        out.hasGT = ds->GetGeoTransform(out.gt) == CE_None;
     }
 
     CPLXMLTreeCloser root(CPLCreateXMLNode(nullptr, CXT_Element, "VRTDataset"));
@@ -847,7 +851,10 @@ static std::unique_ptr<GDALDataset> GDALCalcCreateVRTDerived(
     {
         return nullptr;
     };
-    ds->SetGeoTransform(out.gt);
+    if (out.hasGT)
+    {
+        ds->SetGeoTransform(out.gt);
+    }
     if (out.srs)
     {
         ds->SetSpatialRef(out.srs.get());
@@ -947,7 +954,7 @@ bool GDALRasterCalcAlgorithm::RunImpl(GDALProgressFunc pfnProgress,
 }
 
 /************************************************************************/
-/*                GDALRasterCalcAlgorithm::RunStep()                    */
+/*                  GDALRasterCalcAlgorithm::RunStep()                  */
 /************************************************************************/
 
 bool GDALRasterCalcAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)

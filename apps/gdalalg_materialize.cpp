@@ -22,13 +22,15 @@
 #endif
 
 /************************************************************************/
-/*                     GDALMaterializeRasterAlgorithm()                 */
+/*                   GDALMaterializeRasterAlgorithm()                   */
 /************************************************************************/
 
 GDALMaterializeRasterAlgorithm::GDALMaterializeRasterAlgorithm()
     : GDALMaterializeStepAlgorithm<GDALRasterPipelineStepAlgorithm,
                                    GDAL_OF_RASTER>(HELP_URL)
 {
+    AddRasterHiddenInputDatasetArg();
+
     AddOutputDatasetArg(&m_outputDataset, GDAL_OF_RASTER,
                         /* positionalAndRequired = */ false,
                         _("Materialized dataset name"))
@@ -46,7 +48,7 @@ GDALMaterializeRasterAlgorithm::GDALMaterializeRasterAlgorithm()
 }
 
 /************************************************************************/
-/*               GDALMaterializeRasterAlgorithm::RunStep()              */
+/*              GDALMaterializeRasterAlgorithm::RunStep()               */
 /************************************************************************/
 
 bool GDALMaterializeRasterAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
@@ -152,13 +154,15 @@ bool GDALMaterializeRasterAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
 }
 
 /************************************************************************/
-/*                     GDALMaterializeVectorAlgorithm()                 */
+/*                   GDALMaterializeVectorAlgorithm()                   */
 /************************************************************************/
 
 GDALMaterializeVectorAlgorithm::GDALMaterializeVectorAlgorithm()
     : GDALMaterializeStepAlgorithm<GDALVectorPipelineStepAlgorithm,
                                    GDAL_OF_VECTOR>(HELP_URL)
 {
+    AddVectorHiddenInputDatasetArg();
+
     AddOutputDatasetArg(&m_outputDataset, GDAL_OF_VECTOR,
                         /* positionalAndRequired = */ false,
                         _("Materialized dataset name"))
@@ -178,7 +182,7 @@ GDALMaterializeVectorAlgorithm::GDALMaterializeVectorAlgorithm()
 }
 
 /************************************************************************/
-/*               GDALMaterializeVectorAlgorithm::RunStep()              */
+/*              GDALMaterializeVectorAlgorithm::RunStep()               */
 /************************************************************************/
 
 bool GDALMaterializeVectorAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
@@ -240,7 +244,7 @@ bool GDALMaterializeVectorAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
     }
 
     CPLStringList aosOptions;
-    aosOptions.AddString("--invoked-from-gdal-vector-convert");
+    aosOptions.AddString("--invoked-from-gdal-algorithm");
     if (!m_overwrite)
     {
         aosOptions.AddString("--no-overwrite");

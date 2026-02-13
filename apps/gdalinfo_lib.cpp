@@ -176,7 +176,7 @@ static void Concat(CPLString &osRet, bool bStdoutOutput, const char *pszFormat,
 #endif
 
 /************************************************************************/
-/*           gdal_json_object_new_double_or_str_for_non_finite()        */
+/*         gdal_json_object_new_double_or_str_for_non_finite()          */
 /************************************************************************/
 
 static json_object *
@@ -208,7 +208,7 @@ gdal_json_object_new_double_significant_digits(double dfVal,
 }
 
 /************************************************************************/
-/*                     GDALWarpAppOptionsGetParser()                    */
+/*                    GDALWarpAppOptionsGetParser()                     */
 /************************************************************************/
 
 static std::unique_ptr<GDALArgumentParser>
@@ -298,8 +298,9 @@ GDALInfoAppOptionsGetParser(GDALInfoOptions *psOptions,
                 "system."));
 
     argParser->add_argument("-wkt_format")
-        .metavar("<WKT1|WKT2|WKT2_2015|WKT2_2018|WKT2_2019>")
-        .choices("WKT1", "WKT2", "WKT2_2015", "WKT2_2018", "WKT2_2019")
+        .metavar("<WKT1|WKT1_ESRI|WKT2|WKT2_2015|WKT2_2018|WKT2_2019>")
+        .choices("WKT1", "WKT1_ESRI", "WKT2", "WKT2_2015", "WKT2_2018",
+                 "WKT2_2019")
         .store_into(psOptions->osWKTFormat)
         .help(_("WKT format used for SRS."));
 
@@ -355,7 +356,7 @@ GDALInfoAppOptionsGetParser(GDALInfoOptions *psOptions,
 }
 
 /************************************************************************/
-/*                       GDALInfoAppGetParserUsage()                    */
+/*                     GDALInfoAppGetParserUsage()                      */
 /************************************************************************/
 
 std::string GDALInfoAppGetParserUsage()
@@ -377,7 +378,7 @@ std::string GDALInfoAppGetParserUsage()
 }
 
 /************************************************************************/
-/*                             GDALInfo()                               */
+/*                              GDALInfo()                              */
 /************************************************************************/
 
 /**
@@ -2308,7 +2309,7 @@ static void GDALInfoReportMetadata(const GDALInfoOptions *psOptions,
 }
 
 /************************************************************************/
-/*                             GDALInfoOptionsNew()                     */
+/*                         GDALInfoOptionsNew()                         */
 /************************************************************************/
 
 /**
@@ -2372,7 +2373,7 @@ GDALInfoOptionsNew(char **papszArgv,
 }
 
 /************************************************************************/
-/*                             GDALInfoOptionsFree()                    */
+/*                        GDALInfoOptionsFree()                         */
 /************************************************************************/
 
 /**

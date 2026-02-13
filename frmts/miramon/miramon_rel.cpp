@@ -25,7 +25,7 @@
 CPLString MMRRel::m_szImprobableRELChain = "@#&%$|``|$%&#@";
 
 /************************************************************************/
-/*                              MMRRel()                               */
+/*                               MMRRel()                               */
 /************************************************************************/
 MMRRel::MMRRel(const CPLString &osRELFilenameIn, bool bIMGMustExist)
     : m_osRelFileName(osRELFilenameIn)
@@ -82,7 +82,7 @@ MMRRel::MMRRel(const CPLString &osRELFilenameIn, bool bIMGMustExist)
                 // and we can ask things to this Rel file.
                 UpdateRELNameChar(m_osRelFileName);
                 m_bIsAMiraMonFile = true;
-                if (!OpenRELFile())
+                if (!OpenRELFile("rb"))
                     return;
             }
             return;
@@ -120,7 +120,7 @@ MMRRel::MMRRel(const CPLString &osRELFilenameIn, bool bIMGMustExist)
     UpdateRELNameChar(osRelCandidate);
 
     // We let it be opened
-    if (!OpenRELFile())
+    if (!OpenRELFile("rb"))
         return;
 
     // Collect band information
@@ -134,7 +134,7 @@ MMRRel::MMRRel(const CPLString &osRELFilenameIn, bool bIMGMustExist)
 }
 
 /************************************************************************/
-/*                              ~MMRRel()                              */
+/*                              ~MMRRel()                               */
 /************************************************************************/
 
 MMRRel::~MMRRel()
@@ -143,7 +143,7 @@ MMRRel::~MMRRel()
 }
 
 /************************************************************************/
-/*                     Getting section-key-value                        */
+/*                      Getting section-key-value                       */
 /************************************************************************/
 // Used when the MMRREL is not yet constructed.
 CPLString
@@ -247,11 +247,11 @@ CPLString MMRRel::GetValueFromSectionKey(VSILFILE *pf,
 }
 
 /************************************************************************/
-/*                     Other functions                                  */
+/*                           Other functions                            */
 /************************************************************************/
 
-// Converts FileNameI.rel to FileName.img
-CPLString MMRRel::MMRGetFileNameFromRelName(const CPLString &osRELFile)
+// Converts FileNameI.rel to FileName
+CPLString MMRRel::MMRGetFileNameWithOutI(const CPLString &osRELFile)
 {
     if (osRELFile.empty())
         return "";
@@ -262,7 +262,26 @@ CPLString MMRRel::MMRGetFileNameFromRelName(const CPLString &osRELFile)
         return "";
 
     osFile.resize(osFile.size() - 2);  // I.
-    osFile += pszExtRaster;
+
+    return osFile;
+}
+
+// Converts FileNameI.rel to FileName.xxx (where xxx is an extension)
+CPLString MMRRel::MMRGetFileNameFromRelName(const CPLString &osRELFile,
+                                            const CPLString osExtension)
+{
+    if (osRELFile.empty())
+        return "";
+
+    // Extracts I.rel
+    CPLString osFile =
+        MMRGetFileNameWithOutI(CPLResetExtensionSafe(osRELFile, ""));
+
+    if (!osExtension.empty())
+    {
+        // Adds extension (with the ".", ex: ".img")
+        osFile += osExtension;
+    }
 
     return osFile;
 }
@@ -345,7 +364,8 @@ MMRNomFitxerState MMRRel::MMRStateOfNomFitxerInSection(
                                             osDocumentedLayerName) ||
         osDocumentedLayerName.empty())
     {
-        CPLString osIIMGFromREL = MMRGetFileNameFromRelName(osRELFile);
+        CPLString osIIMGFromREL =
+            MMRGetFileNameFromRelName(osRELFile, pszExtRaster);
         if (SameFile(osIIMGFromREL, osLayerName))
             return MMRNomFitxerState::NOMFITXER_VALUE_EXPECTED;
 
@@ -559,7 +579,7 @@ CPLString MMRRel::GetAssociatedMetadataFileName(const CPLString &osFileName)
 }
 
 /************************************************************************/
-/*                         CheckBandInRel()                             */
+/*                           CheckBandInRel()                           */
 /************************************************************************/
 CPLErr MMRRel::CheckBandInRel(const CPLString &osRELFileName,
                               const CPLString &osIMGFile)
@@ -602,7 +622,8 @@ CPLErr MMRRel::CheckBandInRel(const CPLString &osRELFileName,
                                       KEY_NomFitxer, osRawBandFileName) ||
             osRawBandFileName.empty())
         {
-            CPLString osBandFileName = MMRGetFileNameFromRelName(osRELFileName);
+            CPLString osBandFileName =
+                MMRGetFileNameFromRelName(osRELFileName, pszExtRaster);
             if (osBandFileName.empty())
                 return CE_Failure;
         }
@@ -695,7 +716,7 @@ int MMRRel::IdentifyFile(const GDALOpenInfo *poOpenInfo)
 }
 
 /************************************************************************/
-/*                     GetMetadataValue()                               */
+/*                          GetMetadataValue()                          */
 /************************************************************************/
 bool MMRRel::GetMetadataValue(const CPLString &osMainSection,
                               const CPLString &osSubSection,
@@ -780,7 +801,7 @@ void MMRRel::UpdateRELNameChar(const CPLString &osRelFileNameIn)
 }
 
 /************************************************************************/
-/*                          ParseBandInfo()                             */
+/*                           ParseBandInfo()                            */
 /************************************************************************/
 CPLErr MMRRel::ParseBandInfo()
 {
@@ -861,10 +882,10 @@ CPLErr MMRRel::ParseBandInfo()
         if (m_nBands >= nNBand)
             break;
 
-        m_oBands.emplace_back(
-            std::make_unique<MMRBand>(*this, osBandSectionValue.Trim()));
+        // MMRBand constructor is called
+        m_oBands.emplace_back(*this, osBandSectionValue.Trim());
 
-        if (!m_oBands[m_nBands]->IsValid())
+        if (!m_oBands[m_nBands].IsValid())
         {
             // This band is not been completed
             return CE_Failure;
@@ -912,7 +933,7 @@ int MMRRel::GetRowsNumberFromREL()
 }
 
 /************************************************************************/
-/*                     Preserving metadata                              */
+/*                         Preserving metadata                          */
 /************************************************************************/
 void MMRRel::RELToGDALMetadata(GDALDataset *poDS)
 {
@@ -1005,4 +1026,58 @@ void MMRRel::RELToGDALMetadata(GDALDataset *poDS)
                                   osPendingValue.Trim().c_str(),
                                   m_kMetadataDomain);
     }
+}
+
+CPLErr MMRRel::UpdateGDALColorEntryFromBand(CPLString m_osBandSection,
+                                            GDALColorEntry &m_sConstantColorRGB)
+{
+    // Example: Color_Smb=(255,0,255)
+    CPLString os_Color_Smb;
+    if (!GetMetadataValue(SECTION_COLOR_TEXT, m_osBandSection, "Color_Smb",
+                          os_Color_Smb))
+        return CE_None;
+
+    os_Color_Smb.replaceAll(" ", "");
+    if (!os_Color_Smb.empty() && os_Color_Smb.size() >= 7 &&
+        os_Color_Smb[0] == '(' && os_Color_Smb[os_Color_Smb.size() - 1] == ')')
+    {
+        os_Color_Smb.replaceAll("(", "");
+        os_Color_Smb.replaceAll(")", "");
+        const CPLStringList aosTokens(CSLTokenizeString2(os_Color_Smb, ",", 0));
+        if (CSLCount(aosTokens) != 3)
+        {
+            CPLError(CE_Failure, CPLE_AppDefined,
+                     "Invalid constant color: \"%s\"", GetRELNameChar());
+            return CE_Failure;
+        }
+
+        int nIColor0;
+        if (1 != sscanf(aosTokens[0], "%d", &nIColor0))
+        {
+            CPLError(CE_Failure, CPLE_AppDefined,
+                     "Invalid constant color: \"%s\"", GetRELNameChar());
+            return CE_Failure;
+        }
+
+        int nIColor1;
+        if (1 != sscanf(aosTokens[1], "%d", &nIColor1))
+        {
+            CPLError(CE_Failure, CPLE_AppDefined,
+                     "Invalid constant color: \"%s\"", GetRELNameChar());
+            return CE_Failure;
+        }
+
+        int nIColor2;
+        if (1 != sscanf(aosTokens[2], "%d", &nIColor2))
+        {
+            CPLError(CE_Failure, CPLE_AppDefined,
+                     "Invalid constant color: \"%s\"", GetRELNameChar());
+            return CE_Failure;
+        }
+
+        m_sConstantColorRGB.c1 = static_cast<short>(nIColor0);
+        m_sConstantColorRGB.c2 = static_cast<short>(nIColor1);
+        m_sConstantColorRGB.c3 = static_cast<short>(nIColor2);
+    }
+    return CE_None;
 }

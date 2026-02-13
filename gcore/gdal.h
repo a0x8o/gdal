@@ -1190,6 +1190,7 @@ void CPL_DLL CPL_STDCALL GDALDestroyDriver(GDALDriverH);
 int CPL_DLL CPL_STDCALL GDALRegisterDriver(GDALDriverH);
 void CPL_DLL CPL_STDCALL GDALDeregisterDriver(GDALDriverH);
 void CPL_DLL CPL_STDCALL GDALDestroyDriverManager(void);
+void CPL_DLL GDALClearMemoryCaches(void);
 void CPL_DLL GDALDestroy(void);
 CPLErr CPL_DLL CPL_STDCALL GDALDeleteDataset(GDALDriverH, const char *);
 CPLErr CPL_DLL CPL_STDCALL GDALRenameDataset(GDALDriverH,
@@ -2844,7 +2845,7 @@ extern "C++"
 #ifdef __cplusplus
         CPL_DLL
 #endif
-            GDALMDArrayRawBlockInfo
+        GDALMDArrayRawBlockInfo
     {
         /** Filename into which the raw block is found */
         char *pszFilename;
@@ -2898,6 +2899,9 @@ GDALMDArrayRawBlockInfoRelease(GDALMDArrayRawBlockInfo *psBlockInfo);
 bool CPL_DLL GDALMDArrayGetRawBlockInfo(GDALMDArrayH hArray,
                                         const uint64_t *panBlockCoordinates,
                                         GDALMDArrayRawBlockInfo *psBlockInfo);
+
+int CPL_DLL GDALMDArrayGetOverviewCount(GDALMDArrayH hArray);
+GDALMDArrayH CPL_DLL GDALMDArrayGetOverview(GDALMDArrayH hArray, int nIdx);
 
 void CPL_DLL GDALReleaseArrays(GDALMDArrayH *arrays, size_t nCount);
 int CPL_DLL GDALMDArrayCache(GDALMDArrayH hArray, CSLConstList papszOptions);

@@ -110,7 +110,6 @@ atof
 atoi
 atomicity
 attr
-Attrbute
 attrib
 attrname
 attrvalue
@@ -870,7 +869,6 @@ FHelvetica
 fi
 fid
 FID
-fieds
 FieldDomain
 fieldname
 fieldName
@@ -1732,7 +1730,6 @@ Maptech
 maptools
 Marek
 marshaller
-Matchine
 Mateusz
 MateuszL
 MateuzL
@@ -2405,6 +2402,7 @@ perl
 Petr
 pFct
 pfnCachePage
+pfnClearCaches
 pfnCopy
 pfnCopyFiles
 pfnCreate
@@ -2580,6 +2578,7 @@ predelete
 preinstalled
 preload
 premultiplication
+premultiplied
 Prepar
 preparse
 prepended
@@ -2724,6 +2723,7 @@ qtcreator
 quadkey
 Quadrilateralized
 quadtree
+quantile
 Quantile
 quantizeCoordinates
 quantized
@@ -3485,7 +3485,6 @@ Viewsheds
 virtualenv
 virtualized
 virtualmem
-visibiliy
 visualisation
 vmaplv
 vnd

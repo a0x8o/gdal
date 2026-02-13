@@ -13,7 +13,7 @@
 #include "zarr_v3_codec.h"
 
 /************************************************************************/
-/*                    ZarrV3CodecSequence::Clone()                      */
+/*                     ZarrV3CodecSequence::Clone()                     */
 /************************************************************************/
 
 std::unique_ptr<ZarrV3CodecSequence> ZarrV3CodecSequence::Clone() const
@@ -27,7 +27,7 @@ std::unique_ptr<ZarrV3CodecSequence> ZarrV3CodecSequence::Clone() const
 }
 
 /************************************************************************/
-/*                    ZarrV3CodecSequence::InitFromJson()               */
+/*                 ZarrV3CodecSequence::InitFromJson()                  */
 /************************************************************************/
 
 bool ZarrV3CodecSequence::InitFromJson(const CPLJSONObject &oCodecs,
@@ -154,7 +154,8 @@ bool ZarrV3CodecSequence::InitFromJson(const CPLJSONObject &oCodecs,
                 CE_Warning, CPLE_AppDefined,
                 "Sharding codec found, but not in last position. Consequently "
                 "partial shard decoding will not be possible");
-            oInputArrayMetadata.anBlockSizes = anBlockSizesBeforeSharding;
+            oInputArrayMetadata.anBlockSizes =
+                std::move(anBlockSizesBeforeSharding);
         }
     }
 
@@ -166,7 +167,7 @@ bool ZarrV3CodecSequence::InitFromJson(const CPLJSONObject &oCodecs,
 }
 
 /************************************************************************/
-/*                  ZarrV3CodecBytes::AllocateBuffer()                 */
+/*                  ZarrV3CodecBytes::AllocateBuffer()                  */
 /************************************************************************/
 
 bool ZarrV3CodecSequence::AllocateBuffer(ZarrByteVectorQuickResize &abyBuffer,
@@ -246,7 +247,7 @@ bool ZarrV3CodecSequence::Decode(ZarrByteVectorQuickResize &abyBuffer)
 }
 
 /************************************************************************/
-/*                ZarrV3CodecSequence::DecodePartial()                  */
+/*                 ZarrV3CodecSequence::DecodePartial()                 */
 /************************************************************************/
 
 bool ZarrV3CodecSequence::DecodePartial(VSIVirtualHandle *poFile,
@@ -283,7 +284,41 @@ bool ZarrV3CodecSequence::DecodePartial(VSIVirtualHandle *poFile,
 }
 
 /************************************************************************/
-/*           ZarrV3CodecSequence::GetInnerMostBlockSize()               */
+/*              ZarrV3CodecSequence::BatchDecodePartial()               */
+/************************************************************************/
+
+bool ZarrV3CodecSequence::BatchDecodePartial(
+    VSIVirtualHandle *poFile,
+    const std::vector<std::pair<std::vector<size_t>, std::vector<size_t>>>
+        &anRequests,
+    std::vector<ZarrByteVectorQuickResize> &aResults)
+{
+    // Only batch-decode when sharding is the sole codec. If other codecs
+    // (e.g. transpose) precede it, indices and output need codec-specific
+    // transformations that BatchDecodePartial does not handle.
+    if (m_apoCodecs.size() == 1)
+    {
+        auto *poSharding = dynamic_cast<ZarrV3CodecShardingIndexed *>(
+            m_apoCodecs.back().get());
+        if (poSharding)
+        {
+            return poSharding->BatchDecodePartial(poFile, anRequests, aResults);
+        }
+    }
+
+    // Fallback: sequential DecodePartial for non-sharding codec chains
+    aResults.resize(anRequests.size());
+    for (size_t i = 0; i < anRequests.size(); ++i)
+    {
+        if (!DecodePartial(poFile, aResults[i], anRequests[i].first,
+                           anRequests[i].second))
+            return false;
+    }
+    return true;
+}
+
+/************************************************************************/
+/*             ZarrV3CodecSequence::GetInnerMostBlockSize()             */
 /************************************************************************/
 
 std::vector<size_t> ZarrV3CodecSequence::GetInnerMostBlockSize(

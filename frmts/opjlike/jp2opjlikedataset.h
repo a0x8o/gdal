@@ -19,6 +19,7 @@
 #include "cpl_multiproc.h"
 #include "cpl_string.h"
 #include "cpl_worker_thread_pool.h"
+#include "gdal_thread_pool.h"
 #include "gdaljp2abstractdataset.h"
 #include "gdaljp2metadata.h"
 
@@ -57,19 +58,9 @@ struct JP2DatasetBase
 {
     int GetNumThreads()
     {
-        if (nThreads >= 1)
-            return nThreads;
-
-        const char *pszThreads =
-            CPLGetConfigOption("GDAL_NUM_THREADS", "ALL_CPUS");
-        if (EQUAL(pszThreads, "ALL_CPUS"))
-            nThreads = CPLGetNumCPUs();
-        else
-            nThreads = atoi(pszThreads);
-        if (nThreads > 128)
-            nThreads = 128;
-        if (nThreads <= 0)
-            nThreads = 1;
+        if (nThreads < 0)
+            nThreads = GDALGetNumThreads(GDAL_DEFAULT_MAX_THREAD_COUNT,
+                                         /* bDefaultAllCPUs = */ true);
         return nThreads;
     }
 
@@ -135,7 +126,7 @@ class JP2OPJLikeDataset final : public GDALJP2AbstractDataset, public BASE
     static GDALDataset *Open(GDALOpenInfo *);
     static GDALDataset *CreateCopy(const char *pszFilename,
                                    GDALDataset *poSrcDS, int bStrict,
-                                   char **papszOptions,
+                                   CSLConstList papszOptions,
                                    GDALProgressFunc pfnProgress,
                                    void *pProgressData);
 
@@ -168,7 +159,7 @@ class JP2OPJLikeDataset final : public GDALJP2AbstractDataset, public BASE
 
     static bool WriteBox(VSILFILE *fp, GDALJP2Box *poBox);
     static bool WriteGDALMetadataBox(VSILFILE *fp, GDALDataset *poSrcDS,
-                                     char **papszOptions);
+                                     CSLConstList papszOptions);
     static bool WriteXMLBoxes(VSILFILE *fp, GDALDataset *poSrcDS);
     static bool WriteXMPBox(VSILFILE *fp, GDALDataset *poSrcDS);
     static bool WriteIPRBox(VSILFILE *fp, GDALDataset *poSrcDS);

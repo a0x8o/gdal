@@ -15,7 +15,7 @@
 #include "gdalmultidim_priv.h"
 
 /************************************************************************/
-/*                 GDALRasterAttributeTableFromMDArrays()               */
+/*                GDALRasterAttributeTableFromMDArrays()                */
 /************************************************************************/
 
 class GDALRasterAttributeTableFromMDArrays final
@@ -120,6 +120,7 @@ class GDALRasterAttributeTableFromMDArrays final
                 arrayStartIdx, count, arrayStep, bufferStride,
                 GDALExtendedDataType::CreateString(), pDstBuffer))
             return nullptr;
+        // cppcheck-suppress knownConditionTrueFalse
         if (!pszStr)
             return nullptr;
         m_osTmp = pszStr;
@@ -418,7 +419,7 @@ GDALRasterAttributeTable *GDALRasterAttributeTableFromMDArrays::Clone() const
 }
 
 /************************************************************************/
-/*               GDALRasterAttributeTableFromMDArrays()                 */
+/*                GDALRasterAttributeTableFromMDArrays()                */
 /************************************************************************/
 
 GDALRasterAttributeTableFromMDArrays::GDALRasterAttributeTableFromMDArrays(

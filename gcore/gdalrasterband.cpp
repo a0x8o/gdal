@@ -38,6 +38,7 @@
 #include "cpl_string.h"
 #include "cpl_virtualmem.h"
 #include "cpl_vsi.h"
+#include "cpl_worker_thread_pool.h"
 #include "gdal.h"
 #include "gdal_abstractbandblockcache.h"
 #include "gdalantirecursion.h"
@@ -416,9 +417,8 @@ CPLErr GDALRasterBand::RasterIO(GDALRWFlag eRWFlag, int nXOff, int nYOff,
     /* -------------------------------------------------------------------- */
     /*      Do some validation of parameters.                               */
     /* -------------------------------------------------------------------- */
-    if (CPL_UNLIKELY(nXOff < 0 || nXOff > INT_MAX - nXSize ||
-                     nXOff + nXSize > nRasterXSize || nYOff < 0 ||
-                     nYOff > INT_MAX - nYSize || nYOff + nYSize > nRasterYSize))
+    if (CPL_UNLIKELY(nXOff < 0 || nXSize > nRasterXSize - nXOff || nYOff < 0 ||
+                     nYSize > nRasterYSize - nYOff))
     {
         ReportError(CE_Failure, CPLE_IllegalArg,
                     "Access window out of range in RasterIO().  Requested\n"
@@ -448,7 +448,7 @@ CPLErr GDALRasterBand::RasterIO(GDALRWFlag eRWFlag, int nXOff, int nYOff,
 }
 
 /************************************************************************/
-/*                         RasterIOInternal()                           */
+/*                          RasterIOInternal()                          */
 /************************************************************************/
 
 CPLErr GDALRasterBand::RasterIOInternal(
@@ -508,7 +508,7 @@ CPLErr CPL_STDCALL GDALRasterIO(GDALRasterBandH hBand, GDALRWFlag eRWFlag,
 }
 
 /************************************************************************/
-/*                            GDALRasterIOEx()                          */
+/*                           GDALRasterIOEx()                           */
 /************************************************************************/
 
 /**
@@ -535,7 +535,7 @@ CPLErr CPL_STDCALL GDALRasterIOEx(GDALRasterBandH hBand, GDALRWFlag eRWFlag,
 }
 
 /************************************************************************/
-/*                           GetGDTFromCppType()                        */
+/*                         GetGDTFromCppType()                          */
 /************************************************************************/
 
 namespace
@@ -567,7 +567,7 @@ DEFINE_GetGDTFromCppType(std::complex<double>, GDT_CFloat64);
 }  // namespace
 
 /************************************************************************/
-/*                           ReadRaster()                               */
+/*                             ReadRaster()                             */
 /************************************************************************/
 
 // clang-format off
@@ -788,7 +788,7 @@ INSTANTIATE_READ_RASTER(std::complex<double>)
 //! @endcond
 
 /************************************************************************/
-/*                           ReadRaster()                               */
+/*                             ReadRaster()                             */
 /************************************************************************/
 
 /** Read a region of image data for this band.
@@ -1140,7 +1140,7 @@ CPLErr CPL_STDCALL GDALReadBlock(GDALRasterBandH hBand, int nXOff, int nYOff,
 }
 
 /************************************************************************/
-/*                            IReadBlock()                             */
+/*                             IReadBlock()                             */
 /************************************************************************/
 
 /** \fn GDALRasterBand::IReadBlock( int nBlockXOff, int nBlockYOff, void *pData
@@ -1294,7 +1294,7 @@ CPLErr CPL_STDCALL GDALWriteBlock(GDALRasterBandH hBand, int nXOff, int nYOff,
 }
 
 /************************************************************************/
-/*                   EmitErrorMessageIfWriteNotSupported()              */
+/*                EmitErrorMessageIfWriteNotSupported()                 */
 /************************************************************************/
 
 /**
@@ -1376,7 +1376,7 @@ CPLErr GDALRasterBand::GetActualBlockSize(int nXBlockOff, int nYBlockOff,
 }
 
 /************************************************************************/
-/*                           GDALGetActualBlockSize()                   */
+/*                       GDALGetActualBlockSize()                       */
 /************************************************************************/
 
 /**
@@ -1398,7 +1398,7 @@ CPLErr CPL_STDCALL GDALGetActualBlockSize(GDALRasterBandH hBand, int nXBlockOff,
 }
 
 /************************************************************************/
-/*                     GetSuggestedBlockAccessPattern()                 */
+/*                   GetSuggestedBlockAccessPattern()                   */
 /************************************************************************/
 
 /**
@@ -2077,7 +2077,7 @@ GDALRasterBlock *GDALRasterBand::GetLockedBlockRef(int nXBlockOff,
 }
 
 /************************************************************************/
-/*                               Fill()                                 */
+/*                                Fill()                                */
 /************************************************************************/
 
 /**
@@ -2172,7 +2172,7 @@ CPLErr GDALRasterBand::Fill(double dfRealValue, double dfImaginaryValue)
 }
 
 /************************************************************************/
-/*                         GDALFillRaster()                             */
+/*                           GDALFillRaster()                           */
 /************************************************************************/
 
 /**
@@ -2417,7 +2417,7 @@ int64_t GDALRasterBand::GetNoDataValueAsInt64(int *pbSuccess)
 }
 
 /************************************************************************/
-/*                   GDALGetRasterNoDataValueAsInt64()                  */
+/*                  GDALGetRasterNoDataValueAsInt64()                   */
 /************************************************************************/
 
 /**
@@ -2442,7 +2442,7 @@ int64_t CPL_STDCALL GDALGetRasterNoDataValueAsInt64(GDALRasterBandH hBand,
 }
 
 /************************************************************************/
-/*                       GetNoDataValueAsUInt64()                        */
+/*                       GetNoDataValueAsUInt64()                       */
 /************************************************************************/
 
 /**
@@ -2478,7 +2478,7 @@ uint64_t GDALRasterBand::GetNoDataValueAsUInt64(int *pbSuccess)
 }
 
 /************************************************************************/
-/*                   GDALGetRasterNoDataValueAsUInt64()                  */
+/*                  GDALGetRasterNoDataValueAsUInt64()                  */
 /************************************************************************/
 
 /**
@@ -2503,7 +2503,7 @@ uint64_t CPL_STDCALL GDALGetRasterNoDataValueAsUInt64(GDALRasterBandH hBand,
 }
 
 /************************************************************************/
-/*                        SetNoDataValueAsString()                      */
+/*                       SetNoDataValueAsString()                       */
 /************************************************************************/
 
 /**
@@ -2656,7 +2656,7 @@ CPLErr GDALRasterBand::SetNoDataValue(double /*dfNoData*/)
 }
 
 /************************************************************************/
-/*                         GDALSetRasterNoDataValue()                   */
+/*                      GDALSetRasterNoDataValue()                      */
 /************************************************************************/
 
 /**
@@ -2728,7 +2728,7 @@ CPLErr GDALRasterBand::SetNoDataValueAsInt64(CPL_UNUSED int64_t nNoDataValue)
 }
 
 /************************************************************************/
-/*                 GDALSetRasterNoDataValueAsInt64()                    */
+/*                  GDALSetRasterNoDataValueAsInt64()                   */
 /************************************************************************/
 
 /**
@@ -2800,7 +2800,7 @@ CPLErr GDALRasterBand::SetNoDataValueAsUInt64(CPL_UNUSED uint64_t nNoDataValue)
 }
 
 /************************************************************************/
-/*                 GDALSetRasterNoDataValueAsUInt64()                    */
+/*                  GDALSetRasterNoDataValueAsUInt64()                  */
 /************************************************************************/
 
 /**
@@ -2832,7 +2832,7 @@ CPLErr CPL_STDCALL GDALSetRasterNoDataValueAsUInt64(GDALRasterBandH hBand,
 }
 
 /************************************************************************/
-/*                        DeleteNoDataValue()                           */
+/*                         DeleteNoDataValue()                          */
 /************************************************************************/
 
 /**
@@ -2857,7 +2857,7 @@ CPLErr GDALRasterBand::DeleteNoDataValue()
 }
 
 /************************************************************************/
-/*                       GDALDeleteRasterNoDataValue()                  */
+/*                    GDALDeleteRasterNoDataValue()                     */
 /************************************************************************/
 
 /**
@@ -3481,7 +3481,7 @@ GDALRasterBandH CPL_STDCALL GDALGetRasterSampleOverview(GDALRasterBandH hBand,
 }
 
 /************************************************************************/
-/*                    GDALGetRasterSampleOverviewEx()                   */
+/*                   GDALGetRasterSampleOverviewEx()                    */
 /************************************************************************/
 
 /**
@@ -3742,7 +3742,7 @@ CPLErr GDALRasterBand::SetScale(double /*dfNewScale*/)
 }
 
 /************************************************************************/
-/*                        GDALSetRasterScale()                          */
+/*                         GDALSetRasterScale()                         */
 /************************************************************************/
 
 /**
@@ -4013,7 +4013,7 @@ GDALDatasetH CPL_STDCALL GDALGetBandDataset(GDALRasterBandH hBand)
 }
 
 /************************************************************************/
-/*                      ComputeFloat16NoDataValue()                     */
+/*                     ComputeFloat16NoDataValue()                      */
 /************************************************************************/
 
 static inline void ComputeFloat16NoDataValue(GDALDataType eDataType,
@@ -4035,7 +4035,7 @@ static inline void ComputeFloat16NoDataValue(GDALDataType eDataType,
 }
 
 /************************************************************************/
-/*                        ComputeFloatNoDataValue()                     */
+/*                      ComputeFloatNoDataValue()                       */
 /************************************************************************/
 
 static inline void ComputeFloatNoDataValue(GDALDataType eDataType,
@@ -4075,7 +4075,7 @@ static inline void ComputeFloatNoDataValue(GDALDataType eDataType,
 }
 
 /************************************************************************/
-/*                        struct GDALNoDataValues                       */
+/*                       struct GDALNoDataValues                        */
 /************************************************************************/
 
 /**
@@ -4157,7 +4157,7 @@ struct GDALNoDataValues
 };
 
 /************************************************************************/
-/*                            ARE_REAL_EQUAL()                          */
+/*                           ARE_REAL_EQUAL()                           */
 /************************************************************************/
 
 inline bool ARE_REAL_EQUAL(GFloat16 dfVal1, GFloat16 dfVal2, int ulp = 2)
@@ -5074,7 +5074,7 @@ CPLErr CPL_STDCALL GDALGetDefaultHistogram(GDALRasterBandH hBand,
 }
 
 /************************************************************************/
-/*                      GDALGetDefaultHistogramEx()                     */
+/*                     GDALGetDefaultHistogramEx()                      */
 /************************************************************************/
 
 /**
@@ -5153,7 +5153,7 @@ GDALGetDefaultHistogramEx(GDALRasterBandH hBand, double *pdfMin, double *pdfMax,
 CPLErr GDALRasterBand::AdviseRead(int /*nXOff*/, int /*nYOff*/, int /*nXSize*/,
                                   int /*nYSize*/, int /*nBufXSize*/,
                                   int /*nBufYSize*/, GDALDataType /*eBufType*/,
-                                  char ** /*papszOptions*/)
+                                  CSLConstList /*papszOptions*/)
 {
     return CE_None;
 }
@@ -5322,7 +5322,7 @@ CPLErr CPL_STDCALL GDALGetRasterStatistics(GDALRasterBandH hBand, int bApproxOK,
 }
 
 /************************************************************************/
-/*                         GDALUInt128                                  */
+/*                             GDALUInt128                              */
 /************************************************************************/
 
 #ifdef HAVE_UINT128_T
@@ -5414,7 +5414,7 @@ class GDALUInt128
 #endif
 
 /************************************************************************/
-/*                    ComputeStatisticsInternal()                       */
+/*                     ComputeStatisticsInternal()                      */
 /************************************************************************/
 
 // Just to make coverity scan happy w.r.t overflow_before_widen, but otherwise
@@ -5765,6 +5765,8 @@ template <class T, bool COMPUTE_OTHER_STATS> struct ComputeStatisticsInternal
     }
 };
 
+constexpr int ALIGNMENT_AVX2_OPTIM = 32;
+
 #if (defined(__x86_64__) || defined(_M_X64) ||                                 \
      defined(USE_NEON_OPTIMIZATIONS)) &&                                       \
     (defined(__GNUC__) || defined(_MSC_VER))
@@ -5782,23 +5784,28 @@ ComputeStatisticsByteNoNodata(GPtrDiff_t nBlockPixels,
                               GUIntBig &nSampleCount, GUIntBig &nValidCount)
 {
     // 32-byte alignment may not be enforced by linker, so do it at hand
-    GByte
-        aby32ByteUnaligned[32 + 32 + 32 + (COMPUTE_OTHER_STATS ? 32 + 32 : 0)];
+    GByte aby32ByteUnaligned[ALIGNMENT_AVX2_OPTIM + ALIGNMENT_AVX2_OPTIM +
+                             ALIGNMENT_AVX2_OPTIM +
+                             (COMPUTE_OTHER_STATS
+                                  ? ALIGNMENT_AVX2_OPTIM + ALIGNMENT_AVX2_OPTIM
+                                  : 0)];
     GByte *paby32ByteAligned =
         aby32ByteUnaligned +
-        (32 - (reinterpret_cast<GUIntptr_t>(aby32ByteUnaligned) % 32));
+        (ALIGNMENT_AVX2_OPTIM -
+         (reinterpret_cast<GUIntptr_t>(aby32ByteUnaligned) %
+          ALIGNMENT_AVX2_OPTIM));
     GByte *pabyMin = paby32ByteAligned;
-    GByte *pabyMax = paby32ByteAligned + 32;
-    GUInt32 *panSum =
-        COMPUTE_OTHER_STATS
-            ? reinterpret_cast<GUInt32 *>(paby32ByteAligned + 32 * 2)
-            : nullptr;
+    GByte *pabyMax = paby32ByteAligned + ALIGNMENT_AVX2_OPTIM;
+    GUInt32 *panSum = COMPUTE_OTHER_STATS
+                          ? reinterpret_cast<GUInt32 *>(
+                                paby32ByteAligned + ALIGNMENT_AVX2_OPTIM * 2)
+                          : nullptr;
     GUInt32 *panSumSquare =
-        COMPUTE_OTHER_STATS
-            ? reinterpret_cast<GUInt32 *>(paby32ByteAligned + 32 * 3)
-            : nullptr;
+        COMPUTE_OTHER_STATS ? reinterpret_cast<GUInt32 *>(
+                                  paby32ByteAligned + ALIGNMENT_AVX2_OPTIM * 3)
+                            : nullptr;
 
-    CPLAssert((reinterpret_cast<uintptr_t>(pData) % 32) == 0);
+    CPLAssert((reinterpret_cast<uintptr_t>(pData) % ALIGNMENT_AVX2_OPTIM) == 0);
 
     GPtrDiff_t i = 0;
     // Make sure that sumSquare can fit on uint32
@@ -6355,7 +6362,7 @@ struct ComputeStatisticsInternal<GUInt16, COMPUTE_OTHER_STATS>
 // defined(_MSC_VER))
 
 /************************************************************************/
-/*                          GetPixelValue()                             */
+/*                           GetPixelValue()                            */
 /************************************************************************/
 
 static inline double GetPixelValue(GDALDataType eDataType, bool bSignedByte,
@@ -6480,7 +6487,7 @@ static inline double GetPixelValue(GDALDataType eDataType, bool bSignedByte,
 }
 
 /************************************************************************/
-/*                         SetValidPercent()                            */
+/*                          SetValidPercent()                           */
 /************************************************************************/
 
 //! @cond Doxygen_Suppress
@@ -6638,12 +6645,12 @@ template <bool HAS_NAN, bool CHECK_MIN_NOT_SAME_AS_MAX, bool HAS_NODATA>
 #if defined(__GNUC__)
 __attribute__((noinline))
 #endif
-static int
-ComputeStatisticsFloat32_SSE2(const float *const pafData,
-                              [[maybe_unused]] float fNoDataValue, int iX,
-                              int nCount, float &fMin, float &fMax,
-                              double &dfBlockMean, double &dfBlockM2,
-                              double &dfBlockValidCount)
+static int ComputeStatisticsFloat32_SSE2(const float *const pafData,
+                                         [[maybe_unused]] float fNoDataValue,
+                                         int iX, int nCount, float &fMin,
+                                         float &fMax, double &dfBlockMean,
+                                         double &dfBlockM2,
+                                         double &dfBlockValidCount)
 {
     auto vValidCount = setzero_pd();
     const auto vOne = set1_pd(1);
@@ -6772,12 +6779,12 @@ template <bool CHECK_MIN_NOT_SAME_AS_MAX, bool HAS_NODATA>
 #if defined(__GNUC__)
 __attribute__((noinline))
 #endif
-static int
-ComputeStatisticsFloat64_SSE2(const double *padfData,
-                              [[maybe_unused]] double dfNoDataValue, int iX,
-                              int nCount, double &dfMin, double &dfMax,
-                              double &dfBlockMean, double &dfBlockM2,
-                              double &dfBlockValidCount)
+static int ComputeStatisticsFloat64_SSE2(const double *padfData,
+                                         [[maybe_unused]] double dfNoDataValue,
+                                         int iX, int nCount, double &dfMin,
+                                         double &dfMax, double &dfBlockMean,
+                                         double &dfBlockM2,
+                                         double &dfBlockValidCount)
 {
     auto vValidCount = setzero_pd();
     const auto vOne = set1_pd(1);
@@ -7007,7 +7014,7 @@ static void ComputeBlockStatisticsFloat32(
 }
 
 /************************************************************************/
-/*                         StatisticsTaskFloat32                        */
+/*                        StatisticsTaskFloat32                         */
 /************************************************************************/
 
 namespace
@@ -7369,25 +7376,107 @@ CPLErr GDALRasterBand::ComputeStatistics(int bApproxOK, double *pdfMin,
                     ? static_cast<GUInt32>(sNoDataValues.dfNoDataValue + 1e-10)
                     : nMaxValueType + 1;
 
+            int nChunkXSize = nBlockXSize;
+            int nChunkYSize = nBlockYSize;
+            int nChunksPerRow = nBlocksPerRow;
+            int nChunksPerCol = nBlocksPerColumn;
+
+            int nThreads = 1;
+            if (nChunkYSize > 1)
+            {
+                nThreads = GDALGetNumThreads(CPLGetNumCPUs(),
+                                             /* bDefaultToAllCPUs = */ false);
+            }
+
+            int nNewChunkXSize = nChunkXSize;
+            const int nDTSize = GDALGetDataTypeSizeBytes(eDataType);
+            if (!bApproxOK && nThreads > 1 &&
+                MayMultiBlockReadingBeMultiThreaded())
+            {
+                const int64_t nRAMAmount = CPLGetUsablePhysicalRAM() / 10;
+                const size_t nChunkPixels =
+                    static_cast<size_t>(nChunkXSize) * nChunkYSize;
+                if (nRAMAmount > 0 &&
+                    nChunkPixels <=
+                        std::numeric_limits<size_t>::max() / nDTSize)
+                {
+                    const size_t nBlockSize = nDTSize * nChunkPixels;
+                    const int64_t nBlockCount = nRAMAmount / nBlockSize;
+                    if (nBlockCount >= 2)
+                    {
+                        nNewChunkXSize = static_cast<int>(std::min<int64_t>(
+                            nChunkXSize * std::min<int64_t>(
+                                              nBlockCount,
+                                              (std::numeric_limits<int>::max() -
+                                               ALIGNMENT_AVX2_OPTIM) /
+                                                  nChunkPixels),
+                            nRasterXSize));
+
+                        CPLAssert(nChunkXSize <
+                                  std::numeric_limits<int>::max() /
+                                      nChunkYSize);
+                    }
+                }
+            }
+
+            std::unique_ptr<GByte, VSIFreeReleaser> pabyTempUnaligned;
+            GByte *pabyTemp = nullptr;
+            if (nNewChunkXSize != nBlockXSize)
+            {
+                pabyTempUnaligned.reset(static_cast<GByte *>(
+                    VSIMalloc(nDTSize * nNewChunkXSize * nChunkYSize +
+                              ALIGNMENT_AVX2_OPTIM)));
+                if (pabyTempUnaligned)
+                {
+                    pabyTemp = reinterpret_cast<GByte *>(
+                        reinterpret_cast<uintptr_t>(pabyTempUnaligned.get()) +
+                        (ALIGNMENT_AVX2_OPTIM -
+                         (reinterpret_cast<uintptr_t>(pabyTempUnaligned.get()) %
+                          ALIGNMENT_AVX2_OPTIM)));
+                    nChunkXSize = nNewChunkXSize;
+                    nChunksPerRow =
+                        cpl::div_round_up(nRasterXSize, nChunkXSize);
+                }
+            }
+
             for (GIntBig iSampleBlock = 0;
                  iSampleBlock <
-                 static_cast<GIntBig>(nBlocksPerRow) * nBlocksPerColumn;
+                 static_cast<GIntBig>(nChunksPerRow) * nChunksPerCol;
                  iSampleBlock += nSampleRate)
             {
                 const int iYBlock =
-                    static_cast<int>(iSampleBlock / nBlocksPerRow);
+                    static_cast<int>(iSampleBlock / nChunksPerRow);
                 const int iXBlock =
-                    static_cast<int>(iSampleBlock % nBlocksPerRow);
+                    static_cast<int>(iSampleBlock % nChunksPerRow);
 
-                GDALRasterBlock *const poBlock =
-                    GetLockedBlockRef(iXBlock, iYBlock);
-                if (poBlock == nullptr)
-                    return CE_Failure;
+                const int nXCheck =
+                    std::min(nRasterXSize - nChunkXSize * iXBlock, nChunkXSize);
+                const int nYCheck =
+                    std::min(nRasterYSize - nChunkYSize * iYBlock, nChunkYSize);
 
-                void *const pData = poBlock->GetDataRef();
+                GDALRasterBlock *poBlock = nullptr;
+                if (pabyTemp)
+                {
+                    if (RasterIO(GF_Read, iXBlock * nChunkXSize,
+                                 iYBlock * nChunkYSize, nXCheck, nYCheck,
+                                 pabyTemp, nXCheck, nYCheck, eDataType, 0,
+                                 static_cast<GSpacing>(nChunkXSize * nDTSize),
+                                 nullptr) != CE_None)
+                    {
+                        return CE_Failure;
+                    }
+                }
+                else
+                {
+                    poBlock = GetLockedBlockRef(iXBlock, iYBlock);
+                    if (poBlock == nullptr)
+                    {
+                        return CE_Failure;
+                    }
+                }
 
-                int nXCheck = 0, nYCheck = 0;
-                GetActualBlockSize(iXBlock, iYBlock, &nXCheck, &nYCheck);
+                const void *const pData =
+                    poBlock ? poBlock->GetDataRef() : pabyTemp;
 
                 GUIntBig nBlockSum = 0;
                 GUIntBig nBlockSumSquare = 0;
@@ -7405,7 +7494,7 @@ CPLErr GDALRasterBand::ComputeStatistics(int bApproxOK, double *pdfMin,
                 {
                     ComputeStatisticsInternal<
                         GByte, /* COMPUTE_OTHER_STATS = */ true>::
-                        f(nXCheck, nBlockXSize, nYCheck,
+                        f(nXCheck, nChunkXSize, nYCheck,
                           static_cast<const GByte *>(pData),
                           nNoDataValue <= nMaxValueType, nNoDataValue, nMin,
                           nMax, nBlockSumRef, nBlockSumSquareRef,
@@ -7415,14 +7504,15 @@ CPLErr GDALRasterBand::ComputeStatistics(int bApproxOK, double *pdfMin,
                 {
                     ComputeStatisticsInternal<
                         GUInt16, /* COMPUTE_OTHER_STATS = */ true>::
-                        f(nXCheck, nBlockXSize, nYCheck,
+                        f(nXCheck, nChunkXSize, nYCheck,
                           static_cast<const GUInt16 *>(pData),
                           nNoDataValue <= nMaxValueType, nNoDataValue, nMin,
                           nMax, nBlockSumRef, nBlockSumSquareRef,
                           nBlockSampleCountRef, nBlockValidCountRef);
                 }
 
-                poBlock->DropLock();
+                if (poBlock)
+                    poBlock->DropLock();
 
                 if (!bIntegerStats)
                 {
@@ -7458,8 +7548,8 @@ CPLErr GDALRasterBand::ComputeStatistics(int bApproxOK, double *pdfMin,
                 }
 
                 if (!pfnProgress(static_cast<double>(iSampleBlock) /
-                                     (static_cast<double>(nBlocksPerRow) *
-                                      nBlocksPerColumn),
+                                     (static_cast<double>(nChunksPerRow) *
+                                      nChunksPerCol),
                                  "Compute Statistics", pProgressData))
                 {
                     ReportError(CE_Failure, CPLE_UserInterrupt,
@@ -7575,18 +7665,8 @@ CPLErr GDALRasterBand::ComputeStatistics(int bApproxOK, double *pdfMin,
         {
             if (nChunkYSize > 1)
             {
-                const char *pszNumThreads =
-                    CPLGetConfigOption("GDAL_NUM_THREADS", nullptr);
-                if (pszNumThreads)
-                {
-                    if (EQUAL(pszNumThreads, "ALL_CPUS"))
-                        nThreads = CPLGetNumCPUs();
-                    else
-                        nThreads =
-                            std::clamp(atoi(pszNumThreads), 1, CPLGetNumCPUs());
-                    if (nThreads > 1)
-                        psThreadPool = GDALGetGlobalThreadPool(nThreads);
-                }
+                nThreads = GDALGetNumThreads(CPLGetNumCPUs(),
+                                             /* bDefaultToAllCPUs = */ false);
             }
 
             int nNewChunkXSize = nChunkXSize;
@@ -9064,7 +9144,7 @@ CPLErr GDALRasterBand::ComputeRasterMinMaxLocation(double *pdfMin,
 }
 
 /************************************************************************/
-/*                    GDALComputeRasterMinMaxLocation()                 */
+/*                  GDALComputeRasterMinMaxLocation()                   */
 /************************************************************************/
 
 /**
@@ -9789,7 +9869,7 @@ CPLErr CPL_STDCALL GDALCreateMaskBand(GDALRasterBandH hBand, int nFlags)
 }
 
 /************************************************************************/
-/*                            IsMaskBand()                              */
+/*                             IsMaskBand()                             */
 /************************************************************************/
 
 /**
@@ -9818,7 +9898,7 @@ bool GDALRasterBand::IsMaskBand() const
 }
 
 /************************************************************************/
-/*                            GDALIsMaskBand()                          */
+/*                           GDALIsMaskBand()                           */
 /************************************************************************/
 
 /**
@@ -9866,7 +9946,7 @@ GDALMaskValueRange GDALRasterBand::GetMaskValueRange() const
 }
 
 /************************************************************************/
-/*                      HasConflictingMaskSources()                     */
+/*                     HasConflictingMaskSources()                      */
 /************************************************************************/
 
 /**
@@ -9938,7 +10018,7 @@ bool GDALRasterBand::HasConflictingMaskSources(
 }
 
 /************************************************************************/
-/*                    GetIndexColorTranslationTo()                      */
+/*                     GetIndexColorTranslationTo()                     */
 /************************************************************************/
 
 /**
@@ -10111,7 +10191,7 @@ GDALRasterBand::GetIndexColorTranslationTo(GDALRasterBand *poReferenceBand,
 }
 
 /************************************************************************/
-/*                         SetFlushBlockErr()                           */
+/*                          SetFlushBlockErr()                          */
 /************************************************************************/
 
 /**
@@ -10132,7 +10212,7 @@ void GDALRasterBand::SetFlushBlockErr(CPLErr eErr)
 }
 
 /************************************************************************/
-/*                         IncDirtyBlocks()                             */
+/*                           IncDirtyBlocks()                           */
 /************************************************************************/
 
 /**
@@ -10192,7 +10272,7 @@ void GDALRasterBand::ReportError(CPLErr eErrClass, CPLErrorNum err_no,
 #endif
 
 /************************************************************************/
-/*                           GetVirtualMemAuto()                        */
+/*                         GetVirtualMemAuto()                          */
 /************************************************************************/
 
 /** \brief Create a CPLVirtualMem object from a GDAL raster band object.
@@ -10259,7 +10339,7 @@ void GDALRasterBand::ReportError(CPLErr eErrClass, CPLErrorNum err_no,
 CPLVirtualMem *GDALRasterBand::GetVirtualMemAuto(GDALRWFlag eRWFlag,
                                                  int *pnPixelSpace,
                                                  GIntBig *pnLineSpace,
-                                                 char **papszOptions)
+                                                 CSLConstList papszOptions)
 {
     const char *pszImpl = CSLFetchNameValueDef(
         papszOptions, "USE_DEFAULT_IMPLEMENTATION", "AUTO");
@@ -10289,7 +10369,7 @@ CPLVirtualMem *GDALRasterBand::GetVirtualMemAuto(GDALRWFlag eRWFlag,
 }
 
 /************************************************************************/
-/*                         GDALGetVirtualMemAuto()                      */
+/*                       GDALGetVirtualMemAuto()                        */
 /************************************************************************/
 
 /**
@@ -10311,7 +10391,7 @@ CPLVirtualMem *GDALGetVirtualMemAuto(GDALRasterBandH hBand, GDALRWFlag eRWFlag,
 }
 
 /************************************************************************/
-/*                        GDALGetDataCoverageStatus()                   */
+/*                     GDALGetDataCoverageStatus()                      */
 /************************************************************************/
 
 /**
@@ -10404,7 +10484,7 @@ int CPL_STDCALL GDALGetDataCoverageStatus(GDALRasterBandH hBand, int nXOff,
 }
 
 /************************************************************************/
-/*                          GetDataCoverageStatus()                     */
+/*                       GetDataCoverageStatus()                        */
 /************************************************************************/
 
 /**
@@ -10561,9 +10641,8 @@ int GDALRasterBand::GetDataCoverageStatus(int nXOff, int nYOff, int nXSize,
                                           int nYSize, int nMaskFlagStop,
                                           double *pdfDataPct)
 {
-    if (nXOff < 0 || nYOff < 0 || nXSize > INT_MAX - nXOff ||
-        nYSize > INT_MAX - nYOff || nXOff + nXSize > nRasterXSize ||
-        nYOff + nYSize > nRasterYSize)
+    if (nXOff < 0 || nYOff < 0 || nXSize > nRasterXSize - nXOff ||
+        nYSize > nRasterYSize - nYOff)
     {
         CPLError(CE_Failure, CPLE_AppDefined, "Bad window");
         if (pdfDataPct)
@@ -10576,7 +10655,7 @@ int GDALRasterBand::GetDataCoverageStatus(int nXOff, int nYOff, int nXSize,
 }
 
 /************************************************************************/
-/*                         IGetDataCoverageStatus()                     */
+/*                       IGetDataCoverageStatus()                       */
 /************************************************************************/
 
 int GDALRasterBand::IGetDataCoverageStatus(int /*nXOff*/, int /*nYOff*/,
@@ -10592,7 +10671,7 @@ int GDALRasterBand::IGetDataCoverageStatus(int /*nXOff*/, int /*nYOff*/,
 
 //! @cond Doxygen_Suppress
 /************************************************************************/
-/*                          EnterReadWrite()                            */
+/*                           EnterReadWrite()                           */
 /************************************************************************/
 
 int GDALRasterBand::EnterReadWrite(GDALRWFlag eRWFlag)
@@ -10603,7 +10682,7 @@ int GDALRasterBand::EnterReadWrite(GDALRWFlag eRWFlag)
 }
 
 /************************************************************************/
-/*                         LeaveReadWrite()                             */
+/*                           LeaveReadWrite()                           */
 /************************************************************************/
 
 void GDALRasterBand::LeaveReadWrite()
@@ -10613,7 +10692,7 @@ void GDALRasterBand::LeaveReadWrite()
 }
 
 /************************************************************************/
-/*                           InitRWLock()                               */
+/*                             InitRWLock()                             */
 /************************************************************************/
 
 void GDALRasterBand::InitRWLock()
@@ -10668,7 +10747,7 @@ void GDALRasterBand::InitRWLock()
 
 //! @cond Doxygen_Suppress
 /************************************************************************/
-/*                    EnablePixelTypeSignedByteWarning()                */
+/*                  EnablePixelTypeSignedByteWarning()                  */
 /************************************************************************/
 
 void GDALRasterBand::EnablePixelTypeSignedByteWarning(bool b)
@@ -10684,7 +10763,7 @@ void GDALEnablePixelTypeSignedByteWarning(GDALRasterBandH hBand, bool b)
 //! @endcond
 
 /************************************************************************/
-/*                           GetMetadataItem()                          */
+/*                          GetMetadataItem()                           */
 /************************************************************************/
 
 const char *GDALRasterBand::GetMetadataItem(const char *pszName,
@@ -10890,7 +10969,7 @@ GDALRasterBand::IterateWindows(size_t maxSize) const
 }
 
 /************************************************************************/
-/*                  MayMultiBlockReadingBeMultiThreaded()               */
+/*                MayMultiBlockReadingBeMultiThreaded()                 */
 /************************************************************************/
 
 /** Return whether a RasterIO(GF_Read) request spanning over multiple
@@ -10910,7 +10989,7 @@ bool GDALRasterBand::MayMultiBlockReadingBeMultiThreaded() const
 }
 
 /************************************************************************/
-/*                     GDALMDArrayFromRasterBand                        */
+/*                      GDALMDArrayFromRasterBand                       */
 /************************************************************************/
 
 class GDALMDArrayFromRasterBand final : public GDALMDArray
@@ -10926,6 +11005,7 @@ class GDALMDArrayFromRasterBand final : public GDALMDArray
     std::shared_ptr<GDALMDArray> m_varX{};
     std::shared_ptr<GDALMDArray> m_varY{};
     std::string m_osFilename{};
+    mutable std::vector<std::shared_ptr<GDALMDArray>> m_apoOverviews{};
 
     bool ReadWrite(GDALRWFlag eRWFlag, const GUInt64 *arrayStartIdx,
                    const size_t *count, const GInt64 *arrayStep,
@@ -11022,14 +11102,14 @@ class GDALMDArrayFromRasterBand final : public GDALMDArray
                       "/", "X", osTypeX, osDirectionX, nXSize)};
 
         GDALGeoTransform gt;
-        if (m_poDS->GetGeoTransform(gt) == CE_None && gt[2] == 0 && gt[4] == 0)
+        if (m_poDS->GetGeoTransform(gt) == CE_None && gt.IsAxisAligned())
         {
-            m_varX = GDALMDArrayRegularlySpaced::Create("/", "X", m_dims[1],
-                                                        gt[0], gt[1], 0.5);
+            m_varX = GDALMDArrayRegularlySpaced::Create(
+                "/", "X", m_dims[1], gt.xorig, gt.xscale, 0.5);
             m_dims[1]->SetIndexingVariable(m_varX);
 
-            m_varY = GDALMDArrayRegularlySpaced::Create("/", "Y", m_dims[0],
-                                                        gt[3], gt[5], 0.5);
+            m_varY = GDALMDArrayRegularlySpaced::Create(
+                "/", "Y", m_dims[0], gt.yorig, gt.yscale, 0.5);
             m_dims[0]->SetIndexingVariable(m_varY);
         }
     }
@@ -11169,6 +11249,30 @@ class GDALMDArrayFromRasterBand final : public GDALMDArray
         }
         return res;
     }
+
+    int GetOverviewCount() const override
+    {
+        return m_poBand->GetOverviewCount();
+    }
+
+    std::shared_ptr<GDALMDArray> GetOverview(int idx) const override
+    {
+        const int nOverviews = GetOverviewCount();
+        if (idx < 0 || idx >= nOverviews)
+            return nullptr;
+        m_apoOverviews.resize(nOverviews);
+        if (!m_apoOverviews[idx])
+        {
+            if (auto poOvrBand = m_poBand->GetOverview(idx))
+            {
+                if (auto poOvrDS = poOvrBand->GetDataset())
+                {
+                    m_apoOverviews[idx] = Create(poOvrDS, poOvrBand);
+                }
+            }
+        }
+        return m_apoOverviews[idx];
+    }
 };
 
 bool GDALMDArrayFromRasterBand::IRead(
@@ -11181,7 +11285,7 @@ bool GDALMDArrayFromRasterBand::IRead(
 }
 
 /************************************************************************/
-/*                            ReadWrite()                               */
+/*                             ReadWrite()                              */
 /************************************************************************/
 
 bool GDALMDArrayFromRasterBand::ReadWrite(
@@ -11247,7 +11351,7 @@ bool GDALMDRasterIOFromBand(GDALRasterBand *poBand, GDALRWFlag eRWFlag,
 }
 
 /************************************************************************/
-/*                            AsMDArray()                               */
+/*                             AsMDArray()                              */
 /************************************************************************/
 
 /** Return a view of this raster band as a 2D multidimensional GDALMDArray.
@@ -11283,7 +11387,7 @@ std::shared_ptr<GDALMDArray> GDALRasterBand::AsMDArray() const
 }
 
 /************************************************************************/
-/*                             InterpolateAtPoint()                     */
+/*                         InterpolateAtPoint()                         */
 /************************************************************************/
 
 /**
@@ -11329,7 +11433,7 @@ CPLErr GDALRasterBand::InterpolateAtPoint(double dfPixel, double dfLine,
 }
 
 /************************************************************************/
-/*                        GDALRasterInterpolateAtPoint()                */
+/*                    GDALRasterInterpolateAtPoint()                    */
 /************************************************************************/
 
 /**
@@ -11353,7 +11457,7 @@ CPLErr GDALRasterInterpolateAtPoint(GDALRasterBandH hBand, double dfPixel,
 }
 
 /************************************************************************/
-/*                    InterpolateAtGeolocation()                        */
+/*                      InterpolateAtGeolocation()                      */
 /************************************************************************/
 
 /**
@@ -11415,7 +11519,7 @@ CPLErr GDALRasterBand::InterpolateAtGeolocation(
 }
 
 /************************************************************************/
-/*                  GDALRasterInterpolateAtGeolocation()                */
+/*                 GDALRasterInterpolateAtGeolocation()                 */
 /************************************************************************/
 
 /**
@@ -11443,7 +11547,7 @@ CPLErr GDALRasterInterpolateAtGeolocation(GDALRasterBandH hBand,
 }
 
 /************************************************************************/
-/*                    GDALRasterBand::SplitRasterIO()                   */
+/*                   GDALRasterBand::SplitRasterIO()                    */
 /************************************************************************/
 
 //! @cond Doxygen_Suppress
@@ -11539,7 +11643,7 @@ CPLErr GDALRasterBand::SplitRasterIO(GDALRWFlag eRWFlag, int nXOff, int nYOff,
 //! @endcond
 
 /************************************************************************/
-/*                         ThrowIfNotSameDimensions()                   */
+/*                      ThrowIfNotSameDimensions()                      */
 /************************************************************************/
 
 //! @cond Doxygen_Suppress
@@ -11557,7 +11661,7 @@ void GDALRasterBand::ThrowIfNotSameDimensions(const GDALRasterBand &first,
 //! @endcond
 
 /************************************************************************/
-/*                          GDALRasterBandUnaryOp()                     */
+/*                       GDALRasterBandUnaryOp()                        */
 /************************************************************************/
 
 /** Apply a unary operation on this band.
@@ -11700,7 +11804,7 @@ GDALRasterBandBinaryOpBand(GDALRasterBandH hBand,
 }
 
 /************************************************************************/
-/*                     GDALRasterBandBinaryOpDouble()                   */
+/*                    GDALRasterBandBinaryOpDouble()                    */
 /************************************************************************/
 
 /** Apply a binary operation on this band with a constant
@@ -11736,7 +11840,7 @@ GDALRasterBandBinaryOpDouble(GDALRasterBandH hBand,
 }
 
 /************************************************************************/
-/*                   GDALRasterBandBinaryOpDoubleToBand()               */
+/*                 GDALRasterBandBinaryOpDoubleToBand()                 */
 /************************************************************************/
 
 /** Apply a binary operation on the constant with this band
@@ -11806,7 +11910,7 @@ GDALRasterBandBinaryOpDoubleToBand(double constant,
 }
 
 /************************************************************************/
-/*                           operator+()                                */
+/*                             operator+()                              */
 /************************************************************************/
 
 /** Add this band with another one.
@@ -11826,7 +11930,7 @@ GDALRasterBand::operator+(const GDALRasterBand &other) const
 }
 
 /************************************************************************/
-/*                           operator+()                                */
+/*                             operator+()                              */
 /************************************************************************/
 
 /** Add this band with a constant.
@@ -11843,7 +11947,7 @@ GDALComputedRasterBand GDALRasterBand::operator+(double constant) const
 }
 
 /************************************************************************/
-/*                           operator+()                                */
+/*                             operator+()                              */
 /************************************************************************/
 
 /** Add a band with a constant.
@@ -11859,7 +11963,7 @@ GDALComputedRasterBand operator+(double constant, const GDALRasterBand &other)
 }
 
 /************************************************************************/
-/*                           operator-()                                */
+/*                             operator-()                              */
 /************************************************************************/
 
 /** Return a band whose value is the opposite value of the band for each
@@ -11876,7 +11980,7 @@ GDALComputedRasterBand GDALRasterBand::operator-() const
 }
 
 /************************************************************************/
-/*                           operator-()                                */
+/*                             operator-()                              */
 /************************************************************************/
 
 /** Subtract this band with another one.
@@ -11896,7 +12000,7 @@ GDALRasterBand::operator-(const GDALRasterBand &other) const
 }
 
 /************************************************************************/
-/*                           operator-()                                */
+/*                             operator-()                              */
 /************************************************************************/
 
 /** Subtract this band with a constant.
@@ -11913,7 +12017,7 @@ GDALComputedRasterBand GDALRasterBand::operator-(double constant) const
 }
 
 /************************************************************************/
-/*                           operator-()                                */
+/*                             operator-()                              */
 /************************************************************************/
 
 /** Subtract a constant with a band.
@@ -11929,7 +12033,7 @@ GDALComputedRasterBand operator-(double constant, const GDALRasterBand &other)
 }
 
 /************************************************************************/
-/*                           operator*()                                */
+/*                             operator*()                              */
 /************************************************************************/
 
 /** Multiply this band with another one.
@@ -11949,7 +12053,7 @@ GDALRasterBand::operator*(const GDALRasterBand &other) const
 }
 
 /************************************************************************/
-/*                           operator*()                                */
+/*                             operator*()                              */
 /************************************************************************/
 
 /** Multiply this band by a constant.
@@ -11966,7 +12070,7 @@ GDALComputedRasterBand GDALRasterBand::operator*(double constant) const
 }
 
 /************************************************************************/
-/*                           operator*()                                */
+/*                             operator*()                              */
 /************************************************************************/
 
 /** Multiply a band with a constant.
@@ -11982,7 +12086,7 @@ GDALComputedRasterBand operator*(double constant, const GDALRasterBand &other)
 }
 
 /************************************************************************/
-/*                           operator/()                                */
+/*                             operator/()                              */
 /************************************************************************/
 
 /** Divide this band with another one.
@@ -12002,7 +12106,7 @@ GDALRasterBand::operator/(const GDALRasterBand &other) const
 }
 
 /************************************************************************/
-/*                           operator/()                                */
+/*                             operator/()                              */
 /************************************************************************/
 
 /** Divide this band by a constant.
@@ -12019,7 +12123,7 @@ GDALComputedRasterBand GDALRasterBand::operator/(double constant) const
 }
 
 /************************************************************************/
-/*                           operator/()                                */
+/*                             operator/()                              */
 /************************************************************************/
 
 /** Divide a constant by a band.
@@ -12036,7 +12140,7 @@ GDALComputedRasterBand operator/(double constant, const GDALRasterBand &other)
 }
 
 /************************************************************************/
-/*                          ThrowIfNotMuparser()                        */
+/*                         ThrowIfNotMuparser()                         */
 /************************************************************************/
 
 #ifndef HAVE_MUPARSER
@@ -12048,7 +12152,7 @@ static GDALComputedRasterBand ThrowIfNotMuparser()
 #endif
 
 /************************************************************************/
-/*                           operator>()                                */
+/*                             operator>()                              */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the pixel value of the left operand
@@ -12073,7 +12177,7 @@ GDALRasterBand::operator>(const GDALRasterBand &other) const
 }
 
 /************************************************************************/
-/*                           operator>()                                */
+/*                             operator>()                              */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the pixel value of the left operand
@@ -12096,7 +12200,7 @@ GDALComputedRasterBand GDALRasterBand::operator>(double constant) const
 }
 
 /************************************************************************/
-/*                           operator>()                                */
+/*                             operator>()                              */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the constant is greater than the pixel
@@ -12120,7 +12224,7 @@ GDALComputedRasterBand operator>(double constant, const GDALRasterBand &other)
 }
 
 /************************************************************************/
-/*                           operator>=()                               */
+/*                             operator>=()                             */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the pixel value of the left operand
@@ -12145,7 +12249,7 @@ GDALRasterBand::operator>=(const GDALRasterBand &other) const
 }
 
 /************************************************************************/
-/*                           operator>=()                               */
+/*                             operator>=()                             */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the pixel value of the left operand
@@ -12168,7 +12272,7 @@ GDALComputedRasterBand GDALRasterBand::operator>=(double constant) const
 }
 
 /************************************************************************/
-/*                           operator>=()                               */
+/*                             operator>=()                             */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the constant is greater or equal to
@@ -12192,7 +12296,7 @@ GDALComputedRasterBand operator>=(double constant, const GDALRasterBand &other)
 }
 
 /************************************************************************/
-/*                           operator<()                                */
+/*                             operator<()                              */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the pixel value of the left operand
@@ -12217,7 +12321,7 @@ GDALRasterBand::operator<(const GDALRasterBand &other) const
 }
 
 /************************************************************************/
-/*                           operator<()                                */
+/*                             operator<()                              */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the pixel value of the left operand
@@ -12240,7 +12344,7 @@ GDALComputedRasterBand GDALRasterBand::operator<(double constant) const
 }
 
 /************************************************************************/
-/*                           operator<()                                */
+/*                             operator<()                              */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the constant is lesser than the pixel
@@ -12264,7 +12368,7 @@ GDALComputedRasterBand operator<(double constant, const GDALRasterBand &other)
 }
 
 /************************************************************************/
-/*                           operator<=()                               */
+/*                             operator<=()                             */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the pixel value of the left operand
@@ -12289,7 +12393,7 @@ GDALRasterBand::operator<=(const GDALRasterBand &other) const
 }
 
 /************************************************************************/
-/*                           operator<=()                               */
+/*                             operator<=()                             */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the pixel value of the left operand
@@ -12312,7 +12416,7 @@ GDALComputedRasterBand GDALRasterBand::operator<=(double constant) const
 }
 
 /************************************************************************/
-/*                           operator<=()                               */
+/*                             operator<=()                             */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the constant is lesser or equal to
@@ -12336,7 +12440,7 @@ GDALComputedRasterBand operator<=(double constant, const GDALRasterBand &other)
 }
 
 /************************************************************************/
-/*                           operator==()                               */
+/*                             operator==()                             */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the pixel value of the left operand
@@ -12361,7 +12465,7 @@ GDALRasterBand::operator==(const GDALRasterBand &other) const
 }
 
 /************************************************************************/
-/*                           operator==()                               */
+/*                             operator==()                             */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the pixel value of the left operand
@@ -12384,7 +12488,7 @@ GDALComputedRasterBand GDALRasterBand::operator==(double constant) const
 }
 
 /************************************************************************/
-/*                           operator==()                               */
+/*                             operator==()                             */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the constant is equal to
@@ -12408,7 +12512,7 @@ GDALComputedRasterBand operator==(double constant, const GDALRasterBand &other)
 }
 
 /************************************************************************/
-/*                           operator!=()                               */
+/*                             operator!=()                             */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the pixel value of the left operand
@@ -12433,7 +12537,7 @@ GDALRasterBand::operator!=(const GDALRasterBand &other) const
 }
 
 /************************************************************************/
-/*                           operator!=()                               */
+/*                             operator!=()                             */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the pixel value of the left operand
@@ -12456,7 +12560,7 @@ GDALComputedRasterBand GDALRasterBand::operator!=(double constant) const
 }
 
 /************************************************************************/
-/*                           operator!=()                               */
+/*                             operator!=()                             */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the constant is different from
@@ -12485,7 +12589,7 @@ GDALComputedRasterBand operator!=(double constant, const GDALRasterBand &other)
 #endif
 
 /************************************************************************/
-/*                           operator&&()                               */
+/*                             operator&&()                             */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the pixel value of the left and right
@@ -12510,7 +12614,7 @@ GDALRasterBand::operator&&(const GDALRasterBand &other) const
 }
 
 /************************************************************************/
-/*                           operator&&()                               */
+/*                             operator&&()                             */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the pixel value of the left operand
@@ -12533,7 +12637,7 @@ GDALComputedRasterBand GDALRasterBand::operator&&(bool constant) const
 }
 
 /************************************************************************/
-/*                           operator&&()                               */
+/*                             operator&&()                             */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the constant is true, as well as
@@ -12557,7 +12661,7 @@ GDALComputedRasterBand operator&&(bool constant, const GDALRasterBand &other)
 }
 
 /************************************************************************/
-/*                           operator||()                               */
+/*                             operator||()                             */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the pixel value of the left or right
@@ -12582,7 +12686,7 @@ GDALRasterBand::operator||(const GDALRasterBand &other) const
 }
 
 /************************************************************************/
-/*                           operator||()                               */
+/*                             operator||()                             */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the pixel value of the left operand
@@ -12605,7 +12709,7 @@ GDALComputedRasterBand GDALRasterBand::operator||(bool constant) const
 }
 
 /************************************************************************/
-/*                           operator||()                               */
+/*                             operator||()                             */
 /************************************************************************/
 
 /** Return a band whose value is 1 if the constant is true, or
@@ -12633,7 +12737,7 @@ GDALComputedRasterBand operator||(bool constant, const GDALRasterBand &other)
 #endif
 
 /************************************************************************/
-/*                            operator!()                               */
+/*                             operator!()                              */
 /************************************************************************/
 
 /** Return a band whose value is the logical negation of the pixel value
@@ -12653,7 +12757,7 @@ namespace gdal
 {
 
 /************************************************************************/
-/*                           IfThenElse()                               */
+/*                             IfThenElse()                             */
 /************************************************************************/
 
 /** Return a band whose value is thenBand if the corresponding pixel in condBand
@@ -12690,7 +12794,7 @@ GDALComputedRasterBand IfThenElse(const GDALRasterBand &condBand,
 //! @cond Doxygen_Suppress
 
 /************************************************************************/
-/*                           IfThenElse()                               */
+/*                             IfThenElse()                             */
 /************************************************************************/
 
 /** Return a band whose value is thenValue if the corresponding pixel in condBand
@@ -12726,7 +12830,7 @@ GDALComputedRasterBand IfThenElse(const GDALRasterBand &condBand,
 }
 
 /************************************************************************/
-/*                           IfThenElse()                               */
+/*                             IfThenElse()                             */
 /************************************************************************/
 
 /** Return a band whose value is thenBand if the corresponding pixel in condBand
@@ -12762,7 +12866,7 @@ GDALComputedRasterBand IfThenElse(const GDALRasterBand &condBand,
 }
 
 /************************************************************************/
-/*                           IfThenElse()                               */
+/*                             IfThenElse()                             */
 /************************************************************************/
 
 /** Return a band whose value is thenValue if the corresponding pixel in condBand
@@ -12804,7 +12908,7 @@ GDALComputedRasterBand IfThenElse(const GDALRasterBand &condBand,
 }  // namespace gdal
 
 /************************************************************************/
-/*                     GDALRasterBandIfThenElse()                       */
+/*                      GDALRasterBandIfThenElse()                      */
 /************************************************************************/
 
 /** Return a band whose value is hThenBand if the corresponding pixel in hCondBand
@@ -12874,7 +12978,7 @@ GDALComputedRasterBand GDALRasterBand::AsType(GDALDataType dt) const
 }
 
 /************************************************************************/
-/*                       GDALRasterBandAsDataType()                     */
+/*                      GDALRasterBandAsDataType()                      */
 /************************************************************************/
 
 /** Cast this band to another type.
@@ -12903,7 +13007,7 @@ GDALComputedRasterBandH GDALRasterBandAsDataType(GDALRasterBandH hBand,
 }
 
 /************************************************************************/
-/*                         GetBandVector()                              */
+/*                           GetBandVector()                            */
 /************************************************************************/
 
 static std::vector<const GDALRasterBand *>
@@ -12953,7 +13057,7 @@ GDALOperationOnNBands(GDALComputedRasterBand::Operation op, size_t nBandCount,
 }
 
 /************************************************************************/
-/*                       GDALMaximumOfNBands()                          */
+/*                        GDALMaximumOfNBands()                         */
 /************************************************************************/
 
 /** Return a band whose each pixel value is the maximum of the corresponding
@@ -12975,7 +13079,7 @@ GDALComputedRasterBandH GDALMaximumOfNBands(size_t nBandCount,
 }
 
 /************************************************************************/
-/*                               gdal::max()                            */
+/*                             gdal::max()                              */
 /************************************************************************/
 
 namespace gdal
@@ -13027,7 +13131,7 @@ GDALComputedRasterBandH GDALRasterBandMaxConstant(GDALRasterBandH hBand,
 }
 
 /************************************************************************/
-/*                       GDALMinimumOfNBands()                          */
+/*                        GDALMinimumOfNBands()                         */
 /************************************************************************/
 
 /** Return a band whose each pixel value is the minimum of the corresponding
@@ -13049,7 +13153,7 @@ GDALComputedRasterBandH GDALMinimumOfNBands(size_t nBandCount,
 }
 
 /************************************************************************/
-/*                               gdal::min()                            */
+/*                             gdal::min()                              */
 /************************************************************************/
 
 namespace gdal
@@ -13101,7 +13205,7 @@ GDALComputedRasterBandH GDALRasterBandMinConstant(GDALRasterBandH hBand,
 }
 
 /************************************************************************/
-/*                         GDALMeanOfNBands()                           */
+/*                          GDALMeanOfNBands()                          */
 /************************************************************************/
 
 /** Return a band whose each pixel value is the arithmetic mean of the
@@ -13123,7 +13227,7 @@ GDALComputedRasterBandH GDALMeanOfNBands(size_t nBandCount,
 }
 
 /************************************************************************/
-/*                              gdal::mean()                            */
+/*                             gdal::mean()                             */
 /************************************************************************/
 
 namespace gdal
@@ -13152,7 +13256,7 @@ GDALComputedRasterBand mean(const GDALRasterBand &first,
 }  // namespace gdal
 
 /************************************************************************/
-/*                              gdal::abs()                             */
+/*                             gdal::abs()                              */
 /************************************************************************/
 
 namespace gdal
@@ -13245,7 +13349,7 @@ GDALComputedRasterBand log(const GDALRasterBand &band)
 }  // namespace gdal
 
 /************************************************************************/
-/*                             gdal::log10()                            */
+/*                            gdal::log10()                             */
 /************************************************************************/
 
 namespace gdal

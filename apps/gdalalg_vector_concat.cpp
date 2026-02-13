@@ -40,6 +40,7 @@ GDALVectorConcatAlgorithm::GDALVectorConcatAlgorithm(bool bStandalone)
     : GDALVectorPipelineStepAlgorithm(NAME, DESCRIPTION, HELP_URL,
                                       ConstructorOptions()
                                           .SetStandaloneStep(bStandalone)
+                                          .SetAddDefaultArguments(bStandalone)
                                           .SetInputDatasetMaxCount(INT_MAX)
                                           .SetAddOutputLayerNameArgument(false)
                                           .SetAutoOpenInputDatasets(false))
@@ -84,7 +85,7 @@ GDALVectorConcatAlgorithm::GDALVectorConcatAlgorithm(bool bStandalone)
 GDALVectorConcatAlgorithm::~GDALVectorConcatAlgorithm() = default;
 
 /************************************************************************/
-/*                   GDALVectorConcatOutputDataset                      */
+/*                    GDALVectorConcatOutputDataset                     */
 /************************************************************************/
 
 class GDALVectorConcatOutputDataset final : public GDALDataset
@@ -149,7 +150,7 @@ const char *GDALVectorConcatRenamedLayer::GetName() const
 }
 
 /************************************************************************/
-/*                         BuildLayerName()                             */
+/*                           BuildLayerName()                           */
 /************************************************************************/
 
 static std::string BuildLayerName(const std::string &layerNameTemplate,
@@ -188,7 +189,7 @@ namespace
 {
 
 /************************************************************************/
-/*                            OpenProxiedLayer()                        */
+/*                          OpenProxiedLayer()                          */
 /************************************************************************/
 
 struct PooledInitData
@@ -216,7 +217,7 @@ static OGRLayer *OpenProxiedLayer(void *pUserData)
 }
 
 /************************************************************************/
-/*                         ReleaseProxiedLayer()                        */
+/*                        ReleaseProxiedLayer()                         */
 /************************************************************************/
 
 static void ReleaseProxiedLayer(OGRLayer *, void *pUserData)
@@ -226,7 +227,7 @@ static void ReleaseProxiedLayer(OGRLayer *, void *pUserData)
 }
 
 /************************************************************************/
-/*                        FreeProxiedLayerUserData()                    */
+/*                      FreeProxiedLayerUserData()                      */
 /************************************************************************/
 
 static void FreeProxiedLayerUserData(void *pUserData)
@@ -237,7 +238,7 @@ static void FreeProxiedLayerUserData(void *pUserData)
 }  // namespace
 
 /************************************************************************/
-/*                   GDALVectorConcatAlgorithm::RunStep()               */
+/*                 GDALVectorConcatAlgorithm::RunStep()                 */
 /************************************************************************/
 
 bool GDALVectorConcatAlgorithm::RunStep(GDALPipelineStepRunContext &)
@@ -484,7 +485,7 @@ bool GDALVectorConcatAlgorithm::RunStep(GDALPipelineStepRunContext &)
 }
 
 /************************************************************************/
-/*                GDALVectorConcatAlgorithm::RunImpl()                  */
+/*                 GDALVectorConcatAlgorithm::RunImpl()                 */
 /************************************************************************/
 
 bool GDALVectorConcatAlgorithm::RunImpl(GDALProgressFunc pfnProgress,

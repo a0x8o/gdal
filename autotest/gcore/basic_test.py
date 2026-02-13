@@ -68,7 +68,7 @@ def test_basic_test_strace_non_existing_file():
         "gdal.DontUseExceptions(); gdal.OpenEx('non_existing_ds', gdal.OF_RASTER)" ' " '
     )
     try:
-        (_, err) = gdaltest.runexternal_out_and_err(cmd, encoding="UTF-8")
+        _, err = gdaltest.runexternal_out_and_err(cmd, encoding="UTF-8")
     except Exception as e:
         # strace not available
         pytest.skip(str(e))
@@ -478,7 +478,7 @@ def test_basic_test_14():
     with pytest.raises(Exception):
         ds.SetMetadata({ClassWithoutStrRepr(): "a"})
 
-    ds.SetMetadata([b"foo=\xE8\x03"])
+    ds.SetMetadata([b"foo=\xe8\x03"])
     assert ds.GetMetadata_List() == [b"foo=\xe8\x03"]
 
 
@@ -674,7 +674,7 @@ def test_gdal_EscapeString():
 
     assert gdal.EscapeString('"', gdal.CPLES_XML) == "&quot;"
 
-    assert gdal.EscapeString(b"\xEF\xBB\xBF", gdal.CPLES_XML) == b"&#xFEFF;"
+    assert gdal.EscapeString(b"\xef\xbb\xbf", gdal.CPLES_XML) == b"&#xFEFF;"
 
     assert gdal.EscapeString("\t", gdal.CPLES_XML) == "\t"
 
@@ -692,7 +692,7 @@ def test_gdal_EscapeString():
 
     assert gdal.EscapeString('"', gdal.CPLES_XML_BUT_QUOTES) == '"'
 
-    assert gdal.EscapeString(b"\xEF\xBB\xBF", gdal.CPLES_XML_BUT_QUOTES) == b"&#xFEFF;"
+    assert gdal.EscapeString(b"\xef\xbb\xbf", gdal.CPLES_XML_BUT_QUOTES) == b"&#xFEFF;"
 
     assert gdal.EscapeString("\t", gdal.CPLES_XML_BUT_QUOTES) == "\t"
 
@@ -790,7 +790,7 @@ def test_basic_test_UseExceptions():
         "gdal.UseExceptions();" "gdal.Open('non_existing.tif');" ' " '
     )
     try:
-        (_, err) = gdaltest.runexternal_out_and_err(cmd, encoding="UTF-8")
+        _, err = gdaltest.runexternal_out_and_err(cmd, encoding="UTF-8")
     except Exception as e:
         pytest.skip("got exception %s" % str(e))
     assert "RuntimeError: " in err
@@ -805,7 +805,7 @@ def test_basic_test_UseExceptions_ogr_open():
         "gdal.UseExceptions();" "ogr.Open('non_existing.tif');" ' " '
     )
     try:
-        (_, err) = gdaltest.runexternal_out_and_err(cmd, encoding="UTF-8")
+        _, err = gdaltest.runexternal_out_and_err(cmd, encoding="UTF-8")
     except Exception as e:
         pytest.skip("got exception %s" % str(e))
     assert "RuntimeError: " in err
@@ -820,7 +820,7 @@ def test_basic_test_DontUseExceptions():
         "gdal.DontUseExceptions();" "gdal.Open('non_existing.tif');" ' " '
     )
     try:
-        (_, err) = gdaltest.runexternal_out_and_err(cmd, encoding="UTF-8")
+        _, err = gdaltest.runexternal_out_and_err(cmd, encoding="UTF-8")
     except Exception as e:
         pytest.skip("got exception %s" % str(e))
     assert "ERROR " in err
@@ -1191,3 +1191,22 @@ def test_basic_GetDataTypeByName():
 
     # For now, to avoid breaking backwards compatibility
     assert gdal.GetDataTypeName(gdal.GDT_UInt8) == "Byte"
+
+
+@gdaltest.enable_exceptions()
+def test_basic_exclude_driver_at_open_time():
+
+    if gdal.GetDriverByName("LIBERTIFF"):
+        ds = gdal.OpenEx(
+            "data/gtiff/non_square_pixels.tif",
+            gdal.OF_RASTER,
+            allowed_drivers=["-GTiff", "-idonotexist"],
+        )
+        assert ds.GetDriver().GetDescription() == "LIBERTIFF"
+
+    with pytest.raises(Exception, match="not recognized"):
+        gdal.OpenEx(
+            "data/gtiff/non_square_pixels.tif",
+            gdal.OF_RASTER | gdal.OF_VERBOSE_ERROR,
+            allowed_drivers=["-GTiff", "-LIBERTIFF"],
+        )

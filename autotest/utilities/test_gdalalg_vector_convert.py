@@ -235,7 +235,8 @@ def test_gdalalg_vector_convert_overwrite_non_dataset_file(tmp_vsimem):
     assert convert.Run()
 
 
-def test_gdalalg_vector_convert_skip_errors(tmp_vsimem):
+@pytest.mark.parametrize("skip_errors", (True, False))
+def test_gdalalg_vector_convert_skip_errors(tmp_vsimem, skip_errors):
 
     src_ds = gdal.GetDriverByName("MEM").CreateVector("")
     lyr = src_ds.CreateLayer("test")
@@ -252,11 +253,18 @@ def test_gdalalg_vector_convert_skip_errors(tmp_vsimem):
     convert = get_convert_alg()
     convert["input"] = src_ds
     convert["output"] = tmp_vsimem / "out.shp"
-    convert["skip-errors"] = True
-    assert convert.Run()
+    convert["skip-errors"] = skip_errors
 
-    out_ds = convert["output"].GetDataset()
-    assert out_ds.GetLayer(0).GetFeatureCount() == 2
+    if skip_errors:
+        assert convert.Run()
+
+        out_ds = convert["output"].GetDataset()
+        assert out_ds.GetLayer(0).GetFeatureCount() == 2
+    else:
+        with pytest.raises(
+            Exception, match="Failed to write layer 'test'. Use --skip-errors"
+        ):
+            convert.Run()
 
 
 def test_gdalalg_vector_convert_to_non_available_db_driver():
@@ -287,6 +295,44 @@ def test_gdalalg_vector_convert_output_format_not_guessed(tmp_vsimem):
         match="Cannot guess driver for",
     ):
         convert.Run()
+
+
+@pytest.mark.parametrize(
+    "driver", ("GeoJSON", "GPKG", "ESRI Shapefile", "CSV", "MapInfo File")
+)
+def test_gdalalg_vector_convert_output_format_multiple_layers(tmp_vsimem, driver):
+
+    if not gdal.GetDriverByName(driver):
+        pytest.skip(f"Driver {driver} not available")
+
+    ext = {
+        "GeoJSON": ".geojson",
+        "GPKG": ".gpkg",
+        "ESRI Shapefile": "",
+        "CSV": "",
+        "MapInfo File": "",
+    }
+
+    src_ds = gdal.GetDriverByName("MEM").CreateVector("")
+    with gdal.OpenEx("../ogr/data/poly.shp") as poly_ds:
+        src_ds.CopyLayer(poly_ds.GetLayer(0), "poly_1")
+        src_ds.CopyLayer(poly_ds.GetLayer(0), "poly_2")
+
+    dst_fname = tmp_vsimem / f"out{ext[driver]}"
+
+    convert = get_convert_alg()
+    convert["input"] = src_ds
+    convert["output"] = dst_fname
+    convert["output-format"] = driver
+
+    if driver == "GeoJSON":
+        with pytest.raises(
+            Exception, match="GeoJSON driver does not support multiple layers"
+        ):
+            convert.Run()
+        assert gdal.VSIStatL(dst_fname) is None
+    else:
+        assert convert.Run()
 
 
 @pytest.mark.require_driver("GeoJSON")
@@ -392,3 +438,33 @@ def test_gdalalg_vector_convert_upsert(tmp_vsimem, output_format):
         assert f["other"] == "foo"
         assert f.GetGeometryRef().ExportToWkt() == "POINT (10 10)"
         ds = None
+
+
+@pytest.mark.require_driver("GeoJSON")
+def test_error_message_leak(tmp_vsimem):
+    """Test issue GH #13662"""
+
+    json_path = tmp_vsimem / "test_error_message_leak_in.json"
+    out_path = tmp_vsimem / "test_error_message_leak_out.shp"
+
+    src_ds = ogr.GetDriverByName("GeoJSON").CreateDataSource(json_path)
+    lyr = src_ds.CreateLayer("test")
+    f = ogr.Feature(lyr.GetLayerDefn())
+    f.SetGeometry(ogr.CreateGeometryFromWkt("POINT(1 2)"))
+    lyr.CreateFeature(f)
+    f = ogr.Feature(lyr.GetLayerDefn())
+    f.SetGeometry(ogr.CreateGeometryFromWkt("LINESTRING(1 2, 3 4)"))
+    lyr.CreateFeature(f)
+    src_ds = None
+
+    alg = get_convert_alg()
+    with pytest.raises(
+        Exception,
+        match="Failed to write layer 'test'. Use --skip-errors to ignore errors",
+    ):
+        alg.ParseRunAndFinalize(
+            [
+                json_path,
+                out_path,
+            ],
+        )

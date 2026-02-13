@@ -50,7 +50,7 @@ bool GDALThreadLocalDatasetCacheIsInDestruction();
 // Exists since 8.0.1
 #ifndef PROJ_AT_LEAST_VERSION
 #define PROJ_COMPUTE_VERSION(maj, min, patch)                                  \
-    ((maj)*10000 + (min)*100 + (patch))
+    ((maj) * 10000 + (min) * 100 + (patch))
 #define PROJ_VERSION_NUMBER                                                    \
     PROJ_COMPUTE_VERSION(PROJ_VERSION_MAJOR, PROJ_VERSION_MINOR,               \
                          PROJ_VERSION_PATCH)
@@ -369,8 +369,7 @@ void OGRSpatialReference::Private::refreshProjObj()
 #if PROJ_AT_LEAST_VERSION(9, 1, 0)
             "UNSET_IDENTIFIERS_IF_INCOMPATIBLE_DEF=NO",
 #endif
-            nullptr
-        };
+            nullptr};
         PROJ_STRING_LIST warnings = nullptr;
         PROJ_STRING_LIST errors = nullptr;
         setPjCRS(proj_create_from_wkt(getPROJContext(), pszWKT, options,
@@ -745,7 +744,7 @@ OGRErr OGRSpatialReference::Private::replaceConversionAndUnref(PJ *conv)
 }
 
 /************************************************************************/
-/*                           ToPointer()                                */
+/*                             ToPointer()                              */
 /************************************************************************/
 
 static inline OGRSpatialReference *ToPointer(OGRSpatialReferenceH hSRS)
@@ -754,7 +753,7 @@ static inline OGRSpatialReference *ToPointer(OGRSpatialReferenceH hSRS)
 }
 
 /************************************************************************/
-/*                           ToHandle()                                 */
+/*                              ToHandle()                              */
 /************************************************************************/
 
 static inline OGRSpatialReferenceH ToHandle(OGRSpatialReference *poSRS)
@@ -763,7 +762,7 @@ static inline OGRSpatialReferenceH ToHandle(OGRSpatialReference *poSRS)
 }
 
 /************************************************************************/
-/*                           OGRsnPrintDouble()                         */
+/*                          OGRsnPrintDouble()                          */
 /************************************************************************/
 
 void OGRsnPrintDouble(char *pszStrBuf, size_t size, double dfValue);
@@ -1029,7 +1028,7 @@ OGRSpatialReference::operator=(OGRSpatialReference &&oSource)
 }
 
 /************************************************************************/
-/*                      AssignAndSetThreadSafe()                        */
+/*                       AssignAndSetThreadSafe()                       */
 /************************************************************************/
 
 /** Assignment method, with thread-safety.
@@ -1371,7 +1370,7 @@ const char *CPL_STDCALL OSRGetAttrValue(OGRSpatialReferenceH hSRS,
 }
 
 /************************************************************************/
-/*                             GetName()                                */
+/*                              GetName()                               */
 /************************************************************************/
 
 /**
@@ -1409,7 +1408,7 @@ const char *OGRSpatialReference::GetName() const
 }
 
 /************************************************************************/
-/*                           OSRGetName()                               */
+/*                             OSRGetName()                             */
 /************************************************************************/
 
 /**
@@ -1429,7 +1428,7 @@ const char *OSRGetName(OGRSpatialReferenceH hSRS)
 }
 
 /************************************************************************/
-/*                       GetCelestialBodyName()                         */
+/*                        GetCelestialBodyName()                        */
 /************************************************************************/
 
 /**
@@ -1473,7 +1472,7 @@ const char *OGRSpatialReference::GetCelestialBodyName() const
 }
 
 /************************************************************************/
-/*                       OSRGetCelestialBodyName()                      */
+/*                      OSRGetCelestialBodyName()                       */
 /************************************************************************/
 
 /**
@@ -1658,7 +1657,7 @@ OGRErr OGRSpatialReference::exportToWkt(char **ppszResult) const
 }
 
 /************************************************************************/
-/*                GDAL_proj_crs_create_bound_crs_to_WGS84()             */
+/*              GDAL_proj_crs_create_bound_crs_to_WGS84()               */
 /************************************************************************/
 
 static PJ *GDAL_proj_crs_create_bound_crs_to_WGS84(PJ_CONTEXT *ctx, PJ *pj,
@@ -2061,7 +2060,7 @@ OGRErr OSRExportToWktEx(OGRSpatialReferenceH hSRS, char **ppszReturn,
 }
 
 /************************************************************************/
-/*                       exportToPROJJSON()                             */
+/*                          exportToPROJJSON()                          */
 /************************************************************************/
 
 /**
@@ -2180,7 +2179,7 @@ OGRErr OGRSpatialReference::exportToPROJJSON(
 }
 
 /************************************************************************/
-/*                          OSRExportToPROJJSON()                       */
+/*                        OSRExportToPROJJSON()                         */
 /************************************************************************/
 
 /**
@@ -3913,7 +3912,7 @@ OGRErr OSRCopyGeogCSFrom(OGRSpatialReferenceH hSRS,
 }
 
 /************************************************************************/
-/*                   SET_FROM_USER_INPUT_LIMITATIONS_get()              */
+/*                SET_FROM_USER_INPUT_LIMITATIONS_get()                 */
 /************************************************************************/
 
 /** Limitations for OGRSpatialReference::SetFromUserInput().
@@ -3932,7 +3931,7 @@ CSLConstList OGRSpatialReference::SET_FROM_USER_INPUT_LIMITATIONS_get()
 }
 
 /************************************************************************/
-/*                      RemoveIDFromMemberOfEnsembles()                 */
+/*                   RemoveIDFromMemberOfEnsembles()                    */
 /************************************************************************/
 
 // cppcheck-suppress constParameterReference
@@ -4439,7 +4438,7 @@ OGRErr OSRSetFromUserInputEx(OGRSpatialReferenceH hSRS, const char *pszDef,
 }
 
 /************************************************************************/
-/*                          ImportFromUrl()                             */
+/*                           ImportFromUrl()                            */
 /************************************************************************/
 
 /**
@@ -4553,7 +4552,7 @@ OGRErr OGRSpatialReference::importFromUrl(const char *pszUrl)
 }
 
 /************************************************************************/
-/*                        OSRimportFromUrl()                            */
+/*                          OSRimportFromUrl()                          */
 /************************************************************************/
 
 /**
@@ -5366,7 +5365,7 @@ double OSRGetInvFlattening(OGRSpatialReferenceH hSRS, OGRErr *pnErr)
 }
 
 /************************************************************************/
-/*                           GetEccentricity()                          */
+/*                          GetEccentricity()                           */
 /************************************************************************/
 
 /**
@@ -5393,7 +5392,7 @@ double OGRSpatialReference::GetEccentricity() const
 }
 
 /************************************************************************/
-/*                      GetSquaredEccentricity()                        */
+/*                       GetSquaredEccentricity()                       */
 /************************************************************************/
 
 /**
@@ -5878,7 +5877,7 @@ OGRErr OGRSpatialReference::SetProjection(const char *pszProjection)
 }
 
 /************************************************************************/
-/*                            OSRSetProjection()                        */
+/*                          OSRSetProjection()                          */
 /************************************************************************/
 
 /**
@@ -6997,7 +6996,7 @@ OGRErr OSRSetGH(OGRSpatialReferenceH hSRS, double dfCentralMeridian,
 }
 
 /************************************************************************/
-/*                              SetIGH()                                */
+/*                               SetIGH()                               */
 /************************************************************************/
 
 OGRErr OGRSpatialReference::SetIGH()
@@ -7011,7 +7010,7 @@ OGRErr OGRSpatialReference::SetIGH()
 }
 
 /************************************************************************/
-/*                              OSRSetIGH()                             */
+/*                             OSRSetIGH()                              */
 /************************************************************************/
 
 OGRErr OSRSetIGH(OGRSpatialReferenceH hSRS)
@@ -7041,7 +7040,7 @@ OGRErr OGRSpatialReference::SetGEOS(double dfCentralMeridian,
 }
 
 /************************************************************************/
-/*                              OSRSetGEOS()                             */
+/*                             OSRSetGEOS()                             */
 /************************************************************************/
 
 OGRErr OSRSetGEOS(OGRSpatialReferenceH hSRS, double dfCentralMeridian,
@@ -7056,7 +7055,7 @@ OGRErr OSRSetGEOS(OGRSpatialReferenceH hSRS, double dfCentralMeridian,
 }
 
 /************************************************************************/
-/*                       SetGaussSchreiberTMercator()                   */
+/*                     SetGaussSchreiberTMercator()                     */
 /************************************************************************/
 
 OGRErr OGRSpatialReference::SetGaussSchreiberTMercator(double dfCenterLat,
@@ -7075,7 +7074,7 @@ OGRErr OGRSpatialReference::SetGaussSchreiberTMercator(double dfCenterLat,
 }
 
 /************************************************************************/
-/*                     OSRSetGaussSchreiberTMercator()                  */
+/*                   OSRSetGaussSchreiberTMercator()                    */
 /************************************************************************/
 
 OGRErr OSRSetGaussSchreiberTMercator(OGRSpatialReferenceH hSRS,
@@ -7335,7 +7334,7 @@ OGRErr OGRSpatialReference::SetLOM(double dfCenterLat, double dfCenterLong,
 }
 
 /************************************************************************/
-/*                            SetIWMPolyconic()                         */
+/*                          SetIWMPolyconic()                           */
 /************************************************************************/
 
 OGRErr OGRSpatialReference::SetIWMPolyconic(double dfLat1, double dfLat2,
@@ -7353,7 +7352,7 @@ OGRErr OGRSpatialReference::SetIWMPolyconic(double dfLat1, double dfLat2,
 }
 
 /************************************************************************/
-/*                          OSRSetIWMPolyconic()                        */
+/*                         OSRSetIWMPolyconic()                         */
 /************************************************************************/
 
 OGRErr OSRSetIWMPolyconic(OGRSpatialReferenceH hSRS, double dfLat1,
@@ -8313,7 +8312,7 @@ OGRErr OSRSetWagner(OGRSpatialReferenceH hSRS, int nVariation,
 }
 
 /************************************************************************/
-/*                            SetQSC()                     */
+/*                               SetQSC()                               */
 /************************************************************************/
 
 OGRErr OGRSpatialReference::SetQSC(double dfCenterLat, double dfCenterLong)
@@ -8327,7 +8326,7 @@ OGRErr OGRSpatialReference::SetQSC(double dfCenterLat, double dfCenterLong)
 }
 
 /************************************************************************/
-/*                           OSRSetQSC()                   */
+/*                             OSRSetQSC()                              */
 /************************************************************************/
 
 OGRErr OSRSetQSC(OGRSpatialReferenceH hSRS, double dfCenterLat,
@@ -8340,7 +8339,7 @@ OGRErr OSRSetQSC(OGRSpatialReferenceH hSRS, double dfCenterLat,
 }
 
 /************************************************************************/
-/*                            SetSCH()                     */
+/*                               SetSCH()                               */
 /************************************************************************/
 
 OGRErr OGRSpatialReference::SetSCH(double dfPegLat, double dfPegLong,
@@ -8356,7 +8355,7 @@ OGRErr OGRSpatialReference::SetSCH(double dfPegLat, double dfPegLong,
 }
 
 /************************************************************************/
-/*                           OSRSetSCH()                   */
+/*                             OSRSetSCH()                              */
 /************************************************************************/
 
 OGRErr OSRSetSCH(OGRSpatialReferenceH hSRS, double dfPegLat, double dfPegLong,
@@ -8369,7 +8368,7 @@ OGRErr OSRSetSCH(OGRSpatialReferenceH hSRS, double dfPegLat, double dfPegLong,
 }
 
 /************************************************************************/
-/*                         SetVerticalPerspective()                     */
+/*                       SetVerticalPerspective()                       */
 /************************************************************************/
 
 OGRErr OGRSpatialReference::SetVerticalPerspective(
@@ -8386,7 +8385,7 @@ OGRErr OGRSpatialReference::SetVerticalPerspective(
 }
 
 /************************************************************************/
-/*                       OSRSetVerticalPerspective()                    */
+/*                     OSRSetVerticalPerspective()                      */
 /************************************************************************/
 
 OGRErr OSRSetVerticalPerspective(OGRSpatialReferenceH hSRS,
@@ -8404,7 +8403,7 @@ OGRErr OSRSetVerticalPerspective(OGRSpatialReferenceH hSRS,
 }
 
 /************************************************************************/
-/*             SetDerivedGeogCRSWithPoleRotationGRIBConvention()        */
+/*          SetDerivedGeogCRSWithPoleRotationGRIBConvention()           */
 /************************************************************************/
 
 OGRErr OGRSpatialReference::SetDerivedGeogCRSWithPoleRotationGRIBConvention(
@@ -8430,7 +8429,7 @@ OGRErr OGRSpatialReference::SetDerivedGeogCRSWithPoleRotationGRIBConvention(
 }
 
 /************************************************************************/
-/*         SetDerivedGeogCRSWithPoleRotationNetCDFCFConvention()        */
+/*        SetDerivedGeogCRSWithPoleRotationNetCDFCFConvention()         */
 /************************************************************************/
 
 OGRErr OGRSpatialReference::SetDerivedGeogCRSWithPoleRotationNetCDFCFConvention(
@@ -8720,7 +8719,7 @@ OGRSpatialReference::GetAuthorityCode(const char *pszTargetKey) const
 }
 
 /************************************************************************/
-/*                          OSRGetAuthorityCode()                       */
+/*                        OSRGetAuthorityCode()                         */
 /************************************************************************/
 
 /**
@@ -8874,7 +8873,7 @@ const char *OSRGetAuthorityName(OGRSpatialReferenceH hSRS,
 }
 
 /************************************************************************/
-/*                          GetOGCURN()                                 */
+/*                             GetOGCURN()                              */
 /************************************************************************/
 
 /**
@@ -8987,7 +8986,7 @@ OGRErr OGRSpatialReference::StripVertical()
 }
 
 /************************************************************************/
-/*                            OSRStripVertical()                             */
+/*                          OSRStripVertical()                          */
 /************************************************************************/
 /**
  * \brief Convert a compound cs into a horizontal CS.
@@ -9004,7 +9003,7 @@ OGRErr OSRStripVertical(OGRSpatialReferenceH hSRS)
 }
 
 /************************************************************************/
-/*                   StripTOWGS84IfKnownDatumAndAllowed()               */
+/*                 StripTOWGS84IfKnownDatumAndAllowed()                 */
 /************************************************************************/
 
 /**
@@ -9255,7 +9254,7 @@ int OGRSpatialReference::IsGeocentric() const
 }
 
 /************************************************************************/
-/*                           OSRIsGeocentric()                          */
+/*                          OSRIsGeocentric()                           */
 /************************************************************************/
 /**
  * \brief Check if geocentric coordinate system.
@@ -9272,7 +9271,7 @@ int OSRIsGeocentric(OGRSpatialReferenceH hSRS)
 }
 
 /************************************************************************/
-/*                            IsEmpty()                                 */
+/*                              IsEmpty()                               */
 /************************************************************************/
 
 /**
@@ -9354,7 +9353,7 @@ int OSRIsGeographic(OGRSpatialReferenceH hSRS)
 }
 
 /************************************************************************/
-/*                      IsDerivedGeographic()                           */
+/*                        IsDerivedGeographic()                         */
 /************************************************************************/
 
 /**
@@ -9382,7 +9381,7 @@ int OGRSpatialReference::IsDerivedGeographic() const
 }
 
 /************************************************************************/
-/*                      OSRIsDerivedGeographic()                        */
+/*                       OSRIsDerivedGeographic()                       */
 /************************************************************************/
 /**
  * \brief Check if the CRS is a derived geographic coordinate system.
@@ -9399,7 +9398,7 @@ int OSRIsDerivedGeographic(OGRSpatialReferenceH hSRS)
 }
 
 /************************************************************************/
-/*                      IsDerivedProjected()                            */
+/*                         IsDerivedProjected()                         */
 /************************************************************************/
 
 /**
@@ -9427,7 +9426,7 @@ int OGRSpatialReference::IsDerivedProjected() const
 }
 
 /************************************************************************/
-/*                      OSRIsDerivedProjected()                         */
+/*                       OSRIsDerivedProjected()                        */
 /************************************************************************/
 /**
  * \brief Check if the CRS is a derived projected coordinate system.
@@ -9466,7 +9465,7 @@ int OGRSpatialReference::IsLocal() const
 }
 
 /************************************************************************/
-/*                          OSRIsLocal()                                */
+/*                             OSRIsLocal()                             */
 /************************************************************************/
 /**
  * \brief Check if local coordinate system.
@@ -9482,7 +9481,7 @@ int OSRIsLocal(OGRSpatialReferenceH hSRS)
 }
 
 /************************************************************************/
-/*                            IsVertical()                              */
+/*                             IsVertical()                             */
 /************************************************************************/
 
 /**
@@ -9545,7 +9544,7 @@ int OSRIsVertical(OGRSpatialReferenceH hSRS)
 }
 
 /************************************************************************/
-/*                            IsDynamic()                               */
+/*                             IsDynamic()                              */
 /************************************************************************/
 
 /**
@@ -9633,7 +9632,7 @@ bool OGRSpatialReference::IsDynamic() const
 }
 
 /************************************************************************/
-/*                           OSRIsDynamic()                             */
+/*                            OSRIsDynamic()                            */
 /************************************************************************/
 /**
  * \brief Check if a CRS is a dynamic CRS.
@@ -9654,7 +9653,7 @@ int OSRIsDynamic(OGRSpatialReferenceH hSRS)
 }
 
 /************************************************************************/
-/*                         HasPointMotionOperation()                    */
+/*                      HasPointMotionOperation()                       */
 /************************************************************************/
 
 /**
@@ -9690,7 +9689,7 @@ bool OGRSpatialReference::HasPointMotionOperation() const
 }
 
 /************************************************************************/
-/*                      OSRHasPointMotionOperation()                    */
+/*                     OSRHasPointMotionOperation()                     */
 /************************************************************************/
 
 /**
@@ -10076,7 +10075,7 @@ int OSRIsSame(OGRSpatialReferenceH hSRS1, OGRSpatialReferenceH hSRS2)
 }
 
 /************************************************************************/
-/*                             OSRIsSameEx()                            */
+/*                            OSRIsSameEx()                             */
 /************************************************************************/
 
 /**
@@ -10094,7 +10093,7 @@ int OSRIsSameEx(OGRSpatialReferenceH hSRS1, OGRSpatialReferenceH hSRS2,
 }
 
 /************************************************************************/
-/*                    convertToOtherProjection()                        */
+/*                      convertToOtherProjection()                      */
 /************************************************************************/
 
 /**
@@ -10257,7 +10256,7 @@ OSRConvertToOtherProjection(OGRSpatialReferenceH hSRS,
  *
  */
 OGRSpatialReferenceH *OSRFindMatches(OGRSpatialReferenceH hSRS,
-                                     char **papszOptions, int *pnEntries,
+                                     CSLConstList papszOptions, int *pnEntries,
                                      int **ppanMatchConfidence)
 {
     if (pnEntries)
@@ -10271,7 +10270,7 @@ OGRSpatialReferenceH *OSRFindMatches(OGRSpatialReferenceH hSRS,
 }
 
 /************************************************************************/
-/*                           OSRFreeSRSArray()                          */
+/*                          OSRFreeSRSArray()                           */
 /************************************************************************/
 
 /**
@@ -10292,7 +10291,7 @@ void OSRFreeSRSArray(OGRSpatialReferenceH *pahSRS)
 }
 
 /************************************************************************/
-/*                         FindBestMatch()                              */
+/*                           FindBestMatch()                            */
 /************************************************************************/
 
 /**
@@ -10904,7 +10903,7 @@ void OSRCleanup(void)
 }
 
 /************************************************************************/
-/*                              GetAxesCount()                          */
+/*                            GetAxesCount()                            */
 /************************************************************************/
 
 /**
@@ -10963,7 +10962,7 @@ int OGRSpatialReference::GetAxesCount() const
 }
 
 /************************************************************************/
-/*                           OSRGetAxesCount()                          */
+/*                          OSRGetAxesCount()                           */
 /************************************************************************/
 
 /**
@@ -11390,7 +11389,7 @@ OGRErr OGRSpatialReference::exportToMICoordSys(char **ppszResult) const
 }
 
 /************************************************************************/
-/*                       OSRImportFromMICoordSys()                      */
+/*                      OSRImportFromMICoordSys()                       */
 /************************************************************************/
 /**
  * \brief Import Mapinfo style CoordSys definition.
@@ -11496,7 +11495,7 @@ double OSRCalcSemiMinorFromInvFlattening(double dfSemiMajor,
 }
 
 /************************************************************************/
-/*                        GetWGS84SRS()                                 */
+/*                            GetWGS84SRS()                             */
 /************************************************************************/
 
 static OGRSpatialReference *poSRSWGS84 = nullptr;
@@ -11526,7 +11525,7 @@ OGRSpatialReference *OGRSpatialReference::GetWGS84SRS()
 }
 
 /************************************************************************/
-/*                        CleanupSRSWGS84Mutex()                       */
+/*                        CleanupSRSWGS84Mutex()                        */
 /************************************************************************/
 
 static void CleanupSRSWGS84Mutex()
@@ -11888,7 +11887,7 @@ OGRErr OSRMorphFromESRI(OGRSpatialReferenceH hSRS)
  * @see OGRSpatialReference::FindBestMatch()
  */
 OGRSpatialReferenceH *
-OGRSpatialReference::FindMatches(char **papszOptions, int *pnEntries,
+OGRSpatialReference::FindMatches(CSLConstList papszOptions, int *pnEntries,
                                  int **ppanMatchConfidence) const
 {
     TAKE_OPTIONAL_LOCK();
@@ -12169,7 +12168,7 @@ OGRErr OGRSpatialReference::importFromEPSGA(int nCode)
 }
 
 /************************************************************************/
-/*                          AddGuessedTOWGS84()                         */
+/*                         AddGuessedTOWGS84()                          */
 /************************************************************************/
 
 /**
@@ -12402,7 +12401,7 @@ int OSREPSGTreatsAsLatLong(OGRSpatialReferenceH hSRS)
 }
 
 /************************************************************************/
-/*                     EPSGTreatsAsNorthingEasting()                    */
+/*                    EPSGTreatsAsNorthingEasting()                     */
 /************************************************************************/
 
 /**
@@ -12470,7 +12469,7 @@ int OGRSpatialReference::EPSGTreatsAsNorthingEasting() const
 }
 
 /************************************************************************/
-/*                     OSREPSGTreatsAsNorthingEasting()                 */
+/*                   OSREPSGTreatsAsNorthingEasting()                   */
 /************************************************************************/
 
 /**
@@ -12638,7 +12637,7 @@ OGRErr OGRSpatialReference::ImportFromESRIWisconsinWKT(const char *prjName,
 }
 
 /************************************************************************/
-/*                      GetAxisMappingStrategy()                        */
+/*                       GetAxisMappingStrategy()                       */
 /************************************************************************/
 
 /** \brief Return the data axis to CRS axis mapping strategy.
@@ -12664,7 +12663,7 @@ OSRAxisMappingStrategy OGRSpatialReference::GetAxisMappingStrategy() const
 }
 
 /************************************************************************/
-/*                      OSRGetAxisMappingStrategy()                     */
+/*                     OSRGetAxisMappingStrategy()                      */
 /************************************************************************/
 
 /** \brief Return the data axis to CRS axis mapping strategy.
@@ -12680,7 +12679,7 @@ OSRAxisMappingStrategy OSRGetAxisMappingStrategy(OGRSpatialReferenceH hSRS)
 }
 
 /************************************************************************/
-/*                      SetAxisMappingStrategy()                        */
+/*                       SetAxisMappingStrategy()                       */
 /************************************************************************/
 
 /** \brief Set the data axis to CRS axis mapping strategy.
@@ -12705,7 +12704,7 @@ void OGRSpatialReference::SetAxisMappingStrategy(
 }
 
 /************************************************************************/
-/*                      OSRSetAxisMappingStrategy()                     */
+/*                     OSRSetAxisMappingStrategy()                      */
 /************************************************************************/
 
 /** \brief Set the data axis to CRS axis mapping strategy.
@@ -12722,7 +12721,7 @@ void OSRSetAxisMappingStrategy(OGRSpatialReferenceH hSRS,
 }
 
 /************************************************************************/
-/*                      GetDataAxisToSRSAxisMapping()                   */
+/*                    GetDataAxisToSRSAxisMapping()                     */
 /************************************************************************/
 
 /** \brief Return the data axis to SRS axis mapping.
@@ -12743,7 +12742,7 @@ const std::vector<int> &OGRSpatialReference::GetDataAxisToSRSAxisMapping() const
 }
 
 /************************************************************************/
-/*                     OSRGetDataAxisToSRSAxisMapping()                 */
+/*                   OSRGetDataAxisToSRSAxisMapping()                   */
 /************************************************************************/
 
 /** \brief Return the data axis to SRS axis mapping.
@@ -12765,7 +12764,7 @@ const int *OSRGetDataAxisToSRSAxisMapping(OGRSpatialReferenceH hSRS,
 }
 
 /************************************************************************/
-/*                      SetDataAxisToSRSAxisMapping()                   */
+/*                    SetDataAxisToSRSAxisMapping()                     */
 /************************************************************************/
 
 /** \brief Set a custom data axis to CRS axis mapping.
@@ -12816,7 +12815,7 @@ OGRErr OGRSpatialReference::SetDataAxisToSRSAxisMapping(
 }
 
 /************************************************************************/
-/*                     OSRSetDataAxisToSRSAxisMapping()                 */
+/*                   OSRSetDataAxisToSRSAxisMapping()                   */
 /************************************************************************/
 
 /** \brief Set a custom data axis to CRS axis mapping.
@@ -12846,7 +12845,7 @@ OGRErr OSRSetDataAxisToSRSAxisMapping(OGRSpatialReferenceH hSRS,
 }
 
 /************************************************************************/
-/*                               GetAreaOfUse()                         */
+/*                            GetAreaOfUse()                            */
 /************************************************************************/
 
 /** \brief Return the area of use of the CRS.
@@ -12898,7 +12897,7 @@ bool OGRSpatialReference::GetAreaOfUse(double *pdfWestLongitudeDeg,
 }
 
 /************************************************************************/
-/*                               GetAreaOfUse()                         */
+/*                            GetAreaOfUse()                            */
 /************************************************************************/
 
 /** \brief Return the area of use of the CRS.
@@ -12919,7 +12918,7 @@ int OSRGetAreaOfUse(OGRSpatialReferenceH hSRS, double *pdfWestLongitudeDeg,
 }
 
 /************************************************************************/
-/*                     OSRGetCRSInfoListFromDatabase()                  */
+/*                   OSRGetCRSInfoListFromDatabase()                    */
 /************************************************************************/
 
 /** \brief Enumerate CRS objects from the database.
@@ -13017,7 +13016,7 @@ OSRGetCRSInfoListFromDatabase(const char *pszAuthName,
 }
 
 /************************************************************************/
-/*                        OSRDestroyCRSInfoList()                       */
+/*                       OSRDestroyCRSInfoList()                        */
 /************************************************************************/
 
 /** \brief Destroy the result returned by
@@ -13044,7 +13043,7 @@ void OSRDestroyCRSInfoList(OSRCRSInfo **list)
 }
 
 /************************************************************************/
-/*                   OSRGetAuthorityListFromDatabase()                  */
+/*                  OSRGetAuthorityListFromDatabase()                   */
 /************************************************************************/
 
 /** \brief Return the list of CRS authorities used in the PROJ database.
@@ -13076,7 +13075,7 @@ char **OSRGetAuthorityListFromDatabase()
 }
 
 /************************************************************************/
-/*                    UpdateCoordinateSystemFromGeogCRS()               */
+/*                 UpdateCoordinateSystemFromGeogCRS()                  */
 /************************************************************************/
 
 /*! @cond Doxygen_Suppress */
@@ -13165,7 +13164,7 @@ void OGRSpatialReference::UpdateCoordinateSystemFromGeogCRS()
 /*! @endcond */
 
 /************************************************************************/
-/*                             PromoteTo3D()                            */
+/*                            PromoteTo3D()                             */
 /************************************************************************/
 
 /** \brief "Promotes" a 2D CRS to a 3D CRS one.
@@ -13194,7 +13193,7 @@ OGRErr OGRSpatialReference::PromoteTo3D(const char *pszName)
 }
 
 /************************************************************************/
-/*                             OSRPromoteTo3D()                         */
+/*                           OSRPromoteTo3D()                           */
 /************************************************************************/
 
 /** \brief "Promotes" a 2D CRS to a 3D CRS one.
@@ -13237,7 +13236,7 @@ OGRErr OGRSpatialReference::DemoteTo2D(const char *pszName)
 }
 
 /************************************************************************/
-/*                             OSRDemoteTo2D()                          */
+/*                           OSRDemoteTo2D()                            */
 /************************************************************************/
 
 /** \brief "Demote" a 3D CRS to a 2D CRS one.
@@ -13405,7 +13404,7 @@ int OGRSpatialReference::GetEPSGGeogCS() const
 }
 
 /************************************************************************/
-/*                          SetCoordinateEpoch()                        */
+/*                         SetCoordinateEpoch()                         */
 /************************************************************************/
 
 /** Set the coordinate epoch, as decimal year.
@@ -13432,7 +13431,7 @@ void OGRSpatialReference::SetCoordinateEpoch(double dfCoordinateEpoch)
 }
 
 /************************************************************************/
-/*                      OSRSetCoordinateEpoch()                         */
+/*                       OSRSetCoordinateEpoch()                        */
 /************************************************************************/
 
 /** \brief Set the coordinate epoch, as decimal year.
@@ -13450,7 +13449,7 @@ void OSRSetCoordinateEpoch(OGRSpatialReferenceH hSRS, double dfCoordinateEpoch)
 }
 
 /************************************************************************/
-/*                          GetCoordinateEpoch()                        */
+/*                         GetCoordinateEpoch()                         */
 /************************************************************************/
 
 /** Return the coordinate epoch, as decimal year.
@@ -13478,7 +13477,7 @@ double OGRSpatialReference::GetCoordinateEpoch() const
 }
 
 /************************************************************************/
-/*                      OSRGetCoordinateEpoch()                        */
+/*                       OSRGetCoordinateEpoch()                        */
 /************************************************************************/
 
 /** \brief Get the coordinate epoch, as decimal year.

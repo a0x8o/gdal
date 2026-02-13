@@ -10,14 +10,17 @@
  * SPDX-License-Identifier: MIT
  ****************************************************************************/
 
+#include "cpl_enumerate.h"
 #include "cpl_float.h"
 #include "cpl_vsi_virtual.h"
+#include "cpl_worker_thread_pool.h"
 #include "gdal_thread_pool.h"
 #include "zarr.h"
 #include "zarr_v3_codec.h"
 
 #include <algorithm>
 #include <cassert>
+#include <cinttypes>
 #include <cmath>
 #include <cstdlib>
 #include <limits>
@@ -25,37 +28,36 @@
 #include <set>
 
 /************************************************************************/
-/*                       ZarrV3Array::ZarrV3Array()                     */
+/*                      ZarrV3Array::ZarrV3Array()                      */
 /************************************************************************/
 
 ZarrV3Array::ZarrV3Array(
     const std::shared_ptr<ZarrSharedResource> &poSharedResource,
-    const std::string &osParentName, const std::string &osName,
+    const std::shared_ptr<ZarrGroupBase> &poParent, const std::string &osName,
     const std::vector<std::shared_ptr<GDALDimension>> &aoDims,
     const GDALExtendedDataType &oType, const std::vector<DtypeElt> &aoDtypeElts,
     const std::vector<GUInt64> &anOuterBlockSize,
     const std::vector<GUInt64> &anInnerBlockSize)
-    : GDALAbstractMDArray(osParentName, osName),
-      ZarrArray(poSharedResource, osParentName, osName, aoDims, oType,
-                aoDtypeElts, anOuterBlockSize, anInnerBlockSize)
+    : GDALAbstractMDArray(poParent->GetFullName(), osName),
+      ZarrArray(poSharedResource, poParent, osName, aoDims, oType, aoDtypeElts,
+                anOuterBlockSize, anInnerBlockSize)
 {
 }
 
 /************************************************************************/
-/*                         ZarrV3Array::Create()                        */
+/*                        ZarrV3Array::Create()                         */
 /************************************************************************/
 
-std::shared_ptr<ZarrV3Array>
-ZarrV3Array::Create(const std::shared_ptr<ZarrSharedResource> &poSharedResource,
-                    const std::string &osParentName, const std::string &osName,
-                    const std::vector<std::shared_ptr<GDALDimension>> &aoDims,
-                    const GDALExtendedDataType &oType,
-                    const std::vector<DtypeElt> &aoDtypeElts,
-                    const std::vector<GUInt64> &anOuterBlockSize,
-                    const std::vector<GUInt64> &anInnerBlockSize)
+std::shared_ptr<ZarrV3Array> ZarrV3Array::Create(
+    const std::shared_ptr<ZarrSharedResource> &poSharedResource,
+    const std::shared_ptr<ZarrGroupBase> &poParent, const std::string &osName,
+    const std::vector<std::shared_ptr<GDALDimension>> &aoDims,
+    const GDALExtendedDataType &oType, const std::vector<DtypeElt> &aoDtypeElts,
+    const std::vector<GUInt64> &anOuterBlockSize,
+    const std::vector<GUInt64> &anInnerBlockSize)
 {
     auto arr = std::shared_ptr<ZarrV3Array>(
-        new ZarrV3Array(poSharedResource, osParentName, osName, aoDims, oType,
+        new ZarrV3Array(poSharedResource, poParent, osName, aoDims, oType,
                         aoDtypeElts, anOuterBlockSize, anInnerBlockSize));
     if (arr->m_nTotalInnerChunkCount == 0)
         return nullptr;
@@ -65,7 +67,7 @@ ZarrV3Array::Create(const std::shared_ptr<ZarrSharedResource> &poSharedResource,
 }
 
 /************************************************************************/
-/*                             ~ZarrV3Array()                           */
+/*                            ~ZarrV3Array()                            */
 /************************************************************************/
 
 ZarrV3Array::~ZarrV3Array()
@@ -74,7 +76,7 @@ ZarrV3Array::~ZarrV3Array()
 }
 
 /************************************************************************/
-/*                                Flush()                               */
+/*                               Flush()                                */
 /************************************************************************/
 
 bool ZarrV3Array::Flush()
@@ -124,7 +126,7 @@ bool ZarrV3Array::Flush()
 }
 
 /************************************************************************/
-/*                    ZarrV3Array::Serialize()                          */
+/*                       ZarrV3Array::Serialize()                       */
 /************************************************************************/
 
 bool ZarrV3Array::Serialize(const CPLJSONObject &oAttrs)
@@ -251,7 +253,7 @@ bool ZarrV3Array::Serialize(const CPLJSONObject &oAttrs)
 }
 
 /************************************************************************/
-/*                  ZarrV3Array::NeedDecodedBuffer()                    */
+/*                   ZarrV3Array::NeedDecodedBuffer()                   */
 /************************************************************************/
 
 bool ZarrV3Array::NeedDecodedBuffer() const
@@ -267,7 +269,7 @@ bool ZarrV3Array::NeedDecodedBuffer() const
 }
 
 /************************************************************************/
-/*               ZarrV3Array::AllocateWorkingBuffers()                  */
+/*                ZarrV3Array::AllocateWorkingBuffers()                 */
 /************************************************************************/
 
 bool ZarrV3Array::AllocateWorkingBuffers() const
@@ -364,7 +366,7 @@ bool ZarrV3Array::AllocateWorkingBuffers(
 }
 
 /************************************************************************/
-/*                      ZarrV3Array::LoadBlockData()                     */
+/*                     ZarrV3Array::LoadBlockData()                     */
 /************************************************************************/
 
 bool ZarrV3Array::LoadBlockData(const uint64_t *blockIndices,
@@ -413,8 +415,13 @@ bool ZarrV3Array::LoadBlockData(const uint64_t *blockIndices, bool bUseMutex,
 
     // For network file systems, get the streaming version of the filename,
     // as we don't need arbitrary seeking in the file
-    osFilename = VSIFileManager::GetHandler(osFilename.c_str())
-                     ->GetStreamingFilename(osFilename);
+    // ... unless we do partial decoding, in which case range requests within
+    // a shard are much more efficient
+    if (!(poCodecs && poCodecs->SupportsPartialDecoding()))
+    {
+        osFilename = VSIFileManager::GetHandler(osFilename.c_str())
+                         ->GetStreamingFilename(osFilename);
+    }
 
     // First if we have a tile presence cache, check tile presence from it
     bool bEarlyRet;
@@ -581,6 +588,175 @@ bool ZarrV3Array::LoadBlockData(const uint64_t *blockIndices, bool bUseMutex,
 #undef m_abyRawBlockData
 #undef m_abyDecodedBlockData
 #undef m_poCodecs
+}
+
+/************************************************************************/
+/*                         ZarrV3Array::IRead()                         */
+/************************************************************************/
+
+bool ZarrV3Array::IRead(const GUInt64 *arrayStartIdx, const size_t *count,
+                        const GInt64 *arrayStep, const GPtrDiff_t *bufferStride,
+                        const GDALExtendedDataType &bufferDataType,
+                        void *pDstBuffer) const
+{
+    // For sharded arrays, pre-populate the block cache via ReadMultiRange()
+    // so that the base-class block-by-block loop hits memory, not HTTP.
+    if (m_poCodecs && m_poCodecs->SupportsPartialDecoding())
+    {
+        PreloadShardedBlocks(arrayStartIdx, count);
+    }
+    return ZarrArray::IRead(arrayStartIdx, count, arrayStep, bufferStride,
+                            bufferDataType, pDstBuffer);
+}
+
+/************************************************************************/
+/*                 ZarrV3Array::PreloadShardedBlocks()                  */
+/************************************************************************/
+
+void ZarrV3Array::PreloadShardedBlocks(const GUInt64 *arrayStartIdx,
+                                       const size_t *count) const
+{
+    const size_t nDims = m_aoDims.size();
+    if (nDims == 0)
+        return;
+
+    // Calculate needed block index range
+    std::vector<uint64_t> anBlockMin(nDims), anBlockMax(nDims);
+    size_t nTotalBlocks = 1;
+    for (size_t i = 0; i < nDims; ++i)
+    {
+        anBlockMin[i] = arrayStartIdx[i] / m_anInnerBlockSize[i];
+        anBlockMax[i] =
+            (arrayStartIdx[i] + count[i] - 1) / m_anInnerBlockSize[i];
+        nTotalBlocks *= static_cast<size_t>(anBlockMax[i] - anBlockMin[i] + 1);
+    }
+
+    if (nTotalBlocks <= 1)
+        return;  // single block — no batching benefit
+
+    CPLDebugOnly("ZARR", "PreloadShardedBlocks: %" PRIu64 " blocks to batch",
+                 static_cast<uint64_t>(nTotalBlocks));
+
+    // Enumerate all needed blocks, grouped by shard filename
+    struct BlockInfo
+    {
+        std::vector<uint64_t> anBlockIndices{};
+        std::vector<size_t> anStartIdx{};
+        std::vector<size_t> anCount{};
+    };
+
+    std::map<std::string, std::vector<BlockInfo>> oShardToBlocks;
+
+    // Iterate over all needed block indices
+    std::vector<uint64_t> anCur(nDims);
+    size_t dimIdx = 0;
+lbl_next:
+    if (dimIdx == nDims)
+    {
+        // Skip blocks already in cache
+        const std::vector<uint64_t> cacheKey(anCur.begin(), anCur.end());
+        if (m_oChunkCache.find(cacheKey) == m_oChunkCache.end())
+        {
+            // Compute shard filename and inner chunk start/count
+            std::vector<uint64_t> outerIdx(nDims);
+            BlockInfo info;
+            info.anBlockIndices = anCur;
+            info.anStartIdx.resize(nDims);
+            info.anCount.resize(nDims);
+            for (size_t i = 0; i < nDims; ++i)
+            {
+                outerIdx[i] =
+                    anCur[i] * m_anInnerBlockSize[i] / m_anOuterBlockSize[i];
+                info.anStartIdx[i] = static_cast<size_t>(
+                    (anCur[i] * m_anInnerBlockSize[i]) % m_anOuterBlockSize[i]);
+                info.anCount[i] = static_cast<size_t>(m_anInnerBlockSize[i]);
+            }
+
+            std::string osFilename = BuildChunkFilename(outerIdx.data());
+            oShardToBlocks[osFilename].push_back(std::move(info));
+        }
+    }
+    else
+    {
+        anCur[dimIdx] = anBlockMin[dimIdx];
+        while (true)
+        {
+            dimIdx++;
+            goto lbl_next;
+        lbl_return:
+            dimIdx--;
+            if (anCur[dimIdx] == anBlockMax[dimIdx])
+                break;
+            ++anCur[dimIdx];
+        }
+    }
+    if (dimIdx > 0)
+        goto lbl_return;
+
+    // For each shard with >1 uncached block, batch-read
+    const char *const apszOpenOptions[] = {"IGNORE_FILENAME_RESTRICTIONS=YES",
+                                           nullptr};
+
+    for (auto &[osFilename, aBlocks] : oShardToBlocks)
+    {
+        if (aBlocks.size() <= 1)
+            continue;
+
+        VSIVirtualHandleUniquePtr fp(
+            VSIFOpenEx2L(osFilename.c_str(), "rb", 0, apszOpenOptions));
+        if (!fp)
+            continue;
+
+        // Build request list
+        std::vector<std::pair<std::vector<size_t>, std::vector<size_t>>>
+            anRequests;
+        anRequests.reserve(aBlocks.size());
+        for (const auto &info : aBlocks)
+        {
+            anRequests.push_back({info.anStartIdx, info.anCount});
+        }
+
+        std::vector<ZarrByteVectorQuickResize> aResults;
+        if (!m_poCodecs->BatchDecodePartial(fp.get(), anRequests, aResults))
+            continue;
+
+        // Store results in block cache
+        const bool bNeedDecode = NeedDecodedBuffer();
+        for (size_t i = 0; i < aBlocks.size(); ++i)
+        {
+            if (aResults[i].empty())
+            {
+                CachedBlock cachedBlock;
+                m_oChunkCache[aBlocks[i].anBlockIndices] =
+                    std::move(cachedBlock);
+                continue;
+            }
+
+            CachedBlock cachedBlock;
+            if (bNeedDecode)
+            {
+                const size_t nSourceSize = m_aoDtypeElts.back().nativeOffset +
+                                           m_aoDtypeElts.back().nativeSize;
+                const auto nGDALDTSize = m_oType.GetSize();
+                const size_t nValues = aResults[i].size() / nSourceSize;
+                ZarrByteVectorQuickResize abyDecoded;
+                abyDecoded.resize(nValues * nGDALDTSize);
+                const GByte *pSrc = aResults[i].data();
+                GByte *pDst = abyDecoded.data();
+                for (size_t v = 0; v < nValues;
+                     v++, pSrc += nSourceSize, pDst += nGDALDTSize)
+                {
+                    DecodeSourceElt(m_aoDtypeElts, pSrc, pDst);
+                }
+                std::swap(cachedBlock.abyDecoded, abyDecoded);
+            }
+            else
+            {
+                std::swap(cachedBlock.abyDecoded, aResults[i]);
+            }
+            m_oChunkCache[aBlocks[i].anBlockIndices] = std::move(cachedBlock);
+        }
+    }
 }
 
 /************************************************************************/
@@ -842,7 +1018,7 @@ bool ZarrV3Array::FlushDirtyBlock() const
 }
 
 /************************************************************************/
-/*                         ZarrV3Array::IWrite()                        */
+/*                        ZarrV3Array::IWrite()                         */
 /************************************************************************/
 
 bool ZarrV3Array::IWrite(const GUInt64 *arrayStartIdx, const size_t *count,
@@ -862,7 +1038,7 @@ bool ZarrV3Array::IWrite(const GUInt64 *arrayStartIdx, const size_t *count,
 }
 
 /************************************************************************/
-/*                          BuildChunkFilename()                        */
+/*                         BuildChunkFilename()                         */
 /************************************************************************/
 
 std::string ZarrV3Array::BuildChunkFilename(const uint64_t *blockIndices) const
@@ -901,7 +1077,7 @@ std::string ZarrV3Array::GetDataDirectory() const
 }
 
 /************************************************************************/
-/*                       GetChunkIndicesFromFilename()                  */
+/*                    GetChunkIndicesFromFilename()                     */
 /************************************************************************/
 
 CPLStringList
@@ -927,7 +1103,7 @@ ZarrV3Array::GetChunkIndicesFromFilename(const char *pszFilename) const
 }
 
 /************************************************************************/
-/*                           ParseDtypeV3()                             */
+/*                            ParseDtypeV3()                            */
 /************************************************************************/
 
 static GDALExtendedDataType ParseDtypeV3(const CPLJSONObject &obj,
@@ -1035,7 +1211,7 @@ static GDALExtendedDataType ParseDtypeV3(const CPLJSONObject &obj,
 }
 
 /************************************************************************/
-/*                    ParseNoDataStringAsDouble()                       */
+/*                     ParseNoDataStringAsDouble()                      */
 /************************************************************************/
 
 static double ParseNoDataStringAsDouble(const std::string &osVal, bool &bOK)
@@ -1061,7 +1237,7 @@ static double ParseNoDataStringAsDouble(const std::string &osVal, bool &bOK)
 }
 
 /************************************************************************/
-/*                     ParseNoDataComponent()                           */
+/*                        ParseNoDataComponent()                        */
 /************************************************************************/
 
 template <typename T, typename Tint>
@@ -1104,7 +1280,7 @@ static T ParseNoDataComponent(const CPLJSONObject &oObj, bool &bOK)
 }
 
 /************************************************************************/
-/*                     ZarrV3Group::LoadArray()                         */
+/*                       ZarrV3Group::LoadArray()                       */
 /************************************************************************/
 
 std::shared_ptr<ZarrArray>
@@ -1613,8 +1789,8 @@ ZarrV3Group::LoadArray(const std::string &osArrayName,
         }
     }
 
-    auto poArray = ZarrV3Array::Create(m_poSharedResource, GetFullName(),
-                                       osArrayName, aoDims, oType, aoDtypeElts,
+    auto poArray = ZarrV3Array::Create(m_poSharedResource, Self(), osArrayName,
+                                       aoDims, oType, aoDtypeElts,
                                        anOuterBlockSize, anInnerBlockSize);
     if (!poArray)
         return nullptr;
@@ -1626,8 +1802,7 @@ ZarrV3Group::LoadArray(const std::string &osArrayName,
     {
         poArray->RegisterNoDataValue(abyNoData.data());
     }
-    poArray->ParseSpecialAttributes(m_pSelf.lock(), oAttributes);
-    poArray->SetAttributes(oAttributes);
+    poArray->SetAttributes(Self(), oAttributes);
     poArray->SetDtype(oDtype);
     if (oCodecs.Size() > 0 &&
         oCodecs[oCodecs.Size() - 1].GetString("name") != "bytes")
@@ -1659,7 +1834,7 @@ ZarrV3Group::LoadArray(const std::string &osArrayName,
 }
 
 /************************************************************************/
-/*                   ZarrV3Array::GetRawBlockInfoInfo()                 */
+/*                  ZarrV3Array::GetRawBlockInfoInfo()                  */
 /************************************************************************/
 
 CPLStringList ZarrV3Array::GetRawBlockInfoInfo() const
@@ -1735,7 +1910,7 @@ CPLStringList ZarrV3Array::GetRawBlockInfoInfo() const
 }
 
 /************************************************************************/
-/*                        ZarrV3Array::SetupCodecs()                    */
+/*                      ZarrV3Array::SetupCodecs()                      */
 /************************************************************************/
 
 /* static */ std::unique_ptr<ZarrV3CodecSequence> ZarrV3Array::SetupCodecs(
@@ -1789,7 +1964,7 @@ CPLStringList ZarrV3Array::GetRawBlockInfoInfo() const
 }
 
 /************************************************************************/
-/*                        ZarrV3Array::SetCodecs()                      */
+/*                       ZarrV3Array::SetCodecs()                       */
 /************************************************************************/
 
 void ZarrV3Array::SetCodecs(const CPLJSONArray &oJSONCodecs,
@@ -1797,4 +1972,434 @@ void ZarrV3Array::SetCodecs(const CPLJSONArray &oJSONCodecs,
 {
     m_oJSONCodecs = oJSONCodecs;
     m_poCodecs = std::move(poCodecs);
+}
+
+/************************************************************************/
+/*                     ZarrV3Array::LoadOverviews()                     */
+/************************************************************************/
+
+void ZarrV3Array::LoadOverviews() const
+{
+    if (m_bOverviewsLoaded)
+        return;
+    m_bOverviewsLoaded = true;
+
+    // Cf https://github.com/zarr-conventions/multiscales
+    // and https://github.com/zarr-conventions/spatial
+
+    const auto poRG = GetRootGroup();
+    if (!poRG)
+    {
+        CPLError(CE_Warning, CPLE_AppDefined,
+                 "LoadOverviews(): cannot access root group");
+        return;
+    }
+
+    auto poGroup = GetParentGroup();
+    if (!poGroup)
+    {
+        CPLDebugOnly(ZARR_DEBUG_KEY,
+                     "LoadOverviews(): cannot access parent group");
+        return;
+    }
+
+    // Look for "zarr_conventions" and "multiscales" attributes in our
+    // immediate parent, or in our grandparent if not found.
+    auto poAttrZarrConventions = poGroup->GetAttribute("zarr_conventions");
+    auto poAttrMultiscales = poGroup->GetAttribute("multiscales");
+    if (!poAttrZarrConventions || !poAttrMultiscales)
+    {
+        poGroup = poGroup->GetParentGroup();
+        if (poGroup)
+        {
+            poAttrZarrConventions = poGroup->GetAttribute("zarr_conventions");
+            poAttrMultiscales = poGroup->GetAttribute("multiscales");
+        }
+        if (!poAttrZarrConventions || !poAttrMultiscales)
+        {
+            return;
+        }
+    }
+
+    const char *pszZarrConventions = poAttrZarrConventions->ReadAsString();
+    const char *pszMultiscales = poAttrMultiscales->ReadAsString();
+    if (!pszZarrConventions || !pszMultiscales)
+        return;
+
+    CPLJSONDocument oDoc;
+    if (!oDoc.LoadMemory(pszZarrConventions))
+        return;
+    const auto oZarrConventions = oDoc.GetRoot();
+
+    if (!oDoc.LoadMemory(pszMultiscales))
+        return;
+    const auto oMultiscales = oDoc.GetRoot();
+
+    if (!oZarrConventions.IsValid() ||
+        oZarrConventions.GetType() != CPLJSONObject::Type::Array ||
+        !oMultiscales.IsValid() ||
+        oMultiscales.GetType() != CPLJSONObject::Type::Object)
+    {
+        return;
+    }
+
+    const auto oZarrConventionsArray = oZarrConventions.ToArray();
+    const auto hasMultiscalesUUIDLambda = [](const CPLJSONObject &obj)
+    {
+        constexpr const char *MULTISCALES_UUID =
+            "d35379db-88df-4056-af3a-620245f8e347";
+        return obj.GetString("uuid") == MULTISCALES_UUID;
+    };
+    const bool bFoundMultiScalesUUID =
+        std::find_if(oZarrConventionsArray.begin(), oZarrConventionsArray.end(),
+                     hasMultiscalesUUIDLambda) != oZarrConventionsArray.end();
+    if (!bFoundMultiScalesUUID)
+        return;
+
+    const auto hasSpatialUUIDLambda = [](const CPLJSONObject &obj)
+    {
+        constexpr const char *SPATIAL_UUID =
+            "689b58e2-cf7b-45e0-9fff-9cfc0883d6b4";
+        return obj.GetString("uuid") == SPATIAL_UUID;
+    };
+    const bool bFoundSpatialUUID =
+        std::find_if(oZarrConventionsArray.begin(), oZarrConventionsArray.end(),
+                     hasSpatialUUIDLambda) != oZarrConventionsArray.end();
+
+    const auto oLayout = oMultiscales["layout"];
+    if (!oLayout.IsValid() && oLayout.GetType() != CPLJSONObject::Type::Array)
+    {
+        CPLError(CE_Warning, CPLE_AppDefined,
+                 "layout not found in multiscales");
+        return;
+    }
+
+    // is pixel-is-area ?
+    auto poSpatialRegistration = poGroup->GetAttribute("spatial:registration");
+    const char *pszSpatialRegistration =
+        poSpatialRegistration ? poSpatialRegistration->ReadAsString() : nullptr;
+    const bool bHasExplicitPixelSpatialRegistration =
+        bFoundSpatialUUID && pszSpatialRegistration &&
+        strcmp(pszSpatialRegistration, "pixel") == 0;
+
+    std::vector<std::string> aosSpatialDimensions;
+    std::set<std::string> oSetSpatialDimensionNames;
+    auto poSpatialDimensions = poGroup->GetAttribute("spatial:dimensions");
+    if (bFoundSpatialUUID && poSpatialDimensions)
+    {
+        aosSpatialDimensions = poSpatialDimensions->ReadAsStringArray();
+        for (const auto &osDimName : aosSpatialDimensions)
+        {
+            oSetSpatialDimensionNames.insert(osDimName);
+        }
+    }
+
+    // Multiscales convention: asset/derived_from paths are relative to
+    // the group holding the convention metadata, not the store root.
+    const std::string osGroupPrefix = poGroup->GetFullName().back() == '/'
+                                          ? poGroup->GetFullName()
+                                          : poGroup->GetFullName() + '/';
+    const auto resolveAssetPath =
+        [&osGroupPrefix](const std::string &osRelative) -> std::string
+    { return osGroupPrefix + osRelative; };
+
+    for (const auto &oLayoutItem : oLayout.ToArray())
+    {
+        const std::string osAsset = oLayoutItem.GetString("asset");
+        if (osAsset.empty())
+        {
+            CPLError(CE_Warning, CPLE_AppDefined,
+                     "multiscales.layout[].asset not found");
+            continue;
+        }
+
+        // Resolve "asset" to a MDArray
+        std::shared_ptr<GDALGroup> poAssetGroup;
+        {
+            CPLErrorStateBackuper oBackuper(CPLQuietErrorHandler);
+            poAssetGroup =
+                poRG->OpenGroupFromFullname(resolveAssetPath(osAsset));
+        }
+        std::shared_ptr<GDALMDArray> poAssetArray;
+        if (poAssetGroup)
+        {
+            poAssetArray = poAssetGroup->OpenMDArray(GetName());
+        }
+        else if (osAsset.find('/') == std::string::npos)
+        {
+            poAssetArray = poGroup->OpenMDArray(osAsset);
+            if (!poAssetArray)
+            {
+                CPLError(CE_Warning, CPLE_AppDefined,
+                         "multiscales.layout[].asset=%s ignored, because it is "
+                         "not a valid group or array name",
+                         osAsset.c_str());
+                continue;
+            }
+        }
+        else
+        {
+            poAssetArray =
+                poRG->OpenMDArrayFromFullname(resolveAssetPath(osAsset));
+            if (poAssetArray && poAssetArray->GetName() != GetName())
+            {
+                continue;
+            }
+        }
+        if (!poAssetArray)
+        {
+            continue;
+        }
+        if (poAssetArray->GetDimensionCount() != GetDimensionCount())
+        {
+            CPLError(
+                CE_Warning, CPLE_AppDefined,
+                "multiscales.layout[].asset=%s (%s) ignored, because it  has "
+                "not the same dimension count as %s (%s)",
+                osAsset.c_str(), poAssetArray->GetFullName().c_str(),
+                GetName().c_str(), GetFullName().c_str());
+            continue;
+        }
+        if (poAssetArray->GetDataType() != GetDataType())
+        {
+            CPLError(
+                CE_Warning, CPLE_AppDefined,
+                "multiscales.layout[].asset=%s (%s) ignored, because it has "
+                "not the same data type as %s (%s)",
+                osAsset.c_str(), poAssetArray->GetFullName().c_str(),
+                GetName().c_str(), GetFullName().c_str());
+            continue;
+        }
+
+        bool bAssetIsDownsampledOfThis = false;
+        for (size_t iDim = 0; iDim < GetDimensionCount(); ++iDim)
+        {
+            if (poAssetArray->GetDimensions()[iDim]->GetSize() <
+                GetDimensions()[iDim]->GetSize())
+            {
+                bAssetIsDownsampledOfThis = true;
+                break;
+            }
+        }
+        if (!bAssetIsDownsampledOfThis)
+        {
+            // not an error
+            continue;
+        }
+
+        // Inspect dimensions of the asset
+        std::map<std::string, size_t> oMapAssetDimNameToIdx;
+        const auto &apoAssetDims = poAssetArray->GetDimensions();
+        size_t nCountSpatialDimsFoundInAsset = 0;
+        for (const auto &[idx, poDim] : cpl::enumerate(apoAssetDims))
+        {
+            oMapAssetDimNameToIdx[poDim->GetName()] = idx;
+            if (cpl::contains(oSetSpatialDimensionNames, poDim->GetName()))
+                ++nCountSpatialDimsFoundInAsset;
+        }
+        const bool bAssetHasAllSpatialDims =
+            (nCountSpatialDimsFoundInAsset == aosSpatialDimensions.size());
+
+        // Consistency checks on "derived_from" and "transform"
+        const auto oDerivedFrom = oLayoutItem["derived_from"];
+        const auto oTransform = oLayoutItem["transform"];
+        if (oDerivedFrom.IsValid() && oTransform.IsValid() &&
+            oDerivedFrom.GetType() == CPLJSONObject::Type::String &&
+            oTransform.GetType() == CPLJSONObject::Type::Object)
+        {
+            const std::string osDerivedFrom = oDerivedFrom.ToString();
+            // Resolve "derived_from" to a MDArray
+            std::shared_ptr<GDALGroup> poDerivedFromGroup;
+            {
+                CPLErrorStateBackuper oBackuper(CPLQuietErrorHandler);
+                poDerivedFromGroup = poRG->OpenGroupFromFullname(
+                    resolveAssetPath(osDerivedFrom));
+            }
+            std::shared_ptr<GDALMDArray> poDerivedFromArray;
+            if (poDerivedFromGroup)
+            {
+                poDerivedFromArray = poDerivedFromGroup->OpenMDArray(GetName());
+            }
+            else if (osDerivedFrom.find('/') == std::string::npos)
+            {
+                poDerivedFromArray = poGroup->OpenMDArray(osDerivedFrom);
+                if (!poDerivedFromArray)
+                {
+                    CPLError(CE_Warning, CPLE_AppDefined,
+                             "multiscales.layout[].asset=%s refers to "
+                             "derived_from=%s which does not exist",
+                             osAsset.c_str(), osDerivedFrom.c_str());
+                    poDerivedFromArray.reset();
+                }
+            }
+            else
+            {
+                poDerivedFromArray = poRG->OpenMDArrayFromFullname(
+                    resolveAssetPath(osDerivedFrom));
+            }
+            if (poDerivedFromArray && bAssetHasAllSpatialDims)
+            {
+                if (poDerivedFromArray->GetDimensionCount() !=
+                    GetDimensionCount())
+                {
+                    CPLError(CE_Warning, CPLE_AppDefined,
+                             "multiscales.layout[].asset=%s refers to "
+                             "derived_from=%s that does not have the expected "
+                             "number of dimensions. Ignoring that asset",
+                             osAsset.c_str(), osDerivedFrom.c_str());
+                    continue;
+                }
+
+                const auto oScale = oTransform["scale"];
+                if (oScale.GetType() == CPLJSONObject::Type::Array &&
+                    bHasExplicitPixelSpatialRegistration)
+                {
+                    const auto oScaleArray = oScale.ToArray();
+                    if (oScaleArray.size() != GetDimensionCount())
+                    {
+
+                        CPLError(CE_Warning, CPLE_AppDefined,
+                                 "multiscales.layout[].asset=%s has a "
+                                 "transform.scale array with an unexpected "
+                                 "number of values. Ignoring the asset",
+                                 osAsset.c_str());
+                        continue;
+                    }
+
+                    for (size_t iDim = 0; iDim < GetDimensionCount(); ++iDim)
+                    {
+                        const double dfScale = oScaleArray[iDim].ToDouble();
+                        const double dfExpectedScale =
+                            static_cast<double>(
+                                poDerivedFromArray->GetDimensions()[iDim]
+                                    ->GetSize()) /
+                            static_cast<double>(
+                                poAssetArray->GetDimensions()[iDim]->GetSize());
+                        constexpr double EPSILON = 1e-3;
+                        if (std::fabs(dfScale - dfExpectedScale) >
+                            EPSILON * dfExpectedScale)
+                        {
+                            CPLError(CE_Warning, CPLE_AppDefined,
+                                     "multiscales.layout[].asset=%s has a "
+                                     "transform.scale[%d]=%f value whereas %f "
+                                     "was expected. "
+                                     "Assuming that later value as the scale.",
+                                     osAsset.c_str(), static_cast<int>(iDim),
+                                     dfScale, dfExpectedScale);
+                        }
+                    }
+                }
+
+                const auto oTranslation = oTransform["translation"];
+                if (oTranslation.GetType() == CPLJSONObject::Type::Array &&
+                    bHasExplicitPixelSpatialRegistration)
+                {
+                    const auto oTranslationArray = oTranslation.ToArray();
+                    if (oTranslationArray.size() != GetDimensionCount())
+                    {
+                        CPLError(CE_Warning, CPLE_AppDefined,
+                                 "multiscales.layout[].asset=%s has a "
+                                 "transform.translation array with an "
+                                 "unexpected number of values. "
+                                 "Ignoring the asset",
+                                 osAsset.c_str());
+                        continue;
+                    }
+
+                    for (size_t iDim = 0; iDim < GetDimensionCount(); ++iDim)
+                    {
+                        const double dfOffset =
+                            oTranslationArray[iDim].ToDouble();
+                        if (dfOffset != 0)
+                        {
+                            CPLError(CE_Warning, CPLE_AppDefined,
+                                     "multiscales.layout[].asset=%s has a "
+                                     "transform.translation[%d]=%f value. "
+                                     "Ignoring that offset.",
+                                     osAsset.c_str(), static_cast<int>(iDim),
+                                     dfOffset);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (bFoundSpatialUUID && bAssetHasAllSpatialDims)
+        {
+            const auto oSpatialShape = oLayoutItem["spatial:shape"];
+            if (oSpatialShape.IsValid())
+            {
+                if (oSpatialShape.GetType() != CPLJSONObject::Type::Array)
+                {
+                    CPLError(
+                        CE_Warning, CPLE_AppDefined,
+                        "multiscales.layout[].asset=%s ignored, because its "
+                        "spatial:shape property is not an array",
+                        osAsset.c_str());
+                    continue;
+                }
+                const auto oSpatialShapeArray = oSpatialShape.ToArray();
+                if (oSpatialShapeArray.size() != aosSpatialDimensions.size())
+                {
+                    CPLError(
+                        CE_Warning, CPLE_AppDefined,
+                        "multiscales.layout[].asset=%s ignored, because its "
+                        "spatial:shape property has not the expected number "
+                        "of values",
+                        osAsset.c_str());
+                    continue;
+                }
+
+                bool bSkip = false;
+                for (const auto &[idx, oShapeVal] :
+                     cpl::enumerate(oSpatialShapeArray))
+                {
+                    const auto oIter =
+                        oMapAssetDimNameToIdx.find(aosSpatialDimensions[idx]);
+                    if (oIter != oMapAssetDimNameToIdx.end())
+                    {
+                        const auto poDim = apoAssetDims[oIter->second];
+                        if (poDim->GetSize() !=
+                            static_cast<uint64_t>(oShapeVal.ToLong()))
+                        {
+                            bSkip = true;
+                            CPLError(CE_Warning, CPLE_AppDefined,
+                                     "multiscales.layout[].asset=%s ignored, "
+                                     "because its "
+                                     "spatial:shape[%d] value is %" PRIu64
+                                     " whereas %" PRIu64 " was expected.",
+                                     osAsset.c_str(), static_cast<int>(idx),
+                                     static_cast<uint64_t>(oShapeVal.ToLong()),
+                                     static_cast<uint64_t>(poDim->GetSize()));
+                        }
+                    }
+                }
+                if (bSkip)
+                    continue;
+            }
+        }
+
+        m_apoOverviews.push_back(std::move(poAssetArray));
+    }
+}
+
+/************************************************************************/
+/*                   ZarrV3Array::GetOverviewCount()                    */
+/************************************************************************/
+
+int ZarrV3Array::GetOverviewCount() const
+{
+    LoadOverviews();
+    return static_cast<int>(m_apoOverviews.size());
+}
+
+/************************************************************************/
+/*                      ZarrV3Array::GetOverview()                      */
+/************************************************************************/
+
+std::shared_ptr<GDALMDArray> ZarrV3Array::GetOverview(int idx) const
+{
+    if (idx < 0 || idx >= GetOverviewCount())
+        return nullptr;
+    return m_apoOverviews[idx];
 }

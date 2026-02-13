@@ -31,6 +31,7 @@
 #include "gdalalg_raster_footprint.h"
 #include "gdalalg_raster_polygonize.h"
 #include "gdalalg_raster_info.h"
+#include "gdalalg_raster_pixel_info.h"
 #include "gdalalg_raster_tile.h"
 #include "gdalalg_vector_grid.h"
 #include "gdalalg_vector_info.h"
@@ -56,16 +57,13 @@ GDALPipelineStepAlgorithm::GDALPipelineStepAlgorithm(
 }
 
 /************************************************************************/
-/*       GDALPipelineStepAlgorithm::AddRasterHiddenInputDatasetArg()    */
+/*     GDALPipelineStepAlgorithm::AddRasterHiddenInputDatasetArg()      */
 /************************************************************************/
 
 void GDALPipelineStepAlgorithm::AddRasterHiddenInputDatasetArg()
 {
-    // Added so that "band" argument validation works, because
-    // GDALAlgorithm must be able to retrieve the input dataset
-    AddInputDatasetArg(&m_inputDataset, GDAL_OF_RASTER,
-                       /* positionalAndRequired = */ false)
-        .SetMinCount(1)
+    AddInputDatasetArg(&m_inputDataset, GDAL_OF_RASTER, false)
+        .SetMinCount(0)
         .SetMaxCount(m_constructorOptions.inputDatasetMaxCount)
         .SetAutoOpenDataset(m_constructorOptions.autoOpenInputDatasets)
         .SetMetaVar(m_constructorOptions.inputDatasetMetaVar)
@@ -73,7 +71,7 @@ void GDALPipelineStepAlgorithm::AddRasterHiddenInputDatasetArg()
 }
 
 /************************************************************************/
-/*             GDALPipelineStepAlgorithm::AddRasterInputArgs()          */
+/*           GDALPipelineStepAlgorithm::AddRasterInputArgs()            */
 /************************************************************************/
 
 void GDALPipelineStepAlgorithm::AddRasterInputArgs(
@@ -92,19 +90,22 @@ void GDALPipelineStepAlgorithm::AddRasterInputArgs(
             &m_inputDataset,
             openForMixedRasterVector ? (GDAL_OF_RASTER | GDAL_OF_VECTOR)
                                      : GDAL_OF_RASTER,
-            m_constructorOptions.inputDatasetRequired && !hiddenForCLI,
-            m_constructorOptions.inputDatasetHelpMsg.c_str())
-            .SetMinCount(1)
+            false, m_constructorOptions.inputDatasetHelpMsg.c_str())
+            .SetMinCount(m_constructorOptions.inputDatasetRequired ? 1 : 0)
             .SetMaxCount(m_constructorOptions.inputDatasetMaxCount)
             .SetAutoOpenDataset(m_constructorOptions.autoOpenInputDatasets)
             .SetMetaVar(m_constructorOptions.inputDatasetMetaVar)
             .SetHiddenForCLI(hiddenForCLI);
+    if (m_constructorOptions.inputDatasetPositional && !hiddenForCLI)
+        arg.SetPositional();
+    if (m_constructorOptions.inputDatasetRequired && !hiddenForCLI)
+        arg.SetRequired();
     if (!m_constructorOptions.inputDatasetAlias.empty())
         arg.AddAlias(m_constructorOptions.inputDatasetAlias);
 }
 
 /************************************************************************/
-/*             GDALPipelineStepAlgorithm::AddRasterOutputArgs()         */
+/*           GDALPipelineStepAlgorithm::AddRasterOutputArgs()           */
 /************************************************************************/
 
 void GDALPipelineStepAlgorithm::AddRasterOutputArgs(bool hiddenForCLI)
@@ -136,7 +137,21 @@ void GDALPipelineStepAlgorithm::AddRasterOutputArgs(bool hiddenForCLI)
 }
 
 /************************************************************************/
-/*             GDALPipelineStepAlgorithm::AddVectorInputArgs()         */
+/*     GDALPipelineStepAlgorithm::AddVectorHiddenInputDatasetArg()      */
+/************************************************************************/
+
+void GDALPipelineStepAlgorithm::AddVectorHiddenInputDatasetArg()
+{
+    AddInputDatasetArg(&m_inputDataset, GDAL_OF_VECTOR, false)
+        .SetMinCount(0)
+        .SetMaxCount(m_constructorOptions.inputDatasetMaxCount)
+        .SetAutoOpenDataset(m_constructorOptions.autoOpenInputDatasets)
+        .SetMetaVar(m_constructorOptions.inputDatasetMetaVar)
+        .SetHidden();
+}
+
+/************************************************************************/
+/*           GDALPipelineStepAlgorithm::AddVectorInputArgs()            */
 /************************************************************************/
 
 void GDALPipelineStepAlgorithm::AddVectorInputArgs(bool hiddenForCLI)
@@ -146,12 +161,15 @@ void GDALPipelineStepAlgorithm::AddVectorInputArgs(bool hiddenForCLI)
         .SetHiddenForCLI(hiddenForCLI);
     AddOpenOptionsArg(&m_openOptions).SetHiddenForCLI(hiddenForCLI);
     auto &datasetArg =
-        AddInputDatasetArg(&m_inputDataset, GDAL_OF_VECTOR,
-                           /* positionalAndRequired = */ !hiddenForCLI)
-            .SetMinCount(1)
+        AddInputDatasetArg(&m_inputDataset, GDAL_OF_VECTOR, false)
+            .SetMinCount(m_constructorOptions.inputDatasetRequired ? 1 : 0)
             .SetMaxCount(m_constructorOptions.inputDatasetMaxCount)
             .SetAutoOpenDataset(m_constructorOptions.autoOpenInputDatasets)
             .SetHiddenForCLI(hiddenForCLI);
+    if (m_constructorOptions.inputDatasetPositional && !hiddenForCLI)
+        datasetArg.SetPositional();
+    if (m_constructorOptions.inputDatasetRequired && !hiddenForCLI)
+        datasetArg.SetRequired();
     if (m_constructorOptions.addInputLayerNameArgument)
     {
         auto &layerArg = AddArg(GDAL_ARG_NAME_INPUT_LAYER, 'l',
@@ -163,7 +181,7 @@ void GDALPipelineStepAlgorithm::AddVectorInputArgs(bool hiddenForCLI)
 }
 
 /************************************************************************/
-/*             GDALPipelineStepAlgorithm::AddVectorOutputArgs()         */
+/*           GDALPipelineStepAlgorithm::AddVectorOutputArgs()           */
 /************************************************************************/
 
 void GDALPipelineStepAlgorithm::AddVectorOutputArgs(
@@ -221,11 +239,7 @@ void GDALPipelineStepAlgorithm::AddVectorOutputArgs(
     }
     if (m_constructorOptions.addOutputLayerNameArgument)
     {
-        AddArg(GDAL_ARG_NAME_OUTPUT_LAYER,
-               shortNameOutputLayerAllowed ? 'l' : 0, _("Output layer name"),
-               &m_outputLayerName)
-            .AddHiddenAlias("nln")  // For ogr2ogr nostalgic people
-            .SetHiddenForCLI(hiddenForCLI);
+        AddOutputLayerNameArg(hiddenForCLI, shortNameOutputLayerAllowed);
     }
     if (m_constructorOptions.addSkipErrorsArgument)
     {
@@ -233,6 +247,20 @@ void GDALPipelineStepAlgorithm::AddVectorOutputArgs(
                &m_skipErrors)
             .AddHiddenAlias("skip-failures");  // For ogr2ogr nostalgic people
     }
+}
+
+/************************************************************************/
+/*          GDALPipelineStepAlgorithm::AddOutputLayerNameArg()          */
+/************************************************************************/
+
+void GDALPipelineStepAlgorithm::AddOutputLayerNameArg(
+    bool hiddenForCLI, bool shortNameOutputLayerAllowed)
+{
+    AddArg(GDAL_ARG_NAME_OUTPUT_LAYER, shortNameOutputLayerAllowed ? 'l' : 0,
+           _("Output layer name"),
+           &m_outputLayerName)
+        .AddHiddenAlias("nln")  // For ogr2ogr nostalgic people
+        .SetHiddenForCLI(hiddenForCLI);
 }
 
 /************************************************************************/
@@ -352,10 +380,13 @@ bool GDALPipelineStepAlgorithm::RunImpl(GDALProgressFunc pfnProgress,
                 else
                 {
                     writeAlg->m_outputVRTCompatible = m_outputVRTCompatible;
-                    writeAlg->m_inputDataset.clear();
-                    writeAlg->m_inputDataset.resize(1);
-                    writeAlg->m_inputDataset[0].Set(
-                        m_outputDataset.GetDatasetRef());
+
+                    std::vector<GDALArgDatasetValue> inputDataset(1);
+                    inputDataset[0].Set(m_outputDataset.GetDatasetRef());
+                    auto inputArg = writeAlg->GetArg(GDAL_ARG_NAME_INPUT);
+                    CPLAssert(inputArg);
+                    inputArg->Set(std::move(inputDataset));
+
                     if (pfnProgress)
                     {
                         pScaledData.reset(GDALCreateScaledProgress(
@@ -408,7 +439,7 @@ void GDALPipelineStepAlgorithm::SetInputDataset(GDALDataset *poDS)
 }
 
 /************************************************************************/
-/*                          ProcessGDALGOutput()                        */
+/*                         ProcessGDALGOutput()                         */
 /************************************************************************/
 
 GDALAlgorithm::ProcessGDALGOutputRet
@@ -427,7 +458,7 @@ GDALPipelineStepAlgorithm::ProcessGDALGOutput()
 }
 
 /************************************************************************/
-/*          GDALPipelineStepAlgorithm::CheckSafeForStreamOutput()       */
+/*        GDALPipelineStepAlgorithm::CheckSafeForStreamOutput()         */
 /************************************************************************/
 
 bool GDALPipelineStepAlgorithm::CheckSafeForStreamOutput()
@@ -446,7 +477,7 @@ bool GDALPipelineStepAlgorithm::CheckSafeForStreamOutput()
 }
 
 /************************************************************************/
-/*                 GDALPipelineStepAlgorithm::Finalize()                */
+/*                GDALPipelineStepAlgorithm::Finalize()                 */
 /************************************************************************/
 
 bool GDALPipelineStepAlgorithm::Finalize()
@@ -461,7 +492,7 @@ bool GDALPipelineStepAlgorithm::Finalize()
 GDALAlgorithmStepRegistry::~GDALAlgorithmStepRegistry() = default;
 
 /************************************************************************/
-/*                       GDALPipelineAlgorithm                          */
+/*                        GDALPipelineAlgorithm                         */
 /************************************************************************/
 
 GDALPipelineAlgorithm::GDALPipelineAlgorithm()
@@ -498,6 +529,7 @@ GDALPipelineAlgorithm::GDALPipelineAlgorithm()
     m_stepRegistry.Register<GDALRasterAsFeaturesAlgorithm>();
     m_stepRegistry.Register<GDALRasterContourAlgorithm>();
     m_stepRegistry.Register<GDALRasterFootprintAlgorithm>();
+    m_stepRegistry.Register<GDALRasterPixelInfoAlgorithm>();
     m_stepRegistry.Register<GDALRasterPolygonizeAlgorithm>();
     m_stepRegistry.Register<GDALRasterZonalStatsAlgorithm>();
     m_stepRegistry.Register<GDALVectorGridAlgorithm>();

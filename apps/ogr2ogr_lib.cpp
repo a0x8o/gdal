@@ -48,6 +48,7 @@
 #include "gdal_alg.h"
 #include "gdal_alg_priv.h"
 #include "gdal_priv.h"
+#include "gdal_thread_pool.h"
 #include "ogr_api.h"
 #include "ogr_core.h"
 #include "ogr_feature.h"
@@ -87,7 +88,7 @@ typedef enum
 #define TZ_OFFSET_INVALID INT_MIN
 
 /************************************************************************/
-/*                        GDALVectorTranslateOptions                    */
+/*                      GDALVectorTranslateOptions                      */
 /************************************************************************/
 
 /** Options for use with GDALVectorTranslate(). GDALVectorTranslateOptions* must
@@ -422,8 +423,8 @@ struct GDALVectorTranslateOptions
     /*! set to true to prevent overwriting existing dataset */
     bool bNoOverwrite = false;
 
-    /*! set to true to prevent if called from "gdal vector convert" */
-    bool bInvokedFromGdalVectorConvert = false;
+    /*! set to true to customize error messages when called from "new" (GDAL 3.11) CLI or Algorithm API */
+    bool bInvokedFromGdalAlgorithm = false;
 };
 
 struct TargetLayerInfo
@@ -640,7 +641,7 @@ static OGRLayer *GetLayerAndOverwriteIfNecessary(GDALDataset *poDstDS,
                                                  bool *pbAddOverwriteLCO);
 
 /************************************************************************/
-/*                           LoadGeometry()                             */
+/*                            LoadGeometry()                            */
 /************************************************************************/
 
 static std::unique_ptr<OGRGeometry> LoadGeometry(const std::string &osDS,
@@ -744,7 +745,7 @@ static std::unique_ptr<OGRGeometry> LoadGeometry(const std::string &osDS,
 }
 
 /************************************************************************/
-/*                     OGRSplitListFieldLayer                           */
+/*                        OGRSplitListFieldLayer                        */
 /************************************************************************/
 
 class OGRSplitListFieldLayer : public OGRLayer
@@ -820,7 +821,7 @@ class OGRSplitListFieldLayer : public OGRLayer
 };
 
 /************************************************************************/
-/*                    OGRSplitListFieldLayer()                          */
+/*                       OGRSplitListFieldLayer()                       */
 /************************************************************************/
 
 OGRSplitListFieldLayer::OGRSplitListFieldLayer(OGRLayer *poSrcLayerIn,
@@ -832,7 +833,7 @@ OGRSplitListFieldLayer::OGRSplitListFieldLayer(OGRLayer *poSrcLayerIn,
 }
 
 /************************************************************************/
-/*                   ~OGRSplitListFieldLayer()                          */
+/*                      ~OGRSplitListFieldLayer()                       */
 /************************************************************************/
 
 OGRSplitListFieldLayer::~OGRSplitListFieldLayer()
@@ -842,7 +843,7 @@ OGRSplitListFieldLayer::~OGRSplitListFieldLayer()
 }
 
 /************************************************************************/
-/*                       BuildLayerDefn()                               */
+/*                           BuildLayerDefn()                           */
 /************************************************************************/
 
 bool OGRSplitListFieldLayer::BuildLayerDefn(GDALProgressFunc pfnProgress,
@@ -995,7 +996,7 @@ bool OGRSplitListFieldLayer::BuildLayerDefn(GDALProgressFunc pfnProgress,
 }
 
 /************************************************************************/
-/*                       TranslateFeature()                             */
+/*                          TranslateFeature()                          */
 /************************************************************************/
 
 std::unique_ptr<OGRFeature> OGRSplitListFieldLayer::TranslateFeature(
@@ -1083,7 +1084,7 @@ std::unique_ptr<OGRFeature> OGRSplitListFieldLayer::TranslateFeature(
 }
 
 /************************************************************************/
-/*                       GetNextFeature()                               */
+/*                           GetNextFeature()                           */
 /************************************************************************/
 
 OGRFeature *OGRSplitListFieldLayer::GetNextFeature()
@@ -1094,7 +1095,7 @@ OGRFeature *OGRSplitListFieldLayer::GetNextFeature()
 }
 
 /************************************************************************/
-/*                           GetFeature()                               */
+/*                             GetFeature()                             */
 /************************************************************************/
 
 OGRFeature *OGRSplitListFieldLayer::GetFeature(GIntBig nFID)
@@ -1105,7 +1106,7 @@ OGRFeature *OGRSplitListFieldLayer::GetFeature(GIntBig nFID)
 }
 
 /************************************************************************/
-/*                        GetLayerDefn()                                */
+/*                            GetLayerDefn()                            */
 /************************************************************************/
 
 const OGRFeatureDefn *OGRSplitListFieldLayer::GetLayerDefn() const
@@ -1215,7 +1216,7 @@ GCPCoordTransformation::~GCPCoordTransformation()
 }
 
 /************************************************************************/
-/*                            CompositeCT                               */
+/*                             CompositeCT                              */
 /************************************************************************/
 
 class CompositeCT final : public OGRCoordinateTransformation
@@ -1367,7 +1368,7 @@ class CompositeCT final : public OGRCoordinateTransformation
 CompositeCT::~CompositeCT() = default;
 
 /************************************************************************/
-/*                    AxisMappingCoordinateTransformation               */
+/*                 AxisMappingCoordinateTransformation                  */
 /************************************************************************/
 
 class AxisMappingCoordinateTransformation : public OGRCoordinateTransformation
@@ -1465,7 +1466,7 @@ AxisMappingCoordinateTransformation::~AxisMappingCoordinateTransformation() =
     default;
 
 /************************************************************************/
-/*                        ApplySpatialFilter()                          */
+/*                         ApplySpatialFilter()                         */
 /************************************************************************/
 
 static void ApplySpatialFilter(OGRLayer *poLayer, OGRGeometry *poSpatialFilter,
@@ -1574,7 +1575,7 @@ static int GetFieldType(const char *pszArg, int *pnSubFieldType)
 }
 
 /************************************************************************/
-/*                           IsFieldType()                              */
+/*                            IsFieldType()                             */
 /************************************************************************/
 
 static bool IsFieldType(const char *pszArg)
@@ -1866,7 +1867,7 @@ void GDALVectorTranslateWrappedDataset::ReleaseResultSet(OGRLayer *poResultsSet)
 }
 
 /************************************************************************/
-/*                     OGR2OGRSpatialReferenceHolder                    */
+/*                    OGR2OGRSpatialReferenceHolder                     */
 /************************************************************************/
 
 class OGR2OGRSpatialReferenceHolder
@@ -1897,7 +1898,7 @@ class OGR2OGRSpatialReferenceHolder
 };
 
 /************************************************************************/
-/*                     GDALVectorTranslateCreateCopy()                  */
+/*                   GDALVectorTranslateCreateCopy()                    */
 /************************************************************************/
 
 static GDALDataset *
@@ -2247,7 +2248,7 @@ GDALVectorTranslateCreateCopy(GDALDriver *poDriver, const char *pszDest,
 }
 
 /************************************************************************/
-/*                           CopyRelationships()                        */
+/*                         CopyRelationships()                          */
 /************************************************************************/
 
 static void CopyRelationships(GDALDataset *poODS, GDALDataset *poDS)
@@ -2329,7 +2330,7 @@ static void CopyRelationships(GDALDataset *poODS, GDALDataset *poDS)
 }
 
 /************************************************************************/
-/*                           GDALVectorTranslate()                      */
+/*                        GDALVectorTranslate()                         */
 /************************************************************************/
 /**
  * Converts vector data between file formats.
@@ -2636,10 +2637,21 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
         }
         if (bError)
         {
-            CPLError(CE_Failure, CPLE_IllegalArg,
-                     "-nln name must be specified combined with "
-                     "a single source layer name,\nor a -sql statement, and "
-                     "name must be different from an existing layer.");
+            if (psOptions->bInvokedFromGdalAlgorithm)
+            {
+                CPLError(CE_Failure, CPLE_IllegalArg,
+                         "--output-layer name must be specified combined with "
+                         "a single source layer name and it "
+                         "must be different from an existing layer.");
+            }
+            else
+            {
+                CPLError(
+                    CE_Failure, CPLE_IllegalArg,
+                    "-nln name must be specified combined with "
+                    "a single source layer name,\nor a -sql statement, and "
+                    "name must be different from an existing layer.");
+            }
             return nullptr;
         }
     }
@@ -2753,7 +2765,7 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
             if (aoDrivers.empty())
             {
                 if (CPLGetExtensionSafe(pszDest).empty() &&
-                    !psOptions->bInvokedFromGdalVectorConvert)
+                    !psOptions->bInvokedFromGdalAlgorithm)
                 {
                     psOptions->osFormat = "ESRI Shapefile";
                 }
@@ -2832,23 +2844,28 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
                      "-doo ignored when creating the output datasource.");
         }
 
-        /* --------------------------------------------------------------------
-         */
-        /*      Special case to improve user experience when translating */
-        /*      a datasource with multiple layers into a shapefile. If the */
-        /*      user gives a target datasource with .shp and it does not exist,
-         */
-        /*      the shapefile driver will try to create a file, but this is not
-         */
-        /*      appropriate because here we have several layers, so create */
-        /*      a directory instead. */
-        /* --------------------------------------------------------------------
-         */
-
         const bool bSingleLayer =
             (!psOptions->osSQLStatement.empty() ||
              psOptions->aosLayers.size() == 1 ||
              (psOptions->aosLayers.empty() && poDS->GetLayerCount() == 1));
+
+        bool bOutputDirectory = false;
+        if (!bSingleLayer && CPLGetExtensionSafe(osDestFilename).empty() &&
+            (EQUAL(poDriver->GetDescription(), "CSV") ||
+             EQUAL(poDriver->GetDescription(), "ESRI Shapefile") ||
+             EQUAL(poDriver->GetDescription(), "MapInfo File")))
+        {
+            bOutputDirectory = true;
+        }
+
+        /* ------------------------------------------------------------------ */
+        /*   Special case to improve user experience when translating         */
+        /*   a datasource with multiple layers into a shapefile. If the       */
+        /*   user gives a target datasource with .shp and it does not exist,  */
+        /*   the shapefile driver will try to create a file, but this is not  */
+        /*   appropriate because here we have several layers, so create       */
+        /*   a directory instead.                                             */
+        /* ------------------------------------------------------------------ */
 
         VSIStatBufL sStat;
         if (EQUAL(poDriver->GetDescription(), "ESRI Shapefile") &&
@@ -2864,6 +2881,7 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
                          osDestFilename.c_str());
                 return nullptr;
             }
+            bOutputDirectory = true;
         }
 
         CPLStringList aosDSCO(psOptions->aosDSCO);
@@ -2895,6 +2913,18 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
             return nullptr;
         }
         bNewDataSource = true;
+
+        if (psOptions->bInvokedFromGdalAlgorithm && !bSingleLayer &&
+            !bOutputDirectory &&
+            (!poODS->TestCapability(ODsCCreateLayer) ||
+             !poDriver->GetMetadataItem(GDAL_DCAP_MULTIPLE_VECTOR_LAYERS)))
+        {
+            poDriver->Delete(osDestFilename);
+            CPLError(CE_Failure, CPLE_AppDefined,
+                     "%s driver does not support multiple layers.",
+                     poDriver->GetDescription());
+            return nullptr;
+        }
 
         if (psOptions->bCopyMD)
         {
@@ -3180,7 +3210,7 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
                 }
                 else if (!poResultSet->TestCapability(OLCFastFeatureCount))
                 {
-                    if (!psOptions->bInvokedFromGdalVectorConvert)
+                    if (!psOptions->bInvokedFromGdalAlgorithm)
                     {
                         CPLError(
                             CE_Warning, CPLE_AppDefined,
@@ -3470,12 +3500,24 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
                                             nullptr, psOptions.get())) &&
                     !psOptions->bSkipFailures)
                 {
-                    CPLError(
-                        CE_Failure, CPLE_AppDefined,
-                        "Terminating translation prematurely after failed\n"
-                        "translation of layer %s (use -skipfailures to skip "
-                        "errors)",
-                        poFeatureLayer->GetName());
+                    if (psOptions->bInvokedFromGdalAlgorithm)
+                    {
+                        CPLError(
+                            CE_Failure, CPLE_AppDefined,
+                            "Failed to write layer '%s'. Use --skip-errors to "
+                            "ignore errors and continue writing.",
+                            poFeatureLayer->GetName());
+                    }
+                    else
+                    {
+                        CPLError(
+                            CE_Failure, CPLE_AppDefined,
+                            "Terminating translation prematurely after failed\n"
+                            "translation of layer %s (use -skipfailures to "
+                            "skip "
+                            "errors)",
+                            poFeatureLayer->GetName());
+                    }
 
                     nRetCode = 1;
                     break;
@@ -3634,7 +3676,7 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
             {
                 if (!poLayer->TestCapability(OLCFastFeatureCount))
                 {
-                    if (!psOptions->bInvokedFromGdalVectorConvert)
+                    if (!psOptions->bInvokedFromGdalAlgorithm)
                     {
                         CPLError(
                             CE_Warning, CPLE_NotSupported,
@@ -3743,11 +3785,22 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
                                         pProgressArg.get(), psOptions.get())) &&
                 !psOptions->bSkipFailures)
             {
-                CPLError(CE_Failure, CPLE_AppDefined,
-                         "Terminating translation prematurely after failed\n"
-                         "translation of layer %s (use -skipfailures to skip "
-                         "errors)",
-                         poLayer->GetName());
+                if (psOptions->bInvokedFromGdalAlgorithm)
+                {
+                    CPLError(CE_Failure, CPLE_AppDefined,
+                             "Failed to write layer '%s'. Use --skip-errors to "
+                             "ignore errors and continue writing.",
+                             poLayer->GetName());
+                }
+                else
+                {
+                    CPLError(
+                        CE_Failure, CPLE_AppDefined,
+                        "Terminating translation prematurely after failed\n"
+                        "translation of layer %s (use -skipfailures to skip "
+                        "errors)",
+                        poLayer->GetName());
+                }
 
                 nRetCode = 1;
             }
@@ -3800,7 +3853,7 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
 }
 
 /************************************************************************/
-/*                               SetZ()                                 */
+/*                                SetZ()                                */
 /************************************************************************/
 
 namespace
@@ -3833,7 +3886,7 @@ static void SetZ(OGRGeometry *poGeom, double dfZ)
 }
 
 /************************************************************************/
-/*                       ForceCoordDimension()                          */
+/*                        ForceCoordDimension()                         */
 /************************************************************************/
 
 static int ForceCoordDimension(int eGType, int nCoordDim)
@@ -3852,7 +3905,7 @@ static int ForceCoordDimension(int eGType, int nCoordDim)
 }
 
 /************************************************************************/
-/*                   GetLayerAndOverwriteIfNecessary()                  */
+/*                  GetLayerAndOverwriteIfNecessary()                   */
 /************************************************************************/
 
 static OGRLayer *GetLayerAndOverwriteIfNecessary(GDALDataset *poDstDS,
@@ -3934,7 +3987,7 @@ static OGRLayer *GetLayerAndOverwriteIfNecessary(GDALDataset *poDstDS,
 }
 
 /************************************************************************/
-/*                          ConvertType()                               */
+/*                            ConvertType()                             */
 /************************************************************************/
 
 static OGRwkbGeometryType ConvertType(GeomTypeConversion eGeomTypeConversion,
@@ -3969,7 +4022,7 @@ static OGRwkbGeometryType ConvertType(GeomTypeConversion eGeomTypeConversion,
 }
 
 /************************************************************************/
-/*                        DoFieldTypeConversion()                       */
+/*                       DoFieldTypeConversion()                        */
 /************************************************************************/
 
 static void DoFieldTypeConversion(GDALDataset *poDstDS,
@@ -4127,7 +4180,7 @@ static void DoFieldTypeConversion(GDALDataset *poDstDS,
 }
 
 /************************************************************************/
-/*                        GetArrowGeomFieldIndex()                      */
+/*                       GetArrowGeomFieldIndex()                       */
 /************************************************************************/
 
 static int GetArrowGeomFieldIndex(const struct ArrowSchema *psLayerSchema,
@@ -4168,7 +4221,7 @@ static int GetArrowGeomFieldIndex(const struct ArrowSchema *psLayerSchema,
 }
 
 /************************************************************************/
-/*                        BuildGetArrowStreamOptions()                  */
+/*                     BuildGetArrowStreamOptions()                     */
 /************************************************************************/
 
 static CPLStringList
@@ -4226,7 +4279,7 @@ BuildGetArrowStreamOptions(OGRLayer *poSrcLayer, OGRLayer *poDstLayer,
 }
 
 /************************************************************************/
-/*                 SetupTargetLayer::CanUseWriteArrowBatch()            */
+/*              SetupTargetLayer::CanUseWriteArrowBatch()               */
 /************************************************************************/
 
 bool SetupTargetLayer::CanUseWriteArrowBatch(
@@ -4437,7 +4490,7 @@ bool SetupTargetLayer::CanUseWriteArrowBatch(
 }
 
 /************************************************************************/
-/*              SetupTargetLayer::SetIgnoredFields()                    */
+/*                 SetupTargetLayer::SetIgnoredFields()                 */
 /************************************************************************/
 
 void SetupTargetLayer::SetIgnoredFields(OGRLayer *poSrcLayer)
@@ -4486,7 +4539,7 @@ void SetupTargetLayer::SetIgnoredFields(OGRLayer *poSrcLayer)
 }
 
 /************************************************************************/
-/*                   SetupTargetLayer::Setup()                          */
+/*                      SetupTargetLayer::Setup()                       */
 /************************************************************************/
 
 std::unique_ptr<TargetLayerInfo>
@@ -5187,7 +5240,7 @@ SetupTargetLayer::Setup(OGRLayer *poSrcLayer, const char *pszNewLayerName,
     /* -------------------------------------------------------------------- */
     else if (!bAppend && !m_bNewDataSource)
     {
-        if (psOptions->bInvokedFromGdalVectorConvert)
+        if (psOptions->bInvokedFromGdalAlgorithm)
         {
             CPLError(CE_Failure, CPLE_AppDefined,
                      "Layer %s already exists, and --append not specified. "
@@ -5822,7 +5875,7 @@ SetupTargetLayer::Setup(OGRLayer *poSrcLayer, const char *pszNewLayerName,
 }
 
 /************************************************************************/
-/*                               SetupCT()                              */
+/*                              SetupCT()                               */
 /************************************************************************/
 
 static bool
@@ -6144,7 +6197,7 @@ SetupCT(TargetLayerInfo *psInfo, OGRLayer *poSrcLayer, bool bTransform,
 }
 
 /************************************************************************/
-/*                 LayerTranslator::TranslateArrow()                    */
+/*                  LayerTranslator::TranslateArrow()                   */
 /************************************************************************/
 
 bool LayerTranslator::TranslateArrow(
@@ -6188,26 +6241,13 @@ bool LayerTranslator::TranslateArrow(
     std::vector<GByte> abyModifiedWKB;
     const int nNumReprojectionThreads = []()
     {
-        const int nNumCPUs = CPLGetNumCPUs();
-        if (nNumCPUs <= 1)
-        {
-            return 1;
-        }
-        else
-        {
-            const char *pszNumThreads =
-                CPLGetConfigOption("GDAL_NUM_THREADS", nullptr);
-            if (pszNumThreads)
-            {
-                if (EQUAL(pszNumThreads, "ALL_CPUS"))
-                    return CPLGetNumCPUs();
-                return std::min(atoi(pszNumThreads), 1024);
-            }
-            else
-            {
-                return std::max(2, nNumCPUs / 2);
-            }
-        }
+        const char *pszNumThreads = nullptr;
+        int nVal =
+            GDALGetNumThreads(GDAL_DEFAULT_MAX_THREAD_COUNT,
+                              /* bDefaultToAllCPUs = */ false, &pszNumThreads);
+        if (!pszNumThreads)
+            nVal = std::max(1, CPLGetNumCPUs() / 2);
+        return nVal;
     }();
 
     // Somewhat arbitrary threshold (config option only/mostly for autotest purposes)
@@ -7025,8 +7065,8 @@ bool LayerTranslator::Translate(
                         {
                             OGRwkbGeometryType eTargetType = OGR_GT_GetLinear(
                                 poDstGeometry->getGeometryType());
-                            poDstGeometry.reset(OGRGeometryFactory::forceTo(
-                                poDstGeometry.release(), eTargetType));
+                            poDstGeometry = OGRGeometryFactory::forceTo(
+                                std::move(poDstGeometry), eTargetType);
                         }
                     }
                     else if (bReprojCanInvalidateValidity &&
@@ -7035,9 +7075,9 @@ bool LayerTranslator::Translate(
                                  static_cast<OGRwkbGeometryType>(eGType)) &&
                              poDstGeometry->hasCurveGeometry(TRUE))
                     {
-                        poDstGeometry.reset(OGRGeometryFactory::forceTo(
-                            poDstGeometry.release(),
-                            static_cast<OGRwkbGeometryType>(eGType)));
+                        poDstGeometry = OGRGeometryFactory::forceTo(
+                            std::move(poDstGeometry),
+                            static_cast<OGRwkbGeometryType>(eGType));
                     }
 
                     // Collect left-most, right-most, top-most, bottom-most coordinates.
@@ -7124,21 +7164,20 @@ bool LayerTranslator::Translate(
                         {
                             OGRwkbGeometryType eTargetType = OGR_GT_GetLinear(
                                 poDstGeometry->getGeometryType());
-                            auto poDstGeometryTmp =
+                            auto poDstGeometryTmp = OGRGeometryFactory::forceTo(
                                 std::unique_ptr<OGRGeometry>(
-                                    OGRGeometryFactory::forceTo(
-                                        poReprojectedGeom->clone(),
-                                        eTargetType));
+                                    poReprojectedGeom->clone()),
+                                eTargetType);
                             if (!IsValid(poDstGeometryTmp.get()))
                             {
                                 CPLDebug("OGR2OGR",
                                          "Curve geometry no longer valid after "
                                          "reprojection: transforming it into "
                                          "linear one before reprojecting");
-                                poDstGeometry.reset(OGRGeometryFactory::forceTo(
-                                    poDstGeometry.release(), eTargetType));
-                                poDstGeometry.reset(OGRGeometryFactory::forceTo(
-                                    poDstGeometry.release(), eType));
+                                poDstGeometry = OGRGeometryFactory::forceTo(
+                                    std::move(poDstGeometry), eTargetType);
+                                poDstGeometry = OGRGeometryFactory::forceTo(
+                                    std::move(poDstGeometry), eType);
                             }
                             else
                             {
@@ -7273,19 +7312,18 @@ bool LayerTranslator::Translate(
                             poDstGeometry->getGeometryType();
                         eTargetType =
                             ConvertType(m_eGeomTypeConversion, eTargetType);
-                        poDstGeometry.reset(OGRGeometryFactory::forceTo(
-                            poDstGeometry.release(), eTargetType));
+                        poDstGeometry = OGRGeometryFactory::forceTo(
+                            std::move(poDstGeometry), eTargetType);
                     }
                     else if (eGType != GEOMTYPE_UNCHANGED)
                     {
-                        poDstGeometry.reset(OGRGeometryFactory::forceTo(
-                            poDstGeometry.release(),
-                            static_cast<OGRwkbGeometryType>(eGType)));
+                        poDstGeometry = OGRGeometryFactory::forceTo(
+                            std::move(poDstGeometry),
+                            static_cast<OGRwkbGeometryType>(eGType));
                     }
                 }
 
-                poDstFeature->SetGeomFieldDirectly(iGeom,
-                                                   poDstGeometry.release());
+                poDstFeature->SetGeomField(iGeom, std::move(poDstGeometry));
             }
 
             CPLErrorReset();
@@ -7387,7 +7425,7 @@ bool LayerTranslator::Translate(
 }
 
 /************************************************************************/
-/*                LayerTranslator::GetDstClipGeom()                     */
+/*                  LayerTranslator::GetDstClipGeom()                   */
 /************************************************************************/
 
 /** Returns the destination clip geometry and its envelope
@@ -7445,7 +7483,7 @@ LayerTranslator::GetDstClipGeom(const OGRSpatialReference *poGeomSRS)
 }
 
 /************************************************************************/
-/*                LayerTranslator::GetSrcClipGeom()                     */
+/*                  LayerTranslator::GetSrcClipGeom()                   */
 /************************************************************************/
 
 /** Returns the source clip geometry and its envelope
@@ -7502,7 +7540,7 @@ LayerTranslator::GetSrcClipGeom(const OGRSpatialReference *poGeomSRS)
 }
 
 /************************************************************************/
-/*               TargetLayerInfo::CheckSameCoordinateOperation()        */
+/*           TargetLayerInfo::CheckSameCoordinateOperation()            */
 /************************************************************************/
 
 void TargetLayerInfo::CheckSameCoordinateOperation() const
@@ -7568,7 +7606,7 @@ void TargetLayerInfo::CheckSameCoordinateOperation() const
 }
 
 /************************************************************************/
-/*                   GDALVectorTranslateOptionsGetParser()              */
+/*                GDALVectorTranslateOptionsGetParser()                 */
 /************************************************************************/
 
 static std::unique_ptr<GDALArgumentParser> GDALVectorTranslateOptionsGetParser(
@@ -8421,9 +8459,9 @@ static std::unique_ptr<GDALArgumentParser> GDALVectorTranslateOptionsGetParser(
         .store_into(psOptions->bNoOverwrite)
         .hidden();
 
-    // Undocumented option used by gdal vector convert
-    argParser->add_argument("--invoked-from-gdal-vector-convert")
-        .store_into(psOptions->bInvokedFromGdalVectorConvert)
+    // Undocumented option used by gdal vector * algorithms
+    argParser->add_argument("--invoked-from-gdal-algorithm")
+        .store_into(psOptions->bInvokedFromGdalAlgorithm)
         .hidden();
 
     if (psOptionsForBinary)
@@ -8447,7 +8485,7 @@ static std::unique_ptr<GDALArgumentParser> GDALVectorTranslateOptionsGetParser(
 }
 
 /************************************************************************/
-/*                    GDALVectorTranslateGetParserUsage()               */
+/*                 GDALVectorTranslateGetParserUsage()                  */
 /************************************************************************/
 
 std::string GDALVectorTranslateGetParserUsage()
@@ -8469,7 +8507,7 @@ std::string GDALVectorTranslateGetParserUsage()
 }
 
 /************************************************************************/
-/*                   CHECK_HAS_ENOUGH_ADDITIONAL_ARGS()                 */
+/*                  CHECK_HAS_ENOUGH_ADDITIONAL_ARGS()                  */
 /************************************************************************/
 
 #ifndef CheckHasEnoughAdditionalArgs_defined
@@ -8496,7 +8534,7 @@ static bool CheckHasEnoughAdditionalArgs(CSLConstList papszArgv, int i,
     }
 
 /************************************************************************/
-/*                       GDALVectorTranslateOptionsNew()                */
+/*                   GDALVectorTranslateOptionsNew()                    */
 /************************************************************************/
 
 /**
@@ -8787,7 +8825,7 @@ GDALVectorTranslateOptions *GDALVectorTranslateOptionsNew(
 }
 
 /************************************************************************/
-/*                      GDALVectorTranslateOptionsFree()                */
+/*                   GDALVectorTranslateOptionsFree()                   */
 /************************************************************************/
 
 /**
@@ -8803,7 +8841,7 @@ void GDALVectorTranslateOptionsFree(GDALVectorTranslateOptions *psOptions)
 }
 
 /************************************************************************/
-/*                 GDALVectorTranslateOptionsSetProgress()              */
+/*               GDALVectorTranslateOptionsSetProgress()                */
 /************************************************************************/
 
 /**

@@ -11,6 +11,7 @@
 # SPDX-License-Identifier: MIT
 ###############################################################################
 
+import array
 import glob
 import math
 import os
@@ -861,7 +862,7 @@ def test_libertiff_corrupted(tmp_vsimem):
             gdal.VSIFSeekL(f, i, 0)
             ori_val = gdal.VSIFReadL(1, 1, f)
 
-            for new_val in (b"\x00", b"\x01", b"\x7F", b"\xFE", b"\xFF"):
+            for new_val in (b"\x00", b"\x01", b"\x7f", b"\xfe", b"\xff"):
                 gdal.VSIFSeekL(f, i, 0)
                 gdal.VSIFWriteL(new_val, 1, 1, f)
                 try:
@@ -1000,3 +1001,15 @@ def test_libertiff_non_direct_decompression_non_matching_band_list(
     ds = libertiff_open(filename)
     assert ds.ReadRaster(band_list=[1]) == b"\xff\xff"
     assert ds.ReadRaster(band_list=[2, 1]) == b"\x11\x11\xff\xff"
+
+
+def test_libertiff_read_non_standard_tiled_blockysize_one():
+
+    ds = libertiff_open("data/gtiff/non_standard_tiled_blockysize_one.tif")
+    assert ds.ReadRaster() == b"\x01\x01\x01"
+
+
+def test_libertiff_read_tiled_blockysize_larger_than_rasterysize():
+
+    ds = libertiff_open("data/gtiff/tiled_blockysize_larger_than_rasterysize.tif")
+    assert ds.ReadRaster() == array.array("B", [i for i in range(32)])

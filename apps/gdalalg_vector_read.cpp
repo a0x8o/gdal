@@ -26,8 +26,9 @@
 /************************************************************************/
 
 GDALVectorReadAlgorithm::GDALVectorReadAlgorithm()
-    : GDALVectorPipelineStepAlgorithm(NAME, DESCRIPTION, HELP_URL,
-                                      /* standaloneStep =*/false)
+    : GDALVectorPipelineStepAlgorithm(
+          NAME, DESCRIPTION, HELP_URL,
+          ConstructorOptions().SetAddDefaultArguments(false))
 {
     AddVectorInputArgs(/* hiddenForCLI = */ false);
 }
@@ -66,7 +67,7 @@ class GDALVectorPipelineReadOutputDataset final : public GDALDataset
 };
 
 /************************************************************************/
-/*                 GDALVectorPipelineReadOutputDataset()                */
+/*                GDALVectorPipelineReadOutputDataset()                 */
 /************************************************************************/
 
 GDALVectorPipelineReadOutputDataset::GDALVectorPipelineReadOutputDataset(
@@ -77,7 +78,7 @@ GDALVectorPipelineReadOutputDataset::GDALVectorPipelineReadOutputDataset(
 }
 
 /************************************************************************/
-/*            GDALVectorPipelineReadOutputDataset::AddLayer()           */
+/*           GDALVectorPipelineReadOutputDataset::AddLayer()            */
 /************************************************************************/
 
 void GDALVectorPipelineReadOutputDataset::AddLayer(OGRLayer &oSrcLayer)
@@ -86,7 +87,7 @@ void GDALVectorPipelineReadOutputDataset::AddLayer(OGRLayer &oSrcLayer)
 }
 
 /************************************************************************/
-/*          GDALVectorPipelineReadOutputDataset::GetLayerCount()        */
+/*         GDALVectorPipelineReadOutputDataset::GetLayerCount()         */
 /************************************************************************/
 
 int GDALVectorPipelineReadOutputDataset::GetLayerCount() const
@@ -104,7 +105,7 @@ OGRLayer *GDALVectorPipelineReadOutputDataset::GetLayer(int idx) const
 }
 
 /************************************************************************/
-/*         GDALVectorPipelineReadOutputDataset::TestCapability()        */
+/*        GDALVectorPipelineReadOutputDataset::TestCapability()         */
 /************************************************************************/
 
 int GDALVectorPipelineReadOutputDataset::TestCapability(
@@ -116,7 +117,7 @@ int GDALVectorPipelineReadOutputDataset::TestCapability(
 }
 
 /************************************************************************/
-/*           GDALVectorPipelineReadOutputDataset::ResetReading()        */
+/*         GDALVectorPipelineReadOutputDataset::ResetReading()          */
 /************************************************************************/
 
 void GDALVectorPipelineReadOutputDataset::ResetReading()
@@ -125,7 +126,7 @@ void GDALVectorPipelineReadOutputDataset::ResetReading()
 }
 
 /************************************************************************/
-/*          GDALVectorPipelineReadOutputDataset::GetNextFeature()       */
+/*        GDALVectorPipelineReadOutputDataset::GetNextFeature()         */
 /************************************************************************/
 
 OGRFeature *GDALVectorPipelineReadOutputDataset::GetNextFeature(

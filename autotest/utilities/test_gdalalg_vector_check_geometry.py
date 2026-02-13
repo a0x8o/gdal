@@ -64,18 +64,25 @@ def test_gdalalg_vector_check_geometry(alg, polys):
 
     dst_ds = alg["output"].GetDataset()
     dst_lyr = dst_ds.GetLayer(0)
+    dst_defn = dst_lyr.GetLayerDefn()
+
     assert dst_lyr.GetName() == "error_location"
-    assert dst_lyr.GetLayerDefn().GetGeomType() == ogr.wkbPoint
+    assert dst_defn.GetGeomType() == ogr.wkbMultiPoint
+
+    field_names = [
+        dst_defn.GetFieldDefn(i).GetName() for i in range(dst_defn.GetFieldCount())
+    ]
+    assert field_names == ["error"]
 
     errors = [f for f in dst_lyr]
 
     assert len(errors) == 2
     assert errors[0]["error"] == "Self-intersection"
-    assert errors[0].GetGeometryRef().ExportToWkt() == "POINT (5 5)"
+    assert errors[0].GetGeometryRef().ExportToWkt() == "MULTIPOINT (5 5)"
     assert errors[0].GetFID() == 2
 
     assert errors[1]["error"] == "Hole lies outside shell"
-    assert errors[1].GetGeometryRef().ExportToWkt() == "POINT (15 15)"
+    assert errors[1].GetGeometryRef().ExportToWkt() == "MULTIPOINT (15 15)"
     assert errors[1].GetFID() == 3
 
     assert dst_lyr.GetFeatureCount() == 2
@@ -129,7 +136,7 @@ def test_gdalalg_vector_check_geometry_linestring(alg, lines):
         ogr.GetGEOSVersionMajor(),
         ogr.GetGEOSVersionMinor(),
     ) >= (3, 14):
-        assert out[0].GetGeometryRef().ExportToWkt() == "POINT (5 5)"
+        assert out[0].GetGeometryRef().ExportToWkt() == "MULTIPOINT (5 5)"
     assert out[0].GetFID() == 2
 
     assert alg.Finalize()
@@ -211,7 +218,7 @@ def test_gdalalg_vector_check_geometry_compoundcurve(alg):
         ogr.GetGEOSVersionMajor(),
         ogr.GetGEOSVersionMinor(),
     ) >= (3, 14):
-        expected = ogr.CreateGeometryFromWkt("POINT (1 1)")
+        expected = ogr.CreateGeometryFromWkt("MULTIPOINT (1 1)")
         assert out[0].GetGeometryRef().Distance(expected) < 1e-3
 
 
@@ -273,7 +280,7 @@ def test_gdalalg_vector_check_geometry_geometry_collection(alg):
         ogr.GetGEOSVersionMajor(),
         ogr.GetGEOSVersionMinor(),
     ) >= (3, 14):
-        assert out[0].GetGeometryRef().ExportToWkt() == "POINT (5 5)"
+        assert out[0].GetGeometryRef().ExportToWkt() == "MULTIPOINT (5 5)"
 
 
 def test_gdalalg_vector_check_geometry_non_closed_polygon_ring(alg):
@@ -294,7 +301,7 @@ def test_gdalalg_vector_check_geometry_non_closed_polygon_ring(alg):
         errors[0]["error"].lower()
         == "points of linearring do not form a closed linestring"
     )
-    assert errors[0].GetGeometryRef().ExportToWkt() == "POINT (7 3)"
+    assert errors[0].GetGeometryRef().ExportToWkt() == "MULTIPOINT (7 3)"
 
     assert alg.Finalize()
 
@@ -314,7 +321,7 @@ def test_gdalalg_vector_check_geometry_single_point_polygon(alg):
     errors = [f for f in dst_lyr]
 
     assert errors[0]["error"].lower() == "point array must contain 0 or >1 elements"
-    assert errors[0].GetGeometryRef().ExportToWkt() == "POINT (7 3)"
+    assert errors[0].GetGeometryRef().ExportToWkt() == "MULTIPOINT (7 3)"
 
     assert alg.Finalize()
 
@@ -334,7 +341,7 @@ def test_gdalalg_vector_check_geometry_two_point_polygon(alg):
     errors = [f for f in dst_lyr]
 
     assert "invalid number of points in linearring" in errors[0]["error"].lower()
-    assert errors[0].GetGeometryRef().ExportToWkt() == "POINT (7 3)"
+    assert errors[0].GetGeometryRef().ExportToWkt() == "MULTIPOINT (7 3)"
 
     assert alg.Finalize()
 
@@ -498,10 +505,22 @@ def test_gdalalg_vector_check_geometry_no_geometry_field(alg):
         alg.Run()
 
 
-def test_gdalalg_vector_check_geometry_include_field(alg):
+@pytest.mark.parametrize(
+    "include_field",
+    (
+        ["EAS_ID", "AREA"],
+        ["AREA", "EAS_ID"],
+        ["AREA", "AREA", "EAS_ID"],
+        "ALL",
+        None,
+        "NONE",
+    ),
+)
+def test_gdalalg_vector_check_geometry_include_field(alg, include_field):
 
     alg["input"] = "../ogr/data/poly.shp"
-    alg["include-field"] = ["EAS_ID", "AREA"]
+    if include_field is not None:
+        alg["include-field"] = include_field
     alg["output-format"] = "stream"
     alg["include-valid"] = True
 
@@ -509,12 +528,23 @@ def test_gdalalg_vector_check_geometry_include_field(alg):
     dst_ds = alg["output"].GetDataset()
     dst_lyr = dst_ds.GetLayer(0)
     dst_defn = dst_lyr.GetLayerDefn()
-    assert dst_defn.GetFieldDefn(0).GetName() == "EAS_ID"
-    assert dst_defn.GetFieldDefn(1).GetName() == "AREA"
+    dst_fields = [
+        dst_defn.GetFieldDefn(i).GetName() for i in range(dst_defn.GetFieldCount())
+    ]
 
-    f = dst_lyr.GetNextFeature()
-    assert f["EAS_ID"] == 168
-    assert f["AREA"] == 215229.266
+    if include_field in (None, "NONE"):
+        assert dst_fields == ["error"]
+    else:
+        unique_include_fields = list({f: True for f in include_field}.keys())
+
+        if include_field == "ALL":
+            assert dst_fields == ["AREA", "EAS_ID", "PRFEDEA", "error"]
+        else:
+            assert dst_fields == unique_include_fields + ["error"]
+
+        f = dst_lyr.GetNextFeature()
+        assert f["EAS_ID"] == 168
+        assert f["AREA"] == 215229.266
 
 
 def test_gdalalg_vector_check_geometry_include_field_error(alg):
@@ -523,5 +553,5 @@ def test_gdalalg_vector_check_geometry_include_field_error(alg):
     alg["include-field"] = "does_not_exist"
     alg["output-format"] = "stream"
 
-    with pytest.raises(Exception, match="Specified field .* does not exist"):
+    with pytest.raises(Exception, match="Field .* does not exist"):
         alg.Run()
