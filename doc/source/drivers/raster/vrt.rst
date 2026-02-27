@@ -11,11 +11,13 @@ VRT -- GDAL Virtual Format
 Introduction
 ------------
 
-The VRT driver is a format driver for GDAL that allows a virtual GDAL dataset
+GDAL Virtual Format is a raster driver that allows a virtual GDAL dataset
 to be composed from other GDAL datasets with repositioning, and algorithms
 potentially applied as well as various kinds of metadata altered or added.
 VRT descriptions of datasets can be saved in an XML format normally given the
-extension .vrt.
+extension .vrt.  The :ref:`gdal_raster_mosaic` or :ref:`gdal_raster_stack` programs can build a VRT from a list of datasets.
+
+
 
 Note .vrt files starting with
 
@@ -606,7 +608,7 @@ ArraySource
 .. versionadded:: 3.8
 
 The ArraySource_ indicates that raster data should be read from a 2D array using
-the multidimensional API. If the original array is not a 3D array, a DerivedArray
+the multidimensional API. If the original array is not a 2D array, a DerivedArray
 with a View step must be typically used to create a 2D slice.
 
 ArraySource can have the following child elements:
@@ -1215,7 +1217,7 @@ GDAL provides a set of default pixel functions that can be used without writing 
      - Description
    * - **area**
      - 0
-     - 
+     -
      - (GDAL >= 3.13) Returns the area of each pixel in square meters.
    * - **argmax**
      - >= 1

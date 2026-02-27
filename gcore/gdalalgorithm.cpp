@@ -972,40 +972,56 @@ bool GDALAlgorithmArg::RunValidationActions()
         }
     }
 
+    const auto CheckMinCharCount =
+        [this, &ret](const std::string &val, int nMinCharCount)
+    {
+        if (val.size() < static_cast<size_t>(nMinCharCount))
+        {
+            CPLError(CE_Failure, CPLE_IllegalArg,
+                     "Value of argument '%s' is '%s', but should have at least "
+                     "%d character%s",
+                     GetName().c_str(), val.c_str(), nMinCharCount,
+                     nMinCharCount > 1 ? "s" : "");
+            ret = false;
+        }
+    };
+
+    const auto CheckMaxCharCount =
+        [this, &ret](const std::string &val, int nMaxCharCount)
+    {
+        if (val.size() > static_cast<size_t>(nMaxCharCount))
+        {
+            CPLError(
+                CE_Failure, CPLE_IllegalArg,
+                "Value of argument '%s' is '%s', but should have no more than "
+                "%d character%s",
+                GetName().c_str(), val.c_str(), nMaxCharCount,
+                nMaxCharCount > 1 ? "s" : "");
+            ret = false;
+        }
+    };
+
     if (GetType() == GAAT_STRING)
     {
+        const auto &val = Get<std::string>();
         const int nMinCharCount = GetMinCharCount();
         if (nMinCharCount > 0)
         {
-            const auto &val = Get<std::string>();
-            if (val.size() < static_cast<size_t>(nMinCharCount))
-            {
-                CPLError(
-                    CE_Failure, CPLE_IllegalArg,
-                    "Value of argument '%s' is '%s', but should have at least "
-                    "%d character(s)",
-                    GetName().c_str(), val.c_str(), nMinCharCount);
-                ret = false;
-            }
+            CheckMinCharCount(val, nMinCharCount);
         }
+
+        const int nMaxCharCount = GetMaxCharCount();
+        CheckMaxCharCount(val, nMaxCharCount);
     }
     else if (GetType() == GAAT_STRING_LIST)
     {
         const int nMinCharCount = GetMinCharCount();
-        if (nMinCharCount > 0)
+        const int nMaxCharCount = GetMaxCharCount();
+        for (const auto &val : Get<std::vector<std::string>>())
         {
-            for (const auto &val : Get<std::vector<std::string>>())
-            {
-                if (val.size() < static_cast<size_t>(nMinCharCount))
-                {
-                    CPLError(
-                        CE_Failure, CPLE_IllegalArg,
-                        "Value of argument '%s' is '%s', but should have at "
-                        "least %d character(s)",
-                        GetName().c_str(), val.c_str(), nMinCharCount);
-                    ret = false;
-                }
-            }
+            if (nMinCharCount > 0)
+                CheckMinCharCount(val, nMinCharCount);
+            CheckMaxCharCount(val, nMaxCharCount);
         }
     }
     else if (GetType() == GAAT_INTEGER)
@@ -1711,19 +1727,27 @@ GDALAlgorithm::GDALAlgorithm(const std::string &name,
                         ? "https://gdal.org" + m_helpURL
                         : m_helpURL)
 {
-    AddArg("help", 'h', _("Display help message and exit"), &m_helpRequested)
-        .SetHiddenForAPI()
-        .SetCategory(GAAC_COMMON)
-        .AddAction([this]() { m_specialActionRequested = true; });
-    AddArg("help-doc", 0, _("Display help message for use by documentation"),
-           &m_helpDocRequested)
-        .SetHidden()
-        .AddAction([this]() { m_specialActionRequested = true; });
-    AddArg("json-usage", 0, _("Display usage as JSON document and exit"),
-           &m_JSONUsageRequested)
-        .SetHiddenForAPI()
-        .SetCategory(GAAC_COMMON)
-        .AddAction([this]() { m_specialActionRequested = true; });
+    auto &helpArg =
+        AddArg("help", 'h', _("Display help message and exit"),
+               &m_helpRequested)
+            .SetHiddenForAPI()
+            .SetCategory(GAAC_COMMON)
+            .AddAction([this]()
+                       { m_specialActionRequested = m_calledFromCommandLine; });
+    auto &helpDocArg =
+        AddArg("help-doc", 0,
+               _("Display help message for use by documentation"),
+               &m_helpDocRequested)
+            .SetHidden()
+            .AddAction([this]()
+                       { m_specialActionRequested = m_calledFromCommandLine; });
+    auto &jsonUsageArg =
+        AddArg("json-usage", 0, _("Display usage as JSON document and exit"),
+               &m_JSONUsageRequested)
+            .SetHiddenForAPI()
+            .SetCategory(GAAC_COMMON)
+            .AddAction([this]()
+                       { m_specialActionRequested = m_calledFromCommandLine; });
     AddArg("config", 0, _("Configuration option"), &m_dummyConfigOptions)
         .SetMetaVar("<KEY>=<VALUE>")
         .SetHiddenForAPI()
@@ -1736,6 +1760,26 @@ GDALAlgorithm::GDALAlgorithm(const std::string &name,
                     "Configuration options passed with the 'config' argument "
                     "are ignored");
             });
+
+    AddValidationAction(
+        [this, &helpArg, &helpDocArg, &jsonUsageArg]()
+        {
+            if (!m_calledFromCommandLine && m_specialActionRequested)
+            {
+                for (auto &arg : {&helpArg, &helpDocArg, &jsonUsageArg})
+                {
+                    if (arg->IsExplicitlySet())
+                    {
+                        ReportError(CE_Failure, CPLE_AppDefined,
+                                    "'%s' argument only available when called "
+                                    "from command line",
+                                    arg->GetName().c_str());
+                        return false;
+                    }
+                }
+            }
+            return true;
+        });
 }
 
 /************************************************************************/

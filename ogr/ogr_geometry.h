@@ -506,8 +506,8 @@ class CPL_DLL OGRGeometry
     static GEOSContextHandle_t createGEOSContext();
     static void freeGEOSContext(GEOSContextHandle_t hGEOSCtxt);
     GEOSGeom
-    exportToGEOS(GEOSContextHandle_t hGEOSCtxt,
-                 bool bRemoveEmptyParts = false) const CPL_WARN_UNUSED_RESULT;
+    exportToGEOS(GEOSContextHandle_t hGEOSCtxt, bool bRemoveEmptyParts = false,
+                 bool bAddPointsIfNeeded = false) const CPL_WARN_UNUSED_RESULT;
     virtual OGRBoolean hasCurveGeometry(int bLookForNonLinear = FALSE) const;
     virtual OGRGeometry *getCurveGeometry(
         const char *const *papszOptions = nullptr) const CPL_WARN_UNUSED_RESULT;
@@ -3025,6 +3025,7 @@ class CPL_DLL OGRGeometryCollection : public OGRGeometry
     virtual OGRErr addGeometry(const OGRGeometry *);
     virtual OGRErr addGeometryDirectly(OGRGeometry *);
     OGRErr addGeometry(std::unique_ptr<OGRGeometry> geom);
+    OGRErr addGeometryComponents(std::unique_ptr<OGRGeometryCollection> geom);
     virtual OGRErr removeGeometry(int iIndex, int bDelete = TRUE);
     std::unique_ptr<OGRGeometry> stealGeometry(int iIndex);
 

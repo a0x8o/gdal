@@ -12,13 +12,38 @@
 
 #include "zarr_v3_codec.h"
 
+#include "cpl_mem_cache.h"
 #include "cpl_vsi_virtual.h"
+#include "cpl_worker_thread_pool.h"
+#include "gdal_thread_pool.h"
 
 #include <algorithm>
 #include <cinttypes>
 #include <limits>
+#include <mutex>
+
+// Process-wide LRU cache for shard indices.
+// Key: shard filepath/URL.  Value: flat byte buffer of Location entries
+// (each 16 bytes: uint64_t nOffset + uint64_t nSize, host byte order).
+// Populated lazily by BatchDecodePartial.
+// Shards whose index exceeds GDAL_ZARR_SHARD_INDEX_CACHE_MAX_BYTES
+// (default 1 MiB) fall back to per-entry ReadMultiRange.
+// Thread safety: lru11::Cache<..., std::mutex> serialises all access.
+static constexpr size_t SHARD_INDEX_CACHE_ENTRIES = 64;
+static lru11::Cache<std::string, std::vector<GByte>, std::mutex>
+    g_oShardIndexCache{SHARD_INDEX_CACHE_ENTRIES, 0};
 
 // Implements https://zarr-specs.readthedocs.io/en/latest/v3/codecs/sharding-indexed/index.html
+
+void ZarrClearShardIndexCache()
+{
+    g_oShardIndexCache.clear();
+}
+
+void ZarrEraseShardIndexFromCache(const std::string &osFilename)
+{
+    g_oShardIndexCache.remove(osFilename);
+}
 
 /************************************************************************/
 /*                     ZarrV3CodecShardingIndexed()                     */
@@ -115,6 +140,7 @@ bool ZarrV3CodecShardingIndexed::InitFromConfiguration(
                 static_cast<uint64_t>(m_oInputArrayMetadata.anBlockSizes[i]));
             return false;
         }
+#ifndef __COVERITY__
         // The following cast is safe since ZarrArray::ParseChunkSize() has
         // previously validated that m_oInputArrayMetadata.anBlockSizes[i] fits
         // on size_t
@@ -123,6 +149,7 @@ bool ZarrV3CodecShardingIndexed::InitFromConfiguration(
             // coverity[result_independent_of_operands]
             CPLAssert(nVal <= std::numeric_limits<size_t>::max());
         }
+#endif
         m_anInnerBlockSize.push_back(static_cast<size_t>(nVal));
         anCountInnerChunks.push_back(
             static_cast<size_t>(m_oInputArrayMetadata.anBlockSizes[i] / nVal));
@@ -239,15 +266,279 @@ bool ZarrV3CodecShardingIndexed::InitFromConfiguration(
 }
 
 /************************************************************************/
+/*                    ExtractSubArrayFromLargerOne()                    */
+/************************************************************************/
+
+// Inverse of CopySubArrayIntoLargerOne(): extract a contiguous inner chunk
+// from its position in the larger shard buffer.
+static void
+ExtractSubArrayFromLargerOne(const ZarrByteVectorQuickResize &abySrc,
+                             const std::vector<size_t> &anSrcBlockSize,
+                             const std::vector<size_t> &anInnerBlockSize,
+                             const std::vector<size_t> &anInnerBlockIndices,
+                             ZarrByteVectorQuickResize &abyChunk,
+                             const size_t nDTSize)
+{
+    const auto nDims = anInnerBlockSize.size();
+    CPLAssert(nDims > 0);
+    CPLAssert(nDims == anInnerBlockIndices.size());
+    CPLAssert(nDims == anSrcBlockSize.size());
+    // +1 to avoid gcc -Wnull-dereference false positives
+    std::vector<const GByte *> srcPtrStack(nDims + 1);
+    std::vector<size_t> count(nDims + 1);
+    std::vector<size_t> srcStride(nDims + 1);
+
+    size_t nSrcStride = nDTSize;
+    for (size_t iDim = nDims; iDim > 0;)
+    {
+        --iDim;
+        srcStride[iDim] = nSrcStride;
+        nSrcStride *= anSrcBlockSize[iDim];
+    }
+
+    srcPtrStack[0] = abySrc.data();
+    for (size_t iDim = 0; iDim < nDims; ++iDim)
+    {
+        CPLAssert((anInnerBlockIndices[iDim] + 1) * anInnerBlockSize[iDim] <=
+                  anSrcBlockSize[iDim]);
+        srcPtrStack[0] += anInnerBlockIndices[iDim] * anInnerBlockSize[iDim] *
+                          srcStride[iDim];
+    }
+    GByte *pabyDst = abyChunk.data();
+
+    const size_t nLastDimSize = anInnerBlockSize.back() * nDTSize;
+    size_t dimIdx = 0;
+lbl_next_depth:
+    if (dimIdx + 1 == nDims)
+    {
+        memcpy(pabyDst, srcPtrStack[dimIdx], nLastDimSize);
+        pabyDst += nLastDimSize;
+    }
+    else
+    {
+        count[dimIdx] = anInnerBlockSize[dimIdx];
+        while (true)
+        {
+            dimIdx++;
+            srcPtrStack[dimIdx] = srcPtrStack[dimIdx - 1];
+            goto lbl_next_depth;
+        lbl_return_to_caller:
+            dimIdx--;
+            if (--count[dimIdx] == 0)
+                break;
+            srcPtrStack[dimIdx] += srcStride[dimIdx];
+        }
+    }
+    if (dimIdx > 0)
+        goto lbl_return_to_caller;
+}
+
+/************************************************************************/
+/*                            IsAllNoData()                             */
+/************************************************************************/
+
+// Check if a buffer consists entirely of the fill value.
+static bool IsAllNoData(const ZarrByteVectorQuickResize &abyChunk,
+                        const ZarrArrayMetadata &metadata)
+{
+    const size_t nDTSize = metadata.oElt.nativeSize;
+    const size_t nBytes = abyChunk.size();
+
+    if (metadata.abyNoData.empty() ||
+        metadata.abyNoData == std::vector<GByte>(nDTSize, 0))
+    {
+        // Zero fill value: byte-by-byte check (compiler auto-vectorizes)
+        const GByte *p = abyChunk.data();
+        for (size_t i = 0; i < nBytes; ++i)
+        {
+            if (p[i] != 0)
+                return false;
+        }
+        return true;
+    }
+    else
+    {
+        // Non-zero fill value: element-wise compare
+        CPLAssert(metadata.abyNoData.size() == nDTSize);
+        const GByte *p = abyChunk.data();
+        const size_t nCount = nBytes / nDTSize;
+        for (size_t i = 0; i < nCount; ++i)
+        {
+            if (memcmp(p + i * nDTSize, metadata.abyNoData.data(), nDTSize) !=
+                0)
+                return false;
+        }
+        return true;
+    }
+}
+
+/************************************************************************/
 /*                 ZarrV3CodecShardingIndexed::Encode()                 */
 /************************************************************************/
 
-bool ZarrV3CodecShardingIndexed::Encode(const ZarrByteVectorQuickResize &,
-                                        ZarrByteVectorQuickResize &) const
+bool ZarrV3CodecShardingIndexed::Encode(const ZarrByteVectorQuickResize &abySrc,
+                                        ZarrByteVectorQuickResize &abyDst) const
 {
-    CPLError(CE_Failure, CPLE_NotSupported,
-             "ZarrV3CodecShardingIndexed::Encode() not supported");
-    return false;
+    // Compute total number of inner chunks
+    size_t nInnerChunks = 1;
+    for (size_t i = 0; i < m_anInnerBlockSize.size(); ++i)
+    {
+        const size_t nCountInnerChunksThisDim =
+            m_oInputArrayMetadata.anBlockSizes[i] / m_anInnerBlockSize[i];
+        nInnerChunks *= nCountInnerChunksThisDim;
+    }
+
+    const auto nDTSize = m_oInputArrayMetadata.oElt.nativeSize;
+    const size_t nExpectedSrcSize =
+        nDTSize * MultiplyElements(m_oInputArrayMetadata.anBlockSizes);
+    if (abySrc.size() != nExpectedSrcSize)
+    {
+        CPLError(CE_Failure, CPLE_AppDefined,
+                 "ZarrV3CodecShardingIndexed::Encode(): input buffer size "
+                 "(%" PRIu64 ") != expected (%" PRIu64 ")",
+                 static_cast<uint64_t>(abySrc.size()),
+                 static_cast<uint64_t>(nExpectedSrcSize));
+        return false;
+    }
+
+    // Index: one Location per inner chunk, initially all empty
+    std::vector<Location> anLocations(nInnerChunks,
+                                      {std::numeric_limits<uint64_t>::max(),
+                                       std::numeric_limits<uint64_t>::max()});
+
+    // Accumulate encoded inner chunk data
+    ZarrByteVectorQuickResize abyData;
+    // Reserve approximate capacity: decoded chunk size is close to the upper
+    // bound per chunk (compression may slightly increase size in pathological
+    // cases), but avoids most reallocations.
+    const size_t nDecodedChunkSize =
+        nDTSize * MultiplyElements(m_anInnerBlockSize);
+    // resize+clear = reserve (ZarrByteVectorQuickResize has no reserve())
+    try
+    {
+        abyData.resize(nInnerChunks * nDecodedChunkSize);
+    }
+    catch (const std::exception &)
+    {
+        CPLError(CE_Failure, CPLE_OutOfMemory,
+                 "Cannot allocate memory for accumulated shard data");
+        return false;
+    }
+    abyData.clear();
+    ZarrByteVectorQuickResize abyChunk;
+
+    uint64_t nCurrentOffset = 0;
+    std::vector<size_t> anChunkIndices(m_anInnerBlockSize.size(), 0);
+
+    for (size_t iChunk = 0; iChunk < nInnerChunks; ++iChunk)
+    {
+        // Update chunk coordinates (same iteration order as Decode)
+        if (iChunk > 0)
+        {
+            size_t iDim = m_anInnerBlockSize.size() - 1;
+            while (++anChunkIndices[iDim] ==
+                   m_oInputArrayMetadata.anBlockSizes[iDim] /
+                       m_anInnerBlockSize[iDim])
+            {
+                anChunkIndices[iDim] = 0;
+                --iDim;
+            }
+        }
+
+        // Extract this inner chunk from the shard buffer
+        try
+        {
+            abyChunk.resize(nDecodedChunkSize);
+        }
+        catch (const std::exception &)
+        {
+            CPLError(CE_Failure, CPLE_OutOfMemory,
+                     "Cannot allocate memory for inner chunk");
+            return false;
+        }
+        ExtractSubArrayFromLargerOne(abySrc, m_oInputArrayMetadata.anBlockSizes,
+                                     m_anInnerBlockSize, anChunkIndices,
+                                     abyChunk, nDTSize);
+
+        // Skip empty (all-nodata) chunks
+        if (IsAllNoData(abyChunk, m_oInputArrayMetadata))
+            continue;
+
+        // Encode inner chunk through codec chain (bytes + compressor)
+        if (!m_poCodecSequence->Encode(abyChunk))
+        {
+            CPLError(CE_Failure, CPLE_AppDefined,
+                     "ZarrV3CodecShardingIndexed::Encode(): cannot encode "
+                     "inner chunk %" PRIu64,
+                     static_cast<uint64_t>(iChunk));
+            return false;
+        }
+
+        anLocations[iChunk] = {nCurrentOffset, abyChunk.size()};
+        nCurrentOffset += abyChunk.size();
+        abyData.insert(abyData.end(), abyChunk.begin(), abyChunk.end());
+    }
+
+    // All inner chunks are nodata: signal empty shard via zero-length output
+    if (abyData.empty())
+    {
+        abyDst.clear();
+        return true;
+    }
+
+    // Build index buffer
+    ZarrByteVectorQuickResize abyIndex;
+    const size_t nIndexRawSize = nInnerChunks * sizeof(Location);
+
+    // If index is at start, data offsets must account for the index prefix.
+    // Encode the index once to determine its encoded size (includes CRC32C
+    // overhead), then re-encode below with the adjusted offsets.
+    // Note: currently unreachable in write mode (creation hardcodes "end"),
+    // but kept for completeness with the Decode() start-index path.
+    if (!m_bIndexLocationAtEnd)
+    {
+        // Encode a temporary copy of the index to determine its encoded size
+        abyIndex.resize(nIndexRawSize);
+        memcpy(abyIndex.data(), anLocations.data(), nIndexRawSize);
+        if (!m_poIndexCodecSequence->Encode(abyIndex))
+        {
+            CPLError(
+                CE_Failure, CPLE_AppDefined,
+                "ZarrV3CodecShardingIndexed::Encode(): cannot encode index");
+            return false;
+        }
+        const uint64_t nIndexEncodedSize = abyIndex.size();
+        // Adjust offsets
+        for (auto &loc : anLocations)
+        {
+            if (loc.nOffset != std::numeric_limits<uint64_t>::max())
+                loc.nOffset += nIndexEncodedSize;
+        }
+    }
+
+    // (Re-)encode index with final offsets
+    abyIndex.resize(nIndexRawSize);
+    memcpy(abyIndex.data(), anLocations.data(), nIndexRawSize);
+    if (!m_poIndexCodecSequence->Encode(abyIndex))
+    {
+        CPLError(CE_Failure, CPLE_AppDefined,
+                 "ZarrV3CodecShardingIndexed::Encode(): cannot encode index");
+        return false;
+    }
+
+    // Assemble output: data + index (or index + data)
+    if (m_bIndexLocationAtEnd)
+    {
+        abyDst = std::move(abyData);
+        abyDst.insert(abyDst.end(), abyIndex.begin(), abyIndex.end());
+    }
+    else
+    {
+        abyDst = std::move(abyIndex);
+        abyDst.insert(abyDst.end(), abyData.begin(), abyData.end());
+    }
+
+    return true;
 }
 
 /************************************************************************/
@@ -502,7 +793,6 @@ bool ZarrV3CodecShardingIndexed::DecodePartial(
 
     size_t nInnerChunkCount = 1;
     size_t nInnerChunkIdx = 0;
-    size_t nInnerChunkCountPrevDim = 1;
     for (size_t i = 0; i < anStartIdx.size(); ++i)
     {
         CPLAssert(anStartIdx[i] + anCount[i] <=
@@ -519,10 +809,9 @@ bool ZarrV3CodecShardingIndexed::DecodePartial(
 
         const size_t nCountInnerChunksThisDim =
             m_oInputArrayMetadata.anBlockSizes[i] / m_anInnerBlockSize[i];
-        nInnerChunkIdx *= nInnerChunkCountPrevDim;
-        nInnerChunkIdx += anStartIdx[i] / m_anInnerBlockSize[i];
+        nInnerChunkIdx = nInnerChunkIdx * nCountInnerChunksThisDim +
+                         anStartIdx[i] / m_anInnerBlockSize[i];
         nInnerChunkCount *= nCountInnerChunksThisDim;
-        nInnerChunkCountPrevDim = nCountInnerChunksThisDim;
     }
 
     abyDst.clear();
@@ -613,6 +902,7 @@ bool ZarrV3CodecShardingIndexed::DecodePartial(
 
     if constexpr (sizeof(size_t) < sizeof(uint64_t))
     {
+#ifndef __COVERITY__
         // coverity[result_independent_of_operands]
         if (loc.nSize > std::numeric_limits<size_t>::max())
         {
@@ -623,6 +913,7 @@ bool ZarrV3CodecShardingIndexed::DecodePartial(
                 static_cast<uint64_t>(nInnerChunkIdx), loc.nSize);
             return false;
         }
+#endif
     }
 
     try
@@ -676,7 +967,7 @@ bool ZarrV3CodecShardingIndexed::DecodePartial(
 /************************************************************************/
 
 bool ZarrV3CodecShardingIndexed::BatchDecodePartial(
-    VSIVirtualHandle *poFile,
+    VSIVirtualHandle *poFile, const char *pszFilename,
     const std::vector<std::pair<std::vector<size_t>, std::vector<size_t>>>
         &anRequests,
     std::vector<ZarrByteVectorQuickResize> &aResults)
@@ -729,47 +1020,95 @@ bool ZarrV3CodecShardingIndexed::BatchDecodePartial(
                   m_oInputArrayMetadata.anBlockSizes.size());
 
         size_t nInnerChunkIdx = 0;
-        size_t nInnerChunkCountPrevDim = 1;
         for (size_t i = 0; i < anStartIdx.size(); ++i)
         {
-            nInnerChunkIdx *= nInnerChunkCountPrevDim;
-            nInnerChunkIdx += anStartIdx[i] / m_anInnerBlockSize[i];
-            nInnerChunkCountPrevDim =
+            const size_t nCountInnerChunksThisDim =
                 m_oInputArrayMetadata.anBlockSizes[i] / m_anInnerBlockSize[i];
+            nInnerChunkIdx = nInnerChunkIdx * nCountInnerChunksThisDim +
+                             anStartIdx[i] / m_anInnerBlockSize[i];
         }
         anInnerChunkIndices[iReq] = nInnerChunkIdx;
     }
 
-    // --- Pass 1: ReadMultiRange for index entries (16 bytes each) ---
-    std::vector<vsi_l_offset> anIdxOffsets(anRequests.size());
-    std::vector<size_t> anIdxSizes(anRequests.size(), sizeof(Location));
+    // --- Pass 1: read index entries, using per-shard cache when possible ---
     std::vector<Location> aLocations(anRequests.size());
-    std::vector<void *> ppIdxData(anRequests.size());
 
-    for (size_t i = 0; i < anRequests.size(); ++i)
+    const size_t nIndexBytes = nInnerChunkCount * sizeof(Location);
+    const size_t nMaxIndexBytes =
+        static_cast<size_t>(CPLAtoGIntBig(CPLGetConfigOption(
+            "GDAL_ZARR_SHARD_INDEX_CACHE_MAX_BYTES", "1048576")));
+    if (pszFilename != nullptr && nIndexBytes <= nMaxIndexBytes)
     {
-        anIdxOffsets[i] = nIndexBaseOffset +
-                          static_cast<vsi_l_offset>(anInnerChunkIndices[i]) *
-                              sizeof(Location);
-        ppIdxData[i] = &aLocations[i];
-    }
+        // Try to serve from the in-process index cache.
+        // g_oShardIndexCache serialises its own access via std::mutex.
+        std::vector<GByte> abyIndexBuf;
+        bool bCacheHit = g_oShardIndexCache.tryGet(pszFilename, abyIndexBuf);
+        if (bCacheHit && abyIndexBuf.size() != nIndexBytes)
+            bCacheHit = false;  // stale entry from different layout
 
-    if (poFile->ReadMultiRange(static_cast<int>(anRequests.size()),
-                               ppIdxData.data(), anIdxOffsets.data(),
-                               anIdxSizes.data()) != 0)
-    {
-        CPLError(CE_Failure, CPLE_AppDefined,
-                 "BatchDecodePartial: ReadMultiRange() failed for index");
-        return false;
-    }
-
-    // Byte-swap if needed
-    if (bSwapIndex)
-    {
-        for (auto &loc : aLocations)
+        if (!bCacheHit)
         {
-            CPL_SWAP64PTR(&(loc.nOffset));
-            CPL_SWAP64PTR(&(loc.nSize));
+            // Cache miss: read the full index in one contiguous I/O call.
+            abyIndexBuf.resize(nIndexBytes);
+            poFile->Seek(nIndexBaseOffset, SEEK_SET);
+            if (poFile->Read(abyIndexBuf.data(), nIndexBytes, 1) != 1)
+            {
+                CPLError(CE_Failure, CPLE_AppDefined,
+                         "BatchDecodePartial: failed to read shard index");
+                return false;
+            }
+            if (bSwapIndex)
+            {
+                for (size_t j = 0; j < nInnerChunkCount; ++j)
+                {
+                    GByte *p = abyIndexBuf.data() + j * sizeof(Location);
+                    CPL_SWAP64PTR(p);
+                    CPL_SWAP64PTR(p + sizeof(uint64_t));
+                }
+            }
+            g_oShardIndexCache.insert(pszFilename, abyIndexBuf);
+        }
+
+        for (size_t i = 0; i < anRequests.size(); ++i)
+            memcpy(&aLocations[i],
+                   abyIndexBuf.data() +
+                       anInnerChunkIndices[i] * sizeof(Location),
+                   sizeof(Location));
+    }
+    else
+    {
+        // Shard index too large for cache or no filename: fall back to
+        // per-entry ReadMultiRange.
+        std::vector<vsi_l_offset> anIdxOffsets(anRequests.size());
+        std::vector<size_t> anIdxSizes(anRequests.size(), sizeof(Location));
+        std::vector<void *> ppIdxData(anRequests.size());
+
+        for (size_t i = 0; i < anRequests.size(); ++i)
+        {
+            anIdxOffsets[i] = nIndexBaseOffset + static_cast<vsi_l_offset>(
+                                                     anInnerChunkIndices[i]) *
+                                                     sizeof(Location);
+#ifndef __COVERITY__
+            ppIdxData[i] = &aLocations[i];
+#endif
+        }
+
+        if (poFile->ReadMultiRange(static_cast<int>(anRequests.size()),
+                                   ppIdxData.data(), anIdxOffsets.data(),
+                                   anIdxSizes.data()) != 0)
+        {
+            CPLError(CE_Failure, CPLE_AppDefined,
+                     "BatchDecodePartial: ReadMultiRange() failed for index");
+            return false;
+        }
+
+        if (bSwapIndex)
+        {
+            for (auto &loc : aLocations)
+            {
+                CPL_SWAP64PTR(&(loc.nOffset));
+                CPL_SWAP64PTR(&(loc.nSize));
+            }
         }
     }
 
@@ -813,12 +1152,15 @@ bool ZarrV3CodecShardingIndexed::BatchDecodePartial(
 
         if constexpr (sizeof(size_t) < sizeof(uint64_t))
         {
+#ifndef __COVERITY__
+            // coverity[result_independent_of_operands]
             if (loc.nSize > std::numeric_limits<size_t>::max())
             {
                 CPLError(CE_Failure, CPLE_NotSupported,
                          "BatchDecodePartial: too large chunk size");
                 return false;
             }
+#endif
         }
 
         aDataRanges.push_back({iReq});
@@ -887,33 +1229,110 @@ bool ZarrV3CodecShardingIndexed::BatchDecodePartial(
         return false;
     }
 
-    // --- Decompress each chunk ---
-    for (size_t i = 0; i < aDataRanges.size(); ++i)
+    // --- Decode compressed chunks (parallel when GDAL_NUM_THREADS > 1) ---
+    const int nMaxThreads = GDALGetNumThreads();
+    const int nChunks = static_cast<int>(aDataRanges.size());
+    const int nThreads = std::min(std::max(1, nMaxThreads), nChunks);
+
+    // Try parallel decode when multiple threads are available
+    CPLWorkerThreadPool *wtp = (nThreads > 1 && nChunks > 1)
+                                   ? GDALGetGlobalThreadPool(nMaxThreads)
+                                   : nullptr;
+
+    if (!wtp)
     {
-        const size_t iReq = aDataRanges[i].nReqIdx;
-        const auto &anCount = anRequests[iReq].second;
-        const auto nExpectedDecodedChunkSize =
-            nDTSize * MultiplyElements(anCount);
+        // Sequential fallback
+        for (size_t i = 0; i < aDataRanges.size(); ++i)
+        {
+            const size_t iReq = aDataRanges[i].nReqIdx;
+            const auto &anCount = anRequests[iReq].second;
+            const auto nExpectedDecodedChunkSize =
+                nDTSize * MultiplyElements(anCount);
 
-        if (!m_poCodecSequence->Decode(aCompressed[i]))
+            if (!m_poCodecSequence->Decode(aCompressed[i]))
+            {
+                CPLError(CE_Failure, CPLE_NotSupported,
+                         "BatchDecodePartial: cannot decode chunk %" PRIu64,
+                         static_cast<uint64_t>(anInnerChunkIndices[iReq]));
+                return false;
+            }
+
+            if (aCompressed[i].size() != nExpectedDecodedChunkSize)
+            {
+                CPLError(CE_Failure, CPLE_NotSupported,
+                         "BatchDecodePartial: decoded size %" PRIu64
+                         " != expected %" PRIu64,
+                         static_cast<uint64_t>(aCompressed[i].size()),
+                         static_cast<uint64_t>(nExpectedDecodedChunkSize));
+                return false;
+            }
+
+            aResults[iReq] = std::move(aCompressed[i]);
+        }
+        return true;
+    }
+
+    CPLDebugOnly("ZARR",
+                 "BatchDecodePartial: parallel decode with %d threads "
+                 "for %d chunks",
+                 nThreads, nChunks);
+
+    {
+        bool bGlobalOK = true;
+        std::mutex oMutex;
+
+        // Clone codecs per thread on the main thread (Clone() is not
+        // thread-safe due to JSON object cloning)
+        std::vector<std::unique_ptr<ZarrV3CodecSequence>> apoCodecs(nThreads);
+        for (int t = 0; t < nThreads; ++t)
+            apoCodecs[t] = m_poCodecSequence->Clone();
+
+        auto poJobQueue = wtp->CreateJobQueue();
+        for (int t = 0; t < nThreads; ++t)
+        {
+            const int iFirst =
+                static_cast<int>(static_cast<int64_t>(t) * nChunks / nThreads);
+            const int iEnd = static_cast<int>(static_cast<int64_t>(t + 1) *
+                                              nChunks / nThreads);
+
+            poJobQueue->SubmitJob(
+                [iFirst, iEnd, t, &aDataRanges, &anRequests, &aCompressed,
+                 &aResults, &apoCodecs, &bGlobalOK, &oMutex, nDTSize]()
+                {
+                    for (int i = iFirst; i < iEnd; ++i)
+                    {
+                        {
+                            std::lock_guard<std::mutex> oLock(oMutex);
+                            if (!bGlobalOK)
+                                return;
+                        }
+
+                        const size_t iReq = aDataRanges[i].nReqIdx;
+                        const auto &anCount = anRequests[iReq].second;
+                        const auto nExpected =
+                            nDTSize * MultiplyElements(anCount);
+
+                        if (!apoCodecs[t]->Decode(aCompressed[i]) ||
+                            aCompressed[i].size() != nExpected)
+                        {
+                            std::lock_guard<std::mutex> oLock(oMutex);
+                            bGlobalOK = false;
+                            return;
+                        }
+
+                        // Each job writes to a unique iReq slot - no lock
+                        aResults[iReq] = std::move(aCompressed[i]);
+                    }
+                });
+        }
+        poJobQueue->WaitCompletion();
+
+        if (!bGlobalOK)
         {
             CPLError(CE_Failure, CPLE_NotSupported,
-                     "BatchDecodePartial: cannot decode chunk %" PRIu64,
-                     static_cast<uint64_t>(anInnerChunkIndices[iReq]));
+                     "BatchDecodePartial: parallel decode failed");
             return false;
         }
-
-        if (aCompressed[i].size() != nExpectedDecodedChunkSize)
-        {
-            CPLError(CE_Failure, CPLE_NotSupported,
-                     "BatchDecodePartial: decoded size %" PRIu64
-                     " != expected %" PRIu64,
-                     static_cast<uint64_t>(aCompressed[i].size()),
-                     static_cast<uint64_t>(nExpectedDecodedChunkSize));
-            return false;
-        }
-
-        aResults[iReq] = std::move(aCompressed[i]);
     }
 
     return true;

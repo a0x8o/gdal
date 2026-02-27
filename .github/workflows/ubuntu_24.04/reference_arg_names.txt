@@ -32,6 +32,7 @@ burn
 calc
 checksum
 chunk-size
+classification
 color
 color-count
 color-interpretation
@@ -48,6 +49,7 @@ copy-metadata
 copy-overviews
 copy-src-metadata
 copyright
+country-code
 creation-option
 crs
 curvature-coefficient
@@ -83,6 +85,7 @@ feature-limit
 feature-only
 features
 fetch-metadata
+fid
 field
 field-name
 field-strategy
@@ -101,6 +104,7 @@ geometry-field
 geometry-type
 gradient-alg
 group
+group-by
 group-transactions
 height
 hide-nodata
@@ -124,6 +128,7 @@ invert
 invisible-value
 join-style
 keep-lower-dim
+keep-nested
 kernel
 key
 kml
@@ -183,6 +188,7 @@ no-alpha
 no-check-crs
 no-check-extent
 no-clip
+no-create-empty-layers
 no-ct
 no-dither
 no-edges
@@ -235,6 +241,8 @@ position-crs
 position-dataset
 power
 preserve-boundary
+producer-id
+producer-name
 profile
 promote-pixel-value-to-z
 propagate-nodata
@@ -249,6 +257,7 @@ resampling
 resolution
 resume
 return-code
+scale
 scale-axes
 scheme
 sd-filename

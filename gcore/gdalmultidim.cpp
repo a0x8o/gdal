@@ -816,7 +816,7 @@ GUInt64 GDALGroup::GetTotalCopyCost() const
  * @param nCurCost  Should be provided as a variable initially set to 0.
  * @param nTotalCost Total cost from GetTotalCopyCost().
  * @param pfnProgress Progress callback, or nullptr.
- * @param pProgressData Progress user data, or nulptr.
+ * @param pProgressData Progress user data, or nullptr.
  * @param papszOptions Creation options. Currently, only array creation
  *                     options are supported. They must be prefixed with
  * "ARRAY:" . The scope may be further restricted to arrays of a certain
@@ -1274,7 +1274,9 @@ GDALGroup::GetInnerMostGroup(const std::string &osPathOrArrayOrDim,
         CSLTokenizeString2(osPathOrArrayOrDim.c_str(), "/", 0));
     if (aosTokens.size() == 0)
     {
-        return nullptr;
+        // "/" case: the root group itself is the innermost group
+        osLastPart.clear();
+        return poCurGroup;
     }
 
     for (int i = 0; i < aosTokens.size() - 1; i++)
@@ -1467,6 +1469,8 @@ GDALGroup::OpenGroupFromFullname(const std::string &osFullName,
     auto poGroup(GetInnerMostGroup(osFullName, curGroupHolder, osName));
     if (poGroup == nullptr)
         return nullptr;
+    if (osName.empty())
+        return m_pSelf.lock();
     return poGroup->OpenGroup(osName, papszOptions);
 }
 
@@ -1889,7 +1893,7 @@ bool GDALExtendedDataType::CopyValue(const void *pSrc,
 /*                             CopyValues()                             */
 /************************************************************************/
 
-/** Convert severals value from a source type to a destination type.
+/** Convert several values from a source type to a destination type.
  *
  * If dstType is GEDTC_STRING, the written value will be a pointer to a char*,
  * that must be freed with CPLFree().
@@ -4034,7 +4038,7 @@ bool GDALMDArray::CopyFromAllExceptValues(const GDALMDArray *poSrcArray,
  * @param nCurCost  Should be provided as a variable initially set to 0.
  * @param nTotalCost Total cost from GetTotalCopyCost().
  * @param pfnProgress Progress callback, or nullptr.
- * @param pProgressData Progress user data, or nulptr.
+ * @param pProgressData Progress user data, or nullptr.
  *
  * @return true in case of success (or partial success if bStrict == false).
  */
@@ -8742,6 +8746,9 @@ class GDALRasterBandFromArray final : public GDALPamRasterBand
     GDALColorInterp GetColorInterpretation() override;
     int GetOverviewCount() override;
     GDALRasterBand *GetOverview(int idx) override;
+    CPLErr AdviseRead(int nXOff, int nYOff, int nXSize, int nYSize,
+                      int nBufXSize, int nBufYSize, GDALDataType eBufType,
+                      CSLConstList papszOptions) override;
 };
 
 class GDALDatasetFromArray final : public GDALPamDataset
@@ -8862,6 +8869,48 @@ class GDALDatasetFromArray final : public GDALPamDataset
         return m_oMDD.GetMetadataItem(pszName, pszDomain);
     }
 
+    CPLErr IBuildOverviews(const char *pszResampling, int nOverviews,
+                           const int *panOverviewList, int nListBands,
+                           const int *panBandList, GDALProgressFunc pfnProgress,
+                           void *pProgressData,
+                           CSLConstList papszOptions) override
+    {
+        // Try the multidimensional array path. Use quiet handler to
+        // suppress the "not supported" error from the base class stub.
+        bool bNotSupported = false;
+        std::string osErrMsg;
+        CPLErr eSavedClass = CE_None;
+        int nSavedNo = CPLE_None;
+        {
+            CPLErrorHandlerPusher oQuiet(CPLQuietErrorHandler);
+            CPLErr eErr = m_poArray->BuildOverviews(
+                pszResampling, nOverviews, panOverviewList, pfnProgress,
+                pProgressData, papszOptions);
+            if (eErr == CE_None)
+            {
+                m_bOverviewsDiscovered = false;
+                m_apoOverviews.clear();
+                return CE_None;
+            }
+            nSavedNo = CPLGetLastErrorNo();
+            eSavedClass = CPLGetLastErrorType();
+            osErrMsg = CPLGetLastErrorMsg();
+            bNotSupported = (nSavedNo == CPLE_NotSupported);
+        }
+        if (!bNotSupported)
+        {
+            // Re-emit the error that was suppressed by the quiet handler.
+            CPLError(eSavedClass, nSavedNo, "%s", osErrMsg.c_str());
+            return CE_Failure;
+        }
+        // Driver doesn't implement BuildOverviews - fall back to
+        // default path (e.g. external .ovr file).
+        CPLErrorReset();
+        return GDALDataset::IBuildOverviews(
+            pszResampling, nOverviews, panOverviewList, nListBands, panBandList,
+            pfnProgress, pProgressData, papszOptions);
+    }
+
     void DiscoverOverviews()
     {
         if (!m_bOverviewsDiscovered)
@@ -8921,6 +8970,7 @@ GDALRasterBandFromArray::GDALRasterBandFromArray(
     const auto &dims(poArray->GetDimensions());
     const auto nDimCount(dims.size());
     const auto blockSize(poArray->GetBlockSize());
+
     nBlockYSize = (nDimCount >= 2 && blockSize[poDSIn->m_iYDim])
                       ? static_cast<int>(std::min(static_cast<GUInt64>(INT_MAX),
                                                   blockSize[poDSIn->m_iYDim]))
@@ -8929,7 +8979,28 @@ GDALRasterBandFromArray::GDALRasterBandFromArray(
                       ? static_cast<int>(std::min(static_cast<GUInt64>(INT_MAX),
                                                   blockSize[poDSIn->m_iXDim]))
                       : poDSIn->GetRasterXSize();
+
     eDataType = poArray->GetDataType().GetNumericDataType();
+    const int nDTSize = GDALGetDataTypeSizeBytes(eDataType);
+
+    if (nDTSize > 0)
+    {
+        // If the above computed block size exceeds INT_MAX or 1/100th of the
+        // maximum allowed size for the block cache, divide its shape by two,
+        // along the largest dimension. Only do that while there are at least
+        // one dimension with 2 pixels.
+        while (
+            (nBlockXSize >= 2 || nBlockYSize >= 2) &&
+            (nBlockXSize > INT_MAX / nBlockYSize / nDTSize ||
+             (nBlockXSize > GDALGetCacheMax64() / 100 / nBlockYSize / nDTSize)))
+        {
+            if (nBlockXSize > nBlockYSize)
+                nBlockXSize /= 2;
+            else
+                nBlockYSize /= 2;
+        }
+    }
+
     eAccess = poDSIn->eAccess;
     m_anOffset.resize(nDimCount);
     m_anCount.resize(nDimCount, 1);
@@ -9266,6 +9337,40 @@ CPLErr GDALRasterBandFromArray::IWriteBlock(int nBlockXOff, int nBlockYOff,
 }
 
 /************************************************************************/
+/*                             AdviseRead()                             */
+/************************************************************************/
+
+CPLErr GDALRasterBandFromArray::AdviseRead(int nXOff, int nYOff, int nXSize,
+                                           int nYSize, int nBufXSize,
+                                           int nBufYSize,
+                                           GDALDataType /*eBufType*/,
+                                           CSLConstList papszOptions)
+{
+    auto l_poDS(cpl::down_cast<GDALDatasetFromArray *>(poDS));
+    int bStopProcessing = FALSE;
+    const CPLErr eErr = l_poDS->ValidateRasterIOOrAdviseReadParameters(
+        "AdviseRead()", &bStopProcessing, nXOff, nYOff, nXSize, nYSize,
+        nBufXSize, nBufYSize, 1, &nBand);
+    if (eErr != CE_None || bStopProcessing)
+        return eErr;
+
+    const auto &poArray(l_poDS->m_poArray);
+    std::vector<GUInt64> anArrayStartIdx = m_anOffset;
+    std::vector<size_t> anCount = m_anCount;
+    anArrayStartIdx[l_poDS->m_iXDim] = nXOff;
+    anCount[l_poDS->m_iXDim] = nXSize;
+    if (poArray->GetDimensionCount() >= 2)
+    {
+        anArrayStartIdx[l_poDS->m_iYDim] = nYOff;
+        anCount[l_poDS->m_iYDim] = nYSize;
+    }
+    return poArray->AdviseRead(anArrayStartIdx.data(), anCount.data(),
+                               papszOptions)
+               ? CE_None
+               : CE_Failure;
+}
+
+/************************************************************************/
 /*                             IRasterIO()                              */
 /************************************************************************/
 
@@ -9280,9 +9385,15 @@ CPLErr GDALRasterBandFromArray::IRasterIO(GDALRWFlag eRWFlag, int nXOff,
     auto l_poDS(cpl::down_cast<GDALDatasetFromArray *>(poDS));
     const auto &poArray(l_poDS->m_poArray);
     const int nBufferDTSize(GDALGetDataTypeSizeBytes(eBufType));
+    // If reading/writing at full resolution and with proper stride, go
+    // directly to the array, but, for performance reasons,
+    // only if exactly on chunk boundaries, otherwise go through the block cache.
     if (nXSize == nBufXSize && nYSize == nBufYSize && nBufferDTSize > 0 &&
         (nPixelSpaceBuf % nBufferDTSize) == 0 &&
-        (nLineSpaceBuf % nBufferDTSize) == 0)
+        (nLineSpaceBuf % nBufferDTSize) == 0 && (nXOff % nBlockXSize) == 0 &&
+        (nYOff % nBlockYSize) == 0 &&
+        ((nXSize % nBlockXSize) == 0 || nXOff + nXSize == nRasterXSize) &&
+        ((nYSize % nBlockYSize) == 0 || nYOff + nYSize == nRasterYSize))
     {
         m_anOffset[l_poDS->m_iXDim] = static_cast<GUInt64>(nXOff);
         m_anCount[l_poDS->m_iXDim] = static_cast<size_t>(nXSize);
@@ -9311,6 +9422,16 @@ CPLErr GDALRasterBandFromArray::IRasterIO(GDALRWFlag eRWFlag, int nXOff,
                        ? CE_None
                        : CE_Failure;
         }
+    }
+    // For unaligned reads, give the array a chance to pre-populate its
+    // internal chunk cache (e.g. Zarr v3 sharded batches I/O via
+    // PreloadShardedBlocks). The block cache loop below then hits the
+    // already-decompressed chunks instead of issuing individual reads.
+    // Backends that don't override AdviseRead() return true (no-op).
+    if (eRWFlag == GF_Read)
+    {
+        AdviseRead(nXOff, nYOff, nXSize, nYSize, nBufXSize, nBufYSize, eBufType,
+                   nullptr);
     }
     return GDALRasterBand::IRasterIO(eRWFlag, nXOff, nYOff, nXSize, nYSize,
                                      pData, nBufXSize, nBufYSize, eBufType,
@@ -10024,17 +10145,24 @@ std::unique_ptr<GDALDatasetFromArray> GDALDatasetFromArray::Create(
         }
     }
 
+    if ((nDimCount >= 2 &&
+         dims[iYDim]->GetSize() > static_cast<uint64_t>(INT_MAX)) ||
+        dims[iXDim]->GetSize() > static_cast<uint64_t>(INT_MAX))
+    {
+        CPLError(CE_Failure, CPLE_AppDefined,
+                 "Array is too large to be exposed as a GDAL dataset");
+        return nullptr;
+    }
+
     auto poDS = std::make_unique<GDALDatasetFromArray>(
         array, iXDim, iYDim, CPLStringList(papszOptions));
 
     poDS->eAccess = array->IsWritable() ? GA_Update : GA_ReadOnly;
 
     poDS->nRasterYSize =
-        nDimCount < 2 ? 1
-                      : static_cast<int>(std::min(static_cast<GUInt64>(INT_MAX),
-                                                  dims[iYDim]->GetSize()));
-    poDS->nRasterXSize = static_cast<int>(
-        std::min(static_cast<GUInt64>(INT_MAX), dims[iXDim]->GetSize()));
+        nDimCount < 2 ? 1 : static_cast<int>(dims[iYDim]->GetSize());
+
+    poDS->nRasterXSize = static_cast<int>(dims[iXDim]->GetSize());
 
     std::vector<GUInt64> anOtherDimCoord(nNewDimCount);
     std::vector<GUInt64> anStackIters(nDimCount);
@@ -10128,7 +10256,7 @@ lbl_next_depth:
     else
     {
         poDS->SetBand(nCurBand,
-                      new GDALRasterBandFromArray(
+                      std::make_unique<GDALRasterBandFromArray>(
                           poDS.get(), anOtherDimCoord,
                           aoBandParameterMetadataItems, aoBandImageryMetadata,
                           dfDelay, nStartTime, bHasWarned));
@@ -15584,4 +15712,76 @@ GDALMDArrayH GDALMDArrayGetOverview(GDALMDArrayH hArray, int nIdx)
     if (!poOverview)
         return nullptr;
     return new GDALMDArrayHS(poOverview);
+}
+
+/************************************************************************/
+/*                    GDALMDArray::BuildOverviews()                     */
+/************************************************************************/
+
+/** Build overviews for this array.
+ *
+ * Creates reduced resolution copies of this array using the specified
+ * resampling method. The driver is responsible for storing the overview
+ * arrays and any associated metadata (e.g., multiscales convention for Zarr).
+ *
+ * For arrays with more than 2 dimensions, only the spatial dimensions
+ * (last two by default, or as specified by the spatial:dimensions
+ * attribute) are downsampled. Non-spatial dimensions are preserved.
+ *
+ * Overview factors need not be sorted; the implementation will sort and
+ * deduplicate them. Each level is resampled sequentially from the
+ * previous level (e.g., 4x is built from 2x, not from the base).
+ *
+ * This method can also be invoked via GDALDataset::BuildOverviews()
+ * when the dataset was obtained through GDALMDArray::AsClassicDataset().
+ *
+ * @note The Zarr v3 implementation replaces all existing overviews on each
+ * call, unlike GDALDataset::BuildOverviews() which may add new levels.
+ *
+ * @note Currently only implemented by the Zarr v3 driver.
+ *
+ * @param pszResampling Resampling method name (e.g., "NEAREST", "AVERAGE").
+ *                      If nullptr or empty, defaults to "NEAREST".
+ * @param nOverviews Number of overview levels to build. Pass 0 to remove
+ *                   all existing overviews.
+ * @param panOverviewList Array of overview decimation factors (e.g., 2, 4, 8).
+ *                        Each factor must be >= 2. May be nullptr when
+ *                        nOverviews is 0.
+ * @param pfnProgress Progress callback, or nullptr.
+ * @param pProgressData Progress callback user data.
+ * @param papszOptions Driver-specific options, or nullptr.
+ * @return CE_None on success, CE_Failure otherwise.
+ * @since GDAL 3.13
+ */
+CPLErr GDALMDArray::BuildOverviews(CPL_UNUSED const char *pszResampling,
+                                   CPL_UNUSED int nOverviews,
+                                   CPL_UNUSED const int *panOverviewList,
+                                   CPL_UNUSED GDALProgressFunc pfnProgress,
+                                   CPL_UNUSED void *pProgressData,
+                                   CPL_UNUSED CSLConstList papszOptions)
+{
+    CPLError(CE_Failure, CPLE_NotSupported,
+             "BuildOverviews() not supported by this driver");
+    return CE_Failure;
+}
+
+/************************************************************************/
+/*                     GDALMDArrayBuildOverviews()                      */
+/************************************************************************/
+
+/** \brief Build overviews for a multidimensional array.
+ *
+ * This is the same as the C++ method GDALMDArray::BuildOverviews().
+ *
+ * @since GDAL 3.13
+ */
+CPLErr GDALMDArrayBuildOverviews(GDALMDArrayH hArray, const char *pszResampling,
+                                 int nOverviews, const int *panOverviewList,
+                                 GDALProgressFunc pfnProgress,
+                                 void *pProgressData, CSLConstList papszOptions)
+{
+    VALIDATE_POINTER1(hArray, __func__, CE_Failure);
+    return hArray->m_poImpl->BuildOverviews(pszResampling, nOverviews,
+                                            panOverviewList, pfnProgress,
+                                            pProgressData, papszOptions);
 }

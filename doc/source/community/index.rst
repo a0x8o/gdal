@@ -27,6 +27,17 @@ Code of Conduct
 
    code_of_conduct
 
+
+AI Tool Use Policy
+------------------
+
+See :ref:`ai_tool_policy`.
+
+.. toctree::
+   :hidden:
+
+   ai_tool_policy
+
 .. _mailing_list:
 
 Mailing List
@@ -79,11 +90,11 @@ Conferences
 Upcoming
 ++++++++
 
-.. image::   ../../images/community/foss4gnz2025.png
-   :alt:     FOSS4G 2025
-   :target:  https://2025.foss4g.org//
+.. image::   ../../images/community/foss4g2026.png
+   :alt:     FOSS4G 2026
+   :target:  https://2026.foss4g.org/
 
-`FOSS4G 2025 <https://2025.foss4g.org//>`__ is the Open Source Geospatial Foundation (OSGeo) annual FOSS4G event.
+`FOSS4G 2026 <https://2026.foss4g.org/>`__ is the Open Source Geospatial Foundation (OSGeo) annual FOSS4G event.
 
 Previous
 ++++++++

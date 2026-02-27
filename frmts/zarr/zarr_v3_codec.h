@@ -254,6 +254,10 @@ class ZarrV3CodecBytes final : public ZarrV3Codec
 
     bool IsNoOp() const override
     {
+        // Byte-oriented string types have no endianness concept
+        if (m_oInputArrayMetadata.oElt.nativeType ==
+            DtypeElt::NativeType::STRING_ASCII)
+            return true;
         if constexpr (CPL_IS_LSB)
             return m_oInputArrayMetadata.oElt.nativeSize == 1 || m_bLittle;
         else
@@ -452,11 +456,11 @@ class ZarrV3CodecShardingIndexed final : public ZarrV3Codec
 
     /** Batch-read multiple inner chunks from the same shard via two
      *  ReadMultiRange() passes (index entries, then data), then decode.
-     *  No persistent state is kept — each call reads the needed index
-     *  entries on demand.
+     *  pszFilename is used as a cache key for the shard index; pass nullptr
+     *  to bypass the cache.
      */
     bool BatchDecodePartial(
-        VSIVirtualHandle *poFile,
+        VSIVirtualHandle *poFile, const char *pszFilename,
         const std::vector<std::pair<std::vector<size_t>, std::vector<size_t>>>
             &anRequests,
         std::vector<ZarrByteVectorQuickResize> &aResults);
@@ -522,9 +526,10 @@ class ZarrV3CodecSequence
     /** Batch-read multiple inner chunks via ReadMultiRange().
      *  Delegates to the sharding codec if present, otherwise falls back
      *  to sequential DecodePartial() calls.
+     *  pszFilename is forwarded to the sharding codec for index caching.
      */
     bool BatchDecodePartial(
-        VSIVirtualHandle *poFile,
+        VSIVirtualHandle *poFile, const char *pszFilename,
         const std::vector<std::pair<std::vector<size_t>, std::vector<size_t>>>
             &anRequests,
         std::vector<ZarrByteVectorQuickResize> &aResults);

@@ -579,6 +579,7 @@ Decompressor
 decompressors
 decrementing
 decrypted
+deduplicate
 Deegree
 defacto
 define'ed
@@ -1886,6 +1887,7 @@ multiproc
 multiprocess
 multireadtest
 multirecords
+multiscales
 multispectral
 multistring
 multisurface
@@ -2115,7 +2117,6 @@ nullable
 Nullable
 NullFID
 nullptr
-nulptr
 num
 numaspects
 numbase
@@ -2967,7 +2968,6 @@ setMeasured
 SetNonLinearGeometriesEnabledFlag
 setPoint
 setProperties
-severals
 sg
 sgillies
 sgrd
@@ -2980,6 +2980,7 @@ shapefiles
 Shapefiles
 shapelib
 Shapelib
+sharded
 shortname
 shortnames
 shp
@@ -3081,7 +3082,6 @@ Steinberg
 stepsize
 stereographic
 Stereographic
-Stereograpic
 Stigter
 sto
 storageCRS
@@ -3170,7 +3170,6 @@ subsettings
 substitutable
 substring
 subsubgroup
-subtelty
 subtiles
 subtree
 subtype
@@ -3200,7 +3199,6 @@ sxf
 sym
 symlinked
 syntaxes
-syntaxic
 sys
 sysconfdir
 Szekeres
@@ -3237,7 +3235,6 @@ thescale
 thf
 THH
 Thorne
-thorougful
 threadsafe
 threadsafety
 thresholding
@@ -3317,7 +3314,6 @@ tpkx
 tps
 trac
 Trac
-Traditonal
 transactional
 Transactional
 transcode
@@ -3365,6 +3361,7 @@ unary
 uncached
 uncalibrated
 unclamped
+unclosed
 uncoded
 uncomment
 Uncompress

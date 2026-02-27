@@ -47,13 +47,13 @@ General
 .. only:: html
 
     - :ref:`gdal_program`: Main ``gdal`` entry point
-    - :ref:`gdal_syntax`: Syntax for commands of ``gdal`` program
-    - :ref:`migration_guide_to_gdal_cli`: Migration guide to ``gdal`` command line interface
-    - :ref:`gdal_bash_completion`: Bash completion for ``gdal``
-    - :ref:`gdal_cli_from_c`: How to use ``gdal`` CLI algorithms from C
-    - :ref:`gdal_cli_from_cpp`: How to use ``gdal`` CLI algorithms from C++
-    - :ref:`gdal_cli_from_python`: How to use ``gdal`` CLI algorithms from Python
-    - :ref:`gdal_cli_gdalg`: .gdalg files to replay serialized ``gdal`` commands
+    - :ref:`gdal_syntax`
+    - :ref:`migration_guide_to_gdal_cli`
+    - :ref:`gdal_bash_completion`
+    - :ref:`gdal_cli_from_c`
+    - :ref:`gdal_cli_from_cpp`
+    - :ref:`gdal_cli_from_python`
+    - :ref:`gdal_cli_gdalg`
 
 Commands working with raster or vector inputs
 +++++++++++++++++++++++++++++++++++++++++++++
@@ -198,8 +198,10 @@ Vector commands
    gdal_vector_check_geometry
    gdal_vector_clean_coverage
    gdal_vector_clip
+   gdal_vector_combine
    gdal_vector_concat
    gdal_vector_convert
+   gdal_vector_dissolve
    gdal_vector_edit
    gdal_vector_filter
    gdal_vector_info
@@ -235,6 +237,7 @@ Vector commands
     - :ref:`gdal_vector_check_geometry`: Check a dataset for invalid or non-simple geometries
     - :ref:`gdal_vector_clean_coverage`: Remove gaps and overlaps in a polygon dataset
     - :ref:`gdal_vector_clip`: Clip a vector dataset
+    - :ref:`gdal_vector_combine`: Combine geometries into collections
     - :ref:`gdal_vector_concat`: Concatenate vector datasets
     - :ref:`gdal_vector_convert`: Convert a vector dataset
     - :ref:`gdal_vector_edit`: Edit metadata of a vector dataset
@@ -349,7 +352,7 @@ Driver specific commands
 
     - :ref:`gdal_driver_gpkg_repack`: Repack/vacuum in-place a GeoPackage dataset
     - :ref:`gdal_driver_gti_create`: Create an index of raster datasets compatible of the GDAL Tile Index (GTI) driver
-    - :ref:`gdal_driver_openfilegdb_repack`: Repack in-place a FileGeodabase dataset
+    - :ref:`gdal_driver_openfilegdb_repack`: Repack in-place a FileGeodatabase dataset
     - :ref:`gdal_driver_parquet_create_metadata_file`:  Create the _metadata file for a partitioned Parquet dataset
     - :ref:`gdal_driver_pdf_list_layers`: Return the list of layers of a PDF file.
 

@@ -85,6 +85,8 @@ bool ZarrV2Array::Flush()
 
     bool ret = ZarrV2Array::FlushDirtyBlock();
 
+    m_anCachedBlockIndices.clear();
+
     if (m_bDefinitionModified)
     {
         if (!Serialize())
@@ -1275,9 +1277,6 @@ static GDALExtendedDataType ParseDtype(const CPLJSONObject &obj,
             }
             else if (chType == 'f' && nBytes == 2)
             {
-                // elt.nativeType = DtypeElt::NativeType::IEEEFP;
-                // elt.gdalTypeIsApproxOfNative = true;
-                // eDT = GDT_Float32;
                 elt.nativeType = DtypeElt::NativeType::IEEEFP;
                 eDT = GDT_Float16;
             }

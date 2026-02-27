@@ -672,26 +672,9 @@ void ZarrArray::EncodeElt(const std::vector<DtypeElt> &elts, const GByte *pSrc,
         {
             if (elt.nativeSize == 2)
             {
-                if (elt.gdalTypeIsApproxOfNative)
-                {
-                    CPLAssert(elt.nativeType == DtypeElt::NativeType::IEEEFP);
-                    CPLAssert(elt.gdalType.GetNumericDataType() == GDT_Float32);
-                    const uint32_t uint32Val =
-                        *reinterpret_cast<const uint32_t *>(pSrc +
-                                                            elt.gdalOffset);
-                    bool bHasWarned = false;
-                    uint16_t uint16Val =
-                        CPL_SWAP16(CPLFloatToHalf(uint32Val, bHasWarned));
-                    memcpy(pDst + elt.nativeOffset, &uint16Val,
-                           sizeof(uint16Val));
-                }
-                else
-                {
-                    const uint16_t val =
-                        CPL_SWAP16(*reinterpret_cast<const uint16_t *>(
-                            pSrc + elt.gdalOffset));
-                    memcpy(pDst + elt.nativeOffset, &val, sizeof(val));
-                }
+                const uint16_t val = CPL_SWAP16(
+                    *reinterpret_cast<const uint16_t *>(pSrc + elt.gdalOffset));
+                memcpy(pDst + elt.nativeOffset, &val, sizeof(val));
             }
             else if (elt.nativeSize == 4)
             {
@@ -735,21 +718,7 @@ void ZarrArray::EncodeElt(const std::vector<DtypeElt> &elts, const GByte *pSrc,
         }
         else if (elt.gdalTypeIsApproxOfNative)
         {
-            if (elt.nativeType == DtypeElt::NativeType::IEEEFP &&
-                elt.nativeSize == 2)
-            {
-                CPLAssert(elt.gdalType.GetNumericDataType() == GDT_Float32);
-                const uint32_t uint32Val =
-                    *reinterpret_cast<const uint32_t *>(pSrc + elt.gdalOffset);
-                bool bHasWarned = false;
-                const uint16_t uint16Val =
-                    CPLFloatToHalf(uint32Val, bHasWarned);
-                memcpy(pDst + elt.nativeOffset, &uint16Val, sizeof(uint16Val));
-            }
-            else
-            {
-                CPLAssert(false);
-            }
+            CPLAssert(false);
         }
         else if (elt.nativeType == DtypeElt::NativeType::STRING_ASCII)
         {
@@ -899,19 +868,8 @@ void ZarrArray::DecodeSourceElt(const std::vector<DtypeElt> &elts,
             {
                 uint16_t val;
                 memcpy(&val, pSrc + elt.nativeOffset, sizeof(val));
-                if (elt.gdalTypeIsApproxOfNative)
-                {
-                    CPLAssert(elt.nativeType == DtypeElt::NativeType::IEEEFP);
-                    CPLAssert(elt.gdalType.GetNumericDataType() == GDT_Float32);
-                    uint32_t uint32Val = CPLHalfToFloat(CPL_SWAP16(val));
-                    memcpy(pDst + elt.gdalOffset, &uint32Val,
-                           sizeof(uint32Val));
-                }
-                else
-                {
-                    *reinterpret_cast<uint16_t *>(pDst + elt.gdalOffset) =
-                        CPL_SWAP16(val);
-                }
+                *reinterpret_cast<uint16_t *>(pDst + elt.gdalOffset) =
+                    CPL_SWAP16(val);
             }
             else if (elt.nativeSize == 4)
             {
@@ -957,19 +915,7 @@ void ZarrArray::DecodeSourceElt(const std::vector<DtypeElt> &elts,
         }
         else if (elt.gdalTypeIsApproxOfNative)
         {
-            if (elt.nativeType == DtypeElt::NativeType::IEEEFP &&
-                elt.nativeSize == 2)
-            {
-                CPLAssert(elt.gdalType.GetNumericDataType() == GDT_Float32);
-                uint16_t uint16Val;
-                memcpy(&uint16Val, pSrc + elt.nativeOffset, sizeof(uint16Val));
-                uint32_t uint32Val = CPLHalfToFloat(uint16Val);
-                memcpy(pDst + elt.gdalOffset, &uint32Val, sizeof(uint32Val));
-            }
-            else
-            {
-                CPLAssert(false);
-            }
+            CPLAssert(false);
         }
         else if (elt.nativeType == DtypeElt::NativeType::STRING_ASCII)
         {
@@ -1005,6 +951,9 @@ bool ZarrArray::IAdviseReadCommon(const GUInt64 *arrayStartIdx,
                                   size_t &nReqBlocks) const
 {
     if (!CheckValidAndErrorOutIfNot())
+        return false;
+
+    if (!FlushDirtyBlock())
         return false;
 
     const size_t nDims = m_aoDims.size();
@@ -1076,6 +1025,16 @@ bool ZarrArray::IAdviseReadCommon(const GUInt64 *arrayStartIdx,
                                     /* bDefaultAllCPUs=*/true);
     if (nThreadsMax <= 1)
         return true;
+
+    // libhdf5 doesn't like concurrent access to the same file, even under
+    // a mutex...
+    auto poBlockPresenceArray = OpenBlockPresenceCache(false);
+    if (poBlockPresenceArray)
+    {
+        nThreadsMax = 1;
+        return true;
+    }
+
     CPLDebug(ZARR_DEBUG_KEY, "IAdviseRead(): Using up to %d threads",
              nThreadsMax);
 
@@ -1209,6 +1168,44 @@ bool ZarrArray::IRead(const GUInt64 *arrayStartIdx, const size_t *count,
         arrayStartIdx = arrayStartIdxMod.data();
         arrayStep = arrayStepMod.data();
         bufferStride = bufferStrideMod.data();
+    }
+
+    // Auto-parallel: prefetch multi-chunk reads via IAdviseRead().
+    // arrayStep[i] guaranteed positive after negative-step normalization above.
+    if (nDims >= 2 && m_oChunkCache.empty())
+    {
+        const char *pszNumThreads =
+            CPLGetConfigOption("GDAL_NUM_THREADS", nullptr);
+        if (pszNumThreads != nullptr)
+        {
+            size_t nReqChunks = 1;
+            for (size_t i = 0; i < nDims; ++i)
+            {
+                const uint64_t startBlock =
+                    arrayStartIdx[i] / m_anInnerBlockSize[i];
+                const uint64_t endBlock =
+                    (arrayStartIdx[i] +
+                     (count[i] - 1) * static_cast<uint64_t>(arrayStep[i])) /
+                    m_anInnerBlockSize[i];
+                nReqChunks *= static_cast<size_t>(endBlock - startBlock + 1);
+            }
+            if (nReqChunks > 1)
+            {
+                // IAdviseRead expects the contiguous element count per
+                // dimension, not the strided output count.  When step > 1,
+                // expand count to cover the full element range.
+                std::vector<size_t> anAdjustedCount(nDims);
+                for (size_t i = 0; i < nDims; ++i)
+                {
+                    anAdjustedCount[i] =
+                        1 + (count[i] - 1) * static_cast<size_t>(arrayStep[i]);
+                }
+                CPLStringList aosOptions;
+                aosOptions.SetNameValue("NUM_THREADS", pszNumThreads);
+                CPL_IGNORE_RET_VAL(IAdviseRead(
+                    arrayStartIdx, anAdjustedCount.data(), aosOptions.List()));
+            }
+        }
     }
 
     std::vector<uint64_t> indicesOuterLoop(nDims + 1);
@@ -1768,8 +1765,8 @@ lbl_next_depth:
             if (arrayStep[i] != 0)
             {
                 const auto nextBlockIdx =
-                    std::min((1 + indicesOuterLoop[i] / m_anOuterBlockSize[i]) *
-                                 m_anOuterBlockSize[i],
+                    std::min((1 + indicesOuterLoop[i] / m_anInnerBlockSize[i]) *
+                                 m_anInnerBlockSize[i],
                              arrayStartIdx[i] + count[i] * arrayStep[i]);
                 countInnerLoopInit[i] = static_cast<size_t>(cpl::div_round_up(
                     nextBlockIdx - indicesOuterLoop[i], arrayStep[i]));
@@ -1780,7 +1777,7 @@ lbl_next_depth:
                     indicesOuterLoop[i] == 0 &&
                     countInnerLoopInit[i] == m_aoDims[i]->GetSize();
                 bWriteWholeBlock =
-                    (countInnerLoopInit[i] == m_anOuterBlockSize[i] ||
+                    (countInnerLoopInit[i] == m_anInnerBlockSize[i] ||
                      bWholePartialBlockThisDim);
                 if (bWholePartialBlockThisDim)
                 {
@@ -1866,7 +1863,7 @@ lbl_next_depth:
         m_bCachedBlockEmpty = false;
         if (nDims)
             offsetDstBuffer[0] = static_cast<size_t>(
-                indicesOuterLoop[0] - blockIndices[0] * m_anOuterBlockSize[0]);
+                indicesOuterLoop[0] - blockIndices[0] * m_anInnerBlockSize[0]);
 
         GByte *pabyBlock = &abyBlock[0];
 
@@ -1878,10 +1875,10 @@ lbl_next_depth:
             for (size_t i = dimIdxSubLoop + 1; i < nDims; ++i)
             {
                 nOffset = static_cast<size_t>(
-                    nOffset * m_anOuterBlockSize[i] +
+                    nOffset * m_anInnerBlockSize[i] +
                     (indicesOuterLoop[i] -
-                     blockIndices[i] * m_anOuterBlockSize[i]));
-                step *= m_anOuterBlockSize[i];
+                     blockIndices[i] * m_anInnerBlockSize[i]));
+                step *= m_anInnerBlockSize[i];
             }
             const void *src_ptr = srcPtrStackInnerLoop[dimIdxSubLoop];
             GByte *dst_ptr = pabyBlock + nOffset * nCacheDTSize;
@@ -2048,10 +2045,10 @@ lbl_next_depth:
                     srcPtrStackInnerLoop[dimIdxSubLoop - 1];
                 offsetDstBuffer[dimIdxSubLoop] = static_cast<size_t>(
                     offsetDstBuffer[dimIdxSubLoop - 1] *
-                        m_anOuterBlockSize[dimIdxSubLoop] +
+                        m_anInnerBlockSize[dimIdxSubLoop] +
                     (indicesOuterLoop[dimIdxSubLoop] -
                      blockIndices[dimIdxSubLoop] *
-                         m_anOuterBlockSize[dimIdxSubLoop]));
+                         m_anInnerBlockSize[dimIdxSubLoop]));
                 goto lbl_next_depth_inner_loop;
             lbl_return_to_caller_inner_loop:
                 dimIdxSubLoop--;
@@ -2075,7 +2072,7 @@ lbl_next_depth:
         // This level of loop loops over blocks
         indicesOuterLoop[dimIdx] = arrayStartIdx[dimIdx];
         blockIndices[dimIdx] =
-            indicesOuterLoop[dimIdx] / m_anOuterBlockSize[dimIdx];
+            indicesOuterLoop[dimIdx] / m_anInnerBlockSize[dimIdx];
         while (true)
         {
             dimIdx++;
@@ -2088,13 +2085,13 @@ lbl_next_depth:
 
             size_t nIncr;
             if (static_cast<GUInt64>(arrayStep[dimIdx]) <
-                m_anOuterBlockSize[dimIdx])
+                m_anInnerBlockSize[dimIdx])
             {
                 // Compute index at next block boundary
                 auto newIdx =
                     indicesOuterLoop[dimIdx] +
-                    (m_anOuterBlockSize[dimIdx] -
-                     (indicesOuterLoop[dimIdx] % m_anOuterBlockSize[dimIdx]));
+                    (m_anInnerBlockSize[dimIdx] -
+                     (indicesOuterLoop[dimIdx] % m_anInnerBlockSize[dimIdx]));
                 // And round up compared to arrayStartIdx, arrayStep
                 nIncr = static_cast<size_t>(cpl::div_round_up(
                     newIdx - indicesOuterLoop[dimIdx], arrayStep[dimIdx]));
@@ -2111,7 +2108,7 @@ lbl_next_depth:
                 bufferStride[dimIdx] *
                 static_cast<GPtrDiff_t>(nIncr * nBufferDTSize);
             blockIndices[dimIdx] =
-                indicesOuterLoop[dimIdx] / m_anOuterBlockSize[dimIdx];
+                indicesOuterLoop[dimIdx] / m_anInnerBlockSize[dimIdx];
         }
     }
     if (dimIdx > 0)
@@ -3788,7 +3785,11 @@ std::shared_ptr<ZarrGroupBase> ZarrArray::GetParentGroup() const
         if (auto poRootGroup = m_poSharedResource->GetRootGroup())
         {
             const auto nPos = m_osFullName.rfind('/');
-            if (nPos != 0 && nPos != std::string::npos)
+            if (nPos == 0)
+            {
+                poGroup = std::dynamic_pointer_cast<ZarrGroupBase>(poRootGroup);
+            }
+            else if (nPos != std::string::npos)
             {
                 poGroup = std::dynamic_pointer_cast<ZarrGroupBase>(
                     poRootGroup->OpenGroupFromFullname(
