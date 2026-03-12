@@ -253,6 +253,15 @@ PostGIS, ...), the following layer metadata items may be set:
   ``OVERVIEW_<idx>_DATASET`` and/or ``OVERVIEW_<idx>_LAYER`` may also be
   specified to point to another tile index.
 
+* ``INTERLEAVE=<val>`` (starting with GDAL 3.13) where ``<val>`` can be
+  ``PIXEL`` or ``BAND`` specifies how pixels belonging to multiple bands are
+  grouped together. This setting affects performance, both how external code
+  accesses pixel values, and internal operation of the driver.
+  When using :ref:`gdal_driver_gti_create`, the value is automatically set to
+  match interleave mode among the input sources. Accessing sources whose
+  interleave mode differs from the exposed value may result in reduced performance.
+  See :ref:`raster_data_model_interleave_mode` for more details.
+
 All overviews *must* have exactly the same extent as the full resolution
 virtual mosaic. The GTI driver does not check that, and if that condition is
 not met, subsampled pixel request will lead to incorrect result.
@@ -397,6 +406,8 @@ mentioned in the previous section.
             </OpenOptions>
         </Overview>
 
+        <Interleave>Band|Pixel</Interleave>            <!-- optional -->
+
     </GDALTileIndexDataset>
 
 
@@ -526,6 +537,19 @@ also defined as layer metadata items or in the .gti XML file
       :choices: <float>
 
       Maximum Y value for the virtual mosaic extent
+
+-  .. oo:: WARPING_MEMORY_SIZE.
+      :choices: <string>
+      :default: 64MB
+      :since: 3.12.3
+
+      Set the amount of memory that the warp API is allowed to use for caching
+      when on-the-fly reprojection occurs.
+      The value can be specified either as a fixed amount of memory (e.g.
+      ``200MB``, ``1G``) or as a percentage of usable RAM (``10%``).
+      Note that, in case of multi-threaded optimizations described in the
+      paragraph below, the value applies for each warped source.
+
 
 Multi-threading optimizations
 -----------------------------

@@ -290,6 +290,7 @@ class ZarrSharedResource
     std::weak_ptr<ZarrGroupBase> m_poWeakRootGroup{};
     std::set<std::string> m_oSetArrayInLoading{};
     std::map<std::string, std::shared_ptr<GDALMDArray>> m_oCacheIndexingVar{};
+    std::string m_osKerchunkParquetPath{};
 
     explicit ZarrSharedResource(const std::string &osRootDirectoryName,
                                 bool bUpdatable);
@@ -355,6 +356,11 @@ class ZarrSharedResource
     UpdateDimensionSize(const std::shared_ptr<GDALDimension> &poUpdatedDim);
 
     std::shared_ptr<ZarrGroupBase> GetRootGroup();
+
+    const std::string &GetKerchunkParquetPath() const
+    {
+        return m_osKerchunkParquetPath;
+    }
 
     void SetRootGroup(const std::shared_ptr<ZarrGroupBase> &poRootGroup)
     {
@@ -977,6 +983,10 @@ class ZarrArray CPL_NON_FINAL : public GDALPamMDArray
     };
 
     mutable std::map<std::vector<uint64_t>, CachedBlock> m_oChunkCache{};
+
+    //! Region covered by the last IAdviseRead (for subset check in IRead)
+    mutable std::vector<GUInt64> m_anCachedAdviseReadStart{};
+    mutable std::vector<size_t> m_anCachedAdviseReadCount{};
 
     static uint64_t
     ComputeBlockCount(const std::string &osName,

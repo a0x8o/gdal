@@ -60,14 +60,6 @@
 #define _(x) (x)
 #endif
 
-// Semantincs of indices of a GeoTransform (double[6]) matrix
-constexpr int GT_TOPLEFT_X = 0;
-constexpr int GT_WE_RES = 1;
-constexpr int GT_ROTATION_PARAM1 = 2;
-constexpr int GT_TOPLEFT_Y = 3;
-constexpr int GT_ROTATION_PARAM2 = 4;
-constexpr int GT_NS_RES = 5;
-
 constexpr const char *GTI_PREFIX = "GTI:";
 
 constexpr const char *MD_DS_TILE_INDEX_LAYER = "TILE_INDEX_LAYER";
@@ -95,6 +87,7 @@ constexpr const char *MD_BLOCK_X_SIZE = "BLOCKXSIZE";
 constexpr const char *MD_BLOCK_Y_SIZE = "BLOCKYSIZE";
 constexpr const char *MD_MASK_BAND = "MASK_BAND";
 constexpr const char *MD_RESAMPLING = "RESAMPLING";
+constexpr const char *MD_INTERLEAVE = "INTERLEAVE";
 
 constexpr const char *const apszTIOptions[] = {MD_RESX,
                                                MD_RESY,
@@ -116,7 +109,8 @@ constexpr const char *const apszTIOptions[] = {MD_RESX,
                                                MD_BLOCK_X_SIZE,
                                                MD_BLOCK_Y_SIZE,
                                                MD_MASK_BAND,
-                                               MD_RESAMPLING};
+                                               MD_RESAMPLING,
+                                               MD_INTERLEAVE};
 
 constexpr const char *const MD_BAND_OFFSET = "OFFSET";
 constexpr const char *const MD_BAND_SCALE = "SCALE";
@@ -158,6 +152,44 @@ static inline bool ENDS_WITH_CI(const char *a, const char *b)
 {
     return strlen(a) >= strlen(b) && EQUAL(a + strlen(a) - strlen(b), b);
 }
+
+/************************************************************************/
+/*                          GTISharedSourceKey                          */
+/************************************************************************/
+
+struct GTISharedSourceKey
+{
+    std::string osTileName{};
+    std::vector<int> anBands{};
+
+    bool operator==(const GTISharedSourceKey &other) const
+    {
+        return osTileName == other.osTileName && anBands == other.anBands;
+    }
+
+    CPL_NOSANITIZE_UNSIGNED_INT_OVERFLOW
+    size_t getHash() const noexcept
+    {
+        size_t h = std::hash<std::string>{}(osTileName);
+        for (int b : anBands)
+        {
+            // Cf https://www.boost.org/doc/libs/1_36_0/doc/html/hash/reference.html#boost.hash_combine
+            h ^= std::hash<int>{}(b) + 0x9e3779b9 + (h << 6) + (h >> 2);
+        }
+        return h;
+    }
+};
+
+namespace std
+{
+template <> struct hash<GTISharedSourceKey>
+{
+    size_t operator()(const GTISharedSourceKey &val) const noexcept
+    {
+        return val.getHash();
+    }
+};
+}  // namespace std
 
 /************************************************************************/
 /*                         GDALTileIndexDataset                         */
@@ -246,13 +278,16 @@ class GDALTileIndexDataset final : public GDALPamDataset
 
         //! Source dataset, raw/unwarped
         GDALDataset *poUnreprojectedDS = nullptr;
+
+        //! Whether (nBandCount, panBandMap) is taken into account by poDS
+        bool bBandMapTakenIntoAccount = false;
     };
 
     //! Cache from dataset name to dataset handle.
     //! Note that the dataset objects are ultimately GDALProxyPoolDataset,
     //! and that the GDALProxyPoolDataset limits the number of simultaneously
     //! opened real datasets (controlled by GDAL_MAX_DATASET_POOL_SIZE). Hence 500 is not too big.
-    lru11::Cache<std::string, std::shared_ptr<SharedDataset>>
+    lru11::Cache<GTISharedSourceKey, std::shared_ptr<SharedDataset>>
         m_oMapSharedSources{500};
 
     //! Mask band (e.g. for JPEG compressed + mask band)
@@ -263,6 +298,9 @@ class GDALTileIndexDataset final : public GDALPamDataset
 
     //! Whether all bands of the tile index have the same nodata value.
     bool m_bSameNoData = true;
+
+    //! Whether a band interleave must be exposed.
+    bool m_bBandInterleave = false;
 
     //! Minimum X of the current pixel request, in georeferenced units.
     double m_dfLastMinXFilter = std::numeric_limits<double>::quiet_NaN();
@@ -275,6 +313,9 @@ class GDALTileIndexDataset final : public GDALPamDataset
 
     //! Maximum Y of the current pixel request, in georeferenced units.
     double m_dfLastMaxYFilter = std::numeric_limits<double>::quiet_NaN();
+
+    //! Bands for which m_aoSourceDesc is valid (only if m_bBandInterleave)
+    std::vector<int> m_anLastBands{};
 
     //! Index of the field (within m_poLayer->GetLayerDefn()) used to sort, or -1 if none.
     int m_nSortFieldIndex = -1;
@@ -326,6 +367,9 @@ class GDALTileIndexDataset final : public GDALPamDataset
         //! Source dataset, raw/unwarped
         GDALDataset *poUnreprojectedDS = nullptr;
 
+        //! Whether (nBandCount, panBandMap) is taken into account by poDS
+        bool bBandMapTakenIntoAccount = false;
+
         //! VRTSimpleSource or VRTComplexSource for the source.
         std::unique_ptr<VRTSimpleSource> poSource{};
 
@@ -363,14 +407,18 @@ class GDALTileIndexDataset final : public GDALPamDataset
     //! Whether the GTI file is a STAC collection
     bool m_bSTACCollection = false;
 
+    std::string m_osWarpMemory{};
+
     //! From a source dataset name, return its SourceDesc description structure.
     bool GetSourceDesc(const std::string &osTileName, SourceDesc &oSourceDesc,
-                       std::mutex *pMutex);
+                       std::mutex *pMutex, int nBandCount,
+                       const int *panBandMap);
 
     //! Collect sources corresponding to the georeferenced window of interest,
     //! and store them in m_aoSourceDesc[].
     bool CollectSources(double dfXOff, double dfYOff, double dfXSize,
-                        double dfYSize, bool bMultiThreadAllowed);
+                        double dfYSize, int nBandCount, const int *panBandMap,
+                        bool bMultiThreadAllowed);
 
     //! Sort sources according to m_nSortFieldIndex.
     void SortSourceDesc();
@@ -1561,21 +1609,21 @@ bool GDALTileIndexDataset::Open(GDALOpenInfo *poOpenInfo)
                      "Cannot find geotransform on %s", pszTileName);
             return false;
         }
-        if (!(gtTile[GT_ROTATION_PARAM1] == 0))
+        if (!(gtTile.xrot == 0))
         {
             CPLError(CE_Failure, CPLE_AppDefined,
                      "3rd value of GeoTransform of %s must be 0", pszTileName);
             return false;
         }
-        if (!(gtTile[GT_ROTATION_PARAM2] == 0))
+        if (!(gtTile.yrot == 0))
         {
             CPLError(CE_Failure, CPLE_AppDefined,
                      "5th value of GeoTransform of %s must be 0", pszTileName);
             return false;
         }
 
-        const double dfResX = gtTile[GT_WE_RES];
-        const double dfResY = gtTile[GT_NS_RES];
+        const double dfResX = gtTile.xscale;
+        const double dfResY = gtTile.yscale;
         if (!(dfResX > 0))
         {
             CPLError(CE_Failure, CPLE_AppDefined,
@@ -1623,12 +1671,12 @@ bool GDALTileIndexDataset::Open(GDALOpenInfo *poOpenInfo)
             return false;
         }
 
-        m_gt[GT_TOPLEFT_X] = sEnvelope.MinX;
-        m_gt[GT_WE_RES] = dfResX;
-        m_gt[GT_ROTATION_PARAM1] = 0;
-        m_gt[GT_TOPLEFT_Y] = sEnvelope.MaxY;
-        m_gt[GT_ROTATION_PARAM2] = 0;
-        m_gt[GT_NS_RES] = -std::fabs(dfResY);
+        m_gt.xorig = sEnvelope.MinX;
+        m_gt.xscale = dfResX;
+        m_gt.xrot = 0;
+        m_gt.yorig = sEnvelope.MaxY;
+        m_gt.yrot = 0;
+        m_gt.yscale = -std::fabs(dfResY);
 
         nRasterXSize = static_cast<int>(std::ceil(dfXSize));
         nRasterYSize = static_cast<int>(std::ceil(dfYSize));
@@ -1666,25 +1714,25 @@ bool GDALTileIndexDataset::Open(GDALOpenInfo *poOpenInfo)
         {
             m_gt[i] = CPLAtof(aosTokens[i]);
         }
-        if (!(m_gt[GT_WE_RES] > 0))
+        if (!(m_gt.xscale > 0))
         {
             CPLError(CE_Failure, CPLE_AppDefined, "2nd value of %s must be > 0",
                      MD_GEOTRANSFORM);
             return false;
         }
-        if (!(m_gt[GT_ROTATION_PARAM1] == 0))
+        if (!(m_gt.xrot == 0))
         {
             CPLError(CE_Failure, CPLE_AppDefined, "3rd value of %s must be 0",
                      MD_GEOTRANSFORM);
             return false;
         }
-        if (!(m_gt[GT_ROTATION_PARAM2] == 0))
+        if (!(m_gt.yrot == 0))
         {
             CPLError(CE_Failure, CPLE_AppDefined, "5th value of %s must be 0",
                      MD_GEOTRANSFORM);
             return false;
         }
-        if (!(m_gt[GT_NS_RES] < 0))
+        if (!(m_gt.yscale < 0))
         {
             CPLError(CE_Failure, CPLE_AppDefined, "6th value of %s must be < 0",
                      MD_GEOTRANSFORM);
@@ -1752,12 +1800,12 @@ bool GDALTileIndexDataset::Open(GDALOpenInfo *poOpenInfo)
             return false;
         }
 
-        m_gt[GT_TOPLEFT_X] = sEnvelope.MinX;
-        m_gt[GT_WE_RES] = dfResX;
-        m_gt[GT_ROTATION_PARAM1] = 0;
-        m_gt[GT_TOPLEFT_Y] = sEnvelope.MaxY;
-        m_gt[GT_ROTATION_PARAM2] = 0;
-        m_gt[GT_NS_RES] = -dfResY;
+        m_gt.xorig = sEnvelope.MinX;
+        m_gt.xscale = dfResX;
+        m_gt.xrot = 0;
+        m_gt.yorig = sEnvelope.MaxY;
+        m_gt.yrot = 0;
+        m_gt.yscale = -dfResY;
         nRasterXSize = static_cast<int>(std::ceil(dfXSize));
         nRasterYSize = static_cast<int>(std::ceil(dfYSize));
     }
@@ -1976,8 +2024,8 @@ bool GDALTileIndexDataset::Open(GDALOpenInfo *poOpenInfo)
 
     if (dfOvrFactor > 1.0)
     {
-        m_gt[GT_WE_RES] *= dfOvrFactor;
-        m_gt[GT_NS_RES] *= dfOvrFactor;
+        m_gt.xscale *= dfOvrFactor;
+        m_gt.yscale *= dfOvrFactor;
         nRasterXSize = static_cast<int>(std::ceil(nRasterXSize / dfOvrFactor));
         nRasterYSize = static_cast<int>(std::ceil(nRasterYSize / dfOvrFactor));
     }
@@ -2409,7 +2457,14 @@ bool GDALTileIndexDataset::Open(GDALOpenInfo *poOpenInfo)
         }
     }
 
-    if (nBandCount > 1 && !GetMetadata("IMAGE_STRUCTURE"))
+    const char *pszInterleave = GetOption(MD_INTERLEAVE);
+    if (pszInterleave)
+    {
+        GDALDataset::SetMetadataItem("INTERLEAVE", pszInterleave,
+                                     "IMAGE_STRUCTURE");
+        m_bBandInterleave = EQUAL(pszInterleave, "BAND");
+    }
+    else if (nBandCount > 1 && !GetMetadata("IMAGE_STRUCTURE"))
     {
         GDALDataset::SetMetadataItem("INTERLEAVE", "PIXEL", "IMAGE_STRUCTURE");
     }
@@ -2424,6 +2479,9 @@ bool GDALTileIndexDataset::Open(GDALOpenInfo *poOpenInfo)
     /*      Check for overviews.                                            */
     /* -------------------------------------------------------------------- */
     oOvManager.Initialize(this, poOpenInfo->pszFilename);
+
+    m_osWarpMemory = CSLFetchNameValueDef(poOpenInfo->papszOpenOptions,
+                                          "WARPING_MEMORY_SIZE", "");
 
     return true;
 }
@@ -2757,6 +2815,7 @@ CPLErr GDALTileIndexDataset::FlushCache(bool bAtClosing)
     m_dfLastMinYFilter = std::numeric_limits<double>::quiet_NaN();
     m_dfLastMaxXFilter = std::numeric_limits<double>::quiet_NaN();
     m_dfLastMaxYFilter = std::numeric_limits<double>::quiet_NaN();
+    m_anLastBands.clear();
     m_aoSourceDesc.clear();
     if (GDALPamDataset::FlushCache(bAtClosing) != CE_None)
         eErr = CE_Failure;
@@ -2990,12 +3049,10 @@ int GDALTileIndexBand::IGetDataCoverageStatus(int nXOff, int nYOff, int nXSize,
     if (pdfDataPct != nullptr)
         *pdfDataPct = -1.0;
 
-    const double dfMinX =
-        m_poDS->m_gt[GT_TOPLEFT_X] + nXOff * m_poDS->m_gt[GT_WE_RES];
-    const double dfMaxX = dfMinX + nXSize * m_poDS->m_gt[GT_WE_RES];
-    const double dfMaxY =
-        m_poDS->m_gt[GT_TOPLEFT_Y] + nYOff * m_poDS->m_gt[GT_NS_RES];
-    const double dfMinY = dfMaxY + nYSize * m_poDS->m_gt[GT_NS_RES];
+    const double dfMinX = m_poDS->m_gt.xorig + nXOff * m_poDS->m_gt.xscale;
+    const double dfMaxX = dfMinX + nXSize * m_poDS->m_gt.xscale;
+    const double dfMaxY = m_poDS->m_gt.yorig + nYOff * m_poDS->m_gt.yscale;
+    const double dfMinY = dfMaxY + nYSize * m_poDS->m_gt.yscale;
 
     OGRLayer *poSQLLayer = nullptr;
     if (!m_poDS->m_osSpatialSQL.empty())
@@ -3049,19 +3106,17 @@ int GDALTileIndexBand::IGetDataCoverageStatus(int nXOff, int nYOff, int nXSize,
         poGeom->getEnvelope(&sSourceEnvelope);
 
         const double dfDstXOff = std::max<double>(
-            nXOff, (sSourceEnvelope.MinX - m_poDS->m_gt[GT_TOPLEFT_X]) /
-                       m_poDS->m_gt[GT_WE_RES]);
-        const double dfDstXOff2 =
-            std::min<double>(nXOff + nXSize, (sSourceEnvelope.MaxX -
-                                              m_poDS->m_gt[GT_TOPLEFT_X]) /
-                                                 m_poDS->m_gt[GT_WE_RES]);
+            nXOff,
+            (sSourceEnvelope.MinX - m_poDS->m_gt.xorig) / m_poDS->m_gt.xscale);
+        const double dfDstXOff2 = std::min<double>(
+            nXOff + nXSize,
+            (sSourceEnvelope.MaxX - m_poDS->m_gt.xorig) / m_poDS->m_gt.xscale);
         const double dfDstYOff = std::max<double>(
-            nYOff, (sSourceEnvelope.MaxY - m_poDS->m_gt[GT_TOPLEFT_Y]) /
-                       m_poDS->m_gt[GT_NS_RES]);
-        const double dfDstYOff2 =
-            std::min<double>(nYOff + nYSize, (sSourceEnvelope.MinY -
-                                              m_poDS->m_gt[GT_TOPLEFT_Y]) /
-                                                 m_poDS->m_gt[GT_NS_RES]);
+            nYOff,
+            (sSourceEnvelope.MaxY - m_poDS->m_gt.yorig) / m_poDS->m_gt.yscale);
+        const double dfDstYOff2 = std::min<double>(
+            nYOff + nYSize,
+            (sSourceEnvelope.MinY - m_poDS->m_gt.yorig) / m_poDS->m_gt.yscale);
 
         // CPLDebug("GTI", "dfDstXOff=%f, dfDstXOff2=%f, dfDstYOff=%f, dfDstYOff2=%f",
         //         dfDstXOff, dfDstXOff2, dfDstYOff, dfDstXOff2);
@@ -3199,7 +3254,8 @@ const char *GDALTileIndexBand::GetMetadataItem(const char *pszName,
             iLine >= GetYSize())
             return nullptr;
 
-        if (!m_poDS->CollectSources(iPixel, iLine, 1, 1,
+        const int anBand[] = {nBand};
+        if (!m_poDS->CollectSources(iPixel, iLine, 1, 1, 1, anBand,
                                     /* bMultiThreadAllowed = */ false))
             return nullptr;
 
@@ -3219,7 +3275,6 @@ const char *GDALTileIndexBand::GetMetadataItem(const char *pszName,
                 m_osLastLocationInfo += "</File>";
             };
 
-            const int anBand[] = {nBand};
             if (!m_poDS->NeedInitBuffer(1, anBand))
             {
                 AddSource(m_poDS->m_aoSourceDesc.back());
@@ -3339,43 +3394,43 @@ static bool GetSrcDstWin(const GDALGeoTransform &tileGT, int nTileXSize,
                          double *pdfDstYOff, double *pdfDstXSize,
                          double *pdfDstYSize)
 {
-    const double minX = vrtGT[GT_TOPLEFT_X];
-    const double we_res = vrtGT[GT_WE_RES];
+    const double minX = vrtGT.xorig;
+    const double we_res = vrtGT.xscale;
     const double maxX = minX + nVRTXSize * we_res;
-    const double maxY = vrtGT[GT_TOPLEFT_Y];
-    const double ns_res = vrtGT[GT_NS_RES];
+    const double maxY = vrtGT.yorig;
+    const double ns_res = vrtGT.yscale;
     const double minY = maxY + nVRTYSize * ns_res;
 
     /* Check that the destination bounding box intersects the source bounding
      * box */
-    if (tileGT[GT_TOPLEFT_X] + nTileXSize * tileGT[GT_WE_RES] <= minX)
+    if (tileGT.xorig + nTileXSize * tileGT.xscale <= minX)
         return false;
-    if (tileGT[GT_TOPLEFT_X] >= maxX)
+    if (tileGT.xorig >= maxX)
         return false;
-    if (tileGT[GT_TOPLEFT_Y] + nTileYSize * tileGT[GT_NS_RES] >= maxY)
+    if (tileGT.yorig + nTileYSize * tileGT.yscale >= maxY)
         return false;
-    if (tileGT[GT_TOPLEFT_Y] <= minY)
+    if (tileGT.yorig <= minY)
         return false;
 
-    if (tileGT[GT_TOPLEFT_X] < minX)
+    if (tileGT.xorig < minX)
     {
-        *pdfSrcXOff = (minX - tileGT[GT_TOPLEFT_X]) / tileGT[GT_WE_RES];
+        *pdfSrcXOff = (minX - tileGT.xorig) / tileGT.xscale;
         *pdfDstXOff = 0.0;
     }
     else
     {
         *pdfSrcXOff = 0.0;
-        *pdfDstXOff = ((tileGT[GT_TOPLEFT_X] - minX) / we_res);
+        *pdfDstXOff = ((tileGT.xorig - minX) / we_res);
     }
-    if (maxY < tileGT[GT_TOPLEFT_Y])
+    if (maxY < tileGT.yorig)
     {
-        *pdfSrcYOff = (tileGT[GT_TOPLEFT_Y] - maxY) / -tileGT[GT_NS_RES];
+        *pdfSrcYOff = (tileGT.yorig - maxY) / -tileGT.yscale;
         *pdfDstYOff = 0.0;
     }
     else
     {
         *pdfSrcYOff = 0.0;
-        *pdfDstYOff = ((maxY - tileGT[GT_TOPLEFT_Y]) / -ns_res);
+        *pdfDstYOff = ((maxY - tileGT.yorig) / -ns_res);
     }
 
     *pdfSrcXSize = nTileXSize;
@@ -3385,9 +3440,9 @@ static bool GetSrcDstWin(const GDALGeoTransform &tileGT, int nTileXSize,
     if (*pdfSrcYOff > 0)
         *pdfSrcYSize -= *pdfSrcYOff;
 
-    const double dfSrcToDstXSize = tileGT[GT_WE_RES] / we_res;
+    const double dfSrcToDstXSize = tileGT.xscale / we_res;
     *pdfDstXSize = *pdfSrcXSize * dfSrcToDstXSize;
-    const double dfSrcToDstYSize = tileGT[GT_NS_RES] / ns_res;
+    const double dfSrcToDstYSize = tileGT.yscale / ns_res;
     *pdfDstYSize = *pdfSrcYSize * dfSrcToDstYSize;
 
     if (*pdfDstXOff + *pdfDstXSize > nVRTXSize)
@@ -3449,15 +3504,15 @@ GDALTileIndexDataset::GetSourcesMoreRecentThan(int64_t mTime)
         OGREnvelope sEnvelope;
         poGeom->getEnvelope(&sEnvelope);
 
-        double dfXOff = (sEnvelope.MinX - m_gt[GT_TOPLEFT_X]) / m_gt[GT_WE_RES];
+        double dfXOff = (sEnvelope.MinX - m_gt.xorig) / m_gt.xscale;
         if (dfXOff >= nRasterXSize)
             continue;
 
-        double dfYOff = (sEnvelope.MaxY - m_gt[GT_TOPLEFT_Y]) / m_gt[GT_NS_RES];
+        double dfYOff = (sEnvelope.MaxY - m_gt.yorig) / m_gt.yscale;
         if (dfYOff >= nRasterYSize)
             continue;
 
-        double dfXSize = (sEnvelope.MaxX - sEnvelope.MinX) / m_gt[GT_WE_RES];
+        double dfXSize = (sEnvelope.MaxX - sEnvelope.MinX) / m_gt.xscale;
         if (dfXOff < 0)
         {
             dfXSize += dfXOff;
@@ -3467,7 +3522,7 @@ GDALTileIndexDataset::GetSourcesMoreRecentThan(int64_t mTime)
         }
 
         double dfYSize =
-            (sEnvelope.MaxY - sEnvelope.MinY) / std::fabs(m_gt[GT_NS_RES]);
+            (sEnvelope.MaxY - sEnvelope.MinY) / std::fabs(m_gt.yscale);
         if (dfYOff < 0)
         {
             dfYSize += dfYOff;
@@ -3506,23 +3561,31 @@ GDALTileIndexDataset::GetSourcesMoreRecentThan(int64_t mTime)
 
 bool GDALTileIndexDataset::GetSourceDesc(const std::string &osTileName,
                                          SourceDesc &oSourceDesc,
-                                         std::mutex *pMutex)
+                                         std::mutex *pMutex, int nBandCount,
+                                         const int *panBandMap)
 {
 
     if (pMutex)
         pMutex->lock();
     std::shared_ptr<SharedDataset> sharedDS;
-    m_oMapSharedSources.tryGet(osTileName, sharedDS);
+    GTISharedSourceKey key;
+    key.osTileName = osTileName;
+    if (m_bBandInterleave)
+        key.anBands.insert(key.anBands.end(), panBandMap,
+                           panBandMap + nBandCount);
+    m_oMapSharedSources.tryGet(key, sharedDS);
     if (pMutex)
         pMutex->unlock();
 
     std::shared_ptr<GDALDataset> poTileDS;
     GDALDataset *poUnreprojectedDS = nullptr;
+    bool bBandMapTakenIntoAccount = false;
 
     if (sharedDS)
     {
         poTileDS = sharedDS->poDS;
         poUnreprojectedDS = sharedDS->poUnreprojectedDS;
+        bBandMapTakenIntoAccount = sharedDS->bBandMapTakenIntoAccount;
     }
     else
     {
@@ -3563,10 +3626,16 @@ bool GDALTileIndexDataset::GetSourceDesc(const std::string &osTileName,
                      osTileName.c_str());
             bWarpVRT = true;
             bExportSRS = true;
-            bAddAlphaToVRT = true;
+            if (poTileDS->GetRasterBand(poTileDS->GetRasterCount())
+                        ->GetColorInterpretation() != GCI_AlphaBand &&
+                GetRasterBand(nBands)->GetColorInterpretation() ==
+                    GCI_AlphaBand)
+            {
+                bAddAlphaToVRT = true;
+            }
         }
         else if (poTileDS->GetGeoTransform(tileGT) == CE_None &&
-                 tileGT[GT_NS_RES] > 0 &&
+                 tileGT.yscale > 0 &&
                  ((m_oSRS.IsEmpty() && poTileSRS == nullptr) ||
                   (!m_oSRS.IsEmpty() && poTileSRS && m_oSRS.IsSame(poTileSRS))))
 
@@ -3632,37 +3701,37 @@ bool GDALTileIndexDataset::GetSourceDesc(const std::string &osTileName,
             }
 
             // Second pass to create a warped source VRT whose
-            // extent is aligned on the one of the target VRT
+            // extent is aligned on the one of the target GTI
             GDALGeoTransform warpDSGT;
             const auto eErr = poWarpDS->GetGeoTransform(warpDSGT);
             CPL_IGNORE_RET_VAL(eErr);
             CPLAssert(eErr == CE_None);
-            const double dfVRTMinX = m_gt[GT_TOPLEFT_X];
-            const double dfVRTResX = m_gt[GT_WE_RES];
-            const double dfVRTMaxY = m_gt[GT_TOPLEFT_Y];
-            const double dfVRTResYAbs = -m_gt[GT_NS_RES];
+            const double dfGTIMinX = m_gt.xorig;
+            const double dfGTIResX = m_gt.xscale;
+            const double dfGTIMaxY = m_gt.yorig;
+            const double dfGTIResYAbs = -m_gt.yscale;
             const double dfWarpMinX =
-                std::floor((warpDSGT[GT_TOPLEFT_X] - dfVRTMinX) / dfVRTResX) *
-                    dfVRTResX +
-                dfVRTMinX;
+                std::floor((warpDSGT.xorig - dfGTIMinX) / dfGTIResX) *
+                    dfGTIResX +
+                dfGTIMinX;
             const double dfWarpMaxX =
-                std::ceil((warpDSGT[GT_TOPLEFT_X] +
-                           warpDSGT[GT_WE_RES] * poWarpDS->GetRasterXSize() -
-                           dfVRTMinX) /
-                          dfVRTResX) *
-                    dfVRTResX +
-                dfVRTMinX;
+                std::ceil((warpDSGT.xorig +
+                           warpDSGT.xscale * poWarpDS->GetRasterXSize() -
+                           dfGTIMinX) /
+                          dfGTIResX) *
+                    dfGTIResX +
+                dfGTIMinX;
             const double dfWarpMaxY =
-                dfVRTMaxY - std::floor((dfVRTMaxY - warpDSGT[GT_TOPLEFT_Y]) /
-                                       dfVRTResYAbs) *
-                                dfVRTResYAbs;
+                dfGTIMaxY -
+                std::floor((dfGTIMaxY - warpDSGT.yorig) / dfGTIResYAbs) *
+                    dfGTIResYAbs;
             const double dfWarpMinY =
-                dfVRTMaxY -
-                std::ceil((dfVRTMaxY -
-                           (warpDSGT[GT_TOPLEFT_Y] +
-                            warpDSGT[GT_NS_RES] * poWarpDS->GetRasterYSize())) /
-                          dfVRTResYAbs) *
-                    dfVRTResYAbs;
+                dfGTIMaxY -
+                std::ceil((dfGTIMaxY -
+                           (warpDSGT.yorig +
+                            warpDSGT.yscale * poWarpDS->GetRasterYSize())) /
+                          dfGTIResYAbs) *
+                    dfGTIResYAbs;
 
             aosOptions.AddString("-te");
             aosOptions.AddString(CPLSPrintf("%.17g", dfWarpMinX));
@@ -3671,11 +3740,27 @@ bool GDALTileIndexDataset::GetSourceDesc(const std::string &osTileName,
             aosOptions.AddString(CPLSPrintf("%.17g", dfWarpMaxY));
 
             aosOptions.AddString("-tr");
-            aosOptions.AddString(CPLSPrintf("%.17g", dfVRTResX));
-            aosOptions.AddString(CPLSPrintf("%.17g", dfVRTResYAbs));
+            aosOptions.AddString(CPLSPrintf("%.17g", dfGTIResX));
+            aosOptions.AddString(CPLSPrintf("%.17g", dfGTIResYAbs));
+
+            if (m_bBandInterleave)
+            {
+                bBandMapTakenIntoAccount = true;
+                for (int i = 0; i < nBandCount; ++i)
+                {
+                    aosOptions.AddString("-b");
+                    aosOptions.AddString(CPLSPrintf("%d", panBandMap[i]));
+                }
+            }
 
             if (bAddAlphaToVRT)
                 aosOptions.AddString("-dstalpha");
+
+            if (!m_osWarpMemory.empty())
+            {
+                aosOptions.AddString("-wm");
+                aosOptions.AddString(m_osWarpMemory.c_str());
+            }
 
             psWarpOptions = GDALWarpAppOptionsNew(aosOptions.List(), nullptr);
             poWarpDS.reset(GDALDataset::FromHandle(GDALWarp(
@@ -3692,10 +3777,11 @@ bool GDALTileIndexDataset::GetSourceDesc(const std::string &osTileName,
         sharedDS = std::make_shared<SharedDataset>();
         sharedDS->poDS = poTileDS;
         sharedDS->poUnreprojectedDS = poUnreprojectedDS;
+        sharedDS->bBandMapTakenIntoAccount = bBandMapTakenIntoAccount;
 
         if (pMutex)
             pMutex->lock();
-        m_oMapSharedSources.insert(osTileName, sharedDS);
+        m_oMapSharedSources.insert(key, sharedDS);
         if (pMutex)
             pMutex->unlock();
     }
@@ -3712,8 +3798,8 @@ bool GDALTileIndexDataset::GetSourceDesc(const std::string &osTileName,
     bool bSameNoData = true;
     double dfNoDataValue = 0;
     GDALRasterBand *poMaskBand = nullptr;
-    const int nBandCount = poTileDS->GetRasterCount();
-    for (int iBand = 0; iBand < nBandCount; ++iBand)
+    const int nTileBandCount = poTileDS->GetRasterCount();
+    for (int iBand = 0; iBand < nTileBandCount; ++iBand)
     {
         auto poTileBand = poTileDS->GetRasterBand(iBand + 1);
         int bThisBandHasNoData = false;
@@ -3761,6 +3847,7 @@ bool GDALTileIndexDataset::GetSourceDesc(const std::string &osTileName,
     oSourceDesc.osName = osTileName;
     oSourceDesc.poDS = std::move(poTileDS);
     oSourceDesc.poUnreprojectedDS = poUnreprojectedDS;
+    oSourceDesc.bBandMapTakenIntoAccount = bBandMapTakenIntoAccount;
     oSourceDesc.poSource = std::move(poSource);
     oSourceDesc.bHasNoData = bHasNoData;
     oSourceDesc.bSameNoData = bSameNoData;
@@ -3790,15 +3877,19 @@ int GDALTileIndexDataset::GetNumThreads() const
 
 bool GDALTileIndexDataset::CollectSources(double dfXOff, double dfYOff,
                                           double dfXSize, double dfYSize,
+                                          int nBandCount, const int *panBandMap,
                                           bool bMultiThreadAllowed)
 {
-    const double dfMinX = m_gt[GT_TOPLEFT_X] + dfXOff * m_gt[GT_WE_RES];
-    const double dfMaxX = dfMinX + dfXSize * m_gt[GT_WE_RES];
-    const double dfMaxY = m_gt[GT_TOPLEFT_Y] + dfYOff * m_gt[GT_NS_RES];
-    const double dfMinY = dfMaxY + dfYSize * m_gt[GT_NS_RES];
+    const double dfMinX = m_gt.xorig + dfXOff * m_gt.xscale;
+    const double dfMaxX = dfMinX + dfXSize * m_gt.xscale;
+    const double dfMaxY = m_gt.yorig + dfYOff * m_gt.yscale;
+    const double dfMinY = dfMaxY + dfYSize * m_gt.yscale;
 
     if (dfMinX == m_dfLastMinXFilter && dfMinY == m_dfLastMinYFilter &&
-        dfMaxX == m_dfLastMaxXFilter && dfMaxY == m_dfLastMaxYFilter)
+        dfMaxX == m_dfLastMaxXFilter && dfMaxY == m_dfLastMaxYFilter &&
+        (!m_bBandInterleave ||
+         (m_anLastBands ==
+          std::vector<int>(panBandMap, panBandMap + nBandCount))))
     {
         return true;
     }
@@ -3807,6 +3898,8 @@ bool GDALTileIndexDataset::CollectSources(double dfXOff, double dfYOff,
     m_dfLastMinYFilter = dfMinY;
     m_dfLastMaxXFilter = dfMaxX;
     m_dfLastMaxYFilter = dfMaxY;
+    if (m_bBandInterleave)
+        m_anLastBands = std::vector<int>(panBandMap, panBandMap + nBandCount);
     m_bLastMustUseMultiThreading = false;
 
     OGRLayer *poSQLLayer = nullptr;
@@ -3901,17 +3994,13 @@ bool GDALTileIndexDataset::CollectSources(double dfXOff, double dfYOff,
             poGeom->getEnvelope(&sEnvelope);
 
             CPLRectObj sSourceBounds;
-            sSourceBounds.minx =
-                (sEnvelope.MinX - m_gt[GT_TOPLEFT_X]) / m_gt[GT_WE_RES];
-            sSourceBounds.maxx =
-                (sEnvelope.MaxX - m_gt[GT_TOPLEFT_X]) / m_gt[GT_WE_RES];
+            sSourceBounds.minx = (sEnvelope.MinX - m_gt.xorig) / m_gt.xscale;
+            sSourceBounds.maxx = (sEnvelope.MaxX - m_gt.xorig) / m_gt.xscale;
             // Yes use of MaxY to compute miny is intended given that MaxY is
             // in georeferenced space whereas miny is in pixel space.
-            sSourceBounds.miny =
-                (sEnvelope.MaxY - m_gt[GT_TOPLEFT_Y]) / m_gt[GT_NS_RES];
+            sSourceBounds.miny = (sEnvelope.MaxY - m_gt.yorig) / m_gt.yscale;
             // Same here for maxy vs Miny
-            sSourceBounds.maxy =
-                (sEnvelope.MinY - m_gt[GT_TOPLEFT_Y]) / m_gt[GT_NS_RES];
+            sSourceBounds.maxy = (sEnvelope.MinY - m_gt.yorig) / m_gt.yscale;
 
             // Clamp to global bounds and some epsilon to avoid adjacent tiles
             // to be considered as overlapping
@@ -3965,33 +4054,34 @@ bool GDALTileIndexDataset::CollectSources(double dfXOff, double dfYOff,
             pszTileName, GetDescription(), m_bSTACCollection));
 
         SourceDesc oSourceDesc;
-        if (!GetSourceDesc(osTileName, oSourceDesc, nullptr))
+        if (!GetSourceDesc(osTileName, oSourceDesc, nullptr, nBandCount,
+                           panBandMap))
             return false;
 
         // Check consistency of bounding box in tile index vs actual
         // extent of the tile.
         GDALGeoTransform tileGT;
         if (oSourceDesc.poDS->GetGeoTransform(tileGT) == CE_None &&
-            tileGT[GT_ROTATION_PARAM1] == 0 && tileGT[GT_ROTATION_PARAM2] == 0)
+            tileGT.xrot == 0 && tileGT.yrot == 0)
         {
             OGREnvelope sActualTileExtent;
-            sActualTileExtent.MinX = tileGT[GT_TOPLEFT_X];
+            sActualTileExtent.MinX = tileGT.xorig;
             sActualTileExtent.MaxX =
                 sActualTileExtent.MinX +
-                oSourceDesc.poDS->GetRasterXSize() * tileGT[GT_WE_RES];
-            sActualTileExtent.MaxY = tileGT[GT_TOPLEFT_Y];
+                oSourceDesc.poDS->GetRasterXSize() * tileGT.xscale;
+            sActualTileExtent.MaxY = tileGT.yorig;
             sActualTileExtent.MinY =
                 sActualTileExtent.MaxY +
-                oSourceDesc.poDS->GetRasterYSize() * tileGT[GT_NS_RES];
+                oSourceDesc.poDS->GetRasterYSize() * tileGT.yscale;
             const auto poGeom = poFeature->GetGeometryRef();
             if (poGeom && !poGeom->IsEmpty())
             {
                 OGREnvelope sGeomTileExtent;
                 poGeom->getEnvelope(&sGeomTileExtent);
-                sGeomTileExtent.MinX -= m_gt[GT_WE_RES];
-                sGeomTileExtent.MaxX += m_gt[GT_WE_RES];
-                sGeomTileExtent.MinY -= std::fabs(m_gt[GT_NS_RES]);
-                sGeomTileExtent.MaxY += std::fabs(m_gt[GT_NS_RES]);
+                sGeomTileExtent.MinX -= m_gt.xscale;
+                sGeomTileExtent.MaxX += m_gt.xscale;
+                sGeomTileExtent.MinY -= std::fabs(m_gt.yscale);
+                sGeomTileExtent.MaxY += std::fabs(m_gt.yscale);
                 if (!sGeomTileExtent.Contains(sActualTileExtent))
                 {
                     if (!sGeomTileExtent.Intersects(sActualTileExtent))
@@ -4433,7 +4523,7 @@ CPLErr GDALTileIndexDataset::RenderSource(
     const SourceDesc &oSourceDesc, bool bNeedInitBuffer, int nBandNrMax,
     int nXOff, int nYOff, int nXSize, int nYSize, double dfXOff, double dfYOff,
     double dfXSize, double dfYSize, int nBufXSize, int nBufYSize, void *pData,
-    GDALDataType eBufType, int nBandCount, BANDMAP_TYPE panBandMap,
+    GDALDataType eBufType, int nBandCount, BANDMAP_TYPE panBandMapIn,
     GSpacing nPixelSpace, GSpacing nLineSpace, GSpacing nBandSpace,
     GDALRasterIOExtraArg *psExtraArg,
     VRTSource::WorkingState &oWorkingState) const
@@ -4442,6 +4532,21 @@ CPLErr GDALTileIndexDataset::RenderSource(
     auto &poSource = oSourceDesc.poSource;
     auto poComplexSource = dynamic_cast<VRTComplexSource *>(poSource.get());
     CPLErr eErr = CE_None;
+
+    const auto GetBandFromBandMap = [&oSourceDesc, panBandMapIn](int iBand)
+    {
+        return oSourceDesc.bBandMapTakenIntoAccount ? iBand + 1
+                                                    : panBandMapIn[iBand];
+    };
+
+    std::vector<int> anSerial;
+    if (oSourceDesc.bBandMapTakenIntoAccount)
+    {
+        for (int i = 0; i < nBandCount; ++i)
+            anSerial.push_back(i + 1);
+    }
+    BANDMAP_TYPE panBandMapForRasterIO =
+        oSourceDesc.bBandMapTakenIntoAccount ? anSerial.data() : panBandMapIn;
 
     if (poTileDS->GetRasterCount() + 1 == nBandNrMax &&
         papoBands[nBandNrMax - 1]->GetColorInterpretation() == GCI_AlphaBand &&
@@ -4464,7 +4569,7 @@ CPLErr GDALTileIndexDataset::RenderSource(
         // datasets and we read a RGB one.
         for (int iBand = 0; iBand < nBandCount && eErr == CE_None; ++iBand)
         {
-            const int nBandNr = panBandMap[iBand];
+            const int nBandNr = GetBandFromBandMap(iBand);
             if (nBandNr == nBandNrMax)
             {
                 // The window we will actually request from the source raster band.
@@ -4533,7 +4638,8 @@ CPLErr GDALTileIndexDataset::RenderSource(
         }
         return eErr;
     }
-    else if (poTileDS->GetRasterCount() < nBandNrMax)
+    else if (!oSourceDesc.bBandMapTakenIntoAccount &&
+             poTileDS->GetRasterCount() < nBandNrMax)
     {
         CPLError(CE_Failure, CPLE_AppDefined, "%s has not enough bands.",
                  oSourceDesc.osName.c_str());
@@ -4601,7 +4707,7 @@ CPLErr GDALTileIndexDataset::RenderSource(
                 {
                     for (int iBand = 0; iBand < nBandCount; ++iBand)
                     {
-                        if (panBandMap[iBand] == nMaskBandNr)
+                        if (panBandMapIn[iBand] == nMaskBandNr)
                         {
                             iMaskBandIdx = iBand;
                             break;
@@ -4677,8 +4783,8 @@ CPLErr GDALTileIndexDataset::RenderSource(
             else if (poTileDS->RasterIO(GF_Read, nReqXOff, nReqYOff, nReqXSize,
                                         nReqYSize, abyWorkBuffer.data(),
                                         nOutXSize, nOutYSize, eBufType,
-                                        nBandCount, panBandMap, 0, 0, 0,
-                                        &sExtraArg) != CE_None)
+                                        nBandCount, panBandMapForRasterIO, 0, 0,
+                                        0, &sExtraArg) != CE_None)
             {
                 return CE_Failure;
             }
@@ -4721,16 +4827,17 @@ CPLErr GDALTileIndexDataset::RenderSource(
             sExtraArg.eResampleAlg = m_eResampling;
         }
 
-        auto poTileBand = poTileDS->GetRasterBand(panBandMap[0]);
+        auto poTileBand = poTileDS->GetRasterBand(GetBandFromBandMap(0));
         oSimpleSource.SetRasterBand(poTileBand, false);
         eErr = oSimpleSource.DatasetRasterIO(
             papoBands[0]->GetRasterDataType(), nXOff, nYOff, nXSize, nYSize,
-            pData, nBufXSize, nBufYSize, eBufType, nBandCount, panBandMap,
-            nPixelSpace, nLineSpace, nBandSpace, &sExtraArg);
+            pData, nBufXSize, nBufYSize, eBufType, nBandCount,
+            panBandMapForRasterIO, nPixelSpace, nLineSpace, nBandSpace,
+            &sExtraArg);
     }
     else if (m_bSameDataType && !poComplexSource)
     {
-        auto poTileBand = poTileDS->GetRasterBand(panBandMap[0]);
+        auto poTileBand = poTileDS->GetRasterBand(GetBandFromBandMap(0));
         poSource->SetRasterBand(poTileBand, false);
 
         GDALRasterIOExtraArg sExtraArg;
@@ -4753,14 +4860,15 @@ CPLErr GDALTileIndexDataset::RenderSource(
 
         eErr = poSource->DatasetRasterIO(
             papoBands[0]->GetRasterDataType(), nXOff, nYOff, nXSize, nYSize,
-            pData, nBufXSize, nBufYSize, eBufType, nBandCount, panBandMap,
-            nPixelSpace, nLineSpace, nBandSpace, &sExtraArg);
+            pData, nBufXSize, nBufYSize, eBufType, nBandCount,
+            panBandMapForRasterIO, nPixelSpace, nLineSpace, nBandSpace,
+            &sExtraArg);
     }
     else
     {
         for (int i = 0; i < nBandCount && eErr == CE_None; ++i)
         {
-            const int nBandNr = panBandMap[i];
+            const int nBandNr = GetBandFromBandMap(i);
             GByte *pabyBandData = static_cast<GByte *>(pData) + i * nBandSpace;
             auto poTileBand = poTileDS->GetRasterBand(nBandNr);
             if (poComplexSource)
@@ -4836,7 +4944,8 @@ CPLErr GDALTileIndexDataset::IRasterIO(
         dfYSize = psExtraArg->dfYSize;
     }
 
-    if (!CollectSources(dfXOff, dfYOff, dfXSize, dfYSize,
+    if (!CollectSources(dfXOff, dfYOff, dfXSize, dfYSize, nBandCount,
+                        panBandMap,
                         /* bMultiThreadAllowed = */ true))
     {
         return CE_Failure;
@@ -5003,7 +5112,8 @@ void GDALTileIndexDataset::RasterIOJob::Func(void *pData)
 
         const bool bCanOpenSource =
             psJob->poDS->GetSourceDesc(osTileName, oSourceDesc,
-                                       &psJob->poQueueWorkingStates->oMutex) &&
+                                       &psJob->poQueueWorkingStates->oMutex,
+                                       psJob->nBandCount, psJob->panBandMap) &&
             oSourceDesc.poDS;
 
         if (!bCanOpenSource)
@@ -5337,9 +5447,12 @@ void GDALRegister_GTI()
         "  <Option name='MINY' type='float'/>"
         "  <Option name='MAXX' type='float'/>"
         "  <Option name='MAXY' type='float'/>"
-        "<Option name='NUM_THREADS' type='string' description="
+        "  <Option name='NUM_THREADS' type='string' description="
         "'Number of worker threads for reading. Can be set to ALL_CPUS' "
         "default='ALL_CPUS'/>"
+        "  <Option name='WARPING_MEMORY_SIZE' type='string' description="
+        "'Set the amount of memory that the warp API is allowed to use for "
+        "caching' default='64MB'/>"
         "</OpenOptionList>");
 
 #ifdef GDAL_ENABLE_ALGORITHMS

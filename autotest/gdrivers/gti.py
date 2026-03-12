@@ -1733,7 +1733,7 @@ def test_gti_on_the_fly_warping(tmp_vsimem):
     del index_ds
 
     vrt_ds = gdal.Open(index_filename)
-    assert vrt_ds.GetRasterBand(1).Checksum() == 4772
+    assert vrt_ds.GetRasterBand(1).Checksum() in (4772, 4663)
 
     # Check that we add transparency to the warped source
     index_ds = ogr.GetDriverByName("GPKG").CreateDataSource(index_filename)
@@ -2961,10 +2961,14 @@ def test_gti_read_multi_threaded_disabled_because_truncated_source(tmp_vsimem):
     gdal.VSIFTruncateL(f, gdal.VSIStatL(right_filename).size - 10)
     gdal.VSIFCloseL(f)
 
-    vrt_ds = gdal.Open(index_filename)
+    with gdal.config_options(
+        {"GTI_NUM_THREADS": str(gdal.GetNumCPUs()), "GDAL_NUM_THREADS": "1"},
+        thread_local=False,
+    ):
+        vrt_ds = gdal.Open(index_filename)
 
-    with pytest.raises(Exception, match="right.tif"):
-        vrt_ds.ReadRaster()
+        with pytest.raises(Exception, match="right.tif"):
+            vrt_ds.ReadRaster()
 
     assert vrt_ds.GetMetadataItem("MULTI_THREADED_RASTERIO_LAST_USED", "__DEBUG__") == (
         "1" if gdal.GetNumCPUs() >= 2 else "0"
@@ -3061,7 +3065,8 @@ def test_gti_stac_geoparquet_sentinel2(filename):
     if conn is None:
         pytest.skip("cannot open URL")
 
-    ds = gdal.Open(f"GTI:data/gti/{filename}")
+    with gdal.config_option("CPL_VSIL_CURL_ALLOWED_EXTENSIONS", None):
+        ds = gdal.Open(f"GTI:data/gti/{filename}")
     assert ds.RasterXSize == 5556
     assert ds.RasterYSize == 5540
     assert ds.GetSpatialRef().GetAuthorityCode(None) == "32612"
@@ -3289,6 +3294,69 @@ def test_gti_reprojected_no_out_of_sync_warning(index_filename):
     origins, amplifying the floor/ceil grid-snap that triggers the mismatch.
     Regression test for https://github.com/OSGeo/gdal/issues/13944."""
 
-    gti_ds = gdal.Open(index_filename)
+    gti_ds = gdal.OpenEx(index_filename, open_options=["WARPING_MEMORY=100MB"])
     with gdaltest.error_raised(gdal.CE_None):
         gti_ds.ReadRaster(0, 0, 500, 500)
+
+
+###############################################################################
+
+
+def test_gti_band_interleave(tmp_vsimem):
+
+    # Slightly different dst_crs than the source one from the point of view
+    # of SpatialReference.IsSame(), but not enough to cause pixel differences
+    # during reprojection
+    gdal.alg.driver.gti.create(
+        input="data/small_world.tif",
+        output=tmp_vsimem / "out.gti.gpkg",
+        dst_crs="+proj=longlat +ellps=WGS84",
+    )
+
+    src_ds = gdal.Open("data/small_world.tif")
+
+    ds = gdal.Open(tmp_vsimem / "out.gti.gpkg")
+    assert ds.GetMetadataItem("INTERLEAVE", "IMAGE_STRUCTURE") == "BAND"
+    assert ds.GetRasterBand(1).ReadRaster() == src_ds.GetRasterBand(1).ReadRaster()
+    # test caching
+    assert ds.GetRasterBand(1).ReadRaster() == src_ds.GetRasterBand(1).ReadRaster()
+    assert ds.GetRasterBand(2).ReadRaster() == src_ds.GetRasterBand(2).ReadRaster()
+    assert ds.GetRasterBand(3).ReadRaster() == src_ds.GetRasterBand(3).ReadRaster()
+
+    ds = gdal.Open(tmp_vsimem / "out.gti.gpkg")
+    assert ds.ReadRaster(band_list=[3, 2, 1]) == src_ds.ReadRaster(band_list=[3, 2, 1])
+
+
+###############################################################################
+
+
+def test_gti_band_interleave_rgba(tmp_vsimem):
+
+    gdal.Warp(
+        tmp_vsimem / "in.tif",
+        "data/small_world.tif",
+        options="-dstalpha -co INTERLEAVE=BAND",
+    )
+
+    # Slightly different dst_crs than the source one from the point of view
+    # of SpatialReference.IsSame(), but not enough to cause pixel differences
+    # during reprojection
+    gdal.alg.driver.gti.create(
+        input=tmp_vsimem / "in.tif",
+        output=tmp_vsimem / "out.gti.gpkg",
+        dst_crs="+proj=longlat +ellps=WGS84",
+    )
+
+    src_ds = gdal.Open(tmp_vsimem / "in.tif")
+
+    ds = gdal.Open(tmp_vsimem / "out.gti.gpkg")
+    assert ds.GetMetadataItem("INTERLEAVE", "IMAGE_STRUCTURE") == "BAND"
+    assert ds.GetRasterBand(1).ReadRaster() == src_ds.GetRasterBand(1).ReadRaster()
+    assert ds.GetRasterBand(2).ReadRaster() == src_ds.GetRasterBand(2).ReadRaster()
+    assert ds.GetRasterBand(3).ReadRaster() == src_ds.GetRasterBand(3).ReadRaster()
+    assert ds.GetRasterBand(4).ReadRaster() == src_ds.GetRasterBand(4).ReadRaster()
+
+    ds = gdal.Open(tmp_vsimem / "out.gti.gpkg")
+    assert ds.ReadRaster(band_list=[4, 3, 2, 1]) == src_ds.ReadRaster(
+        band_list=[4, 3, 2, 1]
+    )

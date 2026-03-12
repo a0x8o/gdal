@@ -2006,7 +2006,10 @@ def test_zarr_create_array(tmp_vsimem, datatype, nodata, format):
     error_expected = False
     if datatype.GetNumericDataType() in (gdal.GDT_CInt16, gdal.GDT_CInt32):
         error_expected = True
-    elif format == "ZARR_V3" and datatype.GetClass() != gdal.GEDTC_NUMERIC:
+    elif format == "ZARR_V3" and datatype.GetClass() not in (
+        gdal.GEDTC_NUMERIC,
+        gdal.GEDTC_STRING,
+    ):
         error_expected = True
 
     def create():
@@ -4302,6 +4305,108 @@ def test_zarr_iread_auto_parallel(tmp_path, format):
         ds = None
 
 
+@pytest.mark.parametrize("format", ["ZARR_V2", "ZARR_V3"])
+def test_zarr_multiband_advise_read(tmp_path, format):
+    """Classic API ds.ReadRaster() should get parallel prefetch on all bands."""
+
+    filename = str(tmp_path / "test.zarr")
+    ny, nx, nbands = 60, 80, 3
+    blocksize = 20
+
+    # Create 3-band dataset via multidimensional API (band, y, x)
+    ds = gdal.GetDriverByName("ZARR").CreateMultiDimensional(
+        filename, options=["FORMAT=" + format]
+    )
+    rg = ds.GetRootGroup()
+    dim_band = rg.CreateDimension("band", None, None, nbands)
+    dim_y = rg.CreateDimension("Y", None, None, ny)
+    dim_x = rg.CreateDimension("X", None, None, nx)
+    ar = rg.CreateMDArray(
+        "test",
+        [dim_band, dim_y, dim_x],
+        gdal.ExtendedDataType.Create(gdal.GDT_UInt8),
+        [
+            "BLOCKSIZE=1,%d,%d" % (blocksize, blocksize),
+            "MULTIBAND=YES",
+            "DIM_X=X",
+            "DIM_Y=Y",
+        ],
+    )
+    data_ar = [(i % 256) for i in range(nbands * ny * nx)]
+    data = array.array("B", data_ar)
+    assert ar.Write(data) == gdal.CE_None
+    ds = None
+
+    # Reference: read via classic API without threads
+    ds = gdal.Open(filename)
+    assert ds.RasterCount == nbands
+    expected = ds.ReadRaster()
+    assert expected is not None
+    ds = None
+
+    # Read with GDAL_NUM_THREADS: exercises IAdviseRead on every band
+    with gdal.config_option("GDAL_NUM_THREADS", "ALL_CPUS"):
+        ds = gdal.Open(filename)
+        got = ds.ReadRaster()
+        ds = None
+
+    assert got == expected
+
+
+@pytest.mark.parametrize("format", ["ZARR_V2", "ZARR_V3"])
+def test_zarr_advise_read_cache_preserved(tmp_path, format):
+    """Explicit IAdviseRead cache survives auto-IAdviseRead in IRead.
+
+    After AdviseRead populates the cache, chunk files are deleted.
+    ReadRaster must still return correct data from cache, proving
+    auto-IAdviseRead did not clear it.
+    """
+
+    filename = str(tmp_path / "test.zarr")
+    ny, nx = 60, 80
+    blocksize = 20
+
+    ds = gdal.GetDriverByName("ZARR").CreateMultiDimensional(
+        filename, options=["FORMAT=" + format]
+    )
+    rg = ds.GetRootGroup()
+    dim_y = rg.CreateDimension("Y", None, None, ny)
+    dim_x = rg.CreateDimension("X", None, None, nx)
+    ar = rg.CreateMDArray(
+        "test",
+        [dim_y, dim_x],
+        gdal.ExtendedDataType.Create(gdal.GDT_UInt8),
+        ["BLOCKSIZE=%d,%d" % (blocksize, blocksize)],
+    )
+    data = array.array("B", [(i % 256) for i in range(ny * nx)])
+    ar.Write(data)
+    ds = None
+
+    # Reference read without threads
+    ds = gdal.Open(filename)
+    expected = ds.ReadRaster()
+    ds = None
+
+    with gdal.config_option("GDAL_NUM_THREADS", "ALL_CPUS"):
+        ds = gdal.Open(filename)
+        band = ds.GetRasterBand(1)
+        band.AdviseRead(0, 0, nx, ny)
+
+        # Delete chunk files - Read must succeed from cache
+        for p in tmp_path.rglob("*"):
+            if (
+                p.is_file()
+                and p.suffix not in (".json",)
+                and not p.name.startswith(".z")
+            ):
+                p.unlink()
+
+        got = ds.ReadRaster()
+        ds = None
+
+    assert got == expected
+
+
 def test_zarr_read_invalid_nczarr_dim(tmp_vsimem):
 
     gdal.Mkdir(tmp_vsimem / "test.zarr", 0)
@@ -6450,9 +6555,6 @@ def test_zarr_read_simple_sharding_network():
             # driver re-fetch everything cleanly.
             for _ in range(2):
                 handler = webserver.SequentialHandler()
-                handler.add("GET", "/test.zarr/", 404)
-                handler.add("HEAD", "/test.zarr/.zmetadata", 404)
-                # Probe zarr.json first; v2 probes (.zarray, .zgroup) skipped.
                 handler.add(
                     "HEAD",
                     "/test.zarr/zarr.json",
@@ -8067,20 +8169,6 @@ def test_zarr_v3_read_sharded_null_terminated_bytes():
 
 
 ###############################################################################
-# Test that writing Zarr v3 string data types is rejected
-
-
-def test_zarr_v3_write_string_dtype_not_supported():
-
-    filename = "data/zarr/v3/null_terminated_bytes.zarr"
-    ds = gdal.OpenEx(filename, gdal.OF_MULTIDIM_RASTER)
-    rg = ds.GetRootGroup()
-    ar = rg.OpenMDArray("ar")
-    with gdal.quiet_errors():
-        assert ar.Write(["x", "y"]) == gdal.CE_Failure
-
-
-###############################################################################
 # Sharded write tests
 
 
@@ -8952,3 +9040,152 @@ def test_zarr_driver_create_copy_v3_multithreaded_error(tmp_vsimem):
                 src_ds,
                 options=["BLOCKSIZE=3,31,33", "COMPRESS=GZIP", "FORMAT=ZARR_V3"],
             )
+
+
+###############################################################################
+# Test Zarr v3 vlen-utf8 string data type
+
+
+@pytest.mark.parametrize(
+    "dirname, expected_values",
+    [
+        ("vlen_utf8.zarr", ["hello", "world", "!"]),
+        ("vlen_utf8_zstd.zarr", ["hello", "world", "!"]),
+    ],
+)
+def test_zarr_v3_read_vlen_utf8(dirname, expected_values):
+    if "zstd" in dirname:
+        compressors = gdal.GetDriverByName("Zarr").GetMetadataItem("COMPRESSORS")
+        if "zstd" not in compressors:
+            pytest.skip("compressor zstd not available")
+    ds = gdal.OpenEx(
+        "data/zarr/v3/" + dirname,
+        gdal.OF_MULTIDIM_RASTER,
+    )
+    assert ds is not None
+    rg = ds.GetRootGroup()
+    ar = rg.OpenMDArray("ar")
+    assert ar is not None
+    dt = ar.GetDataType()
+    assert dt.GetClass() == gdal.GEDTC_STRING
+    assert dt.GetMaxStringLength() == 256
+    assert ar.Read() == expected_values
+
+
+###############################################################################
+# Test Zarr v3 vlen-utf8 write + round-trip
+
+
+def test_zarr_v3_write_vlen_utf8(tmp_vsimem):
+    ds = gdal.GetDriverByName("Zarr").CreateMultiDimensional(
+        tmp_vsimem / "test.zarr", options=["FORMAT=ZARR_V3"]
+    )
+    rg = ds.GetRootGroup()
+    dim = rg.CreateDimension("x", None, None, 3)
+    dt = gdal.ExtendedDataType.CreateString(256)
+    ar = rg.CreateMDArray("ar", [dim], dt)
+    assert ar is not None
+    values = ["hello", "world", ""]
+    assert ar.Write(values) == gdal.CE_None
+    ds = None
+
+    # Read back and verify
+    ds = gdal.OpenEx(tmp_vsimem / "test.zarr", gdal.OF_MULTIDIM_RASTER)
+    rg = ds.GetRootGroup()
+    ar = rg.OpenMDArray("ar")
+    assert ar.GetDataType().GetClass() == gdal.GEDTC_STRING
+    assert ar.Read() == values
+
+    # Verify zarr.json codec chain
+    f = gdal.VSIFOpenL(tmp_vsimem / "test.zarr" / "ar" / "zarr.json", "rb")
+    data = gdal.VSIFReadL(1, 10000, f)
+    gdal.VSIFCloseL(f)
+    j = json.loads(data)
+    assert j["data_type"] == "string"
+    assert j["codecs"][0]["name"] == "vlen-utf8"
+
+
+###############################################################################
+# Test Zarr v3 vlen-utf8 write with zstd compression
+
+
+def test_zarr_v3_write_vlen_utf8_with_compression(tmp_vsimem):
+    compressors = gdal.GetDriverByName("Zarr").GetMetadataItem("COMPRESSORS")
+    if "zstd" not in compressors:
+        pytest.skip("compressor zstd not available")
+    ds = gdal.GetDriverByName("Zarr").CreateMultiDimensional(
+        tmp_vsimem / "test.zarr", options=["FORMAT=ZARR_V3"]
+    )
+    rg = ds.GetRootGroup()
+    dim = rg.CreateDimension("x", None, None, 3)
+    dt = gdal.ExtendedDataType.CreateString(256)
+    ar = rg.CreateMDArray("ar", [dim], dt, ["COMPRESS=ZSTD"])
+    assert ar is not None
+    values = ["alpha", "beta", "gamma"]
+    assert ar.Write(values) == gdal.CE_None
+    ds = None
+
+    # Read back and verify round-trip
+    ds = gdal.OpenEx(tmp_vsimem / "test.zarr", gdal.OF_MULTIDIM_RASTER)
+    rg = ds.GetRootGroup()
+    ar = rg.OpenMDArray("ar")
+    assert ar.Read() == values
+
+    # Verify codec chain: [vlen-utf8, zstd]
+    f = gdal.VSIFOpenL(tmp_vsimem / "test.zarr" / "ar" / "zarr.json", "rb")
+    data = gdal.VSIFReadL(1, 10000, f)
+    gdal.VSIFCloseL(f)
+    j = json.loads(data)
+    assert j["codecs"][0]["name"] == "vlen-utf8"
+    assert j["codecs"][1]["name"] == "zstd"
+
+
+###############################################################################
+# Test Zarr v3 vlen-utf8 round-trip with non-ASCII / Unicode strings
+
+
+def test_zarr_v3_write_vlen_utf8_unicode(tmp_vsimem):
+    ds = gdal.GetDriverByName("Zarr").CreateMultiDimensional(
+        tmp_vsimem / "test.zarr", options=["FORMAT=ZARR_V3"]
+    )
+    rg = ds.GetRootGroup()
+    dim = rg.CreateDimension("x", None, None, 4)
+    dt = gdal.ExtendedDataType.CreateString(256)
+    ar = rg.CreateMDArray("ar", [dim], dt)
+    assert ar is not None
+    values = ["\u4e16\u754c", "caf\u00e9", "\u00fc\u00f6\u00e4", ""]
+    assert ar.Write(values) == gdal.CE_None
+    ds = None
+
+    # Read back and verify UTF-8 round-trip
+    ds = gdal.OpenEx(tmp_vsimem / "test.zarr", gdal.OF_MULTIDIM_RASTER)
+    rg = ds.GetRootGroup()
+    ar = rg.OpenMDArray("ar")
+    assert ar.Read() == values
+
+
+###############################################################################
+# Test Zarr v3 vlen-utf8 truncation warning for long strings
+
+
+def test_zarr_v3_read_vlen_utf8_truncation(tmp_vsimem):
+    ds = gdal.GetDriverByName("Zarr").CreateMultiDimensional(
+        tmp_vsimem / "test.zarr", options=["FORMAT=ZARR_V3"]
+    )
+    rg = ds.GetRootGroup()
+    dim = rg.CreateDimension("x", None, None, 1)
+    dt = gdal.ExtendedDataType.CreateString(256)
+    ar = rg.CreateMDArray("ar", [dim], dt)
+    assert ar is not None
+    long_string = "x" * 300
+    assert ar.Write([long_string]) == gdal.CE_None
+    ds = None
+
+    # Read back with small max length - should truncate and warn
+    with gdal.config_option("ZARR_VLEN_STRING_MAX_LENGTH", "10"):
+        with gdal.quiet_errors():
+            ds = gdal.OpenEx(tmp_vsimem / "test.zarr", gdal.OF_MULTIDIM_RASTER)
+            rg = ds.GetRootGroup()
+            ar = rg.OpenMDArray("ar")
+            result = ar.Read()
+            assert result[0] == "x" * 10  # truncated to max_length
