@@ -214,7 +214,7 @@ GDALDataset *GDALDriver::Create(const char *pszFilename, int nXSize, int nYSize,
     if (CPL_UNLIKELY(nBands < 0))
     {
         CPLError(CE_Failure, CPLE_AppDefined,
-                 "Attempt to create dataset with %d bands is illegal,"
+                 "Attempt to create dataset with %d bands is illegal, "
                  "Must be >= 0.",
                  nBands);
         return nullptr;
@@ -225,7 +225,7 @@ GDALDataset *GDALDriver::Create(const char *pszFilename, int nXSize, int nYSize,
                      (nXSize < 1 || nYSize < 1)))
     {
         CPLError(CE_Failure, CPLE_AppDefined,
-                 "Attempt to create %dx%d dataset is illegal,"
+                 "Attempt to create %dx%d dataset is illegal, "
                  "sizes must be larger than zero.",
                  nXSize, nYSize);
         return nullptr;
@@ -1011,6 +1011,8 @@ CPLErr GDALDriver::QuietDeleteForCreateCopy(const char *pszFilename,
     // This is somewhat messy. Ideally there should be a way for the
     // driver to overload the default behavior
     if (!EQUAL(GetDescription(), "MEM") && !EQUAL(GetDescription(), "Memory") &&
+        // VRT with empty name is a un-materialized dataset
+        !(EQUAL(GetDescription(), "VRT") && pszFilename[0] == 0) &&
         // Also exclude database formats for which there's no file list
         // and whose opening might be slow (GeoRaster in particular)
         !EQUAL(GetDescription(), "GeoRaster") &&

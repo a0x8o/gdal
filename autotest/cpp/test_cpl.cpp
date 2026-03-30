@@ -1157,11 +1157,30 @@ TEST_F(test_cpl, CPLGetDirname)
         "2Fgdal%2Fmaster%2Fautotest%2Fogr%2Fdata");
 }
 
-TEST_F(test_cpl, VSIGetDiskFreeSpace)
+TEST_F(test_cpl, CPLLexicallyNormalize)
 {
-    ASSERT_TRUE(VSIGetDiskFreeSpace("/vsimem/") > 0);
-    ASSERT_TRUE(VSIGetDiskFreeSpace(".") == -1 ||
-                VSIGetDiskFreeSpace(".") >= 0);
+    EXPECT_STREQ(CPLLexicallyNormalize("", '/').c_str(), "");
+    EXPECT_STREQ(CPLLexicallyNormalize("x", '/').c_str(), "x");
+    EXPECT_STREQ(CPLLexicallyNormalize("xy", '/').c_str(), "xy");
+    EXPECT_STREQ(CPLLexicallyNormalize("x/", '/').c_str(), "x/");
+    EXPECT_STREQ(CPLLexicallyNormalize("x/.", '/').c_str(), "x/");
+    EXPECT_STREQ(CPLLexicallyNormalize("x/./", '/').c_str(), "x/");
+    EXPECT_STREQ(CPLLexicallyNormalize("x/y", '/').c_str(), "x/y");
+    EXPECT_STREQ(CPLLexicallyNormalize("x/yz", '/').c_str(), "x/yz");
+    EXPECT_STREQ(CPLLexicallyNormalize("xy/z", '/').c_str(), "xy/z");
+    EXPECT_STREQ(CPLLexicallyNormalize("x//y", '/').c_str(), "x/y");
+    EXPECT_STREQ(CPLLexicallyNormalize("/", '/').c_str(), "/");
+    EXPECT_STREQ(CPLLexicallyNormalize("/x", '/').c_str(), "/x");
+    EXPECT_STREQ(CPLLexicallyNormalize("../x", '/').c_str(), "../x");
+    EXPECT_STREQ(CPLLexicallyNormalize("x/../y", '/').c_str(), "y");
+    EXPECT_STREQ(CPLLexicallyNormalize("x/..", '/').c_str(), "");
+    EXPECT_STREQ(CPLLexicallyNormalize("x/../", '/').c_str(), "");
+    EXPECT_STREQ(CPLLexicallyNormalize("xy/../z", '/').c_str(), "z");
+    EXPECT_STREQ(CPLLexicallyNormalize("x/../yz", '/').c_str(), "yz");
+    EXPECT_STREQ(CPLLexicallyNormalize("x/../../yz", '/').c_str(), "../yz");
+    EXPECT_STREQ(CPLLexicallyNormalize("a/x/y/../../t", '/').c_str(), "a/t");
+    EXPECT_STREQ(CPLLexicallyNormalize("a\\x\\y\\..\\..\\t", '/', '\\').c_str(),
+                 "a\\t");
 }
 
 TEST_F(test_cpl, CPLsscanf)
@@ -5745,6 +5764,136 @@ TEST_F(test_cpl, cpl_enumerate)
         EXPECT_EQ(tab[1], 2);
         EXPECT_EQ(tab[2], 3);
     }
+}
+
+TEST_F(test_cpl, CPL_SWAP)
+{
+    {
+        uint8_t x = 1;
+        EXPECT_EQ(CPL_SWAP(x), x);
+        EXPECT_EQ(CPL_AS_LSB(x), x);
+    }
+    {
+        int8_t x = 1;
+        EXPECT_EQ(CPL_SWAP(x), x);
+        EXPECT_EQ(CPL_AS_LSB(x), x);
+    }
+    {
+        uint16_t x = 0x0123;
+        auto y = CPL_SWAP(x);
+        EXPECT_NE(y, x);
+        EXPECT_EQ(CPL_SWAP(y), x);
+#if CPL_IS_LSB
+        EXPECT_EQ(CPL_AS_LSB(x), x);
+#else
+        EXPECT_EQ(CPL_AS_LSB(x), CPL_SWAP(x));
+#endif
+    }
+    {
+        int16_t x = 0x0123;
+        auto y = CPL_SWAP(x);
+        EXPECT_NE(y, x);
+        EXPECT_EQ(CPL_SWAP(y), x);
+#if CPL_IS_LSB
+        EXPECT_EQ(CPL_AS_LSB(x), x);
+#else
+        EXPECT_EQ(CPL_AS_LSB(x), CPL_SWAP(x));
+#endif
+    }
+    {
+        uint32_t x = 0x01234567;
+        auto y = CPL_SWAP(x);
+        EXPECT_NE(y, x);
+        EXPECT_EQ(CPL_SWAP(y), x);
+#if CPL_IS_LSB
+        EXPECT_EQ(CPL_AS_LSB(x), x);
+#else
+        EXPECT_EQ(CPL_AS_LSB(x), CPL_SWAP(x));
+#endif
+    }
+    {
+        int32_t x = 0x01234567;
+        auto y = CPL_SWAP(x);
+        EXPECT_NE(y, x);
+        EXPECT_EQ(CPL_SWAP(y), x);
+#if CPL_IS_LSB
+        EXPECT_EQ(CPL_AS_LSB(x), x);
+#else
+        EXPECT_EQ(CPL_AS_LSB(x), CPL_SWAP(x));
+#endif
+    }
+    {
+        uint64_t x = (static_cast<uint64_t>(0x01234567) << 32) | 0x89ABCDEF;
+        auto y = CPL_SWAP(x);
+        EXPECT_NE(y, x);
+        EXPECT_EQ(CPL_SWAP(y), x);
+#if CPL_IS_LSB
+        EXPECT_EQ(CPL_AS_LSB(x), x);
+#else
+        EXPECT_EQ(CPL_AS_LSB(x), CPL_SWAP(x));
+#endif
+    }
+    {
+        int64_t x = (static_cast<int64_t>(0x01234567) << 32) | 0x89ABCDEF;
+        auto y = CPL_SWAP(x);
+        EXPECT_NE(y, x);
+        EXPECT_EQ(CPL_SWAP(y), x);
+#if CPL_IS_LSB
+        EXPECT_EQ(CPL_AS_LSB(x), x);
+#else
+        EXPECT_EQ(CPL_AS_LSB(x), CPL_SWAP(x));
+#endif
+    }
+    {
+        float x = 1.5;
+        auto y = CPL_SWAP(x);
+        EXPECT_NE(y, x);
+        EXPECT_EQ(CPL_SWAP(y), x);
+#if CPL_IS_LSB
+        EXPECT_EQ(CPL_AS_LSB(x), x);
+#else
+        EXPECT_EQ(CPL_AS_LSB(x), CPL_SWAP(x));
+#endif
+    }
+    {
+        double x = 1.5;
+        auto y = CPL_SWAP(x);
+        EXPECT_NE(y, x);
+        EXPECT_EQ(CPL_SWAP(y), x);
+#if CPL_IS_LSB
+        EXPECT_EQ(CPL_AS_LSB(x), x);
+#else
+        EXPECT_EQ(CPL_AS_LSB(x), CPL_SWAP(x));
+#endif
+    }
+}
+
+TEST_F(test_cpl, CPLLaunderForFilenameSafe)
+{
+    EXPECT_STREQ(CPLLaunderForFilenameSafe("").c_str(), "");
+    EXPECT_STREQ(CPLLaunderForFilenameSafe("a").c_str(), "a");
+    EXPECT_STREQ(CPLLaunderForFilenameSafe("a<b").c_str(), "a_b");
+    EXPECT_STREQ(CPLLaunderForFilenameSafe("a>b").c_str(), "a_b");
+    EXPECT_STREQ(CPLLaunderForFilenameSafe("a:b").c_str(), "a_b");
+    EXPECT_STREQ(CPLLaunderForFilenameSafe("a\"b").c_str(), "a_b");
+    EXPECT_STREQ(CPLLaunderForFilenameSafe("a/b").c_str(), "a_b");
+    EXPECT_STREQ(CPLLaunderForFilenameSafe("a\\b").c_str(), "a_b");
+    EXPECT_STREQ(CPLLaunderForFilenameSafe("a|b").c_str(), "a_b");
+    EXPECT_STREQ(CPLLaunderForFilenameSafe("a?b").c_str(), "a_b");
+    EXPECT_STREQ(CPLLaunderForFilenameSafe("a*b").c_str(), "a_b");
+    EXPECT_STREQ(CPLLaunderForFilenameSafe("a^b").c_str(), "a_b");
+    EXPECT_STREQ(CPLLaunderForFilenameSafe(".").c_str(), "._");
+    EXPECT_STREQ(CPLLaunderForFilenameSafe("..").c_str(), ".._");
+    EXPECT_STREQ(CPLLaunderForFilenameSafe("a.b").c_str(), "a.b");
+    EXPECT_STREQ(CPLLaunderForFilenameSafe(" a ").c_str(), " a _");
+    EXPECT_STREQ(CPLLaunderForFilenameSafe(".a.").c_str(), ".a._");
+    EXPECT_STREQ(CPLLaunderForFilenameSafe(" a ", ';').c_str(), " a ;");
+    EXPECT_STREQ(CPLLaunderForFilenameSafe("CON").c_str(), "CON_");
+    EXPECT_STREQ(CPLLaunderForFilenameSafe("a<b c", ';', " ").c_str(), "a;b;c");
+    EXPECT_STREQ(CPLLaunderForFilenameSafe("a<b c", '\0', " ").c_str(), "abc");
+    EXPECT_STREQ(CPLLaunderForFilenameSafe("CON", '\0', nullptr).c_str(),
+                 "CON_");
+    EXPECT_STREQ(CPLLaunderForFilenameSafe("CON", ';').c_str(), "CON;");
 }
 
 }  // namespace

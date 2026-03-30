@@ -213,6 +213,7 @@ Standard Options
 
     .. include:: gdal_options/overwrite.rst
 
+    .. include:: gdal_options/quiet.rst
 
 Nodata / source validity mask handling
 --------------------------------------
@@ -318,6 +319,11 @@ below one for downsampling, and above one for upsampling.
 .. --------------------------------------------
 
 .. include:: gdal_cli_include/gdalg_raster_compatible.rst
+
+.. Return status code
+.. ------------------
+
+.. include:: return_code.rst
 
 Examples
 --------

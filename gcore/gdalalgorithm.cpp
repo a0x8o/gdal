@@ -2584,10 +2584,16 @@ bool GDALAlgorithm::ProcessDatasetArg(GDALAlgorithmArg *arg,
     const auto updateArg = algForOutput->GetArg(GDAL_ARG_NAME_UPDATE);
     const bool hasUpdateArg = updateArg && updateArg->GetType() == GAAT_BOOLEAN;
     const bool update = hasUpdateArg && updateArg->Get<bool>();
+
+    const auto appendArg = algForOutput->GetArg(GDAL_ARG_NAME_APPEND);
+    const bool hasAppendArg = appendArg && appendArg->GetType() == GAAT_BOOLEAN;
+    const bool append = hasAppendArg && appendArg->Get<bool>();
+
     const auto overwriteArg = algForOutput->GetArg(GDAL_ARG_NAME_OVERWRITE);
     const bool overwrite =
         (arg->IsOutput() && overwriteArg &&
          overwriteArg->GetType() == GAAT_BOOLEAN && overwriteArg->Get<bool>());
+
     auto outputArg = algForOutput->GetArg(GDAL_ARG_NAME_OUTPUT);
     auto &val = [arg]() -> GDALArgDatasetValue &
     {
@@ -2646,7 +2652,11 @@ bool GDALAlgorithm::ProcessDatasetArg(GDALAlgorithmArg *arg,
         if (!arg->IsOutput() || arg->GetDatasetInputFlags() == GADV_NAME)
             flags |= GDAL_OF_VERBOSE_ERROR;
         if ((arg == outputArg || !outputArg) && update)
-            flags |= GDAL_OF_UPDATE | GDAL_OF_VERBOSE_ERROR;
+        {
+            flags |= GDAL_OF_UPDATE;
+            if (!append)
+                flags |= GDAL_OF_VERBOSE_ERROR;
+        }
 
         const auto readOnlyArg = GetArg(GDAL_ARG_NAME_READ_ONLY);
         const bool readOnly =
@@ -2792,7 +2802,7 @@ bool GDALAlgorithm::ProcessDatasetArg(GDALAlgorithmArg *arg,
             val.Set(poDS);
             poDS->ReleaseRef();
         }
-        else
+        else if (!append)
         {
             ret = false;
         }
@@ -2801,10 +2811,6 @@ bool GDALAlgorithm::ProcessDatasetArg(GDALAlgorithmArg *arg,
     // Deal with overwriting the output dataset
     if (ret && arg == outputArg && val.GetDatasetRef() == nullptr)
     {
-        const auto appendArg = algForOutput->GetArg(GDAL_ARG_NAME_APPEND);
-        const bool hasAppendArg =
-            appendArg && appendArg->GetType() == GAAT_BOOLEAN;
-        const bool append = (hasAppendArg && appendArg->Get<bool>());
         if (!append)
         {
             // If outputting to MEM, do not try to erase a real file of the same name!
@@ -2891,7 +2897,14 @@ bool GDALAlgorithm::ProcessDatasetArg(GDALAlgorithmArg *arg,
                     }
                     else if (EQUAL(pszType, "File"))
                     {
-                        VSIUnlink(val.GetName().c_str());
+                        if (VSIUnlink(val.GetName().c_str()) != 0)
+                        {
+                            ReportError(CE_Failure, CPLE_AppDefined,
+                                        "Deleting %s failed: %s",
+                                        val.GetName().c_str(),
+                                        VSIStrerror(errno));
+                            return false;
+                        }
                     }
                     else if (EQUAL(pszType, "Directory"))
                     {
@@ -2905,11 +2918,37 @@ bool GDALAlgorithm::ProcessDatasetArg(GDALAlgorithmArg *arg,
                     }
                     else if (poDriver)
                     {
-                        CPLStringList aosDrivers;
-                        aosDrivers.AddString(poDriver->GetDescription());
-                        CPLErrorStateBackuper oBackuper(CPLQuietErrorHandler);
-                        GDALDriver::QuietDelete(val.GetName().c_str(),
-                                                aosDrivers.List());
+                        bool bDeleteOK;
+                        {
+                            CPLErrorStateBackuper oBackuper(
+                                CPLQuietErrorHandler);
+                            bDeleteOK = (poDriver->Delete(
+                                             val.GetName().c_str()) == CE_None);
+                        }
+                        VSIStatBufL sStat;
+                        if (!bDeleteOK &&
+                            VSIStatL(val.GetName().c_str(), &sStat) == 0)
+                        {
+                            if (VSI_ISDIR(sStat.st_mode))
+                            {
+                                // We don't want the user to accidentally erase a non-GDAL dataset
+                                ReportError(
+                                    CE_Failure, CPLE_AppDefined,
+                                    "Directory '%s' already exists, but is not "
+                                    "recognized as a valid GDAL dataset. "
+                                    "Please manually delete it before retrying",
+                                    val.GetName().c_str());
+                                return false;
+                            }
+                            else if (VSIUnlink(val.GetName().c_str()) != 0)
+                            {
+                                ReportError(CE_Failure, CPLE_AppDefined,
+                                            "Deleting %s failed: %s",
+                                            val.GetName().c_str(),
+                                            VSIStrerror(errno));
+                                return false;
+                            }
+                        }
                     }
                 }
             }
@@ -3806,11 +3845,12 @@ GDALInConstructionAlgorithmArg &GDALAlgorithm::AddOutputDatasetArg(
 GDALInConstructionAlgorithmArg &
 GDALAlgorithm::AddOverwriteArg(bool *pValue, const char *helpMessage)
 {
-    return AddArg(GDAL_ARG_NAME_OVERWRITE, 0,
-                  MsgOrDefault(
-                      helpMessage,
-                      _("Whether overwriting existing output is allowed")),
-                  pValue)
+    return AddArg(
+               GDAL_ARG_NAME_OVERWRITE, 0,
+               MsgOrDefault(
+                   helpMessage,
+                   _("Whether overwriting existing output dataset is allowed")),
+               pValue)
         .SetDefault(false);
 }
 
@@ -3834,11 +3874,12 @@ GDALAlgorithm::AddOverwriteLayerArg(bool *pValue, const char *helpMessage)
             }
             return true;
         });
-    return AddArg(GDAL_ARG_NAME_OVERWRITE_LAYER, 0,
-                  MsgOrDefault(
-                      helpMessage,
-                      _("Whether overwriting existing output is allowed")),
-                  pValue)
+    return AddArg(
+               GDAL_ARG_NAME_OVERWRITE_LAYER, 0,
+               MsgOrDefault(
+                   helpMessage,
+                   _("Whether overwriting existing output layer is allowed")),
+               pValue)
         .SetDefault(false)
         .AddAction(
             [this]
@@ -5778,9 +5819,8 @@ GDALAlgorithm::AddPixelFunctionArgsArg(std::vector<std::string> *pValue,
 
 void GDALAlgorithm::AddProgressArg()
 {
-    AddArg(GDAL_ARG_NAME_QUIET, 'q', _("Quiet mode (no progress bar)"),
-           &m_quiet)
-        .SetHiddenForAPI()
+    AddArg(GDAL_ARG_NAME_QUIET, 'q',
+           _("Quiet mode (no progress bar or warning message)"), &m_quiet)
         .SetCategory(GAAC_COMMON)
         .AddAction([this]() { m_progressBarRequested = false; });
 

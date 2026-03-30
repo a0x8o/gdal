@@ -1102,3 +1102,49 @@ bool SQLHasRemainingContent(const char *pszTail)
     }
     return false;
 }
+
+/************************************************************************/
+/*                   SQLFormatErrorMsgFailedPrepare()                   */
+/************************************************************************/
+
+std::string SQLFormatErrorMsgFailedPrepare(sqlite3 *hDB,
+                                           const char *pszErrMsgIntro,
+                                           const char *pszSQL)
+{
+    std::string osErrorMsg(pszErrMsgIntro);
+    osErrorMsg += sqlite3_errmsg(hDB);
+    osErrorMsg += "\n  ";
+    osErrorMsg += pszSQL;
+#if SQLITE_VERSION_NUMBER >= 3038000L
+    const int nOffset = sqlite3_error_offset(hDB);
+    if (nOffset >= 0 && static_cast<size_t>(nOffset) <= strlen(pszSQL))
+    {
+        osErrorMsg += "\n  ";
+        osErrorMsg.append(nOffset, ' ');
+        osErrorMsg += "^--- error here";
+    }
+#endif
+    return osErrorMsg;
+}
+
+/************************************************************************/
+/*                       SQLGetSQLite3DataType()                        */
+/************************************************************************/
+
+const char *SQLGetSQLite3DataType(int nSQLite3DataType)
+{
+    switch (nSQLite3DataType)
+    {
+        case SQLITE_NULL:
+            return "NULL";
+        case SQLITE_TEXT:
+            return "TEXT";
+        case SQLITE_INTEGER:
+            return "INTEGER";
+        case SQLITE_FLOAT:
+            return "FLOAT";
+        case SQLITE_BLOB:
+            return "BLOB";
+    }
+    return "(unknown)";
+}

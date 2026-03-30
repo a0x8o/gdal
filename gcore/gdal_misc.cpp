@@ -1370,8 +1370,47 @@ const char *GDALGetColorInterpretationName(GDALColorInterp eInterp)
 
         case GCI_SAR_Reserved_2:
             return "SAR_Reserved_2";
+
+            // If adding any (non-reserved) value, also update GDALGetColorInterpretationList()
     }
     return "Undefined";
+}
+
+/************************************************************************/
+/*                  GDALGetColorInterpretationByName()                  */
+/************************************************************************/
+
+/**
+ * \brief Get the list of valid color interpretations.
+ *
+ * Reserved values of the GDALColorInterp enumeration are not listed.
+ *
+ * @param[out] pnCount Pointer to an integer that will be set to the number of
+ *                     values of the returned array. It must not be null.
+ *
+ * @return array of *pnCount values
+ *
+ */
+const GDALColorInterp *GDALGetColorInterpretationList(int *pnCount)
+{
+    VALIDATE_POINTER1(pnCount, "GDALGetColorInterpretationList", nullptr);
+
+    static constexpr GDALColorInterp list[] = {
+        GCI_Undefined,     GCI_GrayIndex,    GCI_PaletteIndex,
+        GCI_RedBand,       GCI_GreenBand,    GCI_BlueBand,
+        GCI_AlphaBand,     GCI_HueBand,      GCI_SaturationBand,
+        GCI_LightnessBand, GCI_CyanBand,     GCI_MagentaBand,
+        GCI_YellowBand,    GCI_BlackBand,    GCI_YCbCr_YBand,
+        GCI_YCbCr_CbBand,  GCI_YCbCr_CrBand, GCI_PanBand,
+        GCI_CoastalBand,   GCI_RedEdgeBand,  GCI_NIRBand,
+        GCI_SWIRBand,      GCI_MWIRBand,     GCI_LWIRBand,
+        GCI_TIRBand,       GCI_OtherIRBand,  GCI_SAR_Ka_Band,
+        GCI_SAR_K_Band,    GCI_SAR_Ku_Band,  GCI_SAR_X_Band,
+        GCI_SAR_C_Band,    GCI_SAR_S_Band,   GCI_SAR_L_Band,
+        GCI_SAR_P_Band,
+    };
+    *pnCount = static_cast<int>(CPL_ARRAYSIZE(list));
+    return list;
 }
 
 /************************************************************************/
@@ -4197,6 +4236,12 @@ int CPL_STDCALL GDALGeneralCmdLineProcessor(int nArgc, char ***ppapszArgv,
                 /*ok*/ printf(
                     "  Supports: Creating geometry fields with NOT NULL "
                     "constraint.\n");
+            if (CPLFetchBool(papszMD, GDAL_DCAP_CURVE_GEOMETRIES, false))
+                /*ok*/ printf("  Supports: Curve geometries.\n");
+            if (CPLFetchBool(papszMD, GDAL_DCAP_Z_GEOMETRIES, false))
+                /*ok*/ printf("  Supports: 3D (Z) geometries.\n");
+            if (CPLFetchBool(papszMD, GDAL_DCAP_MEASURED_GEOMETRIES, false))
+                /*ok*/ printf("  Supports: Measured (M) geometries.\n");
             if (CPLFetchBool(papszMD, GDAL_DCAP_HONOR_GEOM_COORDINATE_PRECISION,
                              false))
                 /*ok*/ printf("  Supports: Writing geometries with given "
@@ -5042,10 +5087,12 @@ GDALRIOResampleAlg GDALRasterIOGetResampleAlg(const char *pszResampling)
 
 const char *GDALRasterIOGetResampleAlg(GDALRIOResampleAlg eResampleAlg)
 {
+    const char *pszRet = "Unknown";
     switch (eResampleAlg)
     {
         case GRIORA_NearestNeighbour:
-            return "NearestNeighbour";
+            pszRet = "NearestNeighbour";
+            break;
         case GRIORA_Bilinear:
             return "Bilinear";
         case GRIORA_Cubic:
@@ -5062,10 +5109,11 @@ const char *GDALRasterIOGetResampleAlg(GDALRIOResampleAlg eResampleAlg)
             return "Mode";
         case GRIORA_Gauss:
             return "Gauss";
-        default:
-            CPLAssert(false);
-            return "Unknown";
+        case GRIORA_RESERVED_START:
+        case GRIORA_RESERVED_END:
+            break;
     }
+    return pszRet;
 }
 
 /************************************************************************/

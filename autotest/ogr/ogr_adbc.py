@@ -42,6 +42,11 @@ def _has_sqlite_driver():
 
 
 def _has_duckdb_driver():
+
+    if gdaltest.is_travis_branch("sanitize"):
+        print("heap-use-after-free in duckdb")
+        return False
+
     import ctypes
 
     for libname in ["libduckdb.so", "libduckdb.dylib", "duckdb.dll"]:
@@ -367,7 +372,7 @@ def test_ogr_adbc_duckdb_parquet_with_spatial(OGR_ADBC_AUTO_LOAD_DUCKDB_SPATIAL)
     reason="duckdb driver missing",
 )
 @pytest.mark.parametrize("OGR_ADBC_AUTO_LOAD_DUCKDB_SPATIAL", ["ON", "OFF"])
-def test_ogr_adbc_duckdb_parquet_with_spatial_and_SQL_open_optoin(
+def test_ogr_adbc_duckdb_parquet_with_spatial_and_SQL_open_option(
     OGR_ADBC_AUTO_LOAD_DUCKDB_SPATIAL,
 ):
 
@@ -587,7 +592,9 @@ def test_ogr_adbc_arrow_stream_numpy_datetime_as_string(tmp_vsimem):
     pytest.importorskip("numpy")
 
     with gdal.OpenEx(
-        "data/parquet/test.parquet", gdal.OF_VECTOR, allowed_drivers=["ADBC"]
+        "data/parquet/test_geoparquet_1_1.parquet",
+        gdal.OF_VECTOR,
+        allowed_drivers=["ADBC"],
     ) as ds:
         lyr = ds.GetLayer(0)
         stream = lyr.GetArrowStreamAsNumPy(

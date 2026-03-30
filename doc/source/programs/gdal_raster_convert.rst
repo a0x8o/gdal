@@ -40,6 +40,13 @@ Standard Options
 
     .. include:: gdal_options/overwrite.rst
 
+    .. include:: gdal_options/quiet.rst
+
+.. Return status code
+.. ------------------
+
+.. include:: return_code.rst
+
 Examples
 --------
 

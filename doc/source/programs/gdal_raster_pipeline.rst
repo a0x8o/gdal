@@ -44,6 +44,8 @@ Potential steps are:
 
 .. program-output:: gdal raster pipeline --help-doc=read
 
+Details for options can be found in :ref:`gdal_raster_read`.
+
 * calc
 
 .. program-output:: gdal raster pipeline --help-doc=calc
@@ -270,6 +272,8 @@ Details for options can be found in :ref:`gdal_raster_compare`.
 
 .. program-output:: gdal raster pipeline --help-doc=write
 
+Details for options can be found in :ref:`gdal_raster_write`.
+
 GDALG output (on-the-fly / streamed dataset)
 --------------------------------------------
 
@@ -322,6 +326,10 @@ Nested pipeline
 
 See :ref:`gdal_nested_pipeline`.
 
+.. Return status code
+.. ------------------
+
+.. include:: return_code.rst
 
 Examples
 --------

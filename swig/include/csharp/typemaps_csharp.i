@@ -477,20 +477,22 @@ CSHARP_OBJECT_ARRAYS_PINNED(GDALRasterBandShadow, Band)
 %apply (int inout[ANY]) {int *pList};
 
 /*
- * Typemap for const char *utf8_path.
+ * Typemap for const char *utf8_string
  */
-%typemap(csin) (const char *utf8_path)  "$module.StringToUtf8Bytes($csinput)"
-%typemap(imtype, out="IntPtr") (const char *utf8_path) "byte[]"
-%typemap(out) (const char *utf8_path) %{ $result = $1; %}
-%typemap(csout, excode=SWIGEXCODE) (const char *utf8_path) {
-        /* %typemap(csout) (const char *utf8_path) */
+%typemap(csin) (const char *utf8_string) "$module.StringToUtf8Bytes($csinput)"
+%typemap(imtype, out="IntPtr") (const char *utf8_string) "byte[]"
+%typemap(out) (const char *utf8_string) %{ $result = $1; %}
+%typemap(csout, excode=SWIGEXCODE) (const char *utf8_string) {
+        /* %typemap(csout) (const char *utf8_string) */
         IntPtr cPtr = $imcall;
         string ret = $module.Utf8BytesToString(cPtr);
         $excode
         return ret;
 }
 
-%apply ( const char *utf8_path ) { const char* GetFieldAsString };
+%apply ( const char *utf8_string ) {
+    const char* GetFieldAsString
+};
 
 /*
  * Typemap for double *defaultval.
@@ -656,7 +658,7 @@ CSHARP_OBJECT_ARRAYS_PINNED(GDALRasterBandShadow, Band)
 /******************************************************************************
  * GDALGetLayerByName typemaps                                                *
  *****************************************************************************/
-%apply ( const char *utf8_path ) { const char* layer_name };
+%apply ( const char *utf8_string ) { const char* layer_name };
 
 /******************************************************************************
  * Band.AdviseRead and Dataset.AdviseRead typemaps                            *
@@ -693,7 +695,7 @@ CSHARP_OBJECT_ARRAYS_PINNED(GDALRasterBandShadow, Band)
                 if (confValPtr != IntPtr.Zero) {
                     confidence_values[cx] = System.Runtime.InteropServices.Marshal.ReadInt32(confValPtr, cx * System.Runtime.InteropServices.Marshal.SizeOf(typeof(Int32)));
                 }
-                
+
             }
         }
         if (cPtr != IntPtr.Zero) {

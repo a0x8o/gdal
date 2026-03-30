@@ -84,6 +84,37 @@ def test_gdalalg_vector_convert_base(tmp_vsimem):
         assert ds.GetLayerByName("layer2").GetFeatureCount() == 10
 
 
+###############################################################################
+
+
+@pytest.mark.require_driver("GPKG")
+def test_gdalalg_vector_convert_append_without_existing_file(tmp_vsimem):
+
+    out_filename = str(tmp_vsimem / "out.gpkg")
+    gdal.alg.vector.convert(
+        input="../ogr/data/poly.shp",
+        output=out_filename,
+        append=True,
+        creation_option={"ADD_GPKG_OGR_CONTENTS": "NO"},
+    )
+
+    with gdal.OpenEx(out_filename) as ds:
+        assert ds.GetLayerByName("poly").GetFeatureCount() == 10
+        with ds.ExecuteSQL(
+            "SELECT * FROM sqlite_master WHERE name = 'gpkg_ogr_contents'"
+        ) as sql_lyr:
+            assert sql_lyr.GetFeatureCount() == 0
+    gdal.alg.vector.convert(
+        input="../ogr/data/poly.shp", output=out_filename, append=True
+    )
+
+    with gdal.OpenEx(out_filename) as ds:
+        assert ds.GetLayerByName("poly").GetFeatureCount() == 20
+
+
+###############################################################################
+
+
 @pytest.mark.require_driver("GPKG")
 def test_gdalalg_vector_convert_dsco(tmp_vsimem):
 
@@ -455,7 +486,7 @@ def test_gdalalg_vector_convert_upsert(tmp_vsimem, output_format):
         return srcDS
 
     if output_format == "SQLite":
-        with pytest.raises(Exception, match="SQLite driver doest not support upsert"):
+        with pytest.raises(Exception, match="SQLite driver does not support upsert"):
             gdal.Run(
                 "vector",
                 "convert",
@@ -504,4 +535,77 @@ def test_error_message_leak(tmp_vsimem):
                 json_path,
                 out_path,
             ],
+        )
+
+
+###############################################################################
+
+
+@pytest.mark.require_driver("GeoJSON")
+@pytest.mark.parametrize("quiet", [True, False])
+def test_gdalalg_vector_convert_warn_no_curve_support(tmp_vsimem, quiet):
+
+    src_ds = gdal.GetDriverByName("MEM").CreateVector("")
+    src_lyr = src_ds.CreateLayer("test")
+    f = ogr.Feature(src_lyr.GetLayerDefn())
+    f.SetGeometry(ogr.CreateGeometryFromWkt("CIRCULARSTRING(0 0,1 1,2 0)"))
+    src_lyr.CreateFeature(f)
+
+    if quiet:
+        with gdaltest.error_raised(gdal.CE_None):
+            gdal.alg.vector.convert(
+                input=src_ds, output=tmp_vsimem / "out.geojson", quiet=True
+            )
+    else:
+        with gdaltest.error_raised(
+            gdal.CE_Warning, match="Attempt to write curve geometries"
+        ):
+            gdal.alg.vector.convert(input=src_ds, output=tmp_vsimem / "out.geojson")
+
+
+###############################################################################
+
+
+@pytest.mark.require_driver("GeoJSON")
+@pytest.mark.parametrize("quiet", [True, False])
+def test_gdalalg_vector_convert_pipeline_warn_no_curve_support(tmp_vsimem, quiet):
+
+    src_ds = gdal.GetDriverByName("MEM").CreateVector("")
+    src_lyr = src_ds.CreateLayer("test")
+    f = ogr.Feature(src_lyr.GetLayerDefn())
+    f.SetGeometry(ogr.CreateGeometryFromWkt("CIRCULARSTRING(0 0,1 1,2 0)"))
+    src_lyr.CreateFeature(f)
+
+    if quiet:
+        with gdaltest.error_raised(gdal.CE_None):
+            gdal.alg.vector.pipeline(
+                input=src_ds,
+                pipeline=f'read ! write {tmp_vsimem / "out.geojson"}',
+                quiet=True,
+            )
+    else:
+        with gdaltest.error_raised(
+            gdal.CE_Warning, match="Attempt to write curve geometries"
+        ):
+            gdal.alg.vector.pipeline(
+                input=src_ds, pipeline=f'read ! write {tmp_vsimem / "out.geojson"}'
+            )
+
+
+###############################################################################
+
+
+@pytest.mark.require_driver("GeoJSON")
+def test_gdalalg_vector_convert_overwrite_fails(tmp_vsimem):
+
+    gdal.alg.vector.convert(
+        input="../ogr/data/poly.shp", output=f"/vsizip/{tmp_vsimem}/out.zip/out.geojson"
+    )
+    with pytest.raises(
+        Exception, match=f"Deleting /vsizip/{tmp_vsimem}/out.zip/out.geojson failed"
+    ):
+        gdal.alg.vector.convert(
+            input="../ogr/data/poly.shp",
+            output=f"/vsizip/{tmp_vsimem}/out.zip/out.geojson",
+            overwrite=True,
         )

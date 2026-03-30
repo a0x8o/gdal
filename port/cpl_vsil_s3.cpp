@@ -1908,38 +1908,15 @@ VSIS3FSHandler::CreateWriteHandle(const char *pszFilename,
 /*                     NormalizeFilenameIfNeeded()                      */
 /************************************************************************/
 
-static void NormalizeFilenameIfNeeded(CPLString &osFilename,
-                                      const char *&pszFilename)
+static void NormalizeFilenameIfNeeded(CPLString &osFilename)
 {
     // Transform '/vsis3/./foo' to '/vsis3/foo' by default
     //
     // Cf https://curl.se/libcurl/c/CURLOPT_PATH_AS_IS.html
-    if (!CPLTestBool(VSIGetPathSpecificOption(pszFilename,
+    if (!CPLTestBool(VSIGetPathSpecificOption(osFilename,
                                               "GDAL_HTTP_PATH_VERBATIM", "NO")))
     {
-        osFilename.replaceAll("/./", '/');
-
-        // Remove "/.." or /../" sequences..
-        while (true)
-        {
-            const auto nSlashDotDotSlashPos = osFilename.find("/../");
-            if (nSlashDotDotSlashPos != std::string::npos &&
-                nSlashDotDotSlashPos > 0)
-            {
-                const auto nLastSlashPos =
-                    osFilename.rfind('/', nSlashDotDotSlashPos - 1);
-                if (nLastSlashPos != std::string::npos)
-                {
-                    osFilename = osFilename.substr(0, nLastSlashPos + 1) +
-                                 osFilename.substr(nSlashDotDotSlashPos +
-                                                   strlen("/../"));
-                    continue;
-                }
-            }
-            break;
-        }
-
-        pszFilename = osFilename.c_str();
+        osFilename = CPLLexicallyNormalize(osFilename, '/');
     }
 }
 
@@ -1955,11 +1932,17 @@ VSIVirtualHandleUniquePtr VSICurlFilesystemHandlerBaseWritable::Open(
         return nullptr;
 
     CPLString osFilename(pszFilename);
-    NormalizeFilenameIfNeeded(osFilename, pszFilename);
+    NormalizeFilenameIfNeeded(osFilename);
+    if (!STARTS_WITH_CI(osFilename.c_str(), GetFSPrefix().c_str()))
+    {
+        CPLError(CE_Failure, CPLE_AppDefined, "Invalid filename '%s'",
+                 pszFilename);
+        return nullptr;
+    }
 
     if (strchr(pszAccess, '+'))
     {
-        if (!SupportsRandomWrite(pszFilename, true))
+        if (!SupportsRandomWrite(osFilename, true))
         {
             if (bSetError)
             {
@@ -1974,16 +1957,16 @@ VSIVirtualHandleUniquePtr VSICurlFilesystemHandlerBaseWritable::Open(
         }
 
         const std::string osTmpFilename(
-            CPLGenerateTempFilenameSafe(CPLGetFilename(pszFilename)));
+            CPLGenerateTempFilenameSafe(CPLGetFilename(osFilename)));
         if (strchr(pszAccess, 'r'))
         {
             auto poExistingFile =
-                VSIFilesystemHandler::OpenStatic(pszFilename, "rb");
+                VSIFilesystemHandler::OpenStatic(osFilename, "rb");
             if (!poExistingFile)
             {
                 return nullptr;
             }
-            if (VSICopyFile(pszFilename, osTmpFilename.c_str(),
+            if (VSICopyFile(osFilename, osTmpFilename.c_str(),
                             poExistingFile.get(), static_cast<vsi_l_offset>(-1),
                             nullptr, nullptr, nullptr) != 0)
             {
@@ -2000,7 +1983,7 @@ VSIVirtualHandleUniquePtr VSICurlFilesystemHandlerBaseWritable::Open(
             return nullptr;
         }
 
-        auto poWriteHandle = CreateWriteHandle(pszFilename, papszOptions);
+        auto poWriteHandle = CreateWriteHandle(osFilename, papszOptions);
         if (!poWriteHandle)
         {
             return nullptr;
@@ -2012,20 +1995,20 @@ VSIVirtualHandleUniquePtr VSICurlFilesystemHandlerBaseWritable::Open(
     else if (strchr(pszAccess, 'w') || strchr(pszAccess, 'a'))
     {
         return VSIVirtualHandleUniquePtr(
-            CreateWriteHandle(pszFilename, papszOptions).release());
+            CreateWriteHandle(osFilename, papszOptions).release());
     }
 
-    if (std::string(pszFilename).back() != '/')
+    if (osFilename.back() != '/')
     {
         // If there's directory content for the directory where this file
         // belongs to, use it to detect if the object does not exist
         CachedDirList cachedDirList;
-        const std::string osDirname(CPLGetDirnameSafe(pszFilename));
+        const std::string osDirname(CPLGetDirnameSafe(osFilename));
         if (STARTS_WITH_CI(osDirname.c_str(), GetFSPrefix().c_str()) &&
             GetCachedDirList(osDirname.c_str(), cachedDirList) &&
             cachedDirList.bGotFileList)
         {
-            const std::string osFilenameOnly(CPLGetFilename(pszFilename));
+            const std::string osFilenameOnly(CPLGetFilename(osFilename));
             bool bFound = false;
             for (int i = 0; i < cachedDirList.oFileList.size(); i++)
             {
@@ -2042,7 +2025,7 @@ VSIVirtualHandleUniquePtr VSICurlFilesystemHandlerBaseWritable::Open(
         }
     }
 
-    return VSICurlFilesystemHandlerBase::Open(pszFilename, pszAccess, bSetError,
+    return VSICurlFilesystemHandlerBase::Open(osFilename, pszAccess, bSetError,
                                               papszOptions);
 }
 
@@ -2485,17 +2468,24 @@ char **VSIS3FSHandler::GetFileMetadata(const char *pszFilename,
         return nullptr;
 
     CPLString osFilename(pszFilename);
-    NormalizeFilenameIfNeeded(osFilename, pszFilename);
+    NormalizeFilenameIfNeeded(osFilename);
+    if (!STARTS_WITH_CI(osFilename.c_str(), GetFSPrefix().c_str()))
+    {
+        CPLError(CE_Failure, CPLE_AppDefined, "Invalid filename '%s'",
+                 pszFilename);
+        return nullptr;
+    }
 
     if (pszDomain == nullptr || !EQUAL(pszDomain, "TAGS"))
     {
         return VSICurlFilesystemHandlerBase::GetFileMetadata(
-            pszFilename, pszDomain, papszOptions);
+            osFilename, pszDomain, papszOptions);
     }
 
     auto poS3HandleHelper =
         std::unique_ptr<VSIS3HandleHelper>(VSIS3HandleHelper::BuildFromURI(
-            pszFilename + GetFSPrefix().size(), GetFSPrefix().c_str(), false));
+            osFilename.c_str() + GetFSPrefix().size(), GetFSPrefix().c_str(),
+            false));
     if (!poS3HandleHelper)
         return nullptr;
 
@@ -2504,7 +2494,7 @@ char **VSIS3FSHandler::GetFileMetadata(const char *pszFilename,
 
     bool bRetry;
 
-    const CPLStringList aosHTTPOptions(CPLHTTPGetOptionsFromEnv(pszFilename));
+    const CPLStringList aosHTTPOptions(CPLHTTPGetOptionsFromEnv(osFilename));
     const CPLHTTPRetryParameters oRetryParameters(aosHTTPOptions);
     CPLHTTPRetryContext oRetryContext(oRetryParameters);
 
@@ -2606,7 +2596,13 @@ bool VSIS3FSHandler::SetFileMetadata(const char *pszFilename,
         return false;
 
     CPLString osFilename(pszFilename);
-    NormalizeFilenameIfNeeded(osFilename, pszFilename);
+    NormalizeFilenameIfNeeded(osFilename);
+    if (!STARTS_WITH_CI(osFilename.c_str(), GetFSPrefix().c_str()))
+    {
+        CPLError(CE_Failure, CPLE_AppDefined, "Invalid filename '%s'",
+                 pszFilename);
+        return false;
+    }
 
     if (pszDomain == nullptr ||
         !(EQUAL(pszDomain, "HEADERS") || EQUAL(pszDomain, "TAGS")))
@@ -2618,12 +2614,13 @@ bool VSIS3FSHandler::SetFileMetadata(const char *pszFilename,
 
     if (EQUAL(pszDomain, "HEADERS"))
     {
-        return CopyObject(pszFilename, pszFilename, papszMetadata) == 0;
+        return CopyObject(osFilename, osFilename, papszMetadata) == 0;
     }
 
     auto poS3HandleHelper =
         std::unique_ptr<VSIS3HandleHelper>(VSIS3HandleHelper::BuildFromURI(
-            pszFilename + GetFSPrefix().size(), GetFSPrefix().c_str(), false));
+            osFilename.c_str() + GetFSPrefix().size(), GetFSPrefix().c_str(),
+            false));
     if (!poS3HandleHelper)
         return false;
 
@@ -2680,7 +2677,7 @@ bool VSIS3FSHandler::SetFileMetadata(const char *pszFilename,
 
     bool bRetry;
 
-    const CPLStringList aosHTTPOptions(CPLHTTPGetOptionsFromEnv(pszFilename));
+    const CPLStringList aosHTTPOptions(CPLHTTPGetOptionsFromEnv(osFilename));
     const CPLHTTPRetryParameters oRetryParameters(aosHTTPOptions);
     CPLHTTPRetryContext oRetryContext(oRetryParameters);
 
@@ -2792,7 +2789,14 @@ int IVSIS3LikeFSHandler::MkdirInternal(const char *pszDirname, long /*nMode*/,
     NetworkStatisticsAction oContextAction("Mkdir");
 
     CPLString osDirname(pszDirname);
-    NormalizeFilenameIfNeeded(osDirname, pszDirname);
+    NormalizeFilenameIfNeeded(osDirname);
+    if (!STARTS_WITH_CI(osDirname.c_str(), GetFSPrefix().c_str()))
+    {
+        CPLError(CE_Failure, CPLE_AppDefined, "Invalid filename '%s'",
+                 pszDirname);
+        return -1;
+    }
+
     if (!osDirname.empty() && osDirname.back() != '/')
         osDirname += "/";
 
@@ -2866,7 +2870,14 @@ int IVSIS3LikeFSHandler::Rmdir(const char *pszDirname)
     NetworkStatisticsAction oContextAction("Rmdir");
 
     CPLString osDirname(pszDirname);
-    NormalizeFilenameIfNeeded(osDirname, pszDirname);
+    NormalizeFilenameIfNeeded(osDirname);
+    if (!STARTS_WITH_CI(osDirname.c_str(), GetFSPrefix().c_str()))
+    {
+        CPLError(CE_Failure, CPLE_AppDefined, "Invalid filename '%s'",
+                 pszDirname);
+        return -1;
+    }
+
     if (!osDirname.empty() && osDirname.back() != '/')
         osDirname += "/";
 
@@ -2925,14 +2936,19 @@ int IVSIS3LikeFSHandler::Stat(const char *pszFilename, VSIStatBufL *pStatBuf,
         return -1;
 
     CPLString osFilename(pszFilename);
-    NormalizeFilenameIfNeeded(osFilename, pszFilename);
+    NormalizeFilenameIfNeeded(osFilename);
+    if (!STARTS_WITH_CI(osFilename.c_str(), GetFSPrefix().c_str()))
+    {
+        CPLError(CE_Failure, CPLE_AppDefined, "Invalid filename '%s'",
+                 pszFilename);
+        return -1;
+    }
 
     if ((nFlags & VSI_STAT_CACHE_ONLY) != 0)
-        return VSICurlFilesystemHandlerBase::Stat(pszFilename, pStatBuf,
-                                                  nFlags);
+        return VSICurlFilesystemHandlerBase::Stat(osFilename, pStatBuf, nFlags);
 
     memset(pStatBuf, 0, sizeof(VSIStatBufL));
-    if (!IsAllowedFilename(pszFilename))
+    if (!IsAllowedFilename(osFilename))
         return -1;
 
     NetworkStatisticsFileSystem oContextFS(GetFSPrefix().c_str());
@@ -3075,9 +3091,15 @@ int IVSIS3LikeFSHandler::Unlink(const char *pszFilename)
         return -1;
 
     CPLString osFilename(pszFilename);
-    NormalizeFilenameIfNeeded(osFilename, pszFilename);
+    NormalizeFilenameIfNeeded(osFilename);
+    if (!STARTS_WITH_CI(osFilename.c_str(), GetFSPrefix().c_str()))
+    {
+        CPLError(CE_Failure, CPLE_AppDefined, "Invalid filename '%s'",
+                 pszFilename);
+        return -1;
+    }
 
-    std::string osNameWithoutPrefix = pszFilename + GetFSPrefix().size();
+    std::string osNameWithoutPrefix = osFilename.c_str() + GetFSPrefix().size();
     if (osNameWithoutPrefix.find('/') == std::string::npos)
     {
         CPLDebug(GetDebugKey(), "%s is not a file", pszFilename);
@@ -3089,7 +3111,7 @@ int IVSIS3LikeFSHandler::Unlink(const char *pszFilename)
     NetworkStatisticsAction oContextAction("Unlink");
 
     VSIStatBufL sStat;
-    if (VSIStatL(pszFilename, &sStat) != 0)
+    if (VSIStatL(osFilename, &sStat) != 0)
     {
         CPLDebug(GetDebugKey(), "%s is not a object", pszFilename);
         errno = ENOENT;
@@ -3102,7 +3124,7 @@ int IVSIS3LikeFSHandler::Unlink(const char *pszFilename)
         return -1;
     }
 
-    return DeleteObject(pszFilename);
+    return DeleteObject(osFilename);
 }
 
 /************************************************************************/
@@ -3119,16 +3141,25 @@ int IVSIS3LikeFSHandler::Rename(const char *oldpath, const char *newpath,
         return -1;
 
     CPLString osOldPath(oldpath);
-    NormalizeFilenameIfNeeded(osOldPath, oldpath);
+    NormalizeFilenameIfNeeded(osOldPath);
+    if (!STARTS_WITH_CI(osOldPath.c_str(), GetFSPrefix().c_str()))
+    {
+        CPLError(CE_Failure, CPLE_AppDefined, "Invalid filename '%s'", oldpath);
+        return -1;
+    }
 
     CPLString osNewPath(newpath);
-    NormalizeFilenameIfNeeded(osNewPath, newpath);
-
+    NormalizeFilenameIfNeeded(osNewPath);
+    if (!STARTS_WITH_CI(osNewPath.c_str(), GetFSPrefix().c_str()))
+    {
+        CPLError(CE_Failure, CPLE_AppDefined, "Invalid filename '%s'", newpath);
+        return -1;
+    }
     NetworkStatisticsFileSystem oContextFS(GetFSPrefix().c_str());
     NetworkStatisticsAction oContextAction("Rename");
 
     VSIStatBufL sStat;
-    if (VSIStatL(oldpath, &sStat) != 0)
+    if (VSIStatL(osOldPath, &sStat) != 0)
     {
         CPLDebug(GetDebugKey(), "%s is not a object", oldpath);
         errno = ENOENT;
@@ -3138,21 +3169,21 @@ int IVSIS3LikeFSHandler::Rename(const char *oldpath, const char *newpath,
     // AWS doesn't like renaming to the same name, and errors out
     // But GCS does like it, and so we might end up killing ourselves !
     // POSIX says renaming on the same file is OK
-    if (strcmp(oldpath, newpath) == 0)
+    if (strcmp(osOldPath, osNewPath) == 0)
         return 0;
 
     if (VSI_ISDIR(sStat.st_mode))
     {
         int ret = 0;
-        const CPLStringList aosList(VSIReadDir(oldpath));
-        Mkdir(newpath, 0755);
+        const CPLStringList aosList(VSIReadDir(osOldPath));
+        Mkdir(osNewPath, 0755);
         const int nListSize = aosList.size();
         for (int i = 0; ret == 0 && i < nListSize; i++)
         {
             const std::string osSrc =
-                CPLFormFilenameSafe(oldpath, aosList[i], nullptr);
+                CPLFormFilenameSafe(osOldPath, aosList[i], nullptr);
             const std::string osTarget =
-                CPLFormFilenameSafe(newpath, aosList[i], nullptr);
+                CPLFormFilenameSafe(osNewPath, aosList[i], nullptr);
             void *pScaledProgress =
                 GDALCreateScaledProgress(static_cast<double>(i) / nListSize,
                                          static_cast<double>(i + 1) / nListSize,
@@ -3163,23 +3194,23 @@ int IVSIS3LikeFSHandler::Rename(const char *oldpath, const char *newpath,
             GDALDestroyScaledProgress(pScaledProgress);
         }
         if (ret == 0)
-            Rmdir(oldpath);
+            Rmdir(osOldPath);
         return ret;
     }
     else
     {
-        if (VSIStatL(newpath, &sStat) == 0 && VSI_ISDIR(sStat.st_mode))
+        if (VSIStatL(osNewPath, &sStat) == 0 && VSI_ISDIR(sStat.st_mode))
         {
             CPLDebug(GetDebugKey(), "%s already exists and is a directory",
                      newpath);
             errno = ENOTEMPTY;
             return -1;
         }
-        if (CopyObject(oldpath, newpath, nullptr) != 0)
+        if (CopyObject(osOldPath, osNewPath, nullptr) != 0)
         {
             return -1;
         }
-        return DeleteObject(oldpath);
+        return DeleteObject(osOldPath);
     }
 }
 
@@ -3489,12 +3520,17 @@ VSIDIR *IVSIS3LikeFSHandler::OpenDir(const char *pszPath, int nRecurseDepth,
         return nullptr;
 
     CPLString osPath(pszPath);
-    NormalizeFilenameIfNeeded(osPath, pszPath);
+    NormalizeFilenameIfNeeded(osPath);
+    if (!STARTS_WITH_CI(osPath.c_str(), GetFSPrefix().c_str()))
+    {
+        CPLError(CE_Failure, CPLE_AppDefined, "Invalid filename '%s'", pszPath);
+        return nullptr;
+    }
 
     NetworkStatisticsFileSystem oContextFS(GetFSPrefix().c_str());
     NetworkStatisticsAction oContextAction("OpenDir");
 
-    std::string osDirnameWithoutPrefix = pszPath + GetFSPrefix().size();
+    std::string osDirnameWithoutPrefix = osPath.c_str() + GetFSPrefix().size();
     if (!osDirnameWithoutPrefix.empty() && osDirnameWithoutPrefix.back() == '/')
     {
         osDirnameWithoutPrefix.pop_back();
@@ -3516,7 +3552,7 @@ VSIDIR *IVSIS3LikeFSHandler::OpenDir(const char *pszPath, int nRecurseDepth,
         return nullptr;
     }
 
-    VSIDIRS3 *dir = new VSIDIRS3(pszPath, this);
+    VSIDIRS3 *dir = new VSIDIRS3(osPath, this);
     dir->nRecurseDepth = nRecurseDepth;
     dir->poHandleHelper = std::move(poS3HandleHelper);
     dir->osBucket = std::move(osBucket);

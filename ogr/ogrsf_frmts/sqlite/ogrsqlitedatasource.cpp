@@ -882,11 +882,13 @@ sqlite3_stmt *OGRSQLiteBaseDataSource::prepareSql(sqlite3 *db, const char *zSql,
     const int rc = sqlite3_prepare_v2(db, zSql, nByte, &stmt, &pszTail);
     if (rc != SQLITE_OK && pfnQueryLoggerFunc)
     {
-        std::string error{"Error preparing query: "};
-        error.append(sqlite3_errmsg(db));
-        pfnQueryLoggerFunc(zSql, error.c_str(), -1, -1, poQueryLoggerArg);
+        pfnQueryLoggerFunc(
+            zSql,
+            SQLFormatErrorMsgFailedPrepare(db, "Error preparing query: ", zSql)
+                .c_str(),
+            -1, -1, poQueryLoggerArg);
     }
-    else if (pszTail && SQLHasRemainingContent(pszTail))
+    else if (strchr(zSql, ';') && pszTail && SQLHasRemainingContent(pszTail))
     {
         sqlite3_finalize(stmt);
         stmt = nullptr;
@@ -1855,7 +1857,7 @@ bool OGRSQLiteDataSource::Create(const char *pszNameIn,
         CPLError(
             CE_Failure, CPLE_NotSupported,
             "OGR was built without libspatialite support\n"
-            "... sorry, creating/writing any SpatiaLite DB is unsupported\n");
+            "... sorry, creating/writing any SpatiaLite DB is unsupported");
 
         return false;
 #endif
@@ -3338,9 +3340,11 @@ OGRLayer *OGRSQLiteDataSource::ExecuteSQL(const char *pszSQLCommand,
     {
         if (nErrorCount == CPLGetErrorCounter())
         {
-            CPLError(CE_Failure, CPLE_AppDefined,
-                     "In ExecuteSQL(): sqlite3_prepare_v2(%s):\n  %s",
-                     osSQLCommand.c_str(), sqlite3_errmsg(GetDB()));
+            CPLError(CE_Failure, CPLE_AppDefined, "%s",
+                     SQLFormatErrorMsgFailedPrepare(
+                         GetDB(), "In ExecuteSQL(): sqlite3_prepare_v2(): ",
+                         osSQLCommand.c_str())
+                         .c_str());
         }
         return nullptr;
     }
@@ -3999,9 +4003,8 @@ OGRErr OGRSQLiteBaseDataSource::SoftStartTransaction()
     OGRErr eErr = OGRERR_NONE;
     if (m_nSoftTransactionLevel == 1)
     {
-        for (int i = 0; i < GetLayerCount(); i++)
+        for (auto *poLayer : GetLayers())
         {
-            OGRLayer *poLayer = GetLayer(i);
             poLayer->PrepareStartTransaction();
         }
 
@@ -4078,9 +4081,8 @@ OGRErr OGRSQLiteBaseDataSource::SoftRollbackTransaction()
         eErr = DoTransactionCommand("ROLLBACK");
         if (eErr == OGRERR_NONE)
         {
-            for (int i = 0; i < GetLayerCount(); i++)
+            for (auto *poLayer : GetLayers())
             {
-                OGRLayer *poLayer = GetLayer(i);
                 poLayer->FinishRollbackTransaction("");
             }
         }
@@ -4097,9 +4099,8 @@ OGRErr OGRSQLiteBaseDataSource::StartSavepoint(const std::string &osName)
     {
         m_bImplicitTransactionOpened = true;
         m_nSoftTransactionLevel++;
-        for (int i = 0; i < GetLayerCount(); i++)
+        for (auto *poLayer : GetLayers())
         {
-            OGRLayer *poLayer = GetLayer(i);
             poLayer->PrepareStartTransaction();
         }
     }

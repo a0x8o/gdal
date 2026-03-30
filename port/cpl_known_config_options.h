@@ -334,7 +334,7 @@ constexpr static const char* const apszKnownConfigOptions[] =
    "GDAL_JPEG2000_STRUCTURE_MAX_LINES", // from gdaljp2structure.cpp
    "GDAL_JPEG_TO_RGB", // from jpgdataset.cpp
    "GDAL_JPEGXL_MAX_BOX_BUFFER_SIZE", // from jpegxl.cpp
-   "GDAL_LOAD_EXTRA_DIM_METADATA_DELAY", // from gdalmultidim.cpp
+   "GDAL_LOAD_EXTRA_DIM_METADATA_DELAY", // from gdalmultidim_array_bridge_classic.cpp
    "GDAL_LOCALE", // from gdaldllmain.cpp
    "GDAL_MAX_BAND_COUNT", // from gdal_misc.cpp, netcdfdataset.cpp, pcidskdataset2.cpp
    "GDAL_MAX_CONNECTIONS", // from gdalogcapidataset.cpp, gdalwmsdataset.cpp
@@ -410,7 +410,7 @@ constexpr static const char* const apszKnownConfigOptions[] =
    "GDAL_STATS_USE_FLOAT32_OPTIM", // from gdalrasterband.cpp
    "GDAL_STATS_USE_FLOAT64_OPTIM", // from gdalrasterband.cpp
    "GDAL_STATS_USE_INTEGER_STATS", // from gdalrasterband.cpp
-   "GDAL_SWATH_SIZE", // from gdalmultidim.cpp, rasterio.cpp
+   "GDAL_SWATH_SIZE", // from gdalmultidim_array.cpp, rasterio.cpp
    "GDAL_TEMP_DRIVER_NAME", // from nearblack_lib_floodfill.cpp
    "GDAL_TERM_PROGRESS_OSC_9_4", // from cpl_progress.cpp
    "GDAL_THRESHOLD_MIN_THREADS_FOR_SPAWN", // from gdalalg_raster_tile.cpp
@@ -698,6 +698,7 @@ constexpr static const char* const apszKnownConfigOptions[] =
    "OGR2OGR_MIN_FEATURES_FOR_THREADED_REPROJ", // from ogr2ogr_lib.cpp
    "OGR2OGR_USE_ARROW_API", // from ogr2ogr_lib.cpp
    "OGR_ADBC_AUTO_LOAD_DUCKDB_SPATIAL", // from ogradbcdataset.cpp
+   "OGR_ADBC_LIBDUCKDB", // from ogradbcdataset.cpp
    "OGR_API_SPY_FILE", // from ograpispy.cpp
    "OGR_API_SPY_SNAPSHOT_PATH", // from ograpispy.cpp
    "OGR_APPLY_GEOM_SET_PRECISION", // from ogr2ogr_lib.cpp, ogrlayer.cpp
@@ -1036,6 +1037,8 @@ constexpr static const char* const apszKnownConfigOptions[] =
    "THRESHOLD", // from ogrct.cpp
    "TIFF_READ_STREAMING", // from gtiffdataset_read.cpp
    "TIFF_USE_OVR", // from gtiffdataset_write.cpp
+   "TIGER_LFIELD_AS_STRING", // from tigerfilebase.cpp
+   "TIGER_VERSION", // from ogrtigerdatasource.cpp
    "TILEDB_ATTRIBUTE", // from tiledbdense.cpp
    "TILEDB_BINARY_TYPE", // from tiledbsparse.cpp
    "TILEDB_BUG", // from tiledbsparse.cpp

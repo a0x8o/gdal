@@ -3540,7 +3540,7 @@ def test_gdalwarp_lib_epsg_4326_to_esri_53037():
     srs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
     src_ds.SetSpatialRef(srs)
     src_ds.SetGeoTransform([-180, 0.033333333333330, 0, 90, 0, -0.033333333333330])
-    # Expension of ESRI:53037 (proj.db of old PROJ releases don't know it)
+    # Expansion of ESRI:53037 (proj.db of old PROJ releases don't know it)
     out_ds = gdal.Warp(
         "",
         src_ds,
@@ -4553,9 +4553,7 @@ def test_gdalwarp_lib_init_dest_invalid(tmp_vsimem, init_dest):
 
 def test_gdalwarp_lib_init_dest_nodata_invalid(tmp_vsimem):
 
-    # TODO: switch from warning to failure in GDAL 3.12
-    # with pytest.raises(Exception, match="NoData value was not defined"):
-    with gdaltest.error_raised(gdal.CE_Warning, "NoData value was not defined"):
+    with gdaltest.error_raised(gdal.CE_Failure, "NoData value was not defined"):
         gdal.Warp(
             tmp_vsimem / "out.tif",
             "../gcore/data/byte.tif",

@@ -508,6 +508,11 @@ struct TargetLayerInfo
     const char *m_pszGeomField = nullptr;
     std::vector<int> m_anDateTimeFieldIdx{};
     bool m_bSupportCurves = false;
+    bool m_bSupportZ = false;
+    bool m_bSupportM = false;
+    bool m_bHasWarnedAboutCurves = false;
+    bool m_bHasWarnedAboutZ = false;
+    bool m_bHasWarnedAboutM = false;
     OGRArrowArrayStream m_sArrowArrayStream{};
 
     void CheckSameCoordinateOperation() const;
@@ -2849,14 +2854,10 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
              psOptions->aosLayers.size() == 1 ||
              (psOptions->aosLayers.empty() && poDS->GetLayerCount() == 1));
 
-        bool bOutputDirectory = false;
-        if (!bSingleLayer && CPLGetExtensionSafe(osDestFilename).empty() &&
-            (EQUAL(poDriver->GetDescription(), "CSV") ||
-             EQUAL(poDriver->GetDescription(), "ESRI Shapefile") ||
-             EQUAL(poDriver->GetDescription(), "MapInfo File")))
-        {
-            bOutputDirectory = true;
-        }
+        bool bOutputDirectory =
+            !bSingleLayer && CPLGetExtensionSafe(osDestFilename).empty() &&
+            poDriver->GetMetadataItem(
+                GDAL_DCAP_MULTIPLE_VECTOR_LAYERS_IN_DIRECTORY);
 
         /* ------------------------------------------------------------------ */
         /*   Special case to improve user experience when translating         */
@@ -2882,6 +2883,16 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
                 return nullptr;
             }
             bOutputDirectory = true;
+        }
+
+        if (psOptions->bInvokedFromGdalAlgorithm && !bSingleLayer &&
+            !bOutputDirectory &&
+            !poDriver->GetMetadataItem(GDAL_DCAP_MULTIPLE_VECTOR_LAYERS))
+        {
+            CPLError(CE_Failure, CPLE_AppDefined,
+                     "%s driver does not support multiple layers.",
+                     poDriver->GetDescription());
+            return nullptr;
         }
 
         CPLStringList aosDSCO(psOptions->aosDSCO);
@@ -2914,18 +2925,6 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
         }
         bNewDataSource = true;
 
-        if (psOptions->bInvokedFromGdalAlgorithm && !bSingleLayer &&
-            !bOutputDirectory &&
-            (!poODS->TestCapability(ODsCCreateLayer) ||
-             !poDriver->GetMetadataItem(GDAL_DCAP_MULTIPLE_VECTOR_LAYERS)))
-        {
-            poDriver->Delete(osDestFilename);
-            CPLError(CE_Failure, CPLE_AppDefined,
-                     "%s driver does not support multiple layers.",
-                     poDriver->GetDescription());
-            return nullptr;
-        }
-
         if (psOptions->bCopyMD)
         {
             const CPLStringList aosDomains(poDS->GetMetadataDomainList());
@@ -2957,7 +2956,7 @@ GDALDatasetH GDALVectorTranslate(const char *pszDest, GDALDatasetH hDstDS,
             poDriver->GetMetadataItem(GDAL_DCAP_UPSERT) == nullptr)
         {
             CPLError(CE_Failure, CPLE_NotSupported,
-                     "%s driver doest not support upsert",
+                     "%s driver does not support upsert",
                      poODS->GetDriver()->GetDescription());
             return nullptr;
         }
@@ -5874,6 +5873,10 @@ SetupTargetLayer::Setup(OGRLayer *poSrcLayer, const char *pszNewLayerName,
 
     psInfo->m_bSupportCurves =
         CPL_TO_BOOL(poDstLayer->TestCapability(OLCCurveGeometries));
+    psInfo->m_bSupportZ =
+        CPL_TO_BOOL(poDstLayer->TestCapability(OLCZGeometries));
+    psInfo->m_bSupportM =
+        CPL_TO_BOOL(poDstLayer->TestCapability(OLCMeasuredGeometries));
 
     psInfo->m_sArrowArrayStream = std::move(streamSrc);
 
@@ -7326,6 +7329,41 @@ bool LayerTranslator::Translate(
                         poDstGeometry = OGRGeometryFactory::forceTo(
                             std::move(poDstGeometry),
                             static_cast<OGRwkbGeometryType>(eGType));
+                    }
+                }
+
+                if (poDstGeometry && !psOptions->bQuiet)
+                {
+                    if (!psInfo->m_bHasWarnedAboutCurves &&
+                        !psInfo->m_bSupportCurves &&
+                        OGR_GT_IsNonLinear(poDstGeometry->getGeometryType()))
+                    {
+                        CPLError(CE_Warning, CPLE_AppDefined,
+                                 "Attempt to write curve geometries to layer "
+                                 "%s that does not support them. They will be "
+                                 "linearized",
+                                 poDstLayer->GetDescription());
+                        psInfo->m_bHasWarnedAboutCurves = true;
+                    }
+                    if (!psInfo->m_bHasWarnedAboutZ && !psInfo->m_bSupportZ &&
+                        OGR_GT_HasZ(poDstGeometry->getGeometryType()))
+                    {
+                        CPLError(CE_Warning, CPLE_AppDefined,
+                                 "Attempt to write Z geometries to layer %s "
+                                 "that does not support them. Z component will "
+                                 "be discarded",
+                                 poDstLayer->GetDescription());
+                        psInfo->m_bHasWarnedAboutZ = true;
+                    }
+                    if (!psInfo->m_bHasWarnedAboutM && !psInfo->m_bSupportM &&
+                        OGR_GT_HasM(poDstGeometry->getGeometryType()))
+                    {
+                        CPLError(CE_Warning, CPLE_AppDefined,
+                                 "Attempt to write M geometries to layer %s "
+                                 "that does not support them. M component will "
+                                 "be discarded",
+                                 poDstLayer->GetDescription());
+                        psInfo->m_bHasWarnedAboutM = true;
                     }
                 }
 
