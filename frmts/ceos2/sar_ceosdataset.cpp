@@ -1239,7 +1239,7 @@ void SAR_CEOSDataset::ScanForMetadata()
             {
                 SetMetadataItem(sDef.pszMetadataItemName, osField.c_str());
                 if (EQUAL(sDef.pszMetadataItemName,
-                          "CEOS_PLATFORM_POS_NUMBER_DATA_POINTS"))
+                          "CEOS_PLATFORM_POS_NUMBER_POINTS"))
                 {
                     nPoints = std::clamp(atoi(osField), 0,
                                          (record->Length - OFFSET_POINT_1) /
@@ -1834,7 +1834,7 @@ GDALDataset *SAR_CEOSDataset::Open(GDALOpenInfo *poOpenInfo)
                     bIsALOS2Or4 && iFile == CEOS_TRAILER_FILE;
                 if (ProcessData(process_fp, iFile, psVolume, -1,
                                 VSIFTellL(process_fp),
-                                bSilentWrongRecordNumber) == 0)
+                                bSilentWrongRecordNumber) == CE_None)
                 {
                     switch (iFile)
                     {
@@ -2129,27 +2129,21 @@ static int ProcessData(VSILFILE *fp, int fileid, CeosSARVolume_t *sar,
                 CPLFree(temp_body);
                 return CE_Warning;
             }
-            else
+            else if (bSilentWrongRecordNumber && iThisRecord == 2)
             {
-                if (bSilentWrongRecordNumber)
-                {
-                    CPLDebug(
-                        "SAR_CEOS",
-                        "Corrupted CEOS File - got record seq# %d instead of "
-                        "the expected %d.",
-                        record->Sequence, iThisRecord);
-                }
-                else
-                {
-                    CPLError(
-                        CE_Warning, CPLE_AppDefined,
-                        "Corrupted CEOS File - got record seq# %d instead of "
-                        "the expected %d.",
-                        record->Sequence, iThisRecord);
-                }
                 CPLFree(record);
                 CPLFree(temp_body);
-                return bSilentWrongRecordNumber ? CE_Warning : CE_Failure;
+                return CE_Warning;
+            }
+            else
+            {
+                CPLError(CE_Warning, CPLE_AppDefined,
+                         "Corrupted CEOS File - got record seq# %d instead of "
+                         "the expected %d.",
+                         record->Sequence, iThisRecord);
+                CPLFree(record);
+                CPLFree(temp_body);
+                return CE_Failure;
             }
         }
 

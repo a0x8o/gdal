@@ -33,22 +33,7 @@ GDALVectorCombineAlgorithm::GDALVectorCombineAlgorithm(bool standaloneStep)
 {
     AddArg("group-by", 0,
            _("Names of field(s) by which inputs should be grouped"), &m_groupBy)
-        .AddValidationAction(
-            [this]()
-            {
-                auto fields = m_groupBy;
-
-                std::sort(fields.begin(), fields.end());
-                if (std::adjacent_find(fields.begin(), fields.end()) !=
-                    fields.end())
-                {
-                    CPLError(
-                        CE_Failure, CPLE_AppDefined,
-                        "--group-by must be a list of unique field names.");
-                    return false;
-                }
-                return true;
-            });
+        .SetDuplicateValuesAllowed(false);
 
     AddArg("keep-nested", 0,
            _("Avoid combining the components of multipart geometries"),
@@ -65,12 +50,10 @@ class GDALVectorCombineOutputLayer final
         OGRLayer &srcLayer, int geomFieldIndex,
         const std::vector<std::string> &groupBy, bool keepNested)
         : GDALVectorNonStreamingAlgorithmLayer(srcLayer, geomFieldIndex),
-          m_groupBy(groupBy), m_defn(OGRFeatureDefn::CreateFeatureDefn(
+          m_groupBy(groupBy), m_defn(OGRFeatureDefnRefCountedPtr::makeInstance(
                                   srcLayer.GetLayerDefn()->GetName())),
           m_keepNested(keepNested)
     {
-        m_defn->Reference();
-
         const OGRFeatureDefn *srcDefn = m_srcLayer.GetLayerDefn();
 
         // Copy field definitions for attribute fields used in
@@ -113,11 +96,6 @@ class GDALVectorCombineOutputLayer final
         }
     }
 
-    ~GDALVectorCombineOutputLayer() override
-    {
-        m_defn->Release();
-    }
-
     GIntBig GetFeatureCount(int bForce) override
     {
         if (m_poAttrQuery == nullptr && m_poFilterGeom == nullptr)
@@ -130,7 +108,7 @@ class GDALVectorCombineOutputLayer final
 
     const OGRFeatureDefn *GetLayerDefn() const override
     {
-        return m_defn;
+        return m_defn.get();
     }
 
     OGRErr IGetExtent(int iGeomField, OGREnvelope *psExtent,
@@ -196,7 +174,8 @@ class GDALVectorCombineOutputLayer final
             {
                 it = m_features
                          .insert(std::pair(
-                             fieldValues, std::make_unique<OGRFeature>(m_defn)))
+                             fieldValues,
+                             std::make_unique<OGRFeature>(m_defn.get())))
                          .first;
                 dstFeature = it->second.get();
 
@@ -398,7 +377,7 @@ class GDALVectorCombineOutputLayer final
     std::map<std::vector<std::string>, std::unique_ptr<OGRFeature>>
         m_features{};
     std::optional<decltype(m_features)::const_iterator> m_itFeature{};
-    OGRFeatureDefn *const m_defn;
+    const OGRFeatureDefnRefCountedPtr m_defn;
     GIntBig m_nProcessedFeaturesRead = 0;
     const bool m_keepNested;
 };

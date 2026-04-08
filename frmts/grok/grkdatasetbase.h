@@ -82,6 +82,7 @@
 #include <grk_config.h>
 
 #include "gdal_thread_pool.h"
+#include "gdaljp2metadata.h"
 
 #ifdef HAVE_CURL
 #include "cpl_aws.h"
@@ -522,7 +523,7 @@ struct GRKCodecWrapper
      * @param numResolutions number of resolutions
      * @return true if successful
      */
-    bool setUpDecompress(int numThreads, char *pszFilename,
+    bool setUpDecompress(int numThreads, const char *pszFilename,
                          vsi_l_offset nCodeStreamLength, uint32_t *nTileW,
                          uint32_t *nTileH, int *numResolutions)
     {
@@ -936,20 +937,10 @@ struct GRKCodecWrapper
         psImage->color_space = static_cast<GRK_COLOR_SPACE>(eColorSpace);
         psImage->numcomps = nBands;
 
-        grk_stream_params streamParams = {};
-        streamParams.seek_fn = JP2Dataset_Seek;
-        streamParams.write_fn = JP2Dataset_Write;
-        streamParams.user_data = psJP2File;
-
-        /* Always ask Grok to do codestream only. We will take care */
-        /* of JP2 boxes */
+        /* Default to J2K; setupJP2Metadata() switches to GRK_FMT_JP2
+         * when writing JP2 files.  Codec creation is deferred to
+         * initCodec() so JP2 metadata can be set first. */
         compressParams.cod_format = GRK_FMT_J2K;
-        pCodec = grk_compress_init(&streamParams, &compressParams, psImage);
-        if (pCodec == nullptr)
-        {
-            CPLError(CE_Failure, CPLE_AppDefined, "grk_compress_init() failed");
-            return false;
-        }
 
         // Store tile grid info for compressTile
         compressBlockXSize = nBlockXSize;
@@ -970,6 +961,579 @@ struct GRKCodecWrapper
                 memset(comp->data, 0,
                        static_cast<size_t>(comp->stride) * comp->h *
                            sizeof(int32_t));
+        }
+
+        return true;
+    }
+
+    /**
+     * @brief Extract cdef and palette info from Grok's parsed JP2 boxes.
+     */
+    void extractJP2BoxInfo(int nBands, int &nRedIndex, int &nGreenIndex,
+                           int &nBlueIndex, int &nAlphaIndex,
+                           GDALColorTable **ppoCT)
+    {
+        if (!psImage || !psImage->meta)
+            return;
+
+        auto *cdef = psImage->meta->color.channel_definition;
+        if (cdef &&
+            cdef->num_channel_descriptions == static_cast<uint16_t>(nBands))
+        {
+            nRedIndex = nGreenIndex = nBlueIndex = -1;
+            for (int i = 0; i < nBands; i++)
+            {
+                int CNi = cdef->descriptions[i].channel;
+                int Typi = cdef->descriptions[i].typ;
+                int Asoci = cdef->descriptions[i].asoc;
+                if (CNi < 0 || CNi >= nBands)
+                {
+                    CPLError(CE_Failure, CPLE_AppDefined,
+                             "Wrong value of CN%d=%d", i, CNi);
+                    break;
+                }
+                if (Typi == 0)
+                {
+                    if (Asoci == 1)
+                        nRedIndex = CNi;
+                    else if (Asoci == 2)
+                        nGreenIndex = CNi;
+                    else if (Asoci == 3)
+                        nBlueIndex = CNi;
+                    else if (Asoci < 0 || (Asoci > nBands && Asoci != 65535))
+                    {
+                        CPLError(CE_Failure, CPLE_AppDefined,
+                                 "Wrong value of Asoc%d=%d", i, Asoci);
+                        break;
+                    }
+                }
+                else if (Typi == 1)
+                    nAlphaIndex = CNi;
+            }
+        }
+        else if (cdef)
+            CPLDebug(debugId(), "Unsupported cdef content");
+
+        auto *pal = psImage->meta->color.palette;
+        if (pal && pal->num_entries <= 256 &&
+            (pal->num_channels == 3 || pal->num_channels == 4))
+        {
+            bool allPrec7 = true;
+            for (int c = 0; c < pal->num_channels; c++)
+                if (pal->channel_prec[c] != 7)
+                {
+                    allPrec7 = false;
+                    break;
+                }
+            if (allPrec7)
+            {
+                *ppoCT = new GDALColorTable();
+                for (int i = 0; i < pal->num_entries; i++)
+                {
+                    GDALColorEntry e;
+                    int off = i * pal->num_channels;
+                    e.c1 = static_cast<short>(pal->lut[off]);
+                    e.c2 = static_cast<short>(pal->lut[off + 1]);
+                    e.c3 = static_cast<short>(pal->lut[off + 2]);
+                    e.c4 = (pal->num_channels == 4)
+                               ? static_cast<short>(pal->lut[off + 3])
+                               : 255;
+                    (*ppoCT)->SetColorEntry(i, &e);
+                }
+            }
+        }
+    }
+
+    /**
+     * @brief Set JP2 metadata on the image for Grok-native JP2 writing.
+     *
+     * Called between initCompress() and initCodec().
+     */
+    void setupJP2Metadata(bool bInspireTG, int bProfile1, bool bGeoBoxesAfter,
+                          GDALJP2Metadata *poJP2MD, GDALJP2Box *poGMLJP2Box,
+                          int nAlphaBandIndex, int nRedBandIndex,
+                          int nGreenBandIndex, int nBlueBandIndex,
+                          JP2_COLOR_SPACE eColorSpace, int nBands,
+                          GDALColorTable *poCT, GDALDataset *poSrcDS,
+                          CSLConstList papszOptions)
+    {
+        compressParams.cod_format = GRK_FMT_JP2;
+
+        if (!psImage->meta)
+            psImage->meta = grk_image_meta_new();
+
+        /* JPX branding + reader requirements */
+        const bool bJPXBranding =
+            CPLFetchBool(papszOptions, "JPX", true) && poGMLJP2Box != nullptr;
+        if (bJPXBranding)
+        {
+            compressParams.jpx_branding = true;
+            compressParams.write_rreq = true;
+            compressParams.num_rreq_standard_features = 0;
+            compressParams.rreq_standard_features
+                [compressParams.num_rreq_standard_features++] =
+                bProfile1 ? 4 : 5;
+            compressParams.rreq_standard_features
+                [compressParams.num_rreq_standard_features++] = 67;
+        }
+        if (bInspireTG && poGMLJP2Box != nullptr &&
+            !CPLFetchBool(papszOptions, "JPX", true))
+        {
+            CPLError(CE_Warning, CPLE_AppDefined,
+                     "INSPIRE_TG=YES implies GMLJP2 which recommends "
+                     "JPX capability");
+        }
+
+        compressParams.geoboxes_after_jp2c = bGeoBoxesAfter;
+
+        const bool bWriteMetadata =
+            CPLFetchBool(papszOptions, "WRITE_METADATA", false);
+        const bool bMainMDOnly =
+            CPLFetchBool(papszOptions, "MAIN_MD_DOMAIN_ONLY", false);
+        const bool bIPR =
+            poSrcDS->GetMetadata("xml:IPR") != nullptr && bWriteMetadata;
+
+        if (bIPR)
+        {
+            compressParams.rreq_standard_features
+                [compressParams.num_rreq_standard_features++] = 35;
+        }
+
+        /* GeoTIFF UUID */
+        if (poJP2MD)
+        {
+            std::unique_ptr<GDALJP2Box> poGeoBox(poJP2MD->CreateJP2GeoTIFF());
+            if (poGeoBox)
+            {
+                const GByte *p = poGeoBox->GetWritableData();
+                GIntBig n = poGeoBox->GetDataLength();
+                if (n > 16) /* skip 16-byte UUID prefix */
+                    grk_image_meta_set_field(psImage->meta, "geotiff", p + 16,
+                                             static_cast<size_t>(n - 16));
+            }
+        }
+
+        /* IPR box */
+        if (bIPR)
+        {
+            std::unique_ptr<GDALJP2Box> poIPRBox(
+                GDALJP2Metadata::CreateIPRBox(poSrcDS));
+            if (poIPRBox)
+            {
+                const GByte *p = poIPRBox->GetWritableData();
+                GIntBig n = poIPRBox->GetDataLength();
+                if (n > 0)
+                    grk_image_meta_set_field(psImage->meta, "ipr", p,
+                                             static_cast<size_t>(n));
+            }
+        }
+
+        /* GMLJP2 asoc boxes */
+        if (poGMLJP2Box)
+        {
+            const GByte *asocData = poGMLJP2Box->GetWritableData();
+            int asocLen = static_cast<int>(poGMLJP2Box->GetDataLength());
+            flattenAndSetAsocBoxes(psImage, asocData, asocLen);
+        }
+
+        /* XMP UUID */
+        if (bWriteMetadata && !bMainMDOnly)
+        {
+            std::unique_ptr<GDALJP2Box> poXMPBox(
+                GDALJP2Metadata::CreateXMPBox(poSrcDS));
+            if (poXMPBox)
+            {
+                const GByte *p = poXMPBox->GetWritableData();
+                GIntBig n = poXMPBox->GetDataLength();
+                if (n > 16)
+                    grk_image_meta_set_field(psImage->meta, "xmp", p + 16,
+                                             static_cast<size_t>(n - 16));
+            }
+        }
+
+        /* GDAL metadata XML box */
+        if (bWriteMetadata)
+        {
+            std::unique_ptr<GDALJP2Box> poMDBox(
+                GDALJP2Metadata::CreateGDALMultiDomainMetadataXMLBox(
+                    poSrcDS, bMainMDOnly));
+            if (poMDBox)
+            {
+                const GByte *p = poMDBox->GetWritableData();
+                GIntBig n = poMDBox->GetDataLength();
+                if (n > 0)
+                    grk_image_meta_set_field(psImage->meta, "xml", p,
+                                             static_cast<size_t>(n));
+            }
+        }
+
+        /* cdef: component type/association */
+        setupCdef(nAlphaBandIndex, nRedBandIndex, nGreenBandIndex,
+                  nBlueBandIndex, eColorSpace, nBands, poCT, papszOptions);
+
+        /* Display resolution */
+        setupResolution(poSrcDS);
+    }
+
+  private:
+    void setupCdef(int nAlphaBandIndex, int nRedBandIndex, int nGreenBandIndex,
+                   int nBlueBandIndex, JP2_COLOR_SPACE eColorSpace, int nBands,
+                   GDALColorTable *poCT, CSLConstList papszOptions)
+    {
+        bool needCdef =
+            (((nBands == 3 || nBands == 4) &&
+              (eColorSpace == static_cast<JP2_COLOR_SPACE>(GRK_CLRSPC_SRGB) ||
+               eColorSpace == static_cast<JP2_COLOR_SPACE>(GRK_CLRSPC_SYCC)) &&
+              (nRedBandIndex != 0 || nGreenBandIndex != 1 ||
+               nBlueBandIndex != 2)) ||
+             nAlphaBandIndex >= 0);
+        if (!needCdef)
+            return;
+
+        int nComponents = nBands;
+        if (poCT != nullptr)
+        {
+            int nCTComp =
+                atoi(CSLFetchNameValueDef(papszOptions, "CT_COMPONENTS", "0"));
+            if (nCTComp == 4)
+                nComponents = 4;
+        }
+        for (int i = 0; i < nComponents; i++)
+        {
+            if (i != nAlphaBandIndex)
+            {
+                psImage->comps[i].type = GRK_CHANNEL_TYPE_COLOUR;
+                if (eColorSpace ==
+                        static_cast<JP2_COLOR_SPACE>(GRK_CLRSPC_GRAY) &&
+                    i == 0)
+                    psImage->comps[i].association = GRK_CHANNEL_ASSOC_COLOUR_1;
+                else if (i == nRedBandIndex)
+                    psImage->comps[i].association = GRK_CHANNEL_ASSOC_COLOUR_1;
+                else if (i == nGreenBandIndex)
+                    psImage->comps[i].association = GRK_CHANNEL_ASSOC_COLOUR_2;
+                else if (i == nBlueBandIndex)
+                    psImage->comps[i].association = GRK_CHANNEL_ASSOC_COLOUR_3;
+            }
+            else
+            {
+                psImage->comps[i].type = GRK_CHANNEL_TYPE_OPACITY;
+                psImage->comps[i].association = GRK_CHANNEL_ASSOC_WHOLE_IMAGE;
+            }
+        }
+    }
+
+    void setupResolution(GDALDataset *poSrcDS)
+    {
+        if (poSrcDS->GetMetadataItem("TIFFTAG_XRESOLUTION") == nullptr ||
+            poSrcDS->GetMetadataItem("TIFFTAG_YRESOLUTION") == nullptr ||
+            poSrcDS->GetMetadataItem("TIFFTAG_RESOLUTIONUNIT") == nullptr)
+            return;
+
+        double dfXRes =
+            CPLAtof(poSrcDS->GetMetadataItem("TIFFTAG_XRESOLUTION"));
+        double dfYRes =
+            CPLAtof(poSrcDS->GetMetadataItem("TIFFTAG_YRESOLUTION"));
+        int nResUnit = atoi(poSrcDS->GetMetadataItem("TIFFTAG_RESOLUTIONUNIT"));
+        if (nResUnit == 2)
+        {
+            dfXRes = dfXRes * 39.37 / 100.0;
+            dfYRes = dfYRes * 39.37 / 100.0;
+        }
+        if ((nResUnit == 2 || nResUnit == 3) && dfXRes > 0 && dfYRes > 0 &&
+            dfXRes < 65535 && dfYRes < 65535)
+        {
+            compressParams.write_display_resolution = true;
+            compressParams.display_resolution[0] = dfXRes * 100.0;
+            compressParams.display_resolution[1] = dfYRes * 100.0;
+        }
+    }
+
+    static void flattenAndSetAsocBoxes(grk_image *image, const GByte *asocData,
+                                       int asocDataLen)
+    {
+        struct AsocEntry
+        {
+            uint32_t level;
+            std::string label;
+            std::vector<uint8_t> xml;
+        };
+
+        std::vector<AsocEntry> entries;
+
+        std::function<void(const GByte *, int, uint32_t)> flattenAsoc;
+        flattenAsoc = [&](const GByte *data, int dataLen, uint32_t level)
+        {
+            int offset = 0;
+            AsocEntry thisEntry;
+            thisEntry.level = level;
+            std::vector<std::pair<const GByte *, int>> childAsocs;
+
+            while (offset + 8 <= dataLen)
+            {
+                uint32_t sz = static_cast<uint32_t>(
+                    (static_cast<uint32_t>(data[offset]) << 24) |
+                    (data[offset + 1] << 16) | (data[offset + 2] << 8) |
+                    data[offset + 3]);
+                if (sz < 8 || offset + static_cast<int>(sz) > dataLen)
+                    break;
+                const GByte *boxContent = data + offset + 8;
+                uint32_t boxContentLen = sz - 8;
+
+                if (memcmp(data + offset + 4, "lbl ", 4) == 0)
+                    thisEntry.label.assign(
+                        reinterpret_cast<const char *>(boxContent),
+                        boxContentLen);
+                else if (memcmp(data + offset + 4, "xml ", 4) == 0)
+                    thisEntry.xml.assign(boxContent,
+                                         boxContent + boxContentLen);
+                else if (memcmp(data + offset + 4, "asoc", 4) == 0)
+                    childAsocs.push_back(
+                        {boxContent, static_cast<int>(boxContentLen)});
+                offset += static_cast<int>(sz);
+            }
+            entries.push_back(std::move(thisEntry));
+            for (auto &child : childAsocs)
+                flattenAsoc(child.first, child.second, level + 1);
+        };
+        flattenAsoc(asocData, asocDataLen, 0);
+
+        if (!entries.empty())
+        {
+            std::vector<grk_asoc> asocs(entries.size());
+            for (size_t i = 0; i < entries.size(); i++)
+            {
+                asocs[i].level = entries[i].level;
+                asocs[i].label = entries[i].label.c_str();
+                asocs[i].xml =
+                    entries[i].xml.empty() ? nullptr : entries[i].xml.data();
+                asocs[i].xml_len = static_cast<uint32_t>(entries[i].xml.size());
+            }
+            grk_image_meta_set_asocs(image->meta, asocs.data(),
+                                     static_cast<uint32_t>(asocs.size()));
+        }
+    }
+
+  public:
+    /**
+     * @brief Returns true if the codec uses native file I/O for writing.
+     *
+     * When true, the VSILFILE passed to open() was closed and should
+     * not be used or closed by the caller.
+     */
+    bool ownsFile() const
+    {
+        return psJP2File && psJP2File->fp_ == nullptr;
+    }
+
+    /**
+     * @brief Create the Grok codec after metadata has been set.
+     *
+     * For local files and /vsis3/, uses native file I/O (closing the
+     * VSILFILE).  For other VSI paths, uses VSILFILE callbacks.
+     */
+    bool initCodec(const char *pszFilename, VSIVirtualHandleUniquePtr &fpOwner)
+    {
+        grk_stream_params streamParams = {};
+        if (pszFilename && GrokCanRead(pszFilename))
+        {
+            CPLDebug("GROK", "Native file write for: %s", pszFilename);
+            safe_strcpy(streamParams.file, pszFilename);
+            fpOwner.reset();  // close before Grok opens natively
+            if (psJP2File)
+                psJP2File->fp_ = nullptr;
+        }
+        else
+        {
+            streamParams.seek_fn = JP2Dataset_Seek;
+            streamParams.write_fn = JP2Dataset_Write;
+            streamParams.user_data = psJP2File;
+        }
+
+        pCodec = grk_compress_init(&streamParams, &compressParams, psImage);
+        if (pCodec == nullptr)
+        {
+            CPLError(CE_Failure, CPLE_AppDefined, "grk_compress_init() failed");
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @brief Rewrite JP2 boxes via Grok transcode.
+     *
+     * Replaces the driver-side box rewriting logic in Close() by using
+     * grk_transcode() to copy the codestream verbatim while writing
+     * updated metadata boxes.
+     *
+     * @param pszFilename source (and destination) file path
+     * @param poDS        dataset carrying updated metadata
+     * @return true on success
+     */
+    static bool rewriteBoxes(const char *pszFilename, GDALDataset *poDS)
+    {
+        CPLDebug("GROK", "Rewriting boxes via transcode for %s", pszFilename);
+
+        /* Read source header to get image */
+        grk_stream_params srcStreamParams{};
+        safe_strcpy(srcStreamParams.file, pszFilename);
+
+        grk_decompress_parameters dparams{};
+        auto *decCodec = grk_decompress_init(&srcStreamParams, &dparams);
+        if (!decCodec)
+        {
+            CPLError(CE_Failure, CPLE_AppDefined,
+                     "grk_decompress_init() failed for rewrite");
+            return false;
+        }
+
+        grk_header_info srcHeader{};
+        if (!grk_decompress_read_header(decCodec, &srcHeader))
+        {
+            CPLError(CE_Failure, CPLE_AppDefined,
+                     "grk_decompress_read_header() failed for rewrite");
+            grk_object_unref(decCodec);
+            return false;
+        }
+
+        auto *srcImage = grk_decompress_get_image(decCodec);
+        if (!srcImage)
+        {
+            CPLError(CE_Failure, CPLE_AppDefined,
+                     "grk_decompress_get_image() failed for rewrite");
+            grk_object_unref(decCodec);
+            return false;
+        }
+
+        /* Prepare updated metadata on the image */
+        if (!srcImage->meta)
+            srcImage->meta = grk_image_meta_new();
+
+        /* GeoTIFF UUID */
+        GDALJP2Metadata oJP2MD;
+        if (poDS->GetGCPCount() > 0)
+        {
+            oJP2MD.SetGCPs(poDS->GetGCPCount(), poDS->GetGCPs());
+            oJP2MD.SetSpatialRef(poDS->GetGCPSpatialRef());
+        }
+        else
+        {
+            const OGRSpatialReference *poSRS = poDS->GetSpatialRef();
+            if (poSRS)
+                oJP2MD.SetSpatialRef(poSRS);
+            GDALGeoTransform gt;
+            if (poDS->GetGeoTransform(gt) == CE_None &&
+                gt != GDALGeoTransform())
+                oJP2MD.SetGeoTransform(gt);
+        }
+        const char *pszAreaOrPoint =
+            poDS->GetMetadataItem(GDALMD_AREA_OR_POINT);
+        oJP2MD.bPixelIsPoint =
+            pszAreaOrPoint && EQUAL(pszAreaOrPoint, GDALMD_AOP_POINT);
+
+        {
+            std::unique_ptr<GDALJP2Box> poGeoBox(oJP2MD.CreateJP2GeoTIFF());
+            if (poGeoBox)
+            {
+                const GByte *p = poGeoBox->GetWritableData();
+                GIntBig n = poGeoBox->GetDataLength();
+                if (n > 16)
+                    grk_image_meta_set_field(srcImage->meta, "geotiff", p + 16,
+                                             static_cast<size_t>(n - 16));
+            }
+        }
+
+        /* IPR box */
+        {
+            std::unique_ptr<GDALJP2Box> poIPRBox(
+                GDALJP2Metadata::CreateIPRBox(poDS));
+            if (poIPRBox)
+            {
+                const GByte *p = poIPRBox->GetWritableData();
+                GIntBig n = poIPRBox->GetDataLength();
+                if (n > 0)
+                    grk_image_meta_set_field(srcImage->meta, "ipr", p,
+                                             static_cast<size_t>(n));
+            }
+        }
+
+        /* XMP UUID */
+        {
+            std::unique_ptr<GDALJP2Box> poXMPBox(
+                GDALJP2Metadata::CreateXMPBox(poDS));
+            if (poXMPBox)
+            {
+                const GByte *p = poXMPBox->GetWritableData();
+                GIntBig n = poXMPBox->GetDataLength();
+                if (n > 16)
+                    grk_image_meta_set_field(srcImage->meta, "xmp", p + 16,
+                                             static_cast<size_t>(n - 16));
+            }
+        }
+
+        /* GDAL metadata XML box */
+        {
+            std::unique_ptr<GDALJP2Box> poMDBox(
+                GDALJP2Metadata::CreateGDALMultiDomainMetadataXMLBox(poDS,
+                                                                     false));
+            if (poMDBox)
+            {
+                const GByte *p = poMDBox->GetWritableData();
+                GIntBig n = poMDBox->GetDataLength();
+                if (n > 0)
+                    grk_image_meta_set_field(srcImage->meta, "xml", p,
+                                             static_cast<size_t>(n));
+            }
+        }
+
+        /* GMLJP2 asoc boxes */
+        bool bHasSRS = poDS->GetSpatialRef() != nullptr &&
+                       !poDS->GetSpatialRef()->IsEmpty();
+        GDALGeoTransform gt;
+        bool bHasGT =
+            poDS->GetGeoTransform(gt) == CE_None && gt != GDALGeoTransform();
+        if (bHasSRS && bHasGT && poDS->GetGCPCount() == 0)
+        {
+            std::unique_ptr<GDALJP2Box> poGMLBox(oJP2MD.CreateGMLJP2(
+                poDS->GetRasterXSize(), poDS->GetRasterYSize()));
+            if (poGMLBox)
+            {
+                const GByte *asocData = poGMLBox->GetWritableData();
+                int asocLen = static_cast<int>(poGMLBox->GetDataLength());
+                flattenAndSetAsocBoxes(srcImage, asocData, asocLen);
+            }
+        }
+
+        /* Transcode: copy codestream, rewrite boxes */
+        grk_cparameters cparams{};
+        grk_compress_set_default_params(&cparams);
+        cparams.cod_format = GRK_FMT_JP2;
+
+        CPLString osTmpFilename(CPLSPrintf("%s.tmp", pszFilename));
+
+        grk_stream_params transSrcParams{};
+        safe_strcpy(transSrcParams.file, pszFilename);
+
+        grk_stream_params dstParams{};
+        safe_strcpy(dstParams.file, osTmpFilename.c_str());
+
+        uint64_t written =
+            grk_transcode(&transSrcParams, &dstParams, &cparams, srcImage);
+        grk_object_unref(decCodec);
+
+        if (written == 0)
+        {
+            CPLError(CE_Failure, CPLE_AppDefined,
+                     "grk_transcode() failed for box rewrite");
+            VSIUnlink(osTmpFilename);
+            return false;
+        }
+
+        if (VSIRename(osTmpFilename, pszFilename) != 0)
+        {
+            CPLError(CE_Failure, CPLE_AppDefined, "Failed to rename %s to %s",
+                     osTmpFilename.c_str(), pszFilename);
+            VSIUnlink(osTmpFilename);
+            return false;
         }
 
         return true;
@@ -1284,10 +1848,10 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
      */
     void init(void)
     {
-        // Initialize Grok's global thread pool exactly once per
-        // process using std::call_once.  The thread count is
-        // resolved from GDAL_NUM_THREADS on the very first call
-        // and never changed afterwards.  This avoids the
+        // Initialize Grok's global thread pool and message handlers
+        // exactly once per process using std::call_once.  The thread
+        // count is resolved from GDAL_NUM_THREADS on the very first
+        // call and never changed afterwards.  This avoids the
         // create-destroy-recreate cycle that caused stale executor
         // state (orphaned task graphs, corrupted wavelet buffers).
         static std::once_flag grokInitFlag;
@@ -1299,29 +1863,29 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
                     nullptr,
                     GDALGetNumThreads(GDAL_DEFAULT_MAX_THREAD_COUNT, true),
                     nullptr);
-            });
 
-        grk_msg_handlers handlers = {};
-        const char *debug_env = std::getenv("GRK_DEBUG");
-        if (debug_env)
-        {
-            int level = std::atoi(debug_env);
-            if (level >= 1)
-                handlers.error_callback = JP2_ErrorCallback;
-            if (level >= 2)
-                handlers.warn_callback = JP2_WarningCallback;
-            if (level >= 3)
-                handlers.info_callback = JP2_InfoCallback;
-            if (level >= 4)
-                handlers.debug_callback = JP2_DebugCallback;
-        }
-        else
-        {
-            handlers.info_callback = JP2_InfoCallback;
-            handlers.warn_callback = JP2_WarningCallback;
-            handlers.error_callback = JP2_ErrorCallback;
-        }
-        grk_set_msg_handlers(handlers);
+                grk_msg_handlers handlers = {};
+                const char *debug_env = std::getenv("GRK_DEBUG");
+                if (debug_env)
+                {
+                    int level = std::atoi(debug_env);
+                    if (level >= 1)
+                        handlers.error_callback = JP2_ErrorCallback;
+                    if (level >= 2)
+                        handlers.warn_callback = JP2_WarningCallback;
+                    if (level >= 3)
+                        handlers.info_callback = JP2_InfoCallback;
+                    if (level >= 4)
+                        handlers.debug_callback = JP2_DebugCallback;
+                }
+                else
+                {
+                    handlers.info_callback = JP2_InfoCallback;
+                    handlers.warn_callback = JP2_WarningCallback;
+                    handlers.error_callback = JP2_ErrorCallback;
+                }
+                grk_set_msg_handlers(handlers);
+            });
     }
 
     /**
@@ -1429,11 +1993,11 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
     };
 
     /**
-     * @brief Copies decoded tile data to the GDAL output buffer.
+     * @brief Scalar fallback: copies decoded tile data for subsampled components.
      *
-     * Handles tile-to-window overlap calculation, per-band data type
-     * conversion, and 1-bit alpha promotion. Called from CopyTiles
-     * (potentially from multiple threads for multi-tile images).
+     * Only called when one or more components have dx/dy != 1 (e.g. YCBCR420).
+     * For non-subsampled components, CopyTiles delegates to
+     * grk_decompress_schedule_swath_copy() for SIMD-accelerated copying.
      */
     static CPLErr CopyTileData(grk_image *img, int nXOff, int nYOff, int nXSize,
                                int nYSize, void *pData, int /*nBufXSize*/,
@@ -1457,75 +2021,8 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
         if (xStart >= xEnd || yStart >= yEnd)
             return CE_None;
 
-        const int cols = xEnd - xStart;
-        const int tileXStart = xStart - tileXOff;
-        const int bufXStart = xStart - nXOff;
-
-        // ---- Fast path: no subsampling, no alpha promotion ----
-        // Hoists type dispatch and band loop outside the pixel loops
-        // so the inner loop is a simple narrowing copy per row.
-        bool canUseFastPath = (nPromoteAlphaBandIdx < 0);
-        for (int i = 0; i < nBandCount && canUseFastPath; ++i)
-        {
-            const int b = panBandMap[i] - 1;
-            if (b < 0 || b >= img->numcomps || !img->comps[b].data ||
-                img->comps[b].dx != 1 || img->comps[b].dy != 1)
-                canUseFastPath = false;
-        }
-
-        if (canUseFastPath)
-        {
-            const int nRows = yEnd - yStart;
-            const int nSrcStride = static_cast<int>(sizeof(int32_t));
-            const int nDstStride = static_cast<int>(nPixelSpace);
-
-            for (int i = 0; i < nBandCount; ++i)
-            {
-                const auto &comp = img->comps[panBandMap[i] - 1];
-                const int srcStride = static_cast<int>(comp.stride);
-                const int32_t *srcBase =
-                    static_cast<const int32_t *>(comp.data) +
-                    static_cast<GPtrDiff_t>(yStart - tileYOff) * srcStride +
-                    tileXStart;
-
-                GByte *dstBase =
-                    static_cast<GByte *>(pData) + i * nBandSpace +
-                    static_cast<GPtrDiff_t>(bufXStart) * nPixelSpace;
-
-                // When source and destination rows are contiguous, batch
-                // all rows into a single GDALCopyWords64 call to avoid
-                // per-row dispatch overhead (type switch + AVX2 check).
-                const GPtrDiff_t totalPixels =
-                    static_cast<GPtrDiff_t>(nRows) * cols;
-                if (srcStride == cols &&
-                    nLineSpace == static_cast<GSpacing>(cols) * nPixelSpace)
-                {
-                    GDALCopyWords64(srcBase, GDT_Int32, nSrcStride, dstBase,
-                                    eBufType, nDstStride, totalPixels);
-                }
-                else
-                {
-                    // First row: goes through GDALCopyWords64 dispatch.
-                    // Subsequent rows: call GDALCopyWords64 per row.
-                    // The per-row overhead is acceptable when rows aren't
-                    // contiguous since we can't batch them.
-                    for (int iY = 0; iY < nRows; ++iY)
-                    {
-                        const int32_t *srcRow =
-                            srcBase + static_cast<GPtrDiff_t>(iY) * srcStride;
-                        GByte *dstRow = dstBase + static_cast<GPtrDiff_t>(
-                                                      yStart - nYOff + iY) *
-                                                      nLineSpace;
-
-                        GDALCopyWords64(srcRow, GDT_Int32, nSrcStride, dstRow,
-                                        eBufType, nDstStride, cols);
-                    }
-                }
-            }
-            return CE_None;
-        }
-
-        // ---- Slow path: subsampled components or alpha promotion ----
+        // Scalar per-pixel loop that handles dx/dy subsampling, alpha promotion,
+        // and all five output types.
         CPLErr eErr = CE_None;
         for (int iY = yStart; iY < yEnd; ++iY)
         {
@@ -1593,18 +2090,18 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
     }
 
     /**
-     * @brief Dispatches tile processing across a thread pool.
+     * @brief Dispatches tile copy to the output buffer.
      *
-     * After decompressAsynch() returns the tile grid range, this method
-     * processes each tile's decoded data via CopyTileData().
+     * Fast path (non-subsampled components): delegates to
+     * grk_decompress_schedule_swath_copy() which uses Grok's existing
+     * Taskflow executor to copy tiles in parallel — no extra thread pool.
      *
-     * For single-tile images (the common case), the tile is processed
-     * directly on the calling thread to avoid thread pool overhead.
-     * For multi-tile images, a thread pool is created and tiles are
-     * processed in parallel.
+     * Slow path (any component with dx/dy != 1, e.g. YCBCR420): creates
+     * a GDAL ThreadPool and calls CopyTileData() per tile (scalar loop
+     * that handles chroma upsampling).
      *
-     * NOTE: grk_decompress_get_tile_image is serialized with codecMutex
-     * as it may not be thread-safe, but CopyTileData runs in parallel.
+     * NOTE: grk_decompress_get_tile_image is serialized in the slow path
+     * only — the fast path uses Grok's internal tile cache directly.
      */
     CPLErr CopyTiles(PostPreload &postPreload, int nXOff, int nYOff, int nXSize,
                      int nYSize, void *pData, int nBufXSize, int nBufYSize,
@@ -1613,26 +2110,99 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
                      GSpacing nLineSpace, GSpacing nBandSpace,
                      int nPromoteAlphaBandIdx)
     {
-        CPLErr eErr = CE_None;
-
+        // ---- Upfront subsampling check ----
+        // If any requested component has dx/dy != 1, fall back to the
+        // scalar slow path; otherwise use the Taskflow-based fast path.
+        // The fast path is only used for multi-tile images because
+        // single-tile images require grk_decompress_get_image() to
+        // trigger post-processing (wait(nullptr) -> postMulti_).
         const int nTotalTiles = (postPreload.tile_x1 - postPreload.tile_x0) *
                                 (postPreload.tile_y1 - postPreload.tile_y0);
+        bool canUseFastPath = (nTotalTiles > 1 && m_codec && m_codec->psImage);
+        if (canUseFastPath)
+        {
+            for (int i = 0; i < nBandCount && canUseFastPath; ++i)
+            {
+                const int b = panBandMap[i] - 1;
+                if (b < 0 ||
+                    b >= static_cast<int>(m_codec->psImage->numcomps) ||
+                    m_codec->psImage->comps[b].dx != 1 ||
+                    m_codec->psImage->comps[b].dy != 1)
+                    canUseFastPath = false;
+            }
+        }
+
+        if (canUseFastPath)
+        {
+            // ---- Fast path: delegate to Grok Taskflow executor ----
+            // grk_decompress_schedule_swath_copy enqueues one Taskflow task
+            // per tile and grk_decompress_wait_swath_copy waits for them.
+            // No extra thread pool is created.
+            uint8_t prec = 8;
+            bool sgnd = false;
+            if (eBufType == GDT_Int16)
+            {
+                prec = 16;
+                sgnd = true;
+            }
+            else if (eBufType == GDT_UInt16)
+            {
+                prec = 16;
+            }
+            else if (eBufType == GDT_Int32)
+            {
+                prec = 32;
+                sgnd = true;
+            }
+            else if (eBufType == GDT_UInt32)
+            {
+                prec = 32;
+            }
+
+            grk_wait_swath waitSwath = {};
+            waitSwath.tile_x0 = postPreload.tile_x0;
+            waitSwath.tile_y0 = postPreload.tile_y0;
+            waitSwath.tile_x1 = postPreload.tile_x1;
+            waitSwath.tile_y1 = postPreload.tile_y1;
+            waitSwath.num_tile_cols = postPreload.num_tile_cols;
+
+            grk_swath_buffer buf = {};
+            buf.data = pData;
+            buf.prec = prec;
+            buf.sgnd = sgnd;
+            buf.numcomps = static_cast<uint16_t>(nBandCount);
+            buf.band_map = const_cast<int *>(panBandMap);
+            buf.pixel_space = static_cast<int64_t>(nPixelSpace);
+            buf.line_space = static_cast<int64_t>(nLineSpace);
+            buf.band_space = static_cast<int64_t>(nBandSpace);
+            buf.promote_alpha = nPromoteAlphaBandIdx;
+            buf.x0 = static_cast<uint32_t>(nXOff);
+            buf.y0 = static_cast<uint32_t>(nYOff);
+            buf.x1 = static_cast<uint32_t>(nXOff + nXSize);
+            buf.y1 = static_cast<uint32_t>(nYOff + nYSize);
+
+            grk_decompress_schedule_swath_copy(m_codec->pCodec, &waitSwath,
+                                               &buf);
+            grk_decompress_wait_swath_copy(m_codec->pCodec);
+            return CE_None;
+        }
+
+        // ---- Slow path: subsampled components or single tile ----
+        CPLErr eErr = CE_None;
 
         // Helper lambda: get tile image, handling single-tile fallback
         auto getTileImage = [&](uint16_t tileno) -> grk_image *
         {
             grk_image *img =
                 grk_decompress_get_tile_image(m_codec->pCodec, tileno, true);
-            // For single-tile images, Grok puts data in the
-            // composite image rather than the per-tile image
             if (!img)
                 img = grk_decompress_get_image(m_codec->pCodec);
             return img;
         };
 
-        // Single-tile fast path: process directly, no thread pool overhead
         if (nTotalTiles <= 1)
         {
+            // Single tile: no thread pool overhead
             uint16_t tileno = postPreload.tile_y0 * postPreload.num_tile_cols +
                               postPreload.tile_x0;
             grk_image *img = getTileImage(tileno);
@@ -1650,17 +2220,14 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
                                 nPromoteAlphaBandIdx);
         }
 
-        // Multi-tile path: use thread pool for parallel processing
+        // Multi-tile: use thread pool for parallel processing
         std::atomic<bool> errorOccurred(false);
         size_t numThreads = static_cast<size_t>(
             GDALGetNumThreads(/* nMaxVal = */ -1,
                               /* bDefaultAllCPUs = */ true));
         ThreadPool pool(numThreads);
-
-        // Mutex for protecting grk_decompress_get_tile_image
         std::mutex codecMutex;
 
-        // Enqueue tasks for each tile
         for (uint16_t ty = postPreload.tile_y0; ty < postPreload.tile_y1; ++ty)
         {
             for (uint16_t tx = postPreload.tile_x0; tx < postPreload.tile_x1;
@@ -1670,19 +2237,14 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
                 pool.enqueue(
                     [&, tileno]
                     {
-                        // If an error has already occurred, skip processing
                         if (errorOccurred)
                             return;
 
-                        // Get tile image (protect with mutex if not thread-safe)
                         grk_image *img = nullptr;
                         {
                             std::lock_guard<std::mutex> lock(codecMutex);
                             img = grk_decompress_get_tile_image(m_codec->pCodec,
                                                                 tileno, true);
-
-                            // For single-tile images, Grok puts data in the
-                            // composite image rather than the per-tile image
                             if (!img)
                                 img = grk_decompress_get_image(m_codec->pCodec);
                         }
@@ -1695,23 +2257,18 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
                             errorOccurred = true;
                             return;
                         }
-                        // Process tile data
                         CPLErr tileErr = CopyTileData(
                             img, nXOff, nYOff, nXSize, nYSize, pData, nBufXSize,
                             nBufYSize, eBufType, nBandCount, panBandMap,
                             nPixelSpace, nLineSpace, nBandSpace,
                             nPromoteAlphaBandIdx);
-
                         if (tileErr != CE_None)
-                        {
                             errorOccurred = true;
-                        }
                     });
             }
         }
 
-        // Thread pool destructor waits for all tasks to complete
-        // If an error occurred, set return value
+        // ThreadPool destructor waits for all tasks to complete.
         if (errorOccurred)
             eErr = CE_Failure;
 
@@ -1787,8 +2344,17 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
                              nPromoteAlphaBandIdx);
         };
 
-        auto postPreload = decompressAsynch(nullptr, nullptr, nXOff, nYOff,
-                                            nXSize, nYSize, rowCopy);
+        // When reading a subset of bands, tile images must persist
+        // across per-band reads.  Use CACHE_IMAGE so that tile row
+        // release keeps the decoded pixels alive.
+        const int nTotalComps =
+            (m_codec && m_codec->psImage) ? m_codec->psImage->numcomps : 0;
+        const bool needPersistentTiles =
+            (!this->bSingleTiled && nBandCount < nTotalComps);
+
+        auto postPreload =
+            decompressAsynch(nullptr, nullptr, nXOff, nYOff, nXSize, nYSize,
+                             rowCopy, needPersistentTiles);
 
         try
         {
@@ -1869,7 +2435,8 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
     PostPreload decompressAsynch(decompress_callback cb, void *user_data,
                                  int swath_x0, int swath_y0, int swath_width,
                                  int swath_height,
-                                 RowCopyFunc rowCopy = nullptr)
+                                 RowCopyFunc rowCopy = nullptr,
+                                 bool needPersistentTiles = false)
     {
         PostPreload rc;
 
@@ -1883,8 +2450,7 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
             m_codec->open(fp_, nCodeStreamStart);
             uint32_t nTileW = 0, nTileH = 0;
             int numRes = 0;
-            char *pszFilename = const_cast<char *>(m_osFilename.c_str());
-            if (!m_codec->setUpDecompress(GetNumThreads(), pszFilename,
+            if (!m_codec->setUpDecompress(GetNumThreads(), m_osFilename.c_str(),
                                           nCodeStreamLength, &nTileW, &nTileH,
                                           &numRes))
             {
@@ -1951,7 +2517,9 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
             decompressParams.simulate_synchronous = true;
             decompressParams.decompress_callback = cb;
             decompressParams.decompress_callback_user_data = user_data;
-            decompressParams.core.tile_cache_strategy = GRK_TILE_CACHE_IMAGE;
+            decompressParams.core.tile_cache_strategy =
+                needPersistentTiles ? GRK_TILE_CACHE_IMAGE
+                                    : GRK_TILE_CACHE_NONE;
             // For multi-tile images, skip composite allocation to avoid
             // a full-resolution buffer.  Single-tile images need the
             // composite because Grok stores their data there (not in the
@@ -2103,6 +2671,33 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
         const int nWidthToRead = std::min(nBlockXSize, nRasterXSize_ - nXOff);
         const int nHeightToRead = std::min(nBlockYSize, nRasterYSize_ - nYOff);
 
+        // The async decompress pipeline decodes a fixed decode window and
+        // cleans up tiles after processing.  IReadBlock calls us for each
+        // block, potentially a different tile each time.  For multi-tile
+        // images, reset the codec so a fresh decompress can target just
+        // this block's region.
+        if (!bSingleTiled && (hasCachedPostPreload_ || initializedAsync))
+        {
+            delete m_codec;
+            m_codec = new GRKCodecWrapper();
+            m_codec->open(fp_, nCodeStreamStart);
+            uint32_t tileW = 0, tileH = 0;
+            int numRes = 0;
+            if (!m_codec->setUpDecompress(GetNumThreads(), m_osFilename.c_str(),
+                                          nCodeStreamLength, &tileW, &tileH,
+                                          &numRes))
+            {
+                delete m_codec;
+                m_codec = nullptr;
+                CPLError(CE_Failure, CPLE_AppDefined,
+                         "readBlockInit: codec reinit failed");
+                return CE_Failure;
+            }
+            CPLErrorReset();
+            hasCachedPostPreload_ = false;
+            initializedAsync = false;
+        }
+
         auto postPreload = decompressAsynch(nullptr, nullptr, nXOff, nYOff,
                                             nWidthToRead, nHeightToRead);
         if (!postPreload.asynch_)
@@ -2112,8 +2707,11 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
             return CE_Failure;
         }
 
-        uint16_t tileno = postPreload.tile_y0 * postPreload.num_tile_cols +
-                          postPreload.tile_x0;
+        // Compute the tile index from block coordinates (not from
+        // postPreload.tile_x0/y0, which reflect the full decompress range).
+        uint16_t tileno =
+            static_cast<uint16_t>(nBlockYOff) * postPreload.num_tile_cols +
+            static_cast<uint16_t>(nBlockXOff);
         grk_image *img =
             grk_decompress_get_tile_image(m_codec->pCodec, tileno, true);
         // For single-tile images, Grok puts data in the composite

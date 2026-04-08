@@ -224,7 +224,7 @@ nitpick_ignore = [
     ("cpp:identifier", "GNMGFID"),
     ("cpp:identifier", "GNM_EDGE_DIR_BOTH"),
     ("cpp:identifier", "OGRFeatureUniquePtr"),
-    ("cpp:identifier", "OGRSpatialReferenceReleaser"),
+    ("cpp:identifier", "OGRSpatialReferenceRefCountedPtr"),
     ("cpp:identifier", "OGRStyleParamId"),
     ("cpp:identifier", "OGRStyleValue"),
     ("cpp:identifier", "string"),
@@ -922,6 +922,13 @@ man_pages = [
         "gdal-vector-convert",
         "Convert a vector dataset",
         [author_evenr],
+        1,
+    ),
+    (
+        "programs/gdal_vector_create",
+        "gdal-vector-create",
+        "Create a vector dataset",
+        [author_elpaso],
         1,
     ),
     (

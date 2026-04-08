@@ -36,6 +36,12 @@ GDALVectorConcaveHullAlgorithm::GDALVectorConcaveHullAlgorithm(
     AddArg("allow-holes", 0, _("Allow holes in the output polygon"),
            &m_opts.m_allowHoles)
         .SetDefault(false);
+
+    AddArg("tight", 0,
+           _("Whether the hull must follow the outer boundaries of the input "
+             "polygons"),
+           &m_opts.m_tight)
+        .SetDefault(false);
 }
 
 #ifdef HAVE_GEOS
@@ -55,24 +61,23 @@ class GDALVectorConcaveHullAlgorithmLayer final
               oSrcLayer, opts),
           m_poFeatureDefn(oSrcLayer.GetLayerDefn()->Clone())
     {
-        m_poFeatureDefn->Reference();
-
         // Concave hull output type can vary; advertise unknown to avoid schema conflicts.
+        // In polygon/multipolygoon mode, preserve input type
         for (int i = 0; i < m_poFeatureDefn->GetGeomFieldCount(); ++i)
         {
             if (IsSelectedGeomField(i))
-                m_poFeatureDefn->GetGeomFieldDefn(i)->SetType(wkbUnknown);
+            {
+                const auto eType =
+                    m_poFeatureDefn->GetGeomFieldDefn(i)->GetType();
+                if (eType != wkbPolygon && eType != wkbMultiPolygon)
+                    m_poFeatureDefn->GetGeomFieldDefn(i)->SetType(wkbUnknown);
+            }
         }
-    }
-
-    ~GDALVectorConcaveHullAlgorithmLayer() override
-    {
-        m_poFeatureDefn->Release();
     }
 
     const OGRFeatureDefn *GetLayerDefn() const override
     {
-        return m_poFeatureDefn;
+        return m_poFeatureDefn.get();
     }
 
   protected:
@@ -89,8 +94,14 @@ class GDALVectorConcaveHullAlgorithmLayer final
 
             if (const OGRGeometry *poGeom = poSrcFeature->GetGeomFieldRef(i))
             {
+                const auto eType = wkbFlatten(poGeom->getGeometryType());
                 std::unique_ptr<OGRGeometry> poHull(
-                    poGeom->ConcaveHull(m_opts.m_ratio, m_opts.m_allowHoles));
+                    (eType == wkbPolygon || eType == wkbMultiPolygon)
+                        ? poGeom->ConcaveHullOfPolygons(m_opts.m_ratio,
+                                                        m_opts.m_tight,
+                                                        m_opts.m_allowHoles)
+                        : poGeom->ConcaveHull(m_opts.m_ratio,
+                                              m_opts.m_allowHoles));
                 if (!poHull)
                 {
                     CPLError(
@@ -99,18 +110,30 @@ class GDALVectorConcaveHullAlgorithmLayer final
                         static_cast<int64_t>(poSrcFeature->GetFID()));
                     return nullptr;
                 }
+                const auto eLayerGeomType =
+                    m_poFeatureDefn->GetGeomFieldDefn(i)->GetType();
+                if (eLayerGeomType == wkbPolygon)
+                {
+                    poHull.reset(
+                        OGRGeometryFactory::forceToPolygon(poHull.release()));
+                }
+                else if (eLayerGeomType == wkbMultiPolygon)
+                {
+                    poHull.reset(OGRGeometryFactory::forceToMultiPolygon(
+                        poHull.release()));
+                }
 
                 poHull->assignSpatialReference(poGeom->getSpatialReference());
                 poSrcFeature->SetGeomField(i, std::move(poHull));
             }
         }
 
-        poSrcFeature->SetFDefnUnsafe(m_poFeatureDefn);
+        poSrcFeature->SetFDefnUnsafe(m_poFeatureDefn.get());
         return poSrcFeature;
     }
 
   private:
-    OGRFeatureDefn *const m_poFeatureDefn;
+    const OGRFeatureDefnRefCountedPtr m_poFeatureDefn;
 
     CPL_DISALLOW_COPY_ASSIGN(GDALVectorConcaveHullAlgorithmLayer)
 };

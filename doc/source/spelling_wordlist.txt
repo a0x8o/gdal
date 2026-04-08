@@ -1197,6 +1197,7 @@ gpx
 gradians
 Grantor
 graylevel
+graticule
 grayscale
 Grayscale
 grc
@@ -3625,7 +3626,6 @@ worldfile
 worldfiles
 WriteArray
 WriteArrowBatch
-wwith
 www
 Wx
 xA

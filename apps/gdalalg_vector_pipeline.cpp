@@ -23,6 +23,7 @@
 #include "gdalalg_vector_concat.h"
 #include "gdalalg_vector_concave_hull.h"
 #include "gdalalg_vector_convex_hull.h"
+#include "gdalalg_vector_create.h"
 #include "gdalalg_vector_dissolve.h"
 #include "gdalalg_vector_edit.h"
 #include "gdalalg_vector_explode_collections.h"
@@ -171,6 +172,9 @@ void GDALVectorPipelineAlgorithm::RegisterAlgorithms(
     registry.Register<GDALVectorClipAlgorithm>(
         addSuffixIfNeeded(GDALVectorClipAlgorithm::NAME));
     registry.Register<GDALVectorDissolveAlgorithm>();
+
+    registry.Register<GDALVectorCreateAlgorithm>(
+        addSuffixIfNeeded(GDALVectorCreateAlgorithm::NAME));
 
     registry.Register<GDALVectorEditAlgorithm>(
         addSuffixIfNeeded(GDALVectorEditAlgorithm::NAME));
@@ -569,6 +573,21 @@ OGRFeature *GDALVectorPipelineOutputDataset::GetNextFeature(
 const OGRFeatureDefn *GDALVectorPipelinePassthroughLayer::GetLayerDefn() const
 {
     return m_srcLayer.GetLayerDefn();
+}
+
+/************************************************************************/
+/*          GDALVectorPipelinePassthroughLayer::GetLayerDefn()          */
+/************************************************************************/
+
+void GDALVectorPipelinePassthroughLayer::TranslateFeature(
+    std::unique_ptr<OGRFeature> poSrcFeature,
+    std::vector<std::unique_ptr<OGRFeature>> &apoOutFeatures)
+{
+    if ((!m_poFilterGeom || FilterGeometry(poSrcFeature->GetGeometryRef())) &&
+        (!m_poAttrQuery || m_poAttrQuery->Evaluate(poSrcFeature.get())))
+    {
+        apoOutFeatures.push_back(std::move(poSrcFeature));
+    }
 }
 
 /************************************************************************/

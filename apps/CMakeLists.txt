@@ -107,6 +107,7 @@ target_sources(appslib PRIVATE
   gdalalg_vector_concave_hull.cpp
   gdalalg_vector_convert.cpp
   gdalalg_vector_convex_hull.cpp
+  gdalalg_vector_create.cpp
   gdalalg_vector_dissolve.cpp
   gdalalg_vector_edit.cpp
   gdalalg_vector_export_schema.cpp
@@ -158,6 +159,8 @@ add_dependencies(appslib generate_gdal_version_h)
 target_sources(${GDAL_LIB_TARGET_NAME} PRIVATE $<TARGET_OBJECTS:appslib>)
 gdal_standard_includes(appslib)
 target_compile_options(appslib PRIVATE ${GDAL_CXX_WARNING_FLAGS} ${WFLAG_OLD_STYLE_CAST} ${WFLAG_EFFCXX} ${WFLAG_DOUBLE_PROMOTION})
+target_compile_definitions(appslib PRIVATE DEPRECATE_OGRFEATUREDEFN_REF_COUNTING)
+target_compile_definitions(appslib PRIVATE DEPRECATE_OGRSPATIALREFERENCE_REF_COUNTING)
 target_include_directories(
   appslib PRIVATE $<TARGET_PROPERTY:gdal_vrt,SOURCE_DIR> $<TARGET_PROPERTY:ogrsf_generic,SOURCE_DIR>)
 if (HAVE_ATOMIC_UINT64_T_WITH_ATOMIC)
@@ -369,7 +372,9 @@ if (BUILD_APPS)
     # gcore/gdal_version.h
     target_include_directories(${UTILCMD} PRIVATE $<TARGET_PROPERTY:gcore,BINARY_DIR>/gdal_version_full)
     gdal_standard_includes(${UTILCMD})
-    target_compile_options(${UTILCMD} PRIVATE ${GDAL_CXX_WARNING_FLAGS} ${WFLAG_OLD_STYLE_CAST})
+    if (NOT "${UTILCMD}" STREQUAL "gdalflattenmask")
+        target_compile_options(${UTILCMD} PRIVATE ${GDAL_CXX_WARNING_FLAGS} ${WFLAG_OLD_STYLE_CAST})
+    endif()
     add_dependencies(${UTILCMD} generate_gdal_version_h)
     if (MSVC OR MINGW)
       target_compile_definitions(${UTILCMD} PRIVATE -DSUPPORTS_WMAIN)

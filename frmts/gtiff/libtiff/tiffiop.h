@@ -331,8 +331,8 @@ struct TIFFOpenOptions
 /* Safe multiply which returns zero if there is an *unsigned* integer overflow.
  * This macro is not safe for *signed* integer types */
 #define TIFFSafeMultiply(t, v, m)                                              \
-    ((((t)(m) != (t)0) && (((t)(((v) * (m)) / (m))) == (t)(v)))                \
-         ? (t)((v) * (m))                                                      \
+    ((((t)(m) != (t)0) && (((t)((((t)(v)) * ((t)(m))) / ((t)(m)))) == (t)(v))) \
+         ? (t)(((t)(v)) * ((t)(m)))                                            \
          : (t)0)
 
 #define TIFFmax(A, B) ((A) > (B) ? (A) : (B))
@@ -476,6 +476,8 @@ extern "C"
     extern uint32_t _TIFFClampDoubleToUInt32(double);
 
     extern void _TIFFCleanupIFDOffsetAndNumberMaps(TIFF *tif);
+
+    extern uint64_t _TIFFStrileSize64(TIFF *tif, uint32_t nrows, int isStrip);
 
     extern tmsize_t _TIFFReadEncodedStripAndAllocBuffer(TIFF *tif,
                                                         uint32_t strip,

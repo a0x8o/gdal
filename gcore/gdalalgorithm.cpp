@@ -33,7 +33,9 @@
 #include <cstdlib>
 #include <limits>
 #include <map>
+#include <type_traits>
 #include <string_view>
+#include <regex>
 
 #ifndef _
 #define _(x) (x)
@@ -943,6 +945,54 @@ bool GDALAlgorithmArg::ValidateRealRange(double val) const
 }
 
 /************************************************************************/
+/*                        CheckDuplicateValues()                        */
+/************************************************************************/
+
+template <class T>
+static bool CheckDuplicateValues(const GDALAlgorithmArg *arg,
+                                 const std::vector<T> &values)
+{
+    auto tmpValues = values;
+    bool bHasDupValues = false;
+    if constexpr (std::is_floating_point_v<T>)
+    {
+        // Avoid undefined behavior with NaN values
+        std::sort(tmpValues.begin(), tmpValues.end(),
+                  [](T a, T b)
+                  {
+                      if (std::isnan(a) && !std::isnan(b))
+                          return true;
+                      if (std::isnan(b))
+                          return false;
+                      return a < b;
+                  });
+
+        bHasDupValues =
+            std::adjacent_find(tmpValues.begin(), tmpValues.end(),
+                               [](T a, T b)
+                               {
+                                   if (std::isnan(a) && std::isnan(b))
+                                       return true;
+                                   return a == b;
+                               }) != tmpValues.end();
+    }
+    else
+    {
+        std::sort(tmpValues.begin(), tmpValues.end());
+        bHasDupValues = std::adjacent_find(tmpValues.begin(),
+                                           tmpValues.end()) != tmpValues.end();
+    }
+    if (bHasDupValues)
+    {
+        CPLError(CE_Failure, CPLE_AppDefined,
+                 "'%s' must be a list of unique values.",
+                 arg->GetName().c_str());
+        return false;
+    }
+    return true;
+}
+
+/************************************************************************/
 /*               GDALAlgorithmArg::RunValidationActions()               */
 /************************************************************************/
 
@@ -1001,46 +1051,117 @@ bool GDALAlgorithmArg::RunValidationActions()
         }
     };
 
-    if (GetType() == GAAT_STRING)
+    switch (GetType())
     {
-        const auto &val = Get<std::string>();
-        const int nMinCharCount = GetMinCharCount();
-        if (nMinCharCount > 0)
+        case GAAT_BOOLEAN:
+            break;
+
+        case GAAT_STRING:
         {
-            CheckMinCharCount(val, nMinCharCount);
+            const auto &val = Get<std::string>();
+            const int nMinCharCount = GetMinCharCount();
+            if (nMinCharCount > 0)
+            {
+                CheckMinCharCount(val, nMinCharCount);
+            }
+
+            const int nMaxCharCount = GetMaxCharCount();
+            CheckMaxCharCount(val, nMaxCharCount);
+            break;
         }
 
-        const int nMaxCharCount = GetMaxCharCount();
-        CheckMaxCharCount(val, nMaxCharCount);
-    }
-    else if (GetType() == GAAT_STRING_LIST)
-    {
-        const int nMinCharCount = GetMinCharCount();
-        const int nMaxCharCount = GetMaxCharCount();
-        for (const auto &val : Get<std::vector<std::string>>())
+        case GAAT_STRING_LIST:
         {
-            if (nMinCharCount > 0)
-                CheckMinCharCount(val, nMinCharCount);
-            CheckMaxCharCount(val, nMaxCharCount);
+            const int nMinCharCount = GetMinCharCount();
+            const int nMaxCharCount = GetMaxCharCount();
+            const auto &values = Get<std::vector<std::string>>();
+            for (const auto &val : values)
+            {
+                if (nMinCharCount > 0)
+                    CheckMinCharCount(val, nMinCharCount);
+                CheckMaxCharCount(val, nMaxCharCount);
+            }
+
+            if (!GetDuplicateValuesAllowed() &&
+                !CheckDuplicateValues(this, values))
+                ret = false;
+            break;
         }
-    }
-    else if (GetType() == GAAT_INTEGER)
-    {
-        ret = ValidateIntRange(Get<int>()) && ret;
-    }
-    else if (GetType() == GAAT_INTEGER_LIST)
-    {
-        for (int v : Get<std::vector<int>>())
-            ret = ValidateIntRange(v) && ret;
-    }
-    else if (GetType() == GAAT_REAL)
-    {
-        ret = ValidateRealRange(Get<double>()) && ret;
-    }
-    else if (GetType() == GAAT_REAL_LIST)
-    {
-        for (double v : Get<std::vector<double>>())
-            ret = ValidateRealRange(v) && ret;
+
+        case GAAT_INTEGER:
+        {
+            ret = ValidateIntRange(Get<int>()) && ret;
+            break;
+        }
+
+        case GAAT_INTEGER_LIST:
+        {
+            const auto &values = Get<std::vector<int>>();
+            for (int v : values)
+                ret = ValidateIntRange(v) && ret;
+
+            if (!GetDuplicateValuesAllowed() &&
+                !CheckDuplicateValues(this, values))
+                ret = false;
+            break;
+        }
+
+        case GAAT_REAL:
+        {
+            ret = ValidateRealRange(Get<double>()) && ret;
+            break;
+        }
+
+        case GAAT_REAL_LIST:
+        {
+            const auto &values = Get<std::vector<double>>();
+            for (double v : values)
+                ret = ValidateRealRange(v) && ret;
+
+            if (!GetDuplicateValuesAllowed() &&
+                !CheckDuplicateValues(this, values))
+                ret = false;
+            break;
+        }
+
+        case GAAT_DATASET:
+            break;
+
+        case GAAT_DATASET_LIST:
+        {
+            if (!GetDuplicateValuesAllowed())
+            {
+                const auto &values = Get<std::vector<GDALArgDatasetValue>>();
+                std::vector<std::string> aosValues;
+                for (const auto &v : values)
+                {
+                    const GDALDataset *poDS = v.GetDatasetRef();
+                    if (poDS)
+                    {
+                        auto poDriver = poDS->GetDriver();
+                        // The dataset name for a MEM driver is not relevant,
+                        // so use the pointer address
+                        if ((poDriver &&
+                             EQUAL(poDriver->GetDescription(), "MEM")) ||
+                            poDS->GetDescription()[0] == 0)
+                        {
+                            aosValues.push_back(CPLSPrintf("%p", poDS));
+                        }
+                        else
+                        {
+                            aosValues.push_back(poDS->GetDescription());
+                        }
+                    }
+                    else
+                    {
+                        aosValues.push_back(v.GetName());
+                    }
+                }
+                if (!CheckDuplicateValues(this, aosValues))
+                    ret = false;
+            }
+            break;
+        }
     }
 
     if (GDALAlgorithmArgTypeIsList(GetType()))
@@ -4969,6 +5090,96 @@ GDALAlgorithm::AddFieldNameArg(std::string *pValue, const char *helpMessage)
 {
     return AddArg("field-name", 0, MsgOrDefault(helpMessage, _("Field name")),
                   pValue);
+}
+
+/************************************************************************/
+/*                GDALAlgorithm::ParseFieldDefinition()                 */
+/************************************************************************/
+bool GDALAlgorithm::ParseFieldDefinition(const std::string &posStrDef,
+                                         OGRFieldDefn *poFieldDefn,
+                                         std::string *posError)
+{
+    static const std::regex re(
+        R"(^([^:]+):([^(\s]+)(?:\((\d+)(?:,(\d+))?\))?$)");
+    std::smatch match;
+    if (std::regex_match(posStrDef, match, re))
+    {
+        const std::string name = match[1];
+        const std::string type = match[2];
+        const int width = match[3].matched ? std::stoi(match[3]) : 0;
+        const int precision = match[4].matched ? std::stoi(match[4]) : 0;
+        poFieldDefn->SetName(name.c_str());
+
+        const auto typeEnum{OGRFieldDefn::GetFieldTypeByName(type.c_str())};
+        if (typeEnum == OFTString && !EQUAL(type.c_str(), "String"))
+        {
+            if (posError)
+                *posError = "Unsupported field type: " + type;
+
+            return false;
+        }
+        poFieldDefn->SetType(typeEnum);
+        poFieldDefn->SetWidth(width);
+        poFieldDefn->SetPrecision(precision);
+        return true;
+    }
+
+    if (posError)
+        *posError = "Invalid field definition format. Expected "
+                    "<NAME>:<TYPE>[(<WIDTH>[,<PRECISION>])]";
+
+    return false;
+}
+
+/************************************************************************/
+/*                GDALAlgorithm::AddFieldDefinitionArg()                */
+/************************************************************************/
+
+GDALInConstructionAlgorithmArg &
+GDALAlgorithm::AddFieldDefinitionArg(std::vector<std::string> *pValues,
+                                     std::vector<OGRFieldDefn> *pFieldDefns,
+                                     const char *helpMessage)
+{
+    auto &arg =
+        AddArg("field", 0, MsgOrDefault(helpMessage, _("Field definition")),
+               pValues)
+            .SetMetaVar("<NAME>:<TYPE>[(<WIDTH>[,<PRECISION>])]")
+            .SetPackedValuesAllowed(true)
+            .SetRepeatedArgAllowed(true);
+
+    auto validationFunction = [this, pFieldDefns, pValues]()
+    {
+        pFieldDefns->clear();
+        for (const auto &strValue : *pValues)
+        {
+            OGRFieldDefn fieldDefn("", OFTString);
+            std::string error;
+            if (!GDALAlgorithm::ParseFieldDefinition(strValue, &fieldDefn,
+                                                     &error))
+            {
+                ReportError(CE_Failure, CPLE_AppDefined, "%s", error.c_str());
+                return false;
+            }
+            // Check uniqueness of field names
+            for (const auto &existingFieldDefn : *pFieldDefns)
+            {
+                if (EQUAL(existingFieldDefn.GetNameRef(),
+                          fieldDefn.GetNameRef()))
+                {
+                    ReportError(CE_Failure, CPLE_AppDefined,
+                                "Duplicate field name: '%s'",
+                                fieldDefn.GetNameRef());
+                    return false;
+                }
+            }
+            pFieldDefns->push_back(fieldDefn);
+        }
+        return true;
+    };
+
+    arg.AddValidationAction(std::move(validationFunction));
+
+    return arg;
 }
 
 /************************************************************************/
