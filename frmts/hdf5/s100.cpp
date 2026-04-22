@@ -10,6 +10,10 @@
  * SPDX-License-Identifier: MIT
  ****************************************************************************/
 
+#ifdef _POSIX_C_SOURCE
+#undef _POSIX_C_SOURCE
+#endif
+
 #include "cpl_time.h"
 
 #include "s100.h"
@@ -1303,8 +1307,8 @@ bool S100BaseWriter::BaseChecks(const char *pszDriverName, bool crsMustBeEPSG,
         return false;
     }
 
-    const char *pszAuthName = m_poSRS->GetAuthorityName(nullptr);
-    const char *pszAuthCode = m_poSRS->GetAuthorityCode(nullptr);
+    const char *pszAuthName = m_poSRS->GetAuthorityName();
+    const char *pszAuthCode = m_poSRS->GetAuthorityCode();
     if (pszAuthName && pszAuthCode && EQUAL(pszAuthName, "EPSG"))
     {
         m_nEPSGCode = atoi(pszAuthCode);

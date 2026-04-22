@@ -1753,8 +1753,12 @@ GDfieldinfo(int32 gridID, const char *fieldname, int32 * rank, int32 dims[],
 
 	    if (statmeta == 0)
 	    {
-		memmove(utlstr, utlstr + 1, strlen(utlstr) - 2);
-		utlstr[strlen(utlstr) - 2] = 0;
+		const size_t len = strlen(utlstr);
+		if (len >= 2 && utlstr[0] == '(' && utlstr[len-1] == ')')
+		{
+		    memmove(utlstr, utlstr + 1, len - 2);
+		    utlstr[len - 2] = '\0';
+		}
 
 		/* Parse trimmed DimList string and get rank */
 		ndims = EHparsestr(utlstr, ',', ptr, slen);
@@ -1975,12 +1979,21 @@ GDSDfldsrch(int32 gridID, int32 sdInterfaceID, const char *fieldname,
 		}
 #endif
 
-		/* Get field list and strip off leading and trailing quotes */
-		/* -------------------------------------------------------- */
-		EHgetmetavalue(metaptrs, "FieldList", name);
-		memmove(name, name + 1, strlen(name) - 2);
-		name[strlen(name) - 2] = 0;
-
+        /* Get field list and strip off leading and trailing quotes */
+        /* -------------------------------------------------------- */
+        if (EHgetmetavalue(metaptrs, "FieldList", name) == 0)
+        {
+            const size_t len = strlen(name);
+            if (len >= 2 && name[0] == '"' && name[len-1] == '"')
+            {
+                memmove(name, name + 1, strlen(name) - 2);
+                name[strlen(name) - 2] = 0;
+            }
+        }
+        else
+        {
+            name[0] = '\0';
+        }
 
 		/* Search for desired field within merged field list */
 		/* ------------------------------------------------- */
@@ -3147,7 +3160,10 @@ GDnentries(int32 gridID, int32 entrycode, int32 * strbufsize)
 		     * Get all string values Don't count quotes
 		     */
 		    EHgetmetavalue(metaptrs, &valName[i][0], utlstr);
-		    *strbufsize += (int32)strlen(utlstr) - 2;
+		    if( utlstr[0] == '"' && utlstr[strlen(utlstr)-1] == '"' )
+		        *strbufsize += (int32)strlen(utlstr) - 2;
+		    else
+		        *strbufsize += (int32)strlen(utlstr);
 		}
 		/* Increment number of entries */
 		nEntries++;

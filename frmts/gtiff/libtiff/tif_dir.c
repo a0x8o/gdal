@@ -31,6 +31,7 @@
 #include "tiffiop.h"
 #include <float.h> /*--: for Rational2Double */
 #include <limits.h>
+#include <math.h>
 
 /*
  * These are used in the backwards compatibility code...
@@ -383,13 +384,13 @@ static int _TIFFVSetField(TIFF *tif, uint32_t tag, va_list ap)
             break;
         case TIFFTAG_XRESOLUTION:
             dblval = va_arg(ap, double);
-            if (dblval != dblval || dblval < 0)
+            if (isnan(dblval) || dblval < 0)
                 goto badvaluedouble;
             td->td_xresolution = _TIFFClampDoubleToFloat(dblval);
             break;
         case TIFFTAG_YRESOLUTION:
             dblval = va_arg(ap, double);
-            if (dblval != dblval || dblval < 0)
+            if (isnan(dblval) || dblval < 0)
                 goto badvaluedouble;
             td->td_yresolution = _TIFFClampDoubleToFloat(dblval);
             break;
@@ -1606,6 +1607,21 @@ int TIFFVGetField(TIFF *tif, uint32_t tag, va_list ap)
     }
 
 /*
+ * Reset tif->tif_dir structure to zero and
+ * initialize some IFD strile counter and index parameters.
+ */
+void _TIFFResetTifDirAndInitStrileCounters(TIFFDirectory *td)
+{
+    _TIFFmemset(td, 0, sizeof(*td));
+    td->td_curstrip = NOSTRIP;      /* invalid strip = NOSTRIP */
+    td->td_row = (uint32_t)-1;      /* read/write pre-increment */
+    td->td_col = (uint32_t)-1;      /* read/write pre-increment */
+    td->td_scanlinesize = 0;        /* initialize to zero */
+    td->td_curtile = NOTILE;        /* invalid tile = NOTILE */
+    td->td_tilesize = (tmsize_t)-1; /* invalidate tilezize */
+}
+
+/*
  * Release storage associated with a directory.
  */
 void TIFFFreeDirectory(TIFF *tif)
@@ -1656,6 +1672,7 @@ void TIFFFreeDirectory(TIFF *tif)
         tif->tif_dir.td_dirdatasize_Noffsets = 0;
     }
     tif->tif_dir.td_iswrittentofile = FALSE;
+    /* Note: tif->tif_dir structure is set to zero in TIFFDefaultDirectory() */
 }
 #undef CleanupField
 
@@ -1686,10 +1703,7 @@ int TIFFCreateDirectory(TIFF *tif)
     tif->tif_diroff = 0;
     tif->tif_nextdiroff = 0;
     tif->tif_curoff = 0;
-    tif->tif_row = (uint32_t)-1;
-    tif->tif_curstrip = (uint32_t)-1;
     tif->tif_dir.td_iswrittentofile = FALSE;
-
     return 0;
 }
 
@@ -1709,15 +1723,12 @@ int TIFFCreateCustomDirectory(TIFF *tif, const TIFFFieldArray *infoarray)
     tif->tif_diroff = 0;
     tif->tif_nextdiroff = 0;
     tif->tif_curoff = 0;
-    tif->tif_row = (uint32_t)-1;
-    tif->tif_curstrip = (uint32_t)-1;
     /* invalidate directory index */
     tif->tif_curdir = TIFF_NON_EXISTENT_DIR_NUMBER;
     /* invalidate IFD loop lists */
     _TIFFCleanupIFDOffsetAndNumberMaps(tif);
     /* To be able to return from SubIFD or custom-IFD to main-IFD */
     tif->tif_setdirectory_force_absolute = TRUE;
-
     return 0;
 }
 
@@ -1748,8 +1759,9 @@ int TIFFDefaultDirectory(TIFF *tif)
 
     tiffFieldArray = _TIFFGetFields();
     _TIFFSetupFields(tif, tiffFieldArray);
-
-    _TIFFmemset(td, 0, sizeof(*td));
+    /* Reset tif->tif_dir structure to zero and
+     * initialize some IFD strile counter and index parameters. */
+    _TIFFResetTifDirAndInitStrileCounters(td);
     td->td_fillorder = FILLORDER_MSB2LSB;
     td->td_bitspersample = 1;
     td->td_threshholding = THRESHHOLD_BILEVEL;
@@ -1885,7 +1897,6 @@ static int TIFFAdvanceDirectory(TIFF *tif, uint64_t *nextdiroff, uint64_t *off,
         {
             tmsize_t poffa, poffb, poffc, poffd;
             uint64_t dircount64;
-            uint16_t dircount16;
             if (poff > (uint64_t)TIFF_TMSIZE_T_MAX - sizeof(uint64_t))
             {
                 TIFFErrorExtR(tif, module,
@@ -1911,14 +1922,13 @@ static int TIFFAdvanceDirectory(TIFF *tif, uint64_t *nextdiroff, uint64_t *off,
                               "Sanity check on directory count failed");
                 return (0);
             }
-            dircount16 = (uint16_t)dircount64;
-            if (poffb > TIFF_TMSIZE_T_MAX - (tmsize_t)(dircount16 * 20) -
+            if (poffb > TIFF_TMSIZE_T_MAX - (tmsize_t)(dircount64 * 20) -
                             (tmsize_t)sizeof(uint64_t))
             {
                 TIFFErrorExtR(tif, module, "Error fetching directory link");
                 return (0);
             }
-            poffc = poffb + dircount16 * 20;
+            poffc = poffb + (tmsize_t)(dircount64 * 20);
             poffd = poffc + (tmsize_t)sizeof(uint64_t);
             if (poffd > tif->tif_size)
             {
@@ -1949,9 +1959,9 @@ static int TIFFAdvanceDirectory(TIFF *tif, uint64_t *nextdiroff, uint64_t *off,
             if (tif->tif_flags & TIFF_SWAB)
                 TIFFSwabShort(&dircount);
             if (off != NULL)
-                *off = TIFFSeekFile(tif, dircount * 12, SEEK_CUR);
+                *off = TIFFSeekFile(tif, dircount * 12U, SEEK_CUR);
             else
-                (void)TIFFSeekFile(tif, dircount * 12, SEEK_CUR);
+                (void)TIFFSeekFile(tif, dircount * 12U, SEEK_CUR);
             if (!ReadOK(tif, &nextdir32, sizeof(uint32_t)))
             {
                 TIFFErrorExtR(tif, module, "%s: Error fetching directory link",
@@ -1965,7 +1975,6 @@ static int TIFFAdvanceDirectory(TIFF *tif, uint64_t *nextdiroff, uint64_t *off,
         else
         {
             uint64_t dircount64;
-            uint16_t dircount16;
             if (!SeekOK(tif, *nextdiroff) ||
                 !ReadOK(tif, &dircount64, sizeof(uint64_t)))
             {
@@ -1983,11 +1992,10 @@ static int TIFFAdvanceDirectory(TIFF *tif, uint64_t *nextdiroff, uint64_t *off,
                               __FILE__, __LINE__, tif->tif_name);
                 return (0);
             }
-            dircount16 = (uint16_t)dircount64;
             if (off != NULL)
-                *off = TIFFSeekFile(tif, dircount16 * 20, SEEK_CUR);
+                *off = TIFFSeekFile(tif, dircount64 * 20, SEEK_CUR);
             else
-                (void)TIFFSeekFile(tif, dircount16 * 20, SEEK_CUR);
+                (void)TIFFSeekFile(tif, dircount64 * 20, SEEK_CUR);
             if (!ReadOK(tif, nextdiroff, sizeof(uint64_t)))
             {
                 TIFFErrorExtR(tif, module, "%s: Error fetching directory link",
@@ -2346,8 +2354,6 @@ int TIFFUnlinkDirectory(TIFF *tif, tdir_t dirn)
     tif->tif_nextdiroff = 0; /* next write must be at end */
     tif->tif_lastdiroff = 0; /* will be updated on next link */
     tif->tif_curoff = 0;
-    tif->tif_row = (uint32_t)-1;
-    tif->tif_curstrip = (uint32_t)-1;
     tif->tif_curdir = TIFF_NON_EXISTENT_DIR_NUMBER;
     if (tif->tif_curdircount > 0)
         tif->tif_curdircount--;

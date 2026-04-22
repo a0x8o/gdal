@@ -653,6 +653,7 @@ TEST_F(test_gdal_algorithm, GDALAlgorithmArg_Set)
     {
         GDALArgDatasetValue val;
         auto decl = GDALAlgorithmArgDecl("", 0, "", GAAT_DATASET);
+        decl.SetIsOutput();
         decl.SetDatasetInputFlags(GADV_NAME);
         decl.SetDatasetOutputFlags(GADV_OBJECT);
         auto arg = GDALAlgorithmArg(decl, &val);
@@ -706,7 +707,7 @@ TEST_F(test_gdal_algorithm, GDALAlgorithmArg_Set)
             arg.Set(static_cast<GDALDataset *>(nullptr));
             EXPECT_TRUE(
                 strstr(CPLGetLastErrorMsg(),
-                       "A dataset cannot be set as an input argument of"));
+                       "Dataset '' must be provided by name, not as object"));
             EXPECT_EQ(CPLGetLastErrorType(), CE_Failure);
         }
     }
@@ -729,9 +730,9 @@ TEST_F(test_gdal_algorithm, GDALAlgorithmArg_Set)
 
                 Run();
 
-                EXPECT_TRUE(
-                    strstr(CPLGetLastErrorMsg(),
-                           "A dataset cannot be set as an input argument of"));
+                EXPECT_TRUE(strstr(
+                    CPLGetLastErrorMsg(),
+                    "Dataset '' must be provided by name, not as object"));
                 EXPECT_EQ(CPLGetLastErrorType(), CE_Failure);
             }
         };
@@ -3518,6 +3519,147 @@ TEST_F(test_gdal_algorithm, mutually_exclusive)
     }
 }
 
+TEST_F(test_gdal_algorithm, mutually_dependent)
+{
+    class MyAlgorithm : public MyAlgorithmWithDummyRun
+    {
+      public:
+        bool m_flag1 = false;
+        bool m_flag2 = false;
+        bool m_flag3 = false;
+
+        MyAlgorithm()
+        {
+            AddArg("flag1", 0, "", &m_flag1)
+                .SetMutualDependencyGroup("my_group");
+            AddArg("flag2", 0, "", &m_flag2)
+                .SetMutualDependencyGroup("my_group");
+            AddArg("flag3", 0, "", &m_flag3)
+                .SetMutualDependencyGroup("my_group");
+        }
+    };
+
+    {
+        MyAlgorithm alg;
+        alg.GetUsageForCLI(false);
+        EXPECT_TRUE(alg.ParseCommandLineArguments({}));
+    }
+
+    {
+        MyAlgorithm alg;
+        EXPECT_TRUE(
+            alg.ParseCommandLineArguments({"--flag1", "--flag2", "--flag3"}));
+    }
+
+    {
+        MyAlgorithm alg;
+        CPLErrorStateBackuper oBackuper(CPLQuietErrorHandler);
+        CPLErrorReset();
+        EXPECT_FALSE(alg.ParseCommandLineArguments({"--flag1"}));
+        EXPECT_EQ(CPLGetLastErrorType(), CE_Failure);
+        EXPECT_STREQ(CPLGetLastErrorMsg(),
+                     "test: Argument(s) 'flag1' require(s) that the following "
+                     "argument(s) are also specified: flag2, flag3.");
+    }
+
+    {
+        MyAlgorithm alg;
+        CPLErrorStateBackuper oBackuper(CPLQuietErrorHandler);
+        CPLErrorReset();
+        EXPECT_FALSE(alg.ParseCommandLineArguments({"--flag2"}));
+        EXPECT_EQ(CPLGetLastErrorType(), CE_Failure);
+        EXPECT_STREQ(CPLGetLastErrorMsg(),
+                     "test: Argument(s) 'flag2' require(s) that the following "
+                     "argument(s) are also specified: flag1, flag3.");
+    }
+
+    {
+        MyAlgorithm alg;
+        CPLErrorStateBackuper oBackuper(CPLQuietErrorHandler);
+        CPLErrorReset();
+        EXPECT_FALSE(alg.ParseCommandLineArguments({"--flag3"}));
+        EXPECT_EQ(CPLGetLastErrorType(), CE_Failure);
+        EXPECT_STREQ(CPLGetLastErrorMsg(),
+                     "test: Argument(s) 'flag3' require(s) that the following "
+                     "argument(s) are also specified: flag1, flag2.");
+    }
+
+    {
+        MyAlgorithm alg;
+        CPLErrorStateBackuper oBackuper(CPLQuietErrorHandler);
+        CPLErrorReset();
+        EXPECT_FALSE(alg.ParseCommandLineArguments({"--flag1", "--flag2"}));
+        EXPECT_EQ(CPLGetLastErrorType(), CE_Failure);
+    }
+
+    {
+        MyAlgorithm alg;
+        CPLErrorStateBackuper oBackuper(CPLQuietErrorHandler);
+        CPLErrorReset();
+        EXPECT_FALSE(alg.ParseCommandLineArguments({"--flag2", "--flag3"}));
+        EXPECT_EQ(CPLGetLastErrorType(), CE_Failure);
+    }
+
+    {
+        MyAlgorithm alg;
+        CPLErrorStateBackuper oBackuper(CPLQuietErrorHandler);
+        CPLErrorReset();
+        EXPECT_FALSE(alg.ParseCommandLineArguments({"--flag1", "--flag3"}));
+        EXPECT_EQ(CPLGetLastErrorType(), CE_Failure);
+    }
+}
+
+// Test dependencies
+TEST_F(test_gdal_algorithm, direct_dependencies)
+{
+    class MyAlgorithm : public MyAlgorithmWithDummyRun
+    {
+      public:
+        bool m_flag1 = false;
+        bool m_flag2 = false;
+
+        MyAlgorithm()
+        {
+            AddArg("flag1", 0, "", &m_flag1)
+                .AddDirectDependency(AddArg("flag2", 0, "", &m_flag2));
+        }
+    };
+
+    {
+        MyAlgorithm alg;
+        EXPECT_EQ(alg.GetArgDependencies("flag1"),
+                  std::vector<std::string>{"flag2"});
+        EXPECT_EQ(alg.GetArgDependencies("flag2"), std::vector<std::string>{});
+    }
+
+    {
+        MyAlgorithm alg;
+        alg.GetUsageForCLI(false);
+        EXPECT_TRUE(alg.ParseCommandLineArguments({}));
+    }
+
+    {
+        MyAlgorithm alg;
+        EXPECT_TRUE(alg.ParseCommandLineArguments({"--flag2"}));
+    }
+
+    {
+        MyAlgorithm alg;
+        CPLErrorStateBackuper oBackuper(CPLQuietErrorHandler);
+        CPLErrorReset();
+        EXPECT_FALSE(alg.ParseCommandLineArguments({"--flag1"}));
+        EXPECT_EQ(CPLGetLastErrorType(), CE_Failure);
+        EXPECT_STREQ(CPLGetLastErrorMsg(),
+                     "test: Argument 'flag1' depends on argument 'flag2' that "
+                     "has not been specified.");
+    }
+
+    {
+        MyAlgorithm alg;
+        EXPECT_TRUE(alg.ParseCommandLineArguments({"--flag1", "--flag2"}));
+    }
+}
+
 TEST_F(test_gdal_algorithm, invalid_input_format)
 {
     class MyAlgorithm : public MyAlgorithmWithDummyRun
@@ -4270,7 +4412,8 @@ TEST_F(test_gdal_algorithm, algorithm_c_api)
                 .SetDefault(std::vector<double>{1.5, 2.5});
             AddArg("intlist", 0, "intlist", &m_intlist)
                 .SetDefault(std::vector<int>{1, 2});
-            AddArg("dataset", 0, "dataset", &m_dsValue);
+            AddArg("dataset", 0, "dataset", &m_dsValue)
+                .SetAvailableInPipelineStep(false);
         }
 
         bool
@@ -4437,6 +4580,7 @@ TEST_F(test_gdal_algorithm, algorithm_c_api)
             CPLErrorStateBackuper oBackuper(CPLQuietErrorHandler);
             EXPECT_EQ(GDALAlgorithmArgGetDefaultAsBoolean(hArg), false);
         }
+        EXPECT_TRUE(GDALAlgorithmArgIsAvailableInPipelineStep(hArg));
         {
             size_t nCount = 0;
             const double *ret =
@@ -4464,6 +4608,7 @@ TEST_F(test_gdal_algorithm, algorithm_c_api)
         EXPECT_EQ(GDALAlgorithmArgGetDatasetInputFlags(hArg),
                   GADV_NAME | GADV_OBJECT);
         EXPECT_EQ(GDALAlgorithmArgGetDatasetOutputFlags(hArg), GADV_OBJECT);
+        EXPECT_FALSE(GDALAlgorithmArgIsAvailableInPipelineStep(hArg));
         GDALArgDatasetValueH hVal = GDALArgDatasetValueCreate();
         GDALArgDatasetValueSetName(hVal, "foo");
 
@@ -5133,6 +5278,171 @@ TEST_F(test_gdal_algorithm, duplicate_values)
         EXPECT_FALSE(alg.ValidateArguments());
         EXPECT_STREQ(CPLGetLastErrorMsg(),
                      "'datasetListAutoOpen' must be a list of unique values.");
+    }
+}
+
+TEST_F(test_gdal_algorithm, list_single_valued_dataset_followed_by_positional)
+{
+    // Scenario of https://github.com/OSGeo/gdal/issues/14358
+
+    class MyAlgorithm : public MyAlgorithmWithDummyRun
+    {
+      public:
+        std::vector<GDALArgDatasetValue> m_inputDataset{};
+        GDALArgDatasetValue m_outputDataset{};
+
+        MyAlgorithm()
+        {
+            AddInputDatasetArg(&m_inputDataset, GDAL_OF_RASTER, true)
+                .SetMaxCount(1)
+                .SetAutoOpenDataset(false);
+            AddOutputDatasetArg(&m_outputDataset, GDAL_OF_RASTER, true)
+                .SetDatasetInputFlags(GADV_NAME | GADV_OBJECT);
+        }
+    };
+
+    {
+        MyAlgorithm alg;
+        EXPECT_TRUE(alg.ParseCommandLineArguments(
+            {"--input", "/vsimem/in.tif", "/vsimem/out.tif"}));
+        EXPECT_EQ(alg.m_inputDataset.size(), 1U);
+    }
+
+    {
+        MyAlgorithm alg;
+        EXPECT_TRUE(alg.ParseCommandLineArguments(
+            {"--input=/vsimem/in.tif", "/vsimem/out.tif"}));
+        EXPECT_EQ(alg.m_inputDataset.size(), 1U);
+    }
+
+    {
+        MyAlgorithm alg;
+        EXPECT_TRUE(alg.ParseCommandLineArguments(
+            {"/vsimem/in.tif", "/vsimem/out.tif"}));
+        EXPECT_EQ(alg.m_inputDataset.size(), 1U);
+    }
+
+    {
+        MyAlgorithm alg;
+        EXPECT_TRUE(alg.ParseCommandLineArguments(
+            {"--input", "/vsimem/in.tif", "--output", "/vsimem/out.tif"}));
+        EXPECT_EQ(alg.m_inputDataset.size(), 1U);
+    }
+
+    {
+        MyAlgorithm alg;
+        CPLErrorStateBackuper oBackuper(CPLQuietErrorHandler);
+        EXPECT_FALSE(alg.ParseCommandLineArguments(
+            {"--input", "/vsimem/in.tif", "--input", "not_expected.tif",
+             "/vsimem/out.tif"}));
+        EXPECT_EQ(alg.m_inputDataset.size(), 1U);
+    }
+
+    {
+        MyAlgorithm alg;
+        CPLErrorStateBackuper oBackuper(CPLQuietErrorHandler);
+        EXPECT_FALSE(
+            alg.ParseCommandLineArguments({"--input", "/vsimem/in.tif"}));
+        EXPECT_EQ(alg.m_inputDataset.size(), 1U);
+    }
+}
+
+TEST_F(test_gdal_algorithm, list_single_valued_str_followed_by_positional)
+{
+    // Scenario of https://github.com/OSGeo/gdal/issues/14358
+
+    class MyAlgorithm : public MyAlgorithmWithDummyRun
+    {
+      public:
+        std::vector<std::string> m_a{};
+        int m_b{};
+
+        MyAlgorithm()
+        {
+            AddArg("a", 0, "a", &m_a)
+                .SetPositional()
+                .SetRequired()
+                .SetMaxCount(1);
+            AddArg("b", 0, "b", &m_b).SetPositional().SetRequired();
+        }
+    };
+
+    {
+        MyAlgorithm alg;
+        EXPECT_TRUE(alg.ParseCommandLineArguments({"--a", "str", "1"}));
+        EXPECT_EQ(alg.m_a.size(), 1U);
+    }
+
+    {
+        MyAlgorithm alg;
+        EXPECT_TRUE(alg.ParseCommandLineArguments({"str", "1"}));
+        EXPECT_EQ(alg.m_a.size(), 1U);
+    }
+}
+
+TEST_F(test_gdal_algorithm, list_single_valued_int_followed_by_positional)
+{
+    // Scenario of https://github.com/OSGeo/gdal/issues/14358
+
+    class MyAlgorithm : public MyAlgorithmWithDummyRun
+    {
+      public:
+        std::vector<int> m_a{};
+        int m_b{};
+
+        MyAlgorithm()
+        {
+            AddArg("a", 0, "a", &m_a)
+                .SetPositional()
+                .SetRequired()
+                .SetMaxCount(1);
+            AddArg("b", 0, "b", &m_b).SetPositional().SetRequired();
+        }
+    };
+
+    {
+        MyAlgorithm alg;
+        EXPECT_TRUE(alg.ParseCommandLineArguments({"--a", "2", "1"}));
+        EXPECT_EQ(alg.m_a.size(), 1U);
+    }
+
+    {
+        MyAlgorithm alg;
+        EXPECT_TRUE(alg.ParseCommandLineArguments({"2", "1"}));
+        EXPECT_EQ(alg.m_a.size(), 1U);
+    }
+}
+
+TEST_F(test_gdal_algorithm, list_single_valued_real_followed_by_positional)
+{
+    // Scenario of https://github.com/OSGeo/gdal/issues/14358
+
+    class MyAlgorithm : public MyAlgorithmWithDummyRun
+    {
+      public:
+        std::vector<double> m_a{};
+        int m_b{};
+
+        MyAlgorithm()
+        {
+            AddArg("a", 0, "a", &m_a)
+                .SetPositional()
+                .SetRequired()
+                .SetMaxCount(1);
+            AddArg("b", 0, "b", &m_b).SetPositional().SetRequired();
+        }
+    };
+
+    {
+        MyAlgorithm alg;
+        EXPECT_TRUE(alg.ParseCommandLineArguments({"--a", "2.5", "1"}));
+        EXPECT_EQ(alg.m_a.size(), 1U);
+    }
+
+    {
+        MyAlgorithm alg;
+        EXPECT_TRUE(alg.ParseCommandLineArguments({"2.5", "1"}));
+        EXPECT_EQ(alg.m_a.size(), 1U);
     }
 }
 

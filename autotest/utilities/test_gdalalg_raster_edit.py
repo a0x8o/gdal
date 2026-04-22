@@ -49,7 +49,7 @@ def test_gdalalg_raster_edit_crs(tmp_vsimem):
     )
 
     with gdal.OpenEx(tmp_filename) as ds:
-        assert ds.GetSpatialRef().GetAuthorityCode(None) == "32611"
+        assert ds.GetSpatialRef().GetAuthorityCode() == "32611"
 
 
 def test_gdalalg_raster_edit_crs_none(tmp_vsimem):
@@ -277,7 +277,7 @@ def test_gdalalg_raster_pipeline_edit_crs(tmp_vsimem):
     )
 
     with gdal.OpenEx(out_filename) as ds:
-        assert ds.GetSpatialRef().GetAuthorityCode(None) == "32611"
+        assert ds.GetSpatialRef().GetAuthorityCode() == "32611"
         assert ds.GetRasterBand(1).Checksum() == 4672
 
 
@@ -395,6 +395,17 @@ def test_gdalalg_raster_pipeline_edit_metadata(tmp_vsimem):
         assert ds.GetMetadata() == {"AREA_OR_POINT": "Area", "bar": "baz"}
 
 
+def test_gdalalg_raster_pipeline_complex():
+    """Test case of https://github.com/OSGeo/gdal/issues/14331"""
+
+    with gdal.alg.raster.pipeline(
+        pipeline="create --size=1,1 --crs EPSG:4269 --bbox=-126,22,-65,50 ! reproject --dst-crs EPSG:4326 ! edit --metadata DESC=stuff"
+    ) as alg:
+        ds = alg.Output()
+        assert ds.GetSpatialRef().GetAuthorityCode() == "4326"
+        assert ds.GetMetadataItem("DESC") == "stuff"
+
+
 def test_gdalalg_raster_edit_gcp_from_list_of_values():
 
     mem_ds = gdal.GetDriverByName("MEM").Create("", 1, 1)
@@ -408,7 +419,7 @@ def test_gdalalg_raster_edit_gcp_from_list_of_values():
     )
 
     assert mem_ds.GetGCPCount() == 2
-    assert mem_ds.GetGCPSpatialRef().GetAuthorityCode(None) == "4326"
+    assert mem_ds.GetGCPSpatialRef().GetAuthorityCode() == "4326"
 
     assert mem_ds.GetGCPs()[0].GCPPixel == 1.5
     assert mem_ds.GetGCPs()[0].GCPLine == 2.5

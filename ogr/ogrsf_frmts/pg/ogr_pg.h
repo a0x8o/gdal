@@ -630,7 +630,7 @@ class OGRPGDataSource final : public GDALDataset
 
     bool HavePostGIS() const
     {
-        return bHavePostGIS;
+        return CPL_TO_BOOL(bHavePostGIS);
     }
 
     int GetUndefinedSRID() const
@@ -653,7 +653,7 @@ class OGRPGDataSource final : public GDALDataset
     }
 
     int FetchSRSId(const OGRSpatialReference *poSRS);
-    const OGRSpatialReference *FetchSRS(int nSRSId);
+    OGRSpatialReferenceRefCountedPtr FetchSRS(int nSRSId);
     static OGRErr InitializeMetadataTables();
 
     int Open(const char *, int bUpdate, int bTestOpen,

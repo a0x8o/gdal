@@ -530,3 +530,27 @@ def test_hdf4multidim_gr_palette():
     assert got[255 * 3 + 0] == 255
     assert got[255 * 3 + 1] == 0
     assert got[255 * 3 + 2] == 1
+
+
+###############################################################################
+# Test bugfix for various crashes
+
+
+@pytest.mark.parametrize(
+    "filename",
+    [
+        "data/hdf4/issue_14356.he4",
+        "data/hdf4/issue_14363.he4",
+        "data/hdf4/issue_14378.he4",
+        "data/hdf4/issue_14379.he4",
+        "data/hdf4/issue_14398.he4",
+        "data/hdf4/issue_14399.he4",
+    ],
+)
+def test_hdf4multidim_gh_crashes(filename):
+
+    if gdaltest.hdf4_drv is None:
+        pytest.skip()
+
+    ds = gdal.OpenEx(filename, gdal.OF_MULTIDIM_RASTER)
+    gdal.MultiDimInfo(ds)

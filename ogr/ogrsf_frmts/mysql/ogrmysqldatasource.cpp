@@ -530,7 +530,7 @@ OGRErr OGRMySQLDataSource::UpdateMetadataTables(const char *pszLayerName,
 /*      OGRSpatialReference, as handles may be cached.                  */
 /************************************************************************/
 
-const OGRSpatialReference *OGRMySQLDataSource::FetchSRS(int nId)
+OGRSpatialReferenceRefCountedPtr OGRMySQLDataSource::FetchSRS(int nId)
 {
     if (nId < 0)
         return nullptr;
@@ -541,7 +541,7 @@ const OGRSpatialReference *OGRMySQLDataSource::FetchSRS(int nId)
     auto oIter = m_oSRSCache.find(nId);
     if (oIter != m_oSRSCache.end())
     {
-        return oIter->second.get();
+        return oIter->second;
     }
 
     // make sure to attempt to free any old results
@@ -592,8 +592,8 @@ const OGRSpatialReference *OGRMySQLDataSource::FetchSRS(int nId)
     {
         // The WKT found in MySQL 8 ST_SPATIAL_REFERENCE_SYSTEMS is not
         // compatible of what GDAL understands.
-        const char *pszAuthorityName = poSRS->GetAuthorityName(nullptr);
-        const char *pszAuthorityCode = poSRS->GetAuthorityCode(nullptr);
+        const char *pszAuthorityName = poSRS->GetAuthorityName();
+        const char *pszAuthorityCode = poSRS->GetAuthorityCode();
         if (pszAuthorityName != nullptr && EQUAL(pszAuthorityName, "EPSG") &&
             pszAuthorityCode != nullptr && strlen(pszAuthorityCode) > 0)
         {
@@ -606,7 +606,7 @@ const OGRSpatialReference *OGRMySQLDataSource::FetchSRS(int nId)
     /*      Add to the cache.                                               */
     /* -------------------------------------------------------------------- */
     oIter = m_oSRSCache.emplace(nId, std::move(poSRS)).first;
-    return oIter->second.get();
+    return oIter->second;
 }
 
 /************************************************************************/
@@ -626,7 +626,7 @@ int OGRMySQLDataSource::FetchSRSId(const OGRSpatialReference *poSRSIn)
     // cppcheck-suppress uselessAssignmentPtrArg
     poSRSIn = nullptr;
 
-    const char *pszAuthorityName = oSRS.GetAuthorityName(nullptr);
+    const char *pszAuthorityName = oSRS.GetAuthorityName();
     int nAuthorityCode = 0;
     if (pszAuthorityName == nullptr || strlen(pszAuthorityName) == 0)
     {
@@ -637,23 +637,23 @@ int OGRMySQLDataSource::FetchSRSId(const OGRSpatialReference *poSRSIn)
          */
         oSRS.AutoIdentifyEPSG();
 
-        pszAuthorityName = oSRS.GetAuthorityName(nullptr);
+        pszAuthorityName = oSRS.GetAuthorityName();
         if (pszAuthorityName != nullptr && EQUAL(pszAuthorityName, "EPSG"))
         {
-            const char *pszAuthorityCode = oSRS.GetAuthorityCode(nullptr);
+            const char *pszAuthorityCode = oSRS.GetAuthorityCode();
             if (pszAuthorityCode != nullptr && strlen(pszAuthorityCode) > 0)
             {
                 /* Import 'clean' SRS */
                 nAuthorityCode = atoi(pszAuthorityCode);
                 oSRS.importFromEPSG(nAuthorityCode);
 
-                pszAuthorityName = oSRS.GetAuthorityName(nullptr);
+                pszAuthorityName = oSRS.GetAuthorityName();
             }
         }
     }
     else
     {
-        const char *pszAuthorityCode = oSRS.GetAuthorityCode(nullptr);
+        const char *pszAuthorityCode = oSRS.GetAuthorityCode();
         if (pszAuthorityCode)
             nAuthorityCode = atoi(pszAuthorityCode);
     }

@@ -141,7 +141,7 @@ struct OGRSpatialReference::Private
     void setRoot(OGR_SRSNode *poRoot);
     void refreshProjObj();
     void nodesChanged();
-    void refreshRootFromProjObj();
+    void refreshRootFromProjObj(bool bForceWKT2);
     void invalidateNodes();
 
     void setMorphToESRI(bool b);
@@ -392,7 +392,7 @@ void OGRSpatialReference::Private::refreshProjObj()
     }
 }
 
-void OGRSpatialReference::Private::refreshRootFromProjObj()
+void OGRSpatialReference::Private::refreshRootFromProjObj(bool bForceWKT2)
 {
     CPLAssert(m_poRoot == nullptr);
 
@@ -406,7 +406,8 @@ void OGRSpatialReference::Private::refreshRootFromProjObj()
         }
         aosOptions.SetNameValue("STRICT", "NO");
 
-        const char *pszWKT;
+        const char *pszWKT = nullptr;
+        if (!bForceWKT2)
         {
             CPLErrorStateBackuper oErrorStateBackuper(CPLQuietErrorHandler);
             pszWKT = proj_as_wkt(getPROJContext(), m_pj_crs,
@@ -1181,7 +1182,7 @@ OGR_SRSNode *OGRSpatialReference::GetRoot()
 
     if (!d->m_poRoot)
     {
-        d->refreshRootFromProjObj();
+        d->refreshRootFromProjObj(false);
     }
     return d->m_poRoot;
 }
@@ -1192,7 +1193,7 @@ const OGR_SRSNode *OGRSpatialReference::GetRoot() const
 
     if (!d->m_poRoot)
     {
-        d->refreshRootFromProjObj();
+        d->refreshRootFromProjObj(false);
     }
     return d->m_poRoot;
 }
@@ -1246,6 +1247,12 @@ void OGRSpatialReference::SetRoot(OGR_SRSNode *poNewRoot)
 OGR_SRSNode *OGRSpatialReference::GetAttrNode(const char *pszNodePath)
 
 {
+    if (strstr(pszNodePath, "CONVERSION") && !d->m_bNodesWKT2)
+    {
+        d->invalidateNodes();
+        d->refreshRootFromProjObj(/* bForceWKT2 = */ true);
+    }
+
     if (strchr(pszNodePath, '|') == nullptr)
     {
         // Fast path
@@ -1464,7 +1471,7 @@ const char *OGRSpatialReference::GetCelestialBodyName() const
     if (std::fabs(GetSemiMajor(nullptr) - SRS_WGS84_SEMIMAJOR) <=
         0.05 * SRS_WGS84_SEMIMAJOR)
         return "Earth";
-    const char *pszAuthName = GetAuthorityName(nullptr);
+    const char *pszAuthName = GetAuthorityName();
     if (pszAuthName && EQUAL(pszAuthName, "EPSG"))
         return "Earth";
     return nullptr;
@@ -8894,8 +8901,8 @@ char *OGRSpatialReference::GetOGCURN() const
 {
     TAKE_OPTIONAL_LOCK();
 
-    const char *pszAuthName = GetAuthorityName(nullptr);
-    const char *pszAuthCode = GetAuthorityCode(nullptr);
+    const char *pszAuthName = GetAuthorityName();
+    const char *pszAuthCode = GetAuthorityCode();
     if (pszAuthName && pszAuthCode)
         return CPLStrdup(
             CPLSPrintf("urn:ogc:def:crs:%s::%s", pszAuthName, pszAuthCode));
@@ -10363,16 +10370,14 @@ OGRSpatialReference::FindBestMatch(int nMinimumMatchConfidence,
             const char *pszBaseAuthorityCode = nullptr;
             const char *pszBaseName = poBaseGeogCRS->GetName();
             if (adfTOWGS84 == std::vector<double>(7) &&
-                (pszAuthorityName = poSRS->GetAuthorityName(nullptr)) !=
-                    nullptr &&
+                (pszAuthorityName = poSRS->GetAuthorityName()) != nullptr &&
                 EQUAL(pszAuthorityName, "EPSG") &&
-                (pszAuthorityCode = poSRS->GetAuthorityCode(nullptr)) !=
+                (pszAuthorityCode = poSRS->GetAuthorityCode()) != nullptr &&
+                (pszBaseAuthorityName = poBaseGeogCRS->GetAuthorityName()) !=
                     nullptr &&
-                (pszBaseAuthorityName =
-                     poBaseGeogCRS->GetAuthorityName(nullptr)) != nullptr &&
                 EQUAL(pszBaseAuthorityName, "EPSG") &&
-                (pszBaseAuthorityCode =
-                     poBaseGeogCRS->GetAuthorityCode(nullptr)) != nullptr &&
+                (pszBaseAuthorityCode = poBaseGeogCRS->GetAuthorityCode()) !=
+                    nullptr &&
                 (EQUAL(pszBaseAuthorityCode, "4326") ||
                  EQUAL(pszBaseAuthorityCode, "4258") ||
                  // For ETRS89-XXX [...] new CRS added in EPSG 12.033+
@@ -10398,7 +10403,7 @@ OGRSpatialReference::FindBestMatch(int nMinimumMatchConfidence,
             {
                 const char *pszAuthName =
                     OGRSpatialReference::FromHandle(pahSRS[i])
-                        ->GetAuthorityName(nullptr);
+                        ->GetAuthorityName();
                 if (pszAuthName != nullptr &&
                     EQUAL(pszAuthName, pszPreferredAuthority))
                 {

@@ -595,3 +595,27 @@ def test_hdf4_gcp_nodata():
     ds = None
 
     assert gcp_count == 72, "did not get expected gcp count"
+
+
+###############################################################################
+# Test bugfix for various crashes
+
+
+@pytest.mark.parametrize(
+    "filename",
+    [
+        "data/hdf4/issue_14356.he4",
+        "data/hdf4/issue_14363.he4",
+        "data/hdf4/issue_14378.he4",
+        "data/hdf4/issue_14379.he4",
+        "data/hdf4/issue_14398.he4",
+        "data/hdf4/issue_14399.he4",
+    ],
+)
+def test_hdf4_gh_crashes(filename):
+
+    if gdaltest.hdf4_drv is None:
+        pytest.skip()
+
+    with gdaltest.disable_exceptions(), gdal.quiet_errors():
+        gdal.Open(filename)

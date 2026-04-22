@@ -41,7 +41,7 @@
  * or 3-bit delta values are used, with the deltas packed
  * into a single byte.
  */
-#define THUNDER_DATA 0x3f /* mask for 6-bit data */
+// #define THUNDER_DATA 0x3f /* mask for 6-bit data */
 #define THUNDER_CODE 0xc0 /* mask for 2-bit code word */
 /* code values */
 #define THUNDER_RUN 0x00        /* run of pixels w/ encoded count */
@@ -56,7 +56,7 @@ static const int threebitdeltas[8] = {0, 1, 2, 3, 0, -3, -2, -1};
 
 #define SETPIXEL(op, v)                                                        \
     {                                                                          \
-        lastpixel = (v)&0xf;                                                   \
+        lastpixel = (v) & 0xf;                                                 \
         if (npixels < maxpixels)                                               \
         {                                                                      \
             if (npixels++ & 1)                                                 \
@@ -163,7 +163,7 @@ static int ThunderDecode(TIFF *tif, uint8_t *op0, tmsize_t maxpixels)
         TIFFErrorExtR(tif, module,
                       "%s data at scanline %lu (%" PRIu64 " != %" PRIu64 ")",
                       npixels < maxpixels ? "Not enough" : "Too much",
-                      (unsigned long)tif->tif_row, (uint64_t)npixels,
+                      (unsigned long)tif->tif_dir.td_row, (uint64_t)npixels,
                       (uint64_t)maxpixels);
         return (0);
     }
@@ -177,7 +177,7 @@ static int ThunderDecodeRow(TIFF *tif, uint8_t *buf, tmsize_t occ, uint16_t s)
     uint8_t *row = buf;
 
     (void)s;
-    if (occ % tif->tif_scanlinesize)
+    if (occ % tif->tif_dir.td_scanlinesize)
     {
         TIFFErrorExtR(tif, module, "Fractional scanlines cannot be read");
         return (0);
@@ -186,8 +186,8 @@ static int ThunderDecodeRow(TIFF *tif, uint8_t *buf, tmsize_t occ, uint16_t s)
     {
         if (!ThunderDecode(tif, row, tif->tif_dir.td_imagewidth))
             return (0);
-        occ -= tif->tif_scanlinesize;
-        row += tif->tif_scanlinesize;
+        occ -= tif->tif_dir.td_scanlinesize;
+        row += tif->tif_dir.td_scanlinesize;
     }
     return (1);
 }

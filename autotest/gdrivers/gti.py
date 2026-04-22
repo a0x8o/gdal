@@ -25,6 +25,8 @@ from osgeo import gdal, ogr
 
 pytestmark = [pytest.mark.require_driver("GTI"), pytest.mark.require_driver("GPKG")]
 
+_UNSET = object()
+
 
 def create_basic_tileindex(
     index_filename,
@@ -35,6 +37,7 @@ def create_basic_tileindex(
     sort_values=None,
     lyr_name="index",
     add_to_existing=False,
+    lyr_srs=_UNSET,
 ):
     if isinstance(src_ds, list):
         src_ds_list = src_ds
@@ -44,9 +47,11 @@ def create_basic_tileindex(
         index_ds = ogr.Open(index_filename, update=1)
     else:
         index_ds = ogr.GetDriverByName("GPKG").CreateDataSource(index_filename)
-    lyr = index_ds.CreateLayer(
-        lyr_name, srs=(src_ds_list[0].GetSpatialRef() if src_ds_list else None)
-    )
+    if lyr_srs is _UNSET:
+        srs = src_ds_list[0].GetSpatialRef() if src_ds_list else None
+    else:
+        srs = lyr_srs
+    lyr = index_ds.CreateLayer(lyr_name, srs=srs)
     lyr.CreateField(ogr.FieldDefn(location_field_name))
     if sort_values:
         lyr.CreateField(ogr.FieldDefn(sort_field_name, sort_field_type))
@@ -77,9 +82,10 @@ def check_basic(
     assert vrt_ds.RasterYSize == src_ds.RasterYSize
     assert vrt_ds.RasterCount == src_ds.RasterCount
     assert vrt_ds.GetGeoTransform() == pytest.approx(src_ds.GetGeoTransform())
-    assert vrt_ds.GetSpatialRef().GetAuthorityCode(
-        None
-    ) == src_ds.GetSpatialRef().GetAuthorityCode(None)
+    assert (
+        vrt_ds.GetSpatialRef().GetAuthorityCode()
+        == src_ds.GetSpatialRef().GetAuthorityCode()
+    )
     for iband in range(1, vrt_ds.RasterCount + 1):
         vrt_band = vrt_ds.GetRasterBand(iband)
         src_band = src_ds.GetRasterBand(iband)
@@ -836,7 +842,7 @@ def test_gti_valid_srs(tmp_path):
     del index_ds
 
     ds = gdal.Open(index_filename)
-    assert ds.GetSpatialRef().GetAuthorityCode(None) == "4267"
+    assert ds.GetSpatialRef().GetAuthorityCode() == "4267"
 
 
 def test_gti_invalid_band_count(tmp_vsimem):
@@ -2160,6 +2166,54 @@ def test_gti_mask_band_explicit(tmp_vsimem):
     assert vrt_ds.GetRasterBand(1).GetMaskBand().ReadRaster() == b"\xff" * (20 * 20)
 
 
+def test_gti_mask_band_overview(tmp_vsimem):
+
+    index_filename = str(tmp_vsimem / "index.gti.gpkg")
+    w = 100
+    h = 100
+
+    with gdal.GetDriverByName("GTiff").Create(
+        tmp_vsimem / "src.tif", w, h, 1
+    ) as src_ds:
+        src_ds.SetGeoTransform([2, 1.0 / w, 0, 49, 0, -1.0 / h])
+        src_ds.GetRasterBand(1).Fill(255)
+        src_ds.CreateMaskBand(gdal.GMF_PER_DATASET)
+        # Mask set in *bottom* part
+        src_ds.GetRasterBand(1).GetMaskBand().WriteRaster(
+            0, h // 2, w, h // 2, b"\xff" * (w * h // 2)
+        )
+
+    with gdal.GetDriverByName("GTiff").Create(
+        tmp_vsimem / "ovr.tif", w // 2, h // 2, 1
+    ) as src_ds:
+        src_ds.SetGeoTransform([2, 2.0 / w, 0, 49, 0, -2.0 / h])
+        src_ds.GetRasterBand(1).Fill(127)
+        src_ds.CreateMaskBand(gdal.GMF_PER_DATASET)
+        # Mask set in *upper* part
+        src_ds.GetRasterBand(1).GetMaskBand().WriteRaster(
+            0, 0, w // 2, h // 4, b"\xff" * (w // 2 * h // 4)
+        )
+
+    index_ds, lyr = create_basic_tileindex(
+        index_filename, gdal.Open(tmp_vsimem / "src.tif")
+    )
+    lyr.SetMetadataItem("OVERVIEW_0_DATASET", str(tmp_vsimem / "ovr.tif"))
+    del index_ds
+
+    vrt_ds = gdal.Open(index_filename)
+    assert vrt_ds.GetRasterBand(1).GetMaskFlags() == gdal.GMF_PER_DATASET
+    assert vrt_ds.GetRasterBand(1).ReadRaster() == b"\xff" * (w * h)
+    assert vrt_ds.GetRasterBand(1).GetMaskBand().ReadRaster() == b"\x00" * (
+        w * h // 2
+    ) + b"\xff" * (w * h // 2)
+    assert vrt_ds.GetRasterBand(1).ReadRaster(0, 0, w, h, w // 2, h // 2) == b"\x7f" * (
+        w // 2 * h // 2
+    )
+    assert vrt_ds.GetRasterBand(1).GetMaskBand().ReadRaster(
+        0, 0, w, h, w // 2, h // 2
+    ) == b"\xff" * (w // 2 * h // 4) + b"\x00" * (w // 2 * h // 4)
+
+
 def test_gti_flushcache(tmp_vsimem):
 
     filename1 = str(tmp_vsimem / "one.tif")
@@ -2273,7 +2327,8 @@ def test_gti_ovr_lyr_name(tmp_vsimem):
         vrt_ds.GetRasterBand(1).GetOverviewCount()
 
 
-def test_gti_ovr_of_ovr(tmp_vsimem):
+@pytest.mark.parametrize("add_factor", [True, False])
+def test_gti_ovr_of_ovr(tmp_vsimem, add_factor):
 
     index_filename = str(tmp_vsimem / "index.gti.gpkg")
 
@@ -2285,19 +2340,22 @@ def test_gti_ovr_of_ovr(tmp_vsimem):
     src_ds = gdal.Open(os.path.join(os.getcwd(), "data", "byte.tif"))
     index_ds, lyr = create_basic_tileindex(index_filename, src_ds)
     lyr.SetMetadataItem("OVERVIEW_0_DATASET", ovr_filename)
+    if add_factor:
+        lyr.SetMetadataItem("OVERVIEW_0_FACTOR", "1")
     del index_ds
 
     vrt_ds = gdal.Open(index_filename)
     ovr_ds = gdal.Open(ovr_filename)
-    assert vrt_ds.GetRasterBand(1).GetOverviewCount() == 2
+    assert vrt_ds.GetRasterBand(1).GetOverviewCount() == (1 if add_factor else 2)
     assert (
         vrt_ds.GetRasterBand(1).GetOverview(0).ReadRaster()
         == ovr_ds.GetRasterBand(1).ReadRaster()
     )
-    assert (
-        vrt_ds.GetRasterBand(1).GetOverview(1).ReadRaster()
-        == ovr_ds.GetRasterBand(1).GetOverview(0).ReadRaster()
-    )
+    if vrt_ds.GetRasterBand(1).GetOverviewCount() == 2:
+        assert (
+            vrt_ds.GetRasterBand(1).GetOverview(1).ReadRaster()
+            == ovr_ds.GetRasterBand(1).GetOverview(0).ReadRaster()
+        )
 
 
 def test_gti_ovr_of_ovr_OVERVIEW_LEVEL_NONE(tmp_vsimem):
@@ -2321,6 +2379,30 @@ def test_gti_ovr_of_ovr_OVERVIEW_LEVEL_NONE(tmp_vsimem):
     assert (
         vrt_ds.GetRasterBand(1).GetOverview(0).ReadRaster()
         == ovr_ds.GetRasterBand(1).ReadRaster()
+    )
+
+
+def test_gti_ovr_factor_on_geotiff(tmp_vsimem):
+
+    index_filename = str(tmp_vsimem / "index.gti.gpkg")
+
+    ovr_filename = str(tmp_vsimem / "byte_ovr.tif")
+    ovr_ds = gdal.Translate(ovr_filename, "data/byte.tif", width=10)
+    ovr_ds.BuildOverviews("NEAR", [2])
+    ovr_ds = None
+
+    src_ds = gdal.Open(os.path.join(os.getcwd(), "data", "byte.tif"))
+    index_ds, lyr = create_basic_tileindex(index_filename, src_ds)
+    lyr.SetMetadataItem("OVERVIEW_0_DATASET", ovr_filename)
+    lyr.SetMetadataItem("OVERVIEW_0_FACTOR", "2")
+    del index_ds
+
+    vrt_ds = gdal.Open(index_filename)
+    ovr_ds = gdal.Open(ovr_filename)
+    assert vrt_ds.GetRasterBand(1).GetOverviewCount() == 1
+    assert (
+        vrt_ds.GetRasterBand(1).GetOverview(0).ReadRaster()
+        == ovr_ds.GetRasterBand(1).GetOverview(0).ReadRaster()
     )
 
 
@@ -2621,6 +2703,18 @@ def test_gti_xml(tmp_vsimem):
     assert vrt_ds.GetRasterBand(1).GetOverview(0).XSize == 10
     del vrt_ds
 
+    xml_content = f"""<GDALTileIndexDataset>
+  <IndexDataset>{index_filename}</IndexDataset>
+      <Overview>
+          <Factor>2</Factor>
+          <Factor>4</Factor>
+      </Overview>
+</GDALTileIndexDataset>"""
+    with pytest.raises(
+        Exception, match="At most one of Factor element is allowed per Overview child"
+    ):
+        gdal.Open(xml_content)
+
     tile_ovr_filename = str(tmp_vsimem / "byte_ovr.tif")
     gdal.Translate(tile_ovr_filename, "data/byte.tif", width=10)
 
@@ -2754,6 +2848,110 @@ def test_gti_xml(tmp_vsimem):
     vrt_ds = gdal.Open(xml_content)
     with pytest.raises(Exception, match="i_do_not_exist"):
         vrt_ds.GetRasterBand(1).GetOverviewCount()
+
+
+@pytest.mark.parametrize("prefix", ["", "GTI:"])
+def test_gti_xml_relative_filename(tmp_vsimem, prefix):
+
+    index_filename = str(tmp_vsimem / "index.gti.gpkg")
+
+    tile_filename = str(tmp_vsimem / "byte.tif")
+    gdal.Translate(tile_filename, "data/byte.tif")
+
+    src_ds = gdal.Open(tile_filename)
+    index_ds, _ = create_basic_tileindex(index_filename, src_ds)
+    del index_ds
+
+    tile_ovr_filename = str(tmp_vsimem / "byte_ovr.tif")
+    gdal.Translate(tile_ovr_filename, "data/byte.tif", width=10)
+    with gdal.Open(tile_ovr_filename) as ds:
+        expected_cs_ovr = ds.GetRasterBand(1).Checksum()
+
+    index2_filename = str(tmp_vsimem / "index2.gti.gpkg")
+    create_basic_tileindex(index2_filename, gdal.Open(tile_ovr_filename))
+
+    xml_filename = str(tmp_vsimem / "index.xml")
+    xml_content = f"""<GDALTileIndexDataset>
+  <IndexDataset>{prefix}index.gti.gpkg</IndexDataset>
+  <Overview>
+      <Dataset>{prefix}index2.gti.gpkg</Dataset>
+  </Overview>
+</GDALTileIndexDataset>"""
+    gdal.FileFromMemBuffer(xml_filename, xml_content)
+
+    gti_ds = gdal.Open(xml_filename)
+    assert gti_ds.GetRasterBand(1).Checksum() == 4672
+    assert gti_ds.GetRasterBand(1).GetOverviewCount() == 1
+    assert gti_ds.GetRasterBand(1).GetOverview(0).Checksum() == expected_cs_ovr
+
+
+@pytest.mark.parametrize("prefix", ["", "GTI:"])
+def test_gti_gpkg_relative_filename(tmp_vsimem, prefix):
+
+    index_filename = str(tmp_vsimem / "index.gti.gpkg")
+
+    tile_filename = str(tmp_vsimem / "byte.tif")
+    gdal.Translate(tile_filename, "data/byte.tif")
+
+    src_ds = gdal.Open(tile_filename)
+    index_ds, _ = create_basic_tileindex(index_filename, src_ds)
+    del index_ds
+
+    gti_ds = gdal.Open(prefix + index_filename)
+    assert gti_ds.GetRasterBand(1).Checksum() == 4672
+
+
+def test_gti_gpkg_overview_relative_filename(tmp_vsimem):
+
+    index_filename = str(tmp_vsimem / "index.gti.gpkg")
+
+    tile_filename = str(tmp_vsimem / "byte.tif")
+    gdal.Translate(tile_filename, "data/byte.tif")
+
+    tile_ovr_filename = str(tmp_vsimem / "byte_ovr.tif")
+    gdal.Translate(tile_ovr_filename, "data/byte.tif", width=10)
+    with gdal.Open(tile_ovr_filename) as ds:
+        expected_cs_ovr = ds.GetRasterBand(1).Checksum()
+
+    src_ds = gdal.Open(tile_filename)
+    index_ds, index_lyr = create_basic_tileindex(index_filename, src_ds)
+    index_lyr.SetMetadataItem("OVERVIEW_0_DATASET", "index2.gti.gpkg")
+    del index_ds
+
+    index2_filename = str(tmp_vsimem / "index2.gti.gpkg")
+    create_basic_tileindex(index2_filename, gdal.Open(tile_ovr_filename))
+
+    gti_ds = gdal.Open(index_filename)
+    assert gti_ds.GetRasterBand(1).Checksum() == 4672
+    assert gti_ds.GetRasterBand(1).GetOverviewCount() == 1
+    assert gti_ds.GetRasterBand(1).GetOverview(0).Checksum() == expected_cs_ovr
+
+
+@pytest.mark.parametrize("prefix", ["", "GTI:"])
+def test_gti_gpkg_overview_absolute_path(tmp_vsimem, prefix):
+
+    index_filename = str(tmp_vsimem / "index.gti.gpkg")
+
+    tile_filename = str(tmp_vsimem / "byte.tif")
+    gdal.Translate(tile_filename, "data/byte.tif")
+
+    tile_ovr_filename = str(tmp_vsimem / "byte_ovr.tif")
+    gdal.Translate(tile_ovr_filename, "data/byte.tif", width=10)
+    with gdal.Open(tile_ovr_filename) as ds:
+        expected_cs_ovr = ds.GetRasterBand(1).Checksum()
+
+    index2_filename = str(tmp_vsimem / "index2.gti.gpkg")
+    create_basic_tileindex(index2_filename, gdal.Open(tile_ovr_filename))
+
+    src_ds = gdal.Open(tile_filename)
+    index_ds, index_lyr = create_basic_tileindex(index_filename, src_ds)
+    index_lyr.SetMetadataItem("OVERVIEW_0_DATASET", prefix + index2_filename)
+    del index_ds
+
+    gti_ds = gdal.Open(index_filename)
+    assert gti_ds.GetRasterBand(1).Checksum() == 4672
+    assert gti_ds.GetRasterBand(1).GetOverviewCount() == 1
+    assert gti_ds.GetRasterBand(1).GetOverview(0).Checksum() == expected_cs_ovr
 
 
 def test_gti_open_options(tmp_vsimem):
@@ -3024,7 +3222,7 @@ def test_gti_stac_geoparquet():
         pytest.skip("cannot open URL")
 
     ds = gdal.Open("GTI:/vsicurl/" + url)
-    assert ds.GetSpatialRef().GetAuthorityCode(None) == "26914"
+    assert ds.GetSpatialRef().GetAuthorityCode() == "26914"
     assert ds.GetGeoTransform() == pytest.approx(
         (408231.0, 1.0, 0.0, 3873862.0, 0.0, -1.0), rel=1e-5
     )
@@ -3069,7 +3267,7 @@ def test_gti_stac_geoparquet_sentinel2(filename):
         ds = gdal.Open(f"GTI:data/gti/{filename}")
     assert ds.RasterXSize == 5556
     assert ds.RasterYSize == 5540
-    assert ds.GetSpatialRef().GetAuthorityCode(None) == "32612"
+    assert ds.GetSpatialRef().GetAuthorityCode() == "32612"
     assert ds.GetGeoTransform() == pytest.approx(
         (398760.0, 20.0, 0.0, 3900560.0, 0.0, -20.0), rel=1e-5
     )
@@ -3360,3 +3558,136 @@ def test_gti_band_interleave_rgba(tmp_vsimem):
     assert ds.ReadRaster(band_list=[4, 3, 2, 1]) == src_ds.ReadRaster(
         band_list=[4, 3, 2, 1]
     )
+
+
+###############################################################################
+
+
+def test_gti_srs_metadata_spatial_filter(tmp_vsimem):
+    """When output SRS differs from the index layer SRS (via SRS layer metadata),
+    spatial filters applied during raster reads must be transformed into the
+    layer's native CRS before querying the index.
+
+    byte.tif is EPSG:26711 (UTM zone 11N). Setting SRS=EPSG:3857 with
+    SRS_BEHAVIOR=REPROJECT creates a warped layer: without it,
+    SetSpatialFilterRect receives EPSG:3857 coordinates but applies them
+    directly to the UTM index layer, which finds no matching tiles and returns
+    an all-zero raster.
+    """
+    index_filename = str(tmp_vsimem / "index.gti.gpkg")
+
+    src_ds = gdal.Open(os.path.join(os.getcwd(), "data", "byte.tif"))
+    index_ds, lyr = create_basic_tileindex(index_filename, src_ds)
+    lyr.SetMetadataItem("SRS", "EPSG:3857")
+    lyr.SetMetadataItem("SRS_BEHAVIOR", "REPROJECT")
+    del index_ds
+
+    ds = gdal.Open(index_filename)
+    assert ds.GetSpatialRef().GetAuthorityCode() == "3857"
+
+    assert ds.GetRasterBand(1).Checksum() != 0
+
+
+###############################################################################
+
+
+def test_gti_srs_open_option_spatial_filter(tmp_vsimem):
+    """SRS specified via open option with SRS_BEHAVIOR=REPROJECT must create a
+    warped layer so that spatial filters during raster reads are correctly
+    transformed.
+
+    This exercises the same code path as test_gti_srs_metadata_spatial_filter
+    but uses open options instead of layer metadata, and also covers the
+    destructor fix: when a warped layer wraps the index layer, the destructor
+    must not pass the wrapper to ReleaseResultSet.
+    """
+    index_filename = str(tmp_vsimem / "index.gti.gpkg")
+
+    src_ds = gdal.Open(os.path.join(os.getcwd(), "data", "byte.tif"))
+    index_ds, _ = create_basic_tileindex(index_filename, src_ds)
+    del index_ds
+
+    ds = gdal.OpenEx(
+        index_filename, open_options=["SRS=EPSG:3857", "SRS_BEHAVIOR=REPROJECT"]
+    )
+    assert ds is not None
+    assert ds.GetSpatialRef().GetAuthorityCode() == "3857"
+    assert ds.GetRasterBand(1).Checksum() != 0
+
+
+###############################################################################
+
+
+def test_gti_srs_behavior_invalid(tmp_vsimem):
+    """SRS_BEHAVIOR with an unrecognized value must fail with a clear error."""
+
+    index_filename = str(tmp_vsimem / "index.gti.gpkg")
+
+    src_ds = gdal.Open(os.path.join(os.getcwd(), "data", "byte.tif"))
+    index_ds, _ = create_basic_tileindex(index_filename, src_ds)
+    del index_ds
+
+    with pytest.raises(Exception, match="Invalid value for SRS_BEHAVIOR"):
+        gdal.OpenEx(
+            index_filename, open_options=["SRS=EPSG:3857", "SRS_BEHAVIOR=INVALID"]
+        )
+
+
+###############################################################################
+
+
+def test_gti_srs_mismatch_no_behavior_warns(tmp_vsimem):
+    """SRS set to a different CRS than the layer's CRS without SRS_BEHAVIOR
+    must emit a warning directing the user to set SRS_BEHAVIOR."""
+
+    index_filename = str(tmp_vsimem / "index.gti.gpkg")
+
+    src_ds = gdal.Open(os.path.join(os.getcwd(), "data", "byte.tif"))
+    index_ds, _ = create_basic_tileindex(index_filename, src_ds)
+    del index_ds
+
+    with gdaltest.error_raised(gdal.CE_Warning, match="SRS_BEHAVIOR"):
+        ds = gdal.OpenEx(index_filename, open_options=["SRS=EPSG:3857"])
+    assert ds is not None
+    assert ds.GetSpatialRef().GetAuthorityCode() == "3857"
+
+
+###############################################################################
+
+
+def test_gti_srs_behavior_override(tmp_vsimem):
+    """SRS_BEHAVIOR=OVERRIDE must apply the specified SRS without creating a
+    warped layer, so the dataset SRS is updated but no reprojection occurs."""
+
+    index_filename = str(tmp_vsimem / "index.gti.gpkg")
+
+    src_ds = gdal.Open(os.path.join(os.getcwd(), "data", "byte.tif"))
+    index_ds, _ = create_basic_tileindex(index_filename, src_ds)
+    del index_ds
+
+    with gdaltest.error_raised(gdal.CE_None):
+        ds = gdal.OpenEx(
+            index_filename, open_options=["SRS=EPSG:3857", "SRS_BEHAVIOR=OVERRIDE"]
+        )
+    assert ds is not None
+    assert ds.GetSpatialRef().GetAuthorityCode() == "3857"
+
+
+###############################################################################
+
+
+def test_gti_srs_no_layer_srs_silent(tmp_vsimem):
+    """SRS specified via open option when the tile index layer has no SRS must
+    be applied silently without any warning."""
+
+    index_filename = str(tmp_vsimem / "index.gti.gpkg")
+
+    src_ds = gdal.Open(os.path.join(os.getcwd(), "data", "byte.tif"))
+    # Create tile index with no SRS on the layer
+    index_ds, _ = create_basic_tileindex(index_filename, src_ds, lyr_srs=None)
+    del index_ds
+
+    with gdaltest.error_raised(gdal.CE_None):
+        ds = gdal.OpenEx(index_filename, open_options=["SRS=EPSG:3857"])
+    assert ds is not None
+    assert ds.GetSpatialRef().GetAuthorityCode() == "3857"

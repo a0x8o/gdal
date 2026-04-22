@@ -15,7 +15,7 @@ import math
 
 import pytest
 
-from osgeo import gdal
+from osgeo import gdal, osr
 
 
 def get_alg():
@@ -210,7 +210,7 @@ def test_gdalalg_raster_create_full():
     assert (
         ds.GetRasterBand(2).ReadRaster(0, 0, 1, 1, buf_type=gdal.GDT_UInt8) == b"\xfe"
     )
-    assert ds.GetSpatialRef().GetAuthorityCode(None) == "4326"
+    assert ds.GetSpatialRef().GetAuthorityCode() == "4326"
     assert ds.GetGeoTransform() == (2.0, 0.5, 0.0, 50.0, 0.0, -0.25)
     assert ds.GetMetadataItem("key") == "value"
 
@@ -234,7 +234,7 @@ def test_gdalalg_raster_create_copy():
     assert (
         ds.GetRasterBand(2).ReadRaster(0, 0, 1, 1, buf_type=gdal.GDT_UInt8) == b"\x00"
     )
-    assert ds.GetSpatialRef().GetAuthorityCode(None) == "4326"
+    assert ds.GetSpatialRef().GetAuthorityCode() == "4326"
     assert ds.GetGeoTransform() == (2.0, 0.5, 0.0, 50.0, 0.0, -0.25)
     assert ds.GetMetadataItem("key") is None
     assert ds.GetRasterBand(1).GetMetadataItem("foo") is None
@@ -250,7 +250,7 @@ def test_gdalalg_raster_create_copy_metadata_missing_input():
     alg["size"] = [1, 1]
     with pytest.raises(
         Exception,
-        match="Argument 'copy-metadata' can only be set when an input dataset is set",
+        match="Argument 'copy-metadata' depends on argument 'input' that has not been specified.",
     ):
         alg.Run()
 
@@ -277,7 +277,7 @@ def test_gdalalg_raster_create_copy_overviews_missing_input():
     alg["size"] = [1, 1]
     with pytest.raises(
         Exception,
-        match="Argument 'copy-overviews' can only be set when an input dataset is set",
+        match="Argument 'copy-overviews' depends on argument 'input' that has not been specified.",
     ):
         alg.Run()
 
@@ -409,7 +409,7 @@ def test_gdalalg_raster_create_copy_override_crs():
     alg["crs"] = "EPSG:32631"
     assert alg.Run()
     ds = alg["output"].GetDataset()
-    assert ds.GetSpatialRef().GetAuthorityCode(None) == "32631"
+    assert ds.GetSpatialRef().GetAuthorityCode() == "32631"
 
 
 def test_gdalalg_raster_create_copy_override_bbox():
@@ -564,3 +564,55 @@ def test_gdalalg_raster_create_like_not_positional(tmp_vsimem):
         "Positional values starting at '/vsimem/test_gdalalg_raster_create_like_not_positional/out.tif' are not expected"
         in err
     )
+
+
+@pytest.mark.parametrize(
+    "blockxsize,blockysize,output_format,expected_blockxsize,expected_blockysize,creation_option",
+    [
+        (16, 32, "GTiff", 16, 32, []),
+        (128, 128, "COG", 128, 128, []),
+        (512, 512, "GPKG", 512, 512, []),
+        (16, 32, "GTiff", 1000, 8, ["TILED=NO"]),
+        (128, 128, "COG", 256, 256, ["BLOCKSIZE=256"]),
+        (512, 512, "GPKG", 256, 256, ["BLOCKSIZE=256"]),
+        (16, 32, "GPKG", 256, 256, []),
+    ],
+)
+def test_gdalalg_raster_create_replicate_tiling(
+    tmp_vsimem,
+    blockxsize,
+    blockysize,
+    output_format,
+    expected_blockxsize,
+    expected_blockysize,
+    creation_option,
+):
+
+    if gdal.GetDriverByName(output_format) is None:
+        pytest.skip(f"{output_format} not available")
+
+    with gdal.GetDriverByName("GTIFF").Create(
+        tmp_vsimem / "src.tif",
+        1000,
+        1000,
+        1,
+        options=["TILED=YES", f"BLOCKXSIZE={blockxsize}", f"BLOCKYSIZE={blockysize}"],
+    ) as ds:
+        ds.SetGeoTransform([2, 1, 0, 49, 0, -1])
+        ds.SetSpatialRef(osr.SpatialReference(epsg=4326))
+
+    out_filename = str(tmp_vsimem / "out") + (
+        ".gpkg" if output_format == "GPKG" else ".tif"
+    )
+    gdal.alg.raster.create(
+        input=tmp_vsimem / "src.tif",
+        output=out_filename,
+        output_format=output_format,
+        creation_option=creation_option,
+    )
+
+    ds = gdal.Open(out_filename)
+    assert ds.GetRasterBand(1).GetBlockSize() == [
+        expected_blockxsize,
+        expected_blockysize,
+    ]

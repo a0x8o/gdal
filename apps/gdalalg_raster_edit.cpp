@@ -54,13 +54,15 @@ GDALRasterEditAlgorithm::GDALRasterEditAlgorithm(bool standaloneStep)
                _("Dataset (to be updated in-place, unless --auxiliary)"),
                &m_dataset, GDAL_OF_RASTER | GDAL_OF_UPDATE)
             .SetPositional()
-            .SetRequired();
-        AddOpenOptionsArg(&m_openOptions);
+            .SetRequired()
+            .SetAvailableInPipelineStep(false);
+        AddOpenOptionsArg(&m_openOptions).SetAvailableInPipelineStep(false);
         AddArg("auxiliary", 0,
                _("Ask for an auxiliary .aux.xml file to be edited"),
                &m_readOnly)
             .AddHiddenAlias("ro")
-            .AddHiddenAlias(GDAL_ARG_NAME_READ_ONLY);
+            .AddHiddenAlias(GDAL_ARG_NAME_READ_ONLY)
+            .SetAvailableInPipelineStep(false);
     }
     else
     {
@@ -314,6 +316,7 @@ bool GDALRasterEditAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
     GDALDataset *poDS = m_dataset.GetDatasetRef();
     if (poDS)
     {
+        // Standalone mode
         if (poDS->GetAccess() != GA_Update && !m_readOnly)
         {
             ReportError(CE_Failure, CPLE_AppDefined,
@@ -324,21 +327,35 @@ bool GDALRasterEditAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
     }
     else
     {
+        // Pipeline mode
         const auto poSrcDS = m_inputDataset[0].GetDatasetRef();
         CPLAssert(poSrcDS);
         CPLAssert(m_outputDataset.GetName().empty());
         CPLAssert(!m_outputDataset.GetDatasetRef());
-
-        CPLStringList aosOptions;
-        aosOptions.push_back("-of");
-        aosOptions.push_back("VRT");
-        GDALTranslateOptions *psOptions =
-            GDALTranslateOptionsNew(aosOptions.List(), nullptr);
-        GDALDatasetH hSrcDS = GDALDataset::ToHandle(poSrcDS);
-        auto poRetDS = GDALDataset::FromHandle(
-            GDALTranslate("", hSrcDS, psOptions, nullptr));
-        GDALTranslateOptionsFree(psOptions);
-        m_outputDataset.Set(std::unique_ptr<GDALDataset>(poRetDS));
+        auto poDriver = poSrcDS->GetDriver();
+        if (poDriver && EQUAL(poDriver->GetDescription(), "VRT") &&
+            poSrcDS->GetDescription()[0] == '\0')
+        {
+            // We can directly edit an anonymous input VRT file
+            // and we actually need to do that since the generic code path
+            // in the other branch will try to serialize and deserialize a XML
+            // file pointing to an anonymous source.
+            m_outputDataset.Set(poSrcDS);
+        }
+        else
+        {
+            // Create a in-memory VRT to avoid modifying the source dataset.
+            CPLStringList aosOptions;
+            aosOptions.push_back("-of");
+            aosOptions.push_back("VRT");
+            GDALTranslateOptions *psOptions =
+                GDALTranslateOptionsNew(aosOptions.List(), nullptr);
+            GDALDatasetH hSrcDS = GDALDataset::ToHandle(poSrcDS);
+            auto poRetDS = GDALDataset::FromHandle(
+                GDALTranslate("", hSrcDS, psOptions, nullptr));
+            GDALTranslateOptionsFree(psOptions);
+            m_outputDataset.Set(std::unique_ptr<GDALDataset>(poRetDS));
+        }
         poDS = m_outputDataset.GetDatasetRef();
     }
 

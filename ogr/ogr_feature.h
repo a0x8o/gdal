@@ -338,7 +338,7 @@ class CPL_DLL OGRGeomFieldDefn
     char *pszName = nullptr;
     OGRwkbGeometryType eGeomType =
         wkbUnknown; /* all values possible except wkbNone */
-    mutable const OGRSpatialReference *poSRS = nullptr;
+    mutable OGRSpatialReferenceRefCountedPtr poSRS = nullptr;
 
     int bIgnore = false;
     mutable int bNullable = true;
@@ -381,6 +381,7 @@ class CPL_DLL OGRGeomFieldDefn
 
     virtual const OGRSpatialReference *GetSpatialRef() const;
     void SetSpatialRef(const OGRSpatialReference *poSRSIn);
+    void SetSpatialRef(OGRSpatialReferenceRefCountedPtr poSRSIn);
 
     int IsIgnored() const
     {
@@ -456,6 +457,13 @@ class CPL_DLL OGRGeomFieldDefn
     /*! @endcond */
 
     TemporaryUnsealer GetTemporaryUnsealer();
+
+  private:
+    OGRSpatialReferenceRefCountedPtr &GetRefCountedSRS() const
+    {
+        GetSpatialRef();
+        return poSRS;
+    }
 };
 
 #ifdef GDAL_COMPILATION
@@ -559,22 +567,36 @@ class CPL_DLL OGRFeatureDefn
         {
           private:
             OwnerT m_poFDefn;
+            const int m_nFieldCount;
             int m_nIdx;
+            ChildT m_curValue{};
 
           public:
             inline Iterator(OwnerT poFDefn, int nIdx)
-                : m_poFDefn(poFDefn), m_nIdx(nIdx)
+                : m_poFDefn(poFDefn), m_nFieldCount(poFDefn->GetFieldCount()),
+                  m_nIdx(nIdx)
             {
+                if (m_nIdx < m_nFieldCount)
+                    m_curValue = m_poFDefn->GetFieldDefn(m_nIdx);
             }
 
-            inline ChildT operator*() const
+            inline const ChildT &operator*() const
             {
-                return m_poFDefn->GetFieldDefn(m_nIdx);
+                return m_curValue;
+            }
+
+            inline ChildT &operator*()
+            {
+                return m_curValue;
             }
 
             inline Iterator &operator++()
             {
                 m_nIdx++;
+                if (m_nIdx < m_nFieldCount)
+                    m_curValue = m_poFDefn->GetFieldDefn(m_nIdx);
+                else
+                    m_curValue = nullptr;
                 return *this;
             }
 
@@ -584,12 +606,12 @@ class CPL_DLL OGRFeatureDefn
             }
         };
 
-        inline Iterator begin()
+        inline Iterator begin() const
         {
             return Iterator(m_poFDefn, 0);
         }
 
-        inline Iterator end()
+        inline Iterator end() const
         {
             return Iterator(m_poFDefn, m_poFDefn->GetFieldCount());
         }
@@ -929,7 +951,6 @@ class CPL_DLL OGRFeatureDefn
     CPL_DISALLOW_COPY_ASSIGN(OGRFeatureDefn)
 };
 
-#ifdef GDAL_COMPILATION
 /*! @cond Doxygen_Suppress */
 
 #include "ogr_refcountedptr.h"
@@ -972,7 +993,6 @@ struct OGRRefCountedPtr<OGRFeatureDefn>
 using OGRFeatureDefnRefCountedPtr = OGRRefCountedPtr<OGRFeatureDefn>;
 
 /*! @endcond */
-#endif
 
 #ifdef GDAL_COMPILATION
 /** Return an object that temporary unseals the OGRFeatureDefn
@@ -1000,6 +1020,13 @@ inline OGRFeatureDefn::TemporaryUnsealer whileUnsealing(OGRFeatureDefn *object,
 {
     return object->GetTemporaryUnsealer(bSealFields);
 }
+
+inline OGRFeatureDefn::TemporaryUnsealer
+whileUnsealing(OGRFeatureDefnRefCountedPtr &object, bool bSealFields = true)
+{
+    return object->GetTemporaryUnsealer(bSealFields);
+}
+
 #endif
 
 /************************************************************************/

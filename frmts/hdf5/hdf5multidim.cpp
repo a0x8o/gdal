@@ -9,6 +9,10 @@
  * SPDX-License-Identifier: MIT
  ****************************************************************************/
 
+#ifdef _POSIX_C_SOURCE
+#undef _POSIX_C_SOURCE
+#endif
+
 #include "hdf5dataset.h"
 #include "hdf5eosparser.h"
 #include "s100.h"
@@ -1712,7 +1716,7 @@ void HDF5Array::InstantiateDimensions(const std::string &osParentName,
                         poRootGroup->OpenDimensionFromFullname(osDimFullName);
                     if (poDim)
                     {
-                        oMapFullNameToDim[osDimFullName] = poDim;
+                        oMapFullNameToDim[osDimFullName] = std::move(poDim);
                     }
                 }
             }

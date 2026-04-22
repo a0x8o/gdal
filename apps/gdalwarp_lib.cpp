@@ -3407,7 +3407,8 @@ static bool ValidateCutline(const OGRGeometry *poGeom, bool bVerbose)
     }
     else if (eType == wkbPolygon)
     {
-        if (OGRGeometryFactory::haveGEOS() && !poGeom->IsValid())
+        std::string osReason;
+        if (OGRGeometryFactory::haveGEOS() && !poGeom->IsValid(&osReason))
         {
             if (!bVerbose)
                 return false;
@@ -3433,12 +3434,14 @@ static bool ValidateCutline(const OGRGeometry *poGeom, bool bVerbose)
 
             if (CPLTestBool(
                     CPLGetConfigOption("GDALWARP_IGNORE_BAD_CUTLINE", "NO")))
+            {
                 CPLError(CE_Warning, CPLE_AppDefined,
-                         "Cutline polygon is invalid.");
+                         "Cutline polygon is invalid: %s.", osReason.c_str());
+            }
             else
             {
                 CPLError(CE_Failure, CPLE_AppDefined,
-                         "Cutline polygon is invalid.");
+                         "Cutline polygon is invalid: %s.", osReason.c_str());
                 return false;
             }
         }
@@ -4393,7 +4396,7 @@ static GDALDatasetH GDALWarpCreateOutput(
                     oSrcSRS.DemoteTo2D(nullptr) == OGRERR_NONE &&
                     oDstSRS.DemoteTo2D(nullptr) == OGRERR_NONE)
                 {
-                    bIsSameHorizontal = oSrcSRS.IsSame(&oDstSRS);
+                    bIsSameHorizontal = CPL_TO_BOOL(oSrcSRS.IsSame(&oDstSRS));
                 }
             }
             if (bIsSameHorizontal)
