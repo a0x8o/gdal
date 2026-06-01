@@ -1,5 +1,7 @@
 .. _gdal_raster_as_features:
 
+.. program:: gdal_raster_as_features
+
 ================================================================================
 ``gdal raster as-features``
 ================================================================================
@@ -24,7 +26,7 @@ Description
 Features may be created as polygons, points, or with no geometry at all.
 Unlike :ref:`gdal_raster_polygonize`, adjacent pixels having the same values are not combined.
 
-This algorithm can be part of a :ref:`gdal_pipeline` or :ref:`gdal_raster_pipeline`.
+This algorithm can be part of a :ref:`gdal_pipeline`.
 
 Program-Specific Options
 ------------------------

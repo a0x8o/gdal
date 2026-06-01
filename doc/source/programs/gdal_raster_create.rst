@@ -1,5 +1,7 @@
 .. _gdal_raster_create:
 
+.. program:: gdal_raster_create
+
 ================================================================================
 ``gdal raster create``
 ================================================================================
@@ -84,7 +86,7 @@ Program-Specific Options
 
     Note that the spatial extent is also left unchanged.
 
-.. option:: --like, --like <DATASET>
+.. option:: -i, --like, --input <TEMPLATE-DATASET>
 
     Name of GDAL input dataset that serves as a template for default values of
     options :option:`--size`, :option:`--band-count`, :option:`--datatype`,
@@ -93,7 +95,7 @@ Program-Specific Options
 
     Since GDAL 3.13, if the input dataset is tiled, and for output formats
     ``GTiff``, ``COG`` and ``GPKG``, its tile dimensions are replicated to
-    the output file, when they are compatible of its capabilities, and if the
+    the output file, when they are compatible with its capabilities, and if the
     user hasn't specified any creation option related to tiling.
 
 .. option:: --metadata <KEY>=<VALUE>

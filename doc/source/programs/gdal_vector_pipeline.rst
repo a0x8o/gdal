@@ -1,5 +1,7 @@
 .. _gdal_vector_pipeline:
 
+.. program:: gdal_vector_pipeline
+
 ================================================================================
 ``gdal vector pipeline``
 ================================================================================
@@ -37,139 +39,130 @@ own positional or non-positional arguments.
 Apart from ``read``, ``concat``, ``info``, ``partition`` and ``write``,
 all other steps can potentially be used several times in a pipeline.
 
-Potential steps are:
+Steps
+-----
+.. rst-class:: steps-toc
 
-* read
+.. contents::
+    :local:
+    :depth: 1
 
-.. program-output:: gdal vector pipeline --help-doc=read
-
-Details for options can be found in :ref:`gdal_vector_read`.
-
-* buffer
+buffer
+******
 
 .. program-output:: gdal vector pipeline --help-doc=buffer
 
 Details for options can be found in :ref:`gdal_vector_buffer`.
 
-* concat
+check-coverage
+**************
 
-.. program-output:: gdal vector pipeline --help-doc=concat
+.. program-output:: gdal vector pipeline --help-doc=check-coverage
 
-Details for options can be found in :ref:`gdal_vector_concat`.
+Details for options can be found in :ref:`gdal_vector_check_coverage`.
 
-* clip
+check-geometry
+**************
+
+.. program-output:: gdal vector pipeline --help-doc=check-geometry
+
+Details for options can be found in :ref:`gdal_vector_check_geometry`.
+
+clean-coverage
+**************
+
+.. program-output:: gdal vector pipeline --help-doc=clean-coverage
+
+Details for options can be found in :ref:`gdal_vector_clean_coverage`.
+
+clip
+****
 
 .. program-output:: gdal vector pipeline --help-doc=clip
 
 Details for options can be found in :ref:`gdal_vector_clip`.
 
-* create
+combine
+*******
+
+.. program-output:: gdal vector pipeline --help-doc=combine
+
+Details for options can be found in :ref:`gdal_vector_combine`.
+
+concave-hull
+************
+
+.. program-output:: gdal vector pipeline --help-doc=concave-hull
+
+Details for options can be found in :ref:`gdal_vector_concave_hull`.
+
+concat
+******
+
+.. program-output:: gdal vector pipeline --help-doc=concat
+
+Details for options can be found in :ref:`gdal_vector_concat`.
+
+convex-hull
+***********
+
+.. program-output:: gdal vector pipeline --help-doc=convex-hull
+
+Details for options can be found in :ref:`gdal_vector_convex_hull`.
+
+create
+******
 
 .. program-output:: gdal vector pipeline --help-doc=create
 
 Details for options can be found in :ref:`gdal_vector_create`.
 
-* edit
+dissolve
+********
+
+.. program-output:: gdal vector pipeline --help-doc=dissolve
+
+Details for options can be found in :ref:`gdal_vector_dissolve`.
+
+edit
+****
 
 .. program-output:: gdal vector pipeline --help-doc=edit
 
 Details for options can be found in :ref:`gdal_vector_edit`.
 
-* explode-collections
+explode-collections
+*******************
 
 .. program-output:: gdal vector pipeline --help-doc=explode-collections
 
 Details for options can be found in :ref:`gdal_vector_explode_collections`.
 
-* filter
+export-schema
+*************
+
+.. versionadded:: 3.12
+
+.. program-output:: gdal vector pipeline --help-doc=export-schema
+
+Details for options can be found in :ref:`gdal_vector_export_schema`.
+
+external
+********
+
+.. program-output:: gdal vector pipeline --help-doc=external
+
+Details for options can be found in :ref:`gdal_external`.
+
+filter
+******
 
 .. program-output:: gdal vector pipeline --help-doc=filter
 
 Details for options can be found in :ref:`gdal_vector_filter`.
 
-* limit
-
-.. program-output:: gdal vector pipeline --help-doc=limit
-
-* make-valid
-
-.. program-output:: gdal vector pipeline --help-doc=make-valid
-
-Details for options can be found in :ref:`gdal_vector_make_valid`.
-
-* materialize
-
-.. program-output:: gdal vector pipeline --help-doc=materialize
-
-Details for options can be found in :ref:`gdal_vector_materialize`.
-
-* rename-layer
-
-.. program-output:: gdal vector pipeline --help-doc=rename-layer
-
-Details for options can be found in :ref:`gdal_vector_rename_layer`.
-
-* reproject
-
-.. program-output:: gdal vector pipeline --help-doc=reproject
-
-Details for options can be found in :ref:`gdal_vector_reproject`.
-
-* segmentize
-
-.. program-output:: gdal vector pipeline --help-doc=segmentize
-
-Details for options can be found in :ref:`gdal_vector_segmentize`.
-
-* select
-
-.. program-output:: gdal vector pipeline --help-doc=select
-
-Details for options can be found in :ref:`gdal_vector_select`.
-
-* set-field-type
-
-.. program-output:: gdal vector pipeline --help-doc=set-field-type
-
-Details for options can be found in :ref:`gdal_vector_set_field_type`.
-
-* set-geom-type
-
-.. program-output:: gdal vector pipeline --help-doc=set-geom-type
-
-Details for options can be found in :ref:`gdal_vector_set_geom_type`.
-
-* simplify
-
-.. program-output:: gdal vector pipeline --help-doc=simplify
-
-Details for options can be found in :ref:`gdal_vector_simplify`.
-
-* simplify-coverage
-
-.. program-output:: gdal vector pipeline --help-doc=simplify-coverage
-
-Details for options can be found in :ref:`gdal_vector_simplify_coverage`.
-
-* sql
-
-.. program-output:: gdal vector pipeline --help-doc=sql
-
-Details for options can be found in :ref:`gdal_vector_sql`.
-
-* update
-
-.. program-output:: gdal vector pipeline --help-doc=update
-
-Details for options can be found in :ref:`gdal_vector_update`.
-
-* swap-xy
-
-.. program-output:: gdal vector pipeline --help-doc=swap-xy
-
-Details for options can be found in :ref:`gdal_vector_swap_xy`.
-
-* info
+info
+****
 
 .. versionadded:: 3.12
 
@@ -177,7 +170,34 @@ Details for options can be found in :ref:`gdal_vector_swap_xy`.
 
 Details for options can be found in :ref:`gdal_vector_info`.
 
-* partition
+limit
+*****
+
+.. program-output:: gdal vector pipeline --help-doc=limit
+
+make-point
+**********
+
+.. program-output:: gdal vector pipeline --help-doc=make-point
+
+Details for options can be found in :ref:`gdal_vector_make_point`.
+
+make-valid
+**********
+
+.. program-output:: gdal vector pipeline --help-doc=make-valid
+
+Details for options can be found in :ref:`gdal_vector_make_valid`.
+
+materialize
+***********
+
+.. program-output:: gdal vector pipeline --help-doc=materialize
+
+Details for options can be found in :ref:`gdal_vector_materialize`.
+
+partition
+*********
 
 .. versionadded:: 3.12
 
@@ -185,7 +205,106 @@ Details for options can be found in :ref:`gdal_vector_info`.
 
 Details for options can be found in :ref:`gdal_vector_partition`.
 
-* write
+read
+****
+
+.. program-output:: gdal vector pipeline --help-doc=read
+
+Details for options can be found in :ref:`gdal_vector_read`.
+
+rename-layer
+************
+
+.. program-output:: gdal vector pipeline --help-doc=rename-layer
+
+Details for options can be found in :ref:`gdal_vector_rename_layer`.
+
+reproject
+*********
+
+.. program-output:: gdal vector pipeline --help-doc=reproject
+
+Details for options can be found in :ref:`gdal_vector_reproject`.
+
+segmentize
+**********
+
+.. program-output:: gdal vector pipeline --help-doc=segmentize
+
+Details for options can be found in :ref:`gdal_vector_segmentize`.
+
+select
+******
+
+.. program-output:: gdal vector pipeline --help-doc=select
+
+Details for options can be found in :ref:`gdal_vector_select`.
+
+set-field-type
+**************
+
+.. program-output:: gdal vector pipeline --help-doc=set-field-type
+
+Details for options can be found in :ref:`gdal_vector_set_field_type`.
+
+set-geom-type
+*************
+
+.. program-output:: gdal vector pipeline --help-doc=set-geom-type
+
+Details for options can be found in :ref:`gdal_vector_set_geom_type`.
+
+simplify
+********
+
+.. program-output:: gdal vector pipeline --help-doc=simplify
+
+Details for options can be found in :ref:`gdal_vector_simplify`.
+
+simplify-coverage
+*****************
+
+.. program-output:: gdal vector pipeline --help-doc=simplify-coverage
+
+Details for options can be found in :ref:`gdal_vector_simplify_coverage`.
+
+sort
+****
+
+.. program-output:: gdal vector pipeline --help-doc=sort
+
+Details for options can be found in :ref:`gdal_vector_sort`.
+
+sql
+***
+
+.. program-output:: gdal vector pipeline --help-doc=sql
+
+Details for options can be found in :ref:`gdal_vector_sql`.
+
+swap-xy
+*******
+
+.. program-output:: gdal vector pipeline --help-doc=swap-xy
+
+Details for options can be found in :ref:`gdal_vector_swap_xy`.
+
+tee
+***
+
+.. program-output:: gdal vector pipeline --help-doc=tee
+
+Details for options can be found in :ref:`gdal_output_nested_pipeline`.
+
+update
+******
+
+.. program-output:: gdal vector pipeline --help-doc=update
+
+Details for options can be found in :ref:`gdal_vector_update`.
+
+write
+*****
 
 .. program-output:: gdal vector pipeline --help-doc=write
 
@@ -207,7 +326,7 @@ line without the final ``write`` step, and is what is generated by
 
     {
         "type": "gdal_streamed_alg",
-        "command_line": "gdal vector pipeline ! read in.gpkg ! reproject --dst-crs=EPSG:32632"
+        "command_line": "gdal vector pipeline ! read in.gpkg ! reproject --output-crs=EPSG:32632"
     }
 
 The final ``write`` step can be added but if so it must explicitly specify the
@@ -217,7 +336,7 @@ The final ``write`` step can be added but if so it must explicitly specify the
 
     {
         "type": "gdal_streamed_alg",
-        "command_line": "gdal vector pipeline ! read in.gpkg ! reproject --dst-crs=EPSG:32632 ! write --output-format=streamed streamed_dataset"
+        "command_line": "gdal vector pipeline ! read in.gpkg ! reproject --output-crs=EPSG:32632 ! write --output-format=streamed streamed_dataset"
     }
 
 
@@ -257,14 +376,14 @@ Examples
 
    .. code-block:: bash
 
-        $ gdal vector pipeline ! read in.gpkg ! reproject --dst-crs=EPSG:32632 ! write out.gpkg --overwrite
+        $ gdal vector pipeline ! read in.gpkg ! reproject --output-crs=EPSG:32632 ! write out.gpkg --overwrite
 
 .. example::
    :title: Serialize the command of a reprojection of a GeoPackage file in a GDALG file, and later read it
 
    .. code-block:: bash
 
-        $ gdal vector pipeline ! read in.gpkg ! reproject --dst-crs=EPSG:32632 ! write in_epsg_32632.gdalg.json --overwrite
+        $ gdal vector pipeline ! read in.gpkg ! reproject --output-crs=EPSG:32632 ! write in_epsg_32632.gdalg.json --overwrite
         $ gdal vector info in_epsg_32632.gdalg.json
 
 .. example::
@@ -272,8 +391,7 @@ Examples
 
    .. code-block:: bash
 
-        $ gdal vector pipeline ! concat --single --dst-crs=EPSG:32632 france.shp belgium.shp ! filter --where "pop > 1e6" ! write out.gpkg --overwrite
-
+        $ gdal vector pipeline ! concat --single --output-crs=EPSG:32632 france.shp belgium.shp ! filter --where "pop > 1e6" ! write out.gpkg --overwrite
 
 .. example::
    :title: Filter and reproject a GeoPackage layer to a GeoJSON file
@@ -302,7 +420,7 @@ Examples
             ! read natural_earth_vector.gpkg --layer ne_110m_populated_places_simple \
             ! filter --where "worldcity = 1" \
             ! select --fields "_ogr_geometry_,name" \
-            ! reproject --dst-crs=ESRI:53009 \
+            ! reproject --output-crs=ESRI:53009 \
             ! write worldcity_53009.geojson --overwrite
 
       .. code-tab:: ps1
@@ -311,7 +429,7 @@ Examples
             ! read natural_earth_vector.gpkg --layer ne_110m_populated_places_simple `
             ! filter --where "worldcity = 1" `
             ! select --fields "_ogr_geometry_,name" `
-            ! reproject --dst-crs=ESRI:53009 `
+            ! reproject --output-crs=ESRI:53009 `
             ! write worldcity_53009.geojson --overwrite
 
 .. only:: html
@@ -329,3 +447,42 @@ Examples
 .. only:: not html
 
    .. image:: ../../images/programs/gdal_pipeline_vector_example.svg
+
+.. example::
+   :title: Clip a vector layer using a nested pipeline as the clipping source
+
+   .. tabs::
+
+      .. code-tab:: bash
+
+       gdal vector pipeline \
+        ! read natural_earth_vector.gpkg --layer "ne_10m_rivers_europe" \
+        ! reproject --output-crs="EPSG:3844" \
+        ! clip --like [ read natural_earth_vector.gpkg --layer "ne_50m_admin_0_countries" ! filter --where "ADMIN='Romania'" ! reproject --output-crs="EPSG:3844" ] \
+        ! set-geom-type --geometry-type="MULTILINESTRING" \
+        ! write romania-rivers.gpkg --overwrite
+
+      .. code-tab:: ps1
+
+       gdal vector pipeline `
+        ! read natural_earth_vector.gpkg --layer "ne_10m_rivers_europe" `
+        ! reproject --output-crs="EPSG:3844" `
+        ! clip --like [ read natural_earth_vector.gpkg --layer "ne_50m_admin_0_countries" ! filter --where "ADMIN='Romania'" ! reproject --output-crs="EPSG:3844" ] `
+        ! set-geom-type --geometry-type="MULTILINESTRING" `
+        ! write romania-rivers.gpkg --overwrite
+
+.. only:: html
+
+   .. image:: ../../images/programs/gdal_pipeline_vector_nested_example.svg
+      :width: 0
+      :height: 0
+
+   .. raw:: html
+
+      <object type="image/svg+xml"
+              data="../_images/gdal_pipeline_vector_nested_example.svg">
+      </object>
+
+.. only:: not html
+
+   .. image:: ../../images/programs/gdal_pipeline_vector_nested_example.svg

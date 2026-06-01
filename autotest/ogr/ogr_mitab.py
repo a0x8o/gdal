@@ -2571,6 +2571,19 @@ def test_ogr_mitab_description(tmp_vsimem):
 
 
 ###############################################################################
+# Check write/read description
+
+
+def test_ogr_mitab_all_double_quotes(tmp_vsimem):
+    filename = tmp_vsimem / "test_description.tab"
+
+    ds = ogr.GetDriverByName("MapInfo File").CreateDataSource(filename)
+    lyr = ds.CreateLayer("test_description", options=["DESCRIPTION=" + ('"' * 100)])
+    lyr.CreateField(ogr.FieldDefn("test", ogr.OFTInteger))
+    assert lyr.GetMetadataItem("DESCRIPTION") == ('"' * 100)
+
+
+###############################################################################
 # Test writing and reading back unset/null date, time, datetime
 
 
@@ -3118,3 +3131,32 @@ def test_ogr_mitab_mif_multilinestring_one_point(tmp_vsimem):
         lyr = ds.GetLayer(0)
         f = lyr.GetNextFeature()
         assert f.GetGeometryRef().ExportToWkt() == "MULTILINESTRING ((1 2))"
+
+
+###############################################################################
+
+
+@gdaltest.enable_exceptions()
+def test_ogr_mitab_used_layer_creation_option_instead_of_creation_option(tmp_vsimem):
+
+    with gdal.GetDriverByName("MapInfo File").CreateVector(
+        tmp_vsimem / "out.mif"
+    ) as ds:
+        with gdaltest.error_raised(
+            gdal.CE_Warning, match="but a creation option of that name exists"
+        ):
+            lyr = ds.CreateLayer("out", options=["FORMAT=TAB"])
+            lyr.CreateField(ogr.FieldDefn("x"))
+
+
+###############################################################################
+
+
+@gdaltest.disable_exceptions()
+def test_ogr_mitab_gh_14529(tmp_vsimem):
+
+    with gdal.quiet_errors():
+        with ogr.Open("data/mitab/poc_14529") as ds:
+            for lyr in ds:
+                for f in lyr:
+                    pass

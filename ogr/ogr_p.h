@@ -73,11 +73,10 @@ OGRWktReadPointsM(const char *pszInput, OGRRawPoint **ppaoPoints,
 void CPL_DLL OGRMakeWktCoordinate(char *, double, double, double, int);
 std::string CPL_DLL OGRMakeWktCoordinate(double, double, double, int,
                                          const OGRWktOptions &opts);
-void CPL_DLL OGRMakeWktCoordinateM(char *, double, double, double, double,
-                                   OGRBoolean, OGRBoolean);
-std::string CPL_DLL OGRMakeWktCoordinateM(double, double, double, double,
-                                          OGRBoolean, OGRBoolean,
-                                          const OGRWktOptions &opts);
+void CPL_DLL OGRMakeWktCoordinateM(char *, double, double, double, double, bool,
+                                   bool);
+std::string CPL_DLL OGRMakeWktCoordinateM(double, double, double, double, bool,
+                                          bool, const OGRWktOptions &opts);
 
 #endif
 
@@ -156,6 +155,8 @@ bool CPL_DLL OGRParseDateTimeYYYYMMDDTHHMMSSsssZ(std::string_view sInput,
 int OGRCompareDate(const OGRField *psFirstTuple,
                    const OGRField *psSecondTuple); /* used by ogr_gensql.cpp and
                                                       ogrfeaturequery.cpp */
+
+bool CPL_DLL OGRIsGeoJSONMediaType(const char *pszMediaType);
 
 /* General utility option processing. */
 int CPL_DLL OGRGeneralCmdLineProcessor(int nArgc, char ***ppapszArgv,

@@ -1,5 +1,7 @@
 .. _gdal_vector_materialize:
 
+.. program:: gdal_vector_materialize
+
 ================================================================================
 ``gdal vector materialize``
 ================================================================================
@@ -64,5 +66,5 @@ Examples
 
    .. code-block:: bash
 
-        $ gdal pipeline ! read in.gpkg ! reproject --dst-crs=EPSG:32632 ! \
+        $ gdal pipeline ! read in.gpkg ! reproject --output-crs=EPSG:32632 ! \
                         ! materialize ! rasterize --resolution 10,10 ! write out.gpkg --overwrite

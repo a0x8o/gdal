@@ -352,21 +352,6 @@ inline GUInt16 ComputeIntegerRMS_4values<GUInt16, double>(double sumSquares)
 /*                    QuadraticMeanByteSSE2OrAVX2()                     */
 /************************************************************************/
 
-#if defined(__SSE4_1__) || defined(__AVX__) || defined(USE_NEON_OPTIMIZATIONS)
-#define sse2_packus_epi32 _mm_packus_epi32
-#else
-inline __m128i sse2_packus_epi32(__m128i a, __m128i b)
-{
-    const auto minus32768_32 = _mm_set1_epi32(-32768);
-    const auto minus32768_16 = _mm_set1_epi16(-32768);
-    a = _mm_add_epi32(a, minus32768_32);
-    b = _mm_add_epi32(b, minus32768_32);
-    a = _mm_packs_epi32(a, b);
-    a = _mm_sub_epi16(a, minus32768_16);
-    return a;
-}
-#endif
-
 #if defined(__SSSE3__) || defined(USE_NEON_OPTIMIZATIONS)
 #define sse2_hadd_epi16 _mm_hadd_epi16
 #else
@@ -439,7 +424,7 @@ inline __m256i FIXUP_LANES(__m256i x)
 #define sqrt_ps _mm_sqrt_ps
 #define cvttps_epi32 _mm_cvttps_epi32
 #define packs_epi32 _mm_packs_epi32
-#define packus_epi32 sse2_packus_epi32
+#define packus_epi32 GDAL_mm_packus_epi32
 #define srli_epi32 _mm_srli_epi32
 #define mullo_epi16 _mm_mullo_epi16
 #define srli_epi16 _mm_srli_epi16
@@ -858,7 +843,7 @@ QuadraticMeanUInt16SSE2(int nDstXWidth, int nChunkXSize,
         rms = _mm_sub_epi32(rms, mask);
 
         // Pack each 32 bit RMS value to 16 bits
-        rms = sse2_packus_epi32(rms, rms /* could be anything */);
+        rms = GDAL_mm_int32_to_uint16(rms);
 #endif
 
         _mm_storel_epi64(reinterpret_cast<__m128i *>(&pDstScanline[iDstPixel]),
@@ -937,7 +922,7 @@ AverageUInt16SSE2(int nDstXWidth, int nChunkXSize,
         }
 
         // Pack each 32 bit average value to 16 bits
-        auto average = sse2_packus_epi32(averageLow, averageHigh);
+        auto average = GDAL_mm_packus_epi32(averageLow, averageHigh);
         _mm_storeu_si128(reinterpret_cast<__m128i *>(&pDstScanline[iDstPixel]),
                          average);
         pSrcScanlineShifted += 2 * DEST_ELTS;
@@ -1238,7 +1223,7 @@ GDALResampleChunk_AverageOrRMS_T(const GDALOverviewResampleArgs &args,
     const GDALColorTable *const poColorTable =
         !bQuadraticMean &&
                 // AVERAGE_BIT2GRAYSCALE
-                CPL_TO_BOOL(STARTS_WITH_CI(pszResampling, "AVERAGE_BIT2G"))
+                STARTS_WITH_CI(pszResampling, "AVERAGE_BIT2G")
             ? nullptr
             : args.poColorTable;
     const bool bPropagateNoData = args.bPropagateNoData;
@@ -1313,13 +1298,11 @@ GDALResampleChunk_AverageOrRMS_T(const GDALOverviewResampleArgs &args,
     {
         const double dfSrcXOff = dfSrcXDelta + iDstPixel * dfXRatioDstToSrc;
         // Apply some epsilon to avoid numerical precision issues
-        int nSrcXOff = static_cast<int>(dfSrcXOff + 1e-8);
+        const int nSrcXOff =
+            std::max(static_cast<int>(dfSrcXOff + 1e-8), nChunkXOff);
         const double dfSrcXOff2 =
             dfSrcXDelta + (iDstPixel + 1) * dfXRatioDstToSrc;
         int nSrcXOff2 = static_cast<int>(ceil(dfSrcXOff2 - 1e-8));
-
-        if (nSrcXOff < nChunkXOff)
-            nSrcXOff = nChunkXOff;
         if (nSrcXOff2 == nSrcXOff)
             nSrcXOff2++;
         if (nSrcXOff2 > nChunkRightXOff)
@@ -1356,9 +1339,7 @@ GDALResampleChunk_AverageOrRMS_T(const GDALOverviewResampleArgs &args,
     for (int iDstLine = nDstYOff; iDstLine < nDstYOff2; ++iDstLine)
     {
         const double dfSrcYOff = dfSrcYDelta + iDstLine * dfYRatioDstToSrc;
-        int nSrcYOff = static_cast<int>(dfSrcYOff + 1e-8);
-        if (nSrcYOff < nChunkYOff)
-            nSrcYOff = nChunkYOff;
+        int nSrcYOff = std::max(static_cast<int>(dfSrcYOff + 1e-8), nChunkYOff);
 
         const double dfSrcYOff2 =
             dfSrcYDelta + (iDstLine + 1) * dfYRatioDstToSrc;
@@ -3566,13 +3547,19 @@ static CPLErr GDALResampleChunk_ConvolutionT(
     // Temporary array to store result of horizontal filter.
     double *const padfHorizontalFiltered = static_cast<double *>(
         VSI_MALLOC3_VERBOSE(nChunkYSize, nDstXSize, sizeof(double) * nBands));
-
+    const uint64_t nWeightCount = static_cast<uint64_t>(
+        2 + 2 * std::max(dfXScaledRadius, dfYScaledRadius) + 0.5);
+    if (nWeightCount > std::numeric_limits<uint32_t>::max() / sizeof(double))
+    {
+        VSIFree(pafWrkScanline);
+        CPLError(CE_Failure, CPLE_NotSupported,
+                 "Too large downsampling factor");
+        return CE_Failure;
+    }
     // To store convolution coefficients.
     double *const padfWeights =
         static_cast<double *>(VSI_MALLOC_ALIGNED_AUTO_VERBOSE(
-            static_cast<int>(
-                2 + 2 * std::max(dfXScaledRadius, dfYScaledRadius) + 0.5) *
-            sizeof(double)));
+            static_cast<size_t>(nWeightCount) * sizeof(double)));
 
     GByte *pabyChunkNodataMaskHorizontalFiltered = nullptr;
     if (pabyChunkNodataMask)
@@ -3600,14 +3587,12 @@ static CPLErr GDALResampleChunk_ConvolutionT(
     {
         const double dfSrcPixel =
             (iDstPixel + 0.5) * dfXRatioDstToSrc + dfSrcXDelta;
-        int nSrcPixelStart =
-            static_cast<int>(floor(dfSrcPixel - dfXScaledRadius + 0.5));
-        if (nSrcPixelStart < nChunkXOff)
-            nSrcPixelStart = nChunkXOff;
-        int nSrcPixelStop =
-            static_cast<int>(dfSrcPixel + dfXScaledRadius + 0.5);
-        if (nSrcPixelStop > nChunkRightXOff)
-            nSrcPixelStop = nChunkRightXOff;
+        const int nSrcPixelStart = std::max(
+            static_cast<int>(floor(dfSrcPixel - dfXScaledRadius + 0.5)),
+            nChunkXOff);
+        const int nSrcPixelStop =
+            std::min(static_cast<int>(dfSrcPixel + dfXScaledRadius + 0.5),
+                     nChunkRightXOff);
 #if 0
         if( nSrcPixelStart < nChunkXOff && nChunkXOff > 0 )
         {
@@ -3972,13 +3957,12 @@ static CPLErr GDALResampleChunk_ConvolutionT(
 
         const double dfSrcLine =
             (iDstLine + 0.5) * dfYRatioDstToSrc + dfSrcYDelta;
-        int nSrcLineStart =
-            static_cast<int>(floor(dfSrcLine - dfYScaledRadius + 0.5));
-        int nSrcLineStop = static_cast<int>(dfSrcLine + dfYScaledRadius + 0.5);
-        if (nSrcLineStart < nChunkYOff)
-            nSrcLineStart = nChunkYOff;
-        if (nSrcLineStop > nChunkBottomYOff)
-            nSrcLineStop = nChunkBottomYOff;
+        const int nSrcLineStart =
+            std::max(static_cast<int>(floor(dfSrcLine - dfYScaledRadius + 0.5)),
+                     nChunkYOff);
+        const int nSrcLineStop =
+            std::min(static_cast<int>(dfSrcLine + dfYScaledRadius + 0.5),
+                     nChunkBottomYOff);
 #if 0
         if( nSrcLineStart < nChunkYOff &&
             nChunkYOff > 0 )

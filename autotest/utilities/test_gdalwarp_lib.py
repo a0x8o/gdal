@@ -2943,7 +2943,7 @@ def test_gdalwarp_lib_to_cog_reprojection_options_te_and_conflicting_t_srs(tmp_v
 
 
 ###############################################################################
-# Test warping of multiple source, compatible of BuildVRT mosaicing, to COG
+# Test warping of multiple source, compatible with BuildVRT mosaicing, to COG
 
 
 def test_gdalwarp_lib_multiple_source_compatible_buildvrt_to_cog(tmp_vsimem):
@@ -2962,7 +2962,7 @@ def test_gdalwarp_lib_multiple_source_compatible_buildvrt_to_cog(tmp_vsimem):
 
 
 ###############################################################################
-# Test warping of multiple source, compatible of BuildVRT mosaicing, to COG,
+# Test warping of multiple sources, compatible with BuildVRT mosaicing, to COG,
 # with reprojection options
 
 
@@ -2993,7 +2993,7 @@ def test_gdalwarp_lib_multiple_source_compatible_buildvrt_to_cog_reprojection_op
 
 
 ###############################################################################
-# Test warping of multiple source, incompatible of BuildVRT mosaicing, to COG
+# Test warping of multiple sources, incompatible with BuildVRT mosaicing, to COG
 
 
 def test_gdalwarp_lib_multiple_source_incompatible_buildvrt_to_cog(tmp_vsimem):
@@ -3017,7 +3017,7 @@ def test_gdalwarp_lib_multiple_source_incompatible_buildvrt_to_cog(tmp_vsimem):
 
 
 ###############################################################################
-# Test warping of multiple source, incompatible of BuildVRT mosaicing, to COG,
+# Test warping of multiple sources, incompatible with BuildVRT mosaicing, to COG,
 # with reprojection options
 
 
@@ -4860,3 +4860,70 @@ def test_gdalwarp_lib_RESET_DEST_PIXELS(dstNodata):
         assert out_ds.ReadRaster() == b"\x00\x00\x00\x00\x02\x03\x00\x00\x00"
     else:
         assert out_ds.ReadRaster() == b"\xff\xff\xff\xff\x02\x03\xff\xff\xff"
+
+
+###############################################################################
+# Test bugfix for https://github.com/OSGeo/gdal/issues/14503
+
+
+def test_gdalwarp_vshift_us_survey_foot_to_metre():
+
+    ds = gdal.Warp(
+        "",
+        "data/input_epsg_6259_plus_6360_us_survey_foot.tif",
+        options="-f MEM -s_srs EPSG:6529+6360 -t_srs EPSG:6319",
+    )
+    assert ds.GetRasterBand(1).GetUnitType() == ""
+
+
+###############################################################################
+# Test bugfix for https://github.com/OSGeo/gdal/issues/14570
+
+
+def test_gdalwarp_lib_detect_border_geoloc_array(tmp_vsimem):
+
+    gdaltest.importorskip_gdal_array()
+    np = pytest.importorskip("numpy")
+
+    # 45 degree rotation
+    cos_alpha = 0.5 * (2**0.5)
+    sin_alpha = 0.5 * (2**0.5)
+    width = 100
+    height = 100
+    X = np.arange(width, dtype=np.float32).reshape((1, width))
+    Y = np.arange(100, dtype=np.float32).reshape((height, 1))
+
+    with gdal.GetDriverByName("GTIFF").Create(
+        tmp_vsimem / "longitude.tif", width, height, 1, gdal.GDT_Float32
+    ) as ds:
+        ds.WriteArray(0.1 * X * cos_alpha - 0.1 * Y * sin_alpha)
+
+    with gdal.GetDriverByName("GTIFF").Create(
+        tmp_vsimem / "latitude.tif", width, height, 1, gdal.GDT_Float32
+    ) as ds:
+        ds.WriteArray(0.1 * X * sin_alpha + 0.1 * Y * sin_alpha)
+
+    ds = gdal.GetDriverByName("MEM").Create("", width, height)
+    ds.GetRasterBand(1).Fill(255)
+    ds.SetMetadata(
+        {
+            "LINE_OFFSET": "0",
+            "LINE_STEP": "1",
+            "PIXEL_OFFSET": "0",
+            "PIXEL_STEP": "1",
+            "X_BAND": "1",
+            "X_DATASET": str(tmp_vsimem / "longitude.tif"),
+            "Y_BAND": "1",
+            "Y_DATASET": str(tmp_vsimem / "latitude.tif"),
+        },
+        "GEOLOCATION",
+    )
+
+    out_ds = gdal.Warp(
+        "", ds, format="MEM", dstSRS="EPSG:4326", xRes=0.1414, yRes=0.1414
+    )
+    assert out_ds.RasterXSize == 100
+    assert out_ds.RasterYSize == 100
+    assert out_ds.GetGeoTransform() == pytest.approx(
+        (-7.071067810058594, 0.1414, 0.0, 14.14213752746582, 0.0, -0.1414)
+    )

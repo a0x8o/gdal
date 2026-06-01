@@ -41,11 +41,15 @@
 #include "ogr_srs_api.h"
 #include "ogr_wkb.h"
 
+#ifndef SFCGAL_MAKE_VERSION
 #define SFCGAL_MAKE_VERSION(major, minor, patch)                               \
     ((major) * 10000 + (minor) * 100 + (patch))
-#define SFCGAL_VERSION                                                         \
+#endif
+#ifndef SFCGAL_VERSION_NUM
+#define SFCGAL_VERSION_NUM                                                     \
     SFCGAL_MAKE_VERSION(SFCGAL_VERSION_MAJOR, SFCGAL_VERSION_MINOR,            \
                         SFCGAL_VERSION_PATCH)
+#endif
 
 //! @cond Doxygen_Suppress
 int OGRGeometry::bGenerate_DB2_V72_BYTE_ORDER = FALSE;
@@ -568,7 +572,7 @@ void OGR_G_AssignSpatialReference(OGRGeometryH hGeom, OGRSpatialReferenceH hSRS)
  * @return TRUE if the geometries intersect, otherwise FALSE.
  */
 
-OGRBoolean OGRGeometry::Intersects(const OGRGeometry *poOtherGeom) const
+bool OGRGeometry::Intersects(const OGRGeometry *poOtherGeom) const
 
 {
     if (poOtherGeom == nullptr)
@@ -594,7 +598,7 @@ OGRBoolean OGRGeometry::Intersects(const OGRGeometry *poOtherGeom) const
     GEOSGeom hThisGeosGeom = exportToGEOS(hGEOSCtxt);
     GEOSGeom hOtherGeosGeom = poOtherGeom->exportToGEOS(hGEOSCtxt);
 
-    OGRBoolean bResult = FALSE;
+    bool bResult = false;
     if (hThisGeosGeom != nullptr && hOtherGeosGeom != nullptr)
     {
         bResult =
@@ -612,7 +616,7 @@ OGRBoolean OGRGeometry::Intersects(const OGRGeometry *poOtherGeom) const
 // Old API compatibility function.
 
 //! @cond Doxygen_Suppress
-OGRBoolean OGRGeometry::Intersect(OGRGeometry *poOtherGeom) const
+bool OGRGeometry::Intersect(OGRGeometry *poOtherGeom) const
 
 {
     return Intersects(poOtherGeom);
@@ -1118,7 +1122,7 @@ bool OGRGeometry::setCoordinateDimension(int nNewDimension)
  * @return (since 3.10) true in case of success, false in case of memory allocation error
  */
 
-bool OGRGeometry::set3D(OGRBoolean bIs3D)
+bool OGRGeometry::set3D(bool bIs3D)
 
 {
     if (bIs3D)
@@ -1142,7 +1146,7 @@ bool OGRGeometry::set3D(OGRBoolean bIs3D)
  * @return (since 3.10) true in case of success, false in case of memory allocation error
  */
 
-bool OGRGeometry::setMeasured(OGRBoolean bIsMeasured)
+bool OGRGeometry::setMeasured(bool bIsMeasured)
 
 {
     if (bIsMeasured)
@@ -1202,7 +1206,7 @@ void OGR_G_Set3D(OGRGeometryH hGeom, int bIs3D)
 {
     VALIDATE_POINTER0(hGeom, "OGR_G_Set3D");
 
-    OGRGeometry::FromHandle(hGeom)->set3D(bIs3D);
+    OGRGeometry::FromHandle(hGeom)->set3D(CPL_TO_BOOL(bIs3D));
 }
 
 /************************************************************************/
@@ -1228,11 +1232,11 @@ void OGR_G_SetMeasured(OGRGeometryH hGeom, int bIsMeasured)
 {
     VALIDATE_POINTER0(hGeom, "OGR_G_SetMeasured");
 
-    OGRGeometry::FromHandle(hGeom)->setMeasured(bIsMeasured);
+    OGRGeometry::FromHandle(hGeom)->setMeasured(CPL_TO_BOOL(bIsMeasured));
 }
 
 /**
- * \fn int OGRGeometry::Equals( OGRGeometry *poOtherGeom ) const;
+ * \fn bool OGRGeometry::Equals( OGRGeometry *poOtherGeom ) const;
  *
  * \brief Returns TRUE if two geometries are equivalent.
  *
@@ -1254,7 +1258,7 @@ void OGR_G_SetMeasured(OGRGeometryH hGeom, int bIsMeasured)
 // Backward compatibility method.
 
 //! @cond Doxygen_Suppress
-int OGRGeometry::Equal(OGRGeometry *poOtherGeom) const
+bool OGRGeometry::Equal(OGRGeometry *poOtherGeom) const
 {
     return Equals(poOtherGeom);
 }
@@ -2221,7 +2225,7 @@ void OGR_G_Empty(OGRGeometryH hGeom)
 }
 
 /**
- * \fn OGRBoolean OGRGeometry::IsEmpty() const;
+ * \fn bool OGRGeometry::IsEmpty() const;
  *
  * \brief Returns TRUE (non-zero) if the object has no points.
  *
@@ -2277,7 +2281,7 @@ int OGR_G_IsEmpty(OGRGeometryH hGeom)
  * @return TRUE if the geometry has no points, otherwise FALSE.
  */
 
-OGRBoolean OGRGeometry::IsValid(std::string *posReason) const
+bool OGRGeometry::IsValid(std::string *posReason) const
 
 {
     if (posReason)
@@ -2333,7 +2337,7 @@ OGRBoolean OGRGeometry::IsValid(std::string *posReason) const
         return FALSE;
 
 #else
-        OGRBoolean bResult = FALSE;
+        bool bResult = false;
 
         // Some invalid geometries, such as lines with one point, or
         // rings that do not close, cannot be converted to GEOS.
@@ -2506,7 +2510,7 @@ char *OGR_G_GetInvalidityReason(OGRGeometryH hGeom)
  * @return TRUE if the geometry has no points, otherwise FALSE.
  */
 
-OGRBoolean OGRGeometry::IsSimple() const
+bool OGRGeometry::IsSimple() const
 
 {
 #ifndef HAVE_GEOS
@@ -2515,7 +2519,7 @@ OGRBoolean OGRGeometry::IsSimple() const
 
 #else
 
-    OGRBoolean bResult = FALSE;
+    bool bResult = false;
 
     GEOSContextHandle_t hGEOSCtxt = createGEOSContext();
     GEOSGeom hThisGeosGeom = exportToGEOS(hGEOSCtxt);
@@ -2577,7 +2581,7 @@ int OGR_G_IsSimple(OGRGeometryH hGeom)
  * length and closure (self-intersection is not checked), otherwise FALSE.
  */
 
-OGRBoolean OGRGeometry::IsRing() const
+bool OGRGeometry::IsRing() const
 
 {
 #ifndef HAVE_GEOS
@@ -2586,7 +2590,7 @@ OGRBoolean OGRGeometry::IsRing() const
 
 #else
 
-    OGRBoolean bResult = FALSE;
+    bool bResult = false;
 
     GEOSContextHandle_t hGEOSCtxt = createGEOSContext();
     GEOSGeom hThisGeosGeom = exportToGEOS(hGEOSCtxt);
@@ -3587,8 +3591,8 @@ GEOSGeom OGRGeometry::exportToGEOS(GEOSContextHandle_t hGEOSCtxt,
     std::unique_ptr<OGRGeometry> poModifiedInput = nullptr;
     const OGRGeometry *poGeosInput = this;
 
-    const bool bHasZ = CPL_TO_BOOL(poGeosInput->Is3D());
-    bool bHasM = CPL_TO_BOOL(poGeosInput->IsMeasured());
+    const bool bHasZ = poGeosInput->Is3D();
+    bool bHasM = poGeosInput->IsMeasured();
 
     if (poGeosInput->hasCurveGeometry())
     {
@@ -3715,7 +3719,7 @@ GEOSGeom OGRGeometry::exportToGEOS(GEOSContextHandle_t hGEOSCtxt,
  *
  */
 
-OGRBoolean OGRGeometry::hasCurveGeometry(CPL_UNUSED int bLookForNonLinear) const
+bool OGRGeometry::hasCurveGeometry(CPL_UNUSED int bLookForNonLinear) const
 {
     return FALSE;
 }
@@ -4101,12 +4105,12 @@ static OGRGeometry *BuildGeometryFromTwoGeoms(
 /*                      OGRGEOSBooleanPredicate()                       */
 /************************************************************************/
 
-static OGRBoolean OGRGEOSBooleanPredicate(
+static bool OGRGEOSBooleanPredicate(
     const OGRGeometry *poSelf, const OGRGeometry *poOtherGeom,
     char (*pfnGEOSFunction_r)(GEOSContextHandle_t, const GEOSGeometry *,
                               const GEOSGeometry *))
 {
-    OGRBoolean bResult = FALSE;
+    bool bResult = false;
 
     GEOSContextHandle_t hGEOSCtxt = poSelf->createGEOSContext();
     GEOSGeom hThisGeosGeom = poSelf->exportToGEOS(hGEOSCtxt);
@@ -4191,7 +4195,7 @@ OGRGeometry *OGRGeometry::MakeValid(CSLConstList papszOptions) const
     else if (wkbFlatten(getGeometryType()) == wkbCurvePolygon)
     {
         GEOSContextHandle_t hGEOSCtxt = initGEOS_r(nullptr, nullptr);
-        OGRBoolean bIsValid = FALSE;
+        bool bIsValid = false;
         GEOSGeom hGeosGeom = exportToGEOS(hGEOSCtxt);
         if (hGeosGeom)
         {
@@ -5999,7 +6003,7 @@ OGRGeometryH OGR_G_SymmetricDifference(OGRGeometryH hThis, OGRGeometryH hOther)
  * @return TRUE if they are disjoint, otherwise FALSE.
  */
 
-OGRBoolean OGRGeometry::Disjoint(const OGRGeometry *poOtherGeom) const
+bool OGRGeometry::Disjoint(const OGRGeometry *poOtherGeom) const
 
 {
     (void)poOtherGeom;
@@ -6072,7 +6076,7 @@ int OGR_G_Disjoint(OGRGeometryH hThis, OGRGeometryH hOther)
  * @return TRUE if they are touching, otherwise FALSE.
  */
 
-OGRBoolean OGRGeometry::Touches(const OGRGeometry *poOtherGeom) const
+bool OGRGeometry::Touches(const OGRGeometry *poOtherGeom) const
 
 {
     (void)poOtherGeom;
@@ -6145,8 +6149,7 @@ int OGR_G_Touches(OGRGeometryH hThis, OGRGeometryH hOther)
  * @return TRUE if they are crossing, otherwise FALSE.
  */
 
-OGRBoolean
-OGRGeometry::Crosses(UNUSED_PARAMETER const OGRGeometry *poOtherGeom) const
+bool OGRGeometry::Crosses(UNUSED_PARAMETER const OGRGeometry *poOtherGeom) const
 
 {
     if (IsSFCGALCompatible() || poOtherGeom->IsSFCGALCompatible())
@@ -6253,7 +6256,7 @@ int OGR_G_Crosses(OGRGeometryH hThis, OGRGeometryH hOther)
  * @return TRUE if poOtherGeom is within this geometry, otherwise FALSE.
  */
 
-OGRBoolean OGRGeometry::Within(const OGRGeometry *poOtherGeom) const
+bool OGRGeometry::Within(const OGRGeometry *poOtherGeom) const
 
 {
     (void)poOtherGeom;
@@ -6326,7 +6329,7 @@ int OGR_G_Within(OGRGeometryH hThis, OGRGeometryH hOther)
  * @return TRUE if poOtherGeom contains this geometry, otherwise FALSE.
  */
 
-OGRBoolean OGRGeometry::Contains(const OGRGeometry *poOtherGeom) const
+bool OGRGeometry::Contains(const OGRGeometry *poOtherGeom) const
 
 {
     (void)poOtherGeom;
@@ -6400,7 +6403,7 @@ int OGR_G_Contains(OGRGeometryH hThis, OGRGeometryH hOther)
  * @return TRUE if they are overlapping, otherwise FALSE.
  */
 
-OGRBoolean OGRGeometry::Overlaps(const OGRGeometry *poOtherGeom) const
+bool OGRGeometry::Overlaps(const OGRGeometry *poOtherGeom) const
 
 {
     (void)poOtherGeom;
@@ -6916,7 +6919,7 @@ OGRGeometryH OGR_G_SimplifyPreserveTopology(OGRGeometryH hThis,
  * Note that this is not the same as OGRGeometry::SetPrecision(). The later
  * will return valid geometries, whereas roundCoordinates() does not make
  * such guarantee and may return geometries with invalidities, if they are
- * not compatible of the specified precision. roundCoordinates() supports
+ * not compatible with the specified precision. roundCoordinates() supports
  * curve geometries, whereas SetPrecision() does not currently.
  *
  * One use case for roundCoordinates() is to undo the effect of
@@ -8575,7 +8578,7 @@ OGRGeometry::OGRexportToSFCGAL(UNUSED_IF_NO_SFCGAL const OGRGeometry *poGeom)
 #ifdef HAVE_SFCGAL
 
     sfcgal_init();
-#if SFCGAL_VERSION >= SFCGAL_MAKE_VERSION(1, 5, 2)
+#if SFCGAL_VERSION_NUM >= SFCGAL_MAKE_VERSION(1, 5, 2)
 
     const auto exportToSFCGALViaWKB =
         [](const OGRGeometry *geom) -> sfcgal_geometry_t *
@@ -8733,7 +8736,7 @@ OGRGeometry *OGRGeometry::SFCGALexportToOGR(
     sfcgal_init();
     char *pabySFCGAL = nullptr;
     size_t nLength = 0;
-#if SFCGAL_VERSION >= SFCGAL_MAKE_VERSION(1, 5, 2)
+#if SFCGAL_VERSION_NUM >= SFCGAL_MAKE_VERSION(1, 5, 2)
 
     sfcgal_geometry_as_wkb(geometry, &pabySFCGAL, &nLength);
 
@@ -8833,7 +8836,7 @@ OGRGeometry *OGRGeometry::SFCGALexportToOGR(
 //! @endcond
 
 //! @cond Doxygen_Suppress
-OGRBoolean OGRGeometry::IsSFCGALCompatible() const
+bool OGRGeometry::IsSFCGALCompatible() const
 {
     const OGRwkbGeometryType eGType = wkbFlatten(getGeometryType());
     if (eGType == wkbTriangle || eGType == wkbPolyhedralSurface ||

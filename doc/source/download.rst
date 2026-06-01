@@ -18,12 +18,12 @@ Source Code
 Current Release
 ...............
 
-* **2026-03-20** `gdal-3.12.3.tar.gz`_ `3.12.3 Release Notes`_ (`3.12.3 md5`_, `3.12.3 sig`_)
+* **2026-05-08** `gdal-3.13.0.tar.gz`_ `3.13.0 Release Notes`_ (`3.13.0 md5`_, `3.13.0 sig`_)
 
-.. _`3.12.3 Release Notes`: https://github.com/OSGeo/gdal/blob/v3.12.3/NEWS.md
-.. _`gdal-3.12.3.tar.gz`: https://github.com/OSGeo/gdal/releases/download/v3.12.3/gdal-3.12.3.tar.gz
-.. _`3.12.3 md5`: https://github.com/OSGeo/gdal/releases/download/v3.12.3/gdal-3.12.3.tar.gz.md5
-.. _`3.12.3 sig`: https://github.com/OSGeo/gdal/releases/download/v3.12.3/gdal-3.12.3.tar.gz.sig
+.. _`3.13.0 Release Notes`: https://github.com/OSGeo/gdal/blob/v3.13.0/NEWS.md
+.. _`gdal-3.13.0.tar.gz`: https://github.com/OSGeo/gdal/releases/download/v3.13.0/gdal-3.13.0.tar.gz
+.. _`3.13.0 md5`: https://github.com/OSGeo/gdal/releases/download/v3.13.0/gdal-3.13.0.tar.gz.md5
+.. _`3.13.0 sig`: https://github.com/OSGeo/gdal/releases/download/v3.13.0/gdal-3.13.0.tar.gz.sig
 
 The GPG signing key is:
 
@@ -202,6 +202,8 @@ GDAL is available as several subpackages:
 - ``libgdal-tiledb``: :ref:`raster.tiledb` driver as a plugin (depends on libgdal-core, available since GDAL 3.9.1)
 - ``libgdal-xls``: :ref:`vector.xls` driver as a plugin (depends on libgdal-core, available since GDAL 3.9.1)
 
+For background on the GDAL package split on conda-forge, see
+`Introducing Lightweight Versions of GDAL and PDAL <https://quansight.com/post/introducing-lightweight-versions-of-gdal-and-pdal/>`__.
 
 To install the ``gdal`` package (Python bindings and utilities), and ``libgdal-core``:
 

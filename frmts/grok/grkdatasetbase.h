@@ -476,8 +476,9 @@ struct GRKCodecWrapper
      */
     void allocComponentParams(int nBands)
     {
+        // need to zero-init the component structs
         pasBandParams = static_cast<grk_image_comp *>(
-            CPLMalloc(nBands * sizeof(grk_image_comp)));
+            CPLCalloc(nBands, sizeof(grk_image_comp)));
     }
 
     /**
@@ -1938,6 +1939,7 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
     bool initializedAsync = false;  ///< True after first grk_decompress() call
     PostPreload cachedPostPreload_{};    ///< Cached first-call tile grid info
     bool hasCachedPostPreload_ = false;  ///< True after first decompressAsynch
+    VSILFILE *m_ovFp = nullptr;  ///< Private file handle for overview codec
 
     /**
      * @brief Destroys the JP2GRKDatasetBase object
@@ -2131,6 +2133,91 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
         if (xStart >= xEnd || yStart >= yEnd)
             return CE_None;
 
+        // can use fast path when there is no sub-sampling, no alpha promotion
+        // and output pixels are contiguous
+        const int elemSize = GDALGetDataTypeSizeBytes(eBufType);
+        bool canFastCopy = (nPromoteAlphaBandIdx < 0 &&
+                            nPixelSpace == elemSize && elemSize > 0);
+        for (int i = 0; i < nBandCount && canFastCopy; ++i)
+        {
+            const int b = panBandMap[i] - 1;
+            if (b < 0 || b >= img->numcomps)
+                canFastCopy = false;
+            else
+            {
+                const auto &comp = img->comps[b];
+                if (comp.dx != 1 || comp.dy != 1 || !comp.data)
+                    canFastCopy = false;
+            }
+        }
+
+        if (canFastCopy)
+        {
+            const int copyWidth = xEnd - xStart;
+            for (int i = 0; i < nBandCount; ++i)
+            {
+                const int srcBandIdx = panBandMap[i] - 1;
+                const auto &comp = img->comps[srcBandIdx];
+                const int srcXStart = xStart - tileXOff;
+
+                for (int iY = yStart; iY < yEnd; ++iY)
+                {
+                    const int srcRow = iY - tileYOff;
+                    const int dstRow = iY - nYOff;
+                    const int dstX = xStart - nXOff;
+                    auto dst = static_cast<uint8_t *>(pData) +
+                               dstRow * nLineSpace + dstX * nPixelSpace +
+                               i * nBandSpace;
+
+                    if (comp.data_type == GRK_INT_16)
+                    {
+                        const auto src =
+                            static_cast<int16_t *>(comp.data) +
+                            srcRow * static_cast<int>(comp.stride) + srcXStart;
+                        if (eBufType == GDT_UInt16 || eBufType == GDT_Int16)
+                        {
+                            memcpy(dst, src, copyWidth * sizeof(int16_t));
+                        }
+                        else if (eBufType == GDT_Byte)
+                        {
+                            for (int x = 0; x < copyWidth; ++x)
+                                dst[x] = static_cast<GByte>(src[x]);
+                        }
+                        else if (eBufType == GDT_Int32 ||
+                                 eBufType == GDT_UInt32)
+                        {
+                            auto dst32 = reinterpret_cast<int32_t *>(dst);
+                            for (int x = 0; x < copyWidth; ++x)
+                                dst32[x] = src[x];
+                        }
+                    }
+                    else
+                    {
+                        const auto src =
+                            static_cast<int32_t *>(comp.data) +
+                            srcRow * static_cast<int>(comp.stride) + srcXStart;
+                        if (eBufType == GDT_Int32 || eBufType == GDT_UInt32)
+                        {
+                            memcpy(dst, src, copyWidth * sizeof(int32_t));
+                        }
+                        else if (eBufType == GDT_UInt16 ||
+                                 eBufType == GDT_Int16)
+                        {
+                            auto dst16 = reinterpret_cast<int16_t *>(dst);
+                            for (int x = 0; x < copyWidth; ++x)
+                                dst16[x] = static_cast<int16_t>(src[x]);
+                        }
+                        else if (eBufType == GDT_Byte)
+                        {
+                            for (int x = 0; x < copyWidth; ++x)
+                                dst[x] = static_cast<GByte>(src[x]);
+                        }
+                    }
+                }
+            }
+            return CE_None;
+        }
+
         // Scalar per-pixel loop that handles dx/dy subsampling, alpha promotion,
         // and all five output types.
         CPLErr eErr = CE_None;
@@ -2165,7 +2252,13 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
                     const GPtrDiff_t dstOffset =
                         bufX * nPixelSpace + bufY * nLineSpace + i * nBandSpace;
 
-                    int32_t value = static_cast<int32_t *>(comp.data)[tileIdx];
+                    // Grok v20.3.x can use 16 bit storage for images with
+                    // precision ≤ 12 bits - we need to  cast to correct type
+                    int32_t value;
+                    if (comp.data_type == GRK_INT_16)
+                        value = static_cast<int16_t *>(comp.data)[tileIdx];
+                    else
+                        value = static_cast<int32_t *>(comp.data)[tileIdx];
                     if (srcBandIdx == nPromoteAlphaBandIdx)
                         value *= 255;
                     if (eBufType == GDT_Byte)
@@ -2228,7 +2321,8 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
         // trigger post-processing (wait(nullptr) -> postMulti_).
         const int nTotalTiles = (postPreload.tile_x1 - postPreload.tile_x0) *
                                 (postPreload.tile_y1 - postPreload.tile_y0);
-        bool canUseFastPath = (nTotalTiles > 1 && m_codec && m_codec->psImage);
+        bool canUseFastPath =
+            (nTotalTiles > 1 && m_codec && m_codec->psImage && iLevel == 0);
         if (canUseFastPath)
         {
             for (int i = 0; i < nBandCount && canUseFastPath; ++i)
@@ -2457,14 +2551,9 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
         // When reading a subset of bands, tile images must persist
         // across per-band reads.  Use CACHE_IMAGE so that tile row
         // release keeps the decoded pixels alive.
-        const int nTotalComps =
-            (m_codec && m_codec->psImage) ? m_codec->psImage->numcomps : 0;
-        const bool needPersistentTiles =
-            (!this->bSingleTiled && nBandCount < nTotalComps);
-
         auto postPreload =
             decompressAsynch(nullptr, nullptr, nXOff, nYOff, nXSize, nYSize,
-                             rowCopy, needPersistentTiles);
+                             rowCopy, nBandCount);
 
         try
         {
@@ -2546,7 +2635,7 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
                                  int swath_x0, int swath_y0, int swath_width,
                                  int swath_height,
                                  RowCopyFunc rowCopy = nullptr,
-                                 bool needPersistentTiles = false)
+                                 int nBandCount = 0)
     {
         PostPreload rc;
 
@@ -2554,10 +2643,24 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
         // Overview datasets are created without a codec during Open;
         // initialise one on first read so decompression at this
         // reduce level can proceed.
+        // Open a private file handle so the overview codec does not
+        // interfere with the main dataset's file position.
         if (!m_codec && iLevel > 0)
         {
+            if (m_ovFp)
+            {
+                VSIFCloseL(m_ovFp);
+                m_ovFp = nullptr;
+            }
+            m_ovFp = VSIFOpenL(m_osFilename.c_str(), "rb");
+            if (!m_ovFp)
+            {
+                CPLError(CE_Failure, CPLE_OpenFailed,
+                         "Failed to open file for overview level %d", iLevel);
+                return rc;
+            }
             m_codec = new GRKCodecWrapper();
-            m_codec->open(fp_, nCodeStreamStart);
+            m_codec->open(m_ovFp, nCodeStreamStart);
             uint32_t nTileW = 0, nTileH = 0;
             int numRes = 0;
             if (!m_codec->setUpDecompress(GetNumThreads(), m_osFilename.c_str(),
@@ -2566,6 +2669,8 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
             {
                 delete m_codec;
                 m_codec = nullptr;
+                VSIFCloseL(m_ovFp);
+                m_ovFp = nullptr;
                 CPLError(CE_Failure, CPLE_AppDefined,
                          "Failed to init overview codec for level %d", iLevel);
                 return rc;
@@ -2620,6 +2725,15 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
             return cached;
         }
 
+        // Compute needPersistentTiles after lazy codec init (m_codec is now
+        // guaranteed non-null).  When reading a subset of bands, tile images
+        // must persist across per-band reads so that subsequent band reads
+        // can extract their data from the cached tiles.
+        const int nTotalComps =
+            (m_codec && m_codec->psImage) ? m_codec->psImage->numcomps : 0;
+        const bool needPersistentTiles =
+            (!this->bSingleTiled && nBandCount > 0 && nBandCount < nTotalComps);
+
         if (!initializedAsync)
         {
             grk_decompress_parameters decompressParams = {};
@@ -2640,11 +2754,10 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
 
             if (!this->fullDecompress_)
             {
+                decompressParams.dw_reduced = true;
                 if (area_x0_ == 0 && area_y0_ == 0 && area_x1_ == 0 &&
                     area_y1_ == 0)
                 {
-                    // No AdviseRead region: use swath coordinates.
-                    // to trigger full image asynch decompress
                     decompressParams.dw_x0 = swath_x0;
                     decompressParams.dw_y0 = swath_y0;
                     decompressParams.dw_x1 = swath_x0 + swath_width;

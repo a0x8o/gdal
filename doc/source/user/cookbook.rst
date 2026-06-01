@@ -21,6 +21,15 @@ General How do I...
 ... get the GDAL version?
    :example:`gdal-version`
 
+... view debug output?
+   :example:`debug-output`
+
+... write GDAL output and errors to a log file?
+   :example:`debug-log-file`
+
+... log :term:`curl` output for HTTP requests?
+   :example:`debug-log-curl`
+
 Raster How do I...
 ------------------
 
@@ -50,6 +59,12 @@ Vector How do I...
 ... list all layers in a dataset?
     - :example:`gdal-vector-info-list-layers`
     - :example:`gdal-vector-info-geom-name`
+
+... filter features using an attribute query?
+   :example:`gdal-vector-filter-where`
+
+... list unique values in a field?
+   :example:`gdal-vector-sql-distinct`
 
 Raster and Vector How do I...
 -----------------------------

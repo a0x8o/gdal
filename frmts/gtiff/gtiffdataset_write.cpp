@@ -525,8 +525,7 @@ inline bool GTiffDataset::IsFirstPixelEqualToNoData(const void *pBuffer)
     if (m_nBitsPerSample == 32 && eDT == GDT_Float32)
     {
         if (std::isnan(m_dfNoDataValue))
-            return CPL_TO_BOOL(
-                std::isnan(*(static_cast<const float *>(pBuffer))));
+            return std::isnan(*(static_cast<const float *>(pBuffer)));
         return GDALIsValueInRange<float>(dfEffectiveNoData) &&
                *(static_cast<const float *>(pBuffer)) ==
                    static_cast<float>(dfEffectiveNoData);
@@ -534,8 +533,7 @@ inline bool GTiffDataset::IsFirstPixelEqualToNoData(const void *pBuffer)
     if (m_nBitsPerSample == 64 && eDT == GDT_Float64)
     {
         if (std::isnan(dfEffectiveNoData))
-            return CPL_TO_BOOL(
-                std::isnan(*(static_cast<const double *>(pBuffer))));
+            return std::isnan(*(static_cast<const double *>(pBuffer)));
         return *(static_cast<const double *>(pBuffer)) == dfEffectiveNoData;
     }
     return false;
@@ -4832,7 +4830,7 @@ void GTiffDataset::PushMetadataToPam()
                     papszMD = CSLRemoveStrings(papszMD, i, 1, nullptr);
             }
 
-            if (nBand == 0)
+            if (!poBand)
                 GDALPamDataset::SetMetadata(papszMD, papszDomainList[iDomain]);
             else
                 poBand->GDALPamRasterBand::SetMetadata(
@@ -5488,10 +5486,8 @@ TIFF *GTiffDataset::CreateLL(const char *pszFilename, int nXSize, int nYSize,
                 CSLFetchNameValue(papszParamList, "INTERLEAVE"))
         {
             if (EQUAL(pszValue, "PIXEL"))
-                nPlanar = PLANARCONFIG_CONTIG;
-            else if (EQUAL(pszValue, "BAND"))
             {
-                nPlanar = PLANARCONFIG_SEPARATE;
+                nPlanar = PLANARCONFIG_CONTIG;
             }
             else if (EQUAL(pszValue, "BAND"))
             {
@@ -5540,7 +5536,7 @@ TIFF *GTiffDataset::CreateLL(const char *pszFilename, int nXSize, int nYSize,
         {
             ReportError(
                 pszFilename, CE_Failure, CPLE_IllegalArg,
-                "COMPRESS=%s is only compatible of un-tiled images whose "
+                "COMPRESS=%s is only compatible with un-tiled images whose "
                 "width is lesser or equal to %d pixels. "
                 "To overcome this limitation, set the TILED=YES creation "
                 "option.",
@@ -5550,17 +5546,18 @@ TIFF *GTiffDataset::CreateLL(const char *pszFilename, int nXSize, int nYSize,
         else if (l_nCompression == sLimitation.nCodecID && bTiled &&
                  l_nBlockXSize > sLimitation.nMaxDim)
         {
-            ReportError(pszFilename, CE_Failure, CPLE_IllegalArg,
-                        "COMPRESS=%s is only compatible of tiled images whose "
-                        "BLOCKXSIZE is lesser or equal to %d pixels.",
-                        sLimitation.pszCodecName, sLimitation.nMaxDim);
+            ReportError(
+                pszFilename, CE_Failure, CPLE_IllegalArg,
+                "COMPRESS=%s is only compatible with tiled images whose "
+                "BLOCKXSIZE is lesser or equal to %d pixels.",
+                sLimitation.pszCodecName, sLimitation.nMaxDim);
             return nullptr;
         }
         else if (l_nCompression == sLimitation.nCodecID &&
                  l_nBlockYSize > sLimitation.nMaxDim)
         {
             ReportError(pszFilename, CE_Failure, CPLE_IllegalArg,
-                        "COMPRESS=%s is only compatible of images whose "
+                        "COMPRESS=%s is only compatible with images whose "
                         "BLOCKYSIZE is lesser or equal to %d pixels. "
                         "To overcome this limitation, set the TILED=YES "
                         "creation option",
@@ -6157,7 +6154,7 @@ TIFF *GTiffDataset::CreateLL(const char *pszFilename, int nXSize, int nYSize,
                 ReportError(
                     pszFilename, CE_Failure, CPLE_NotSupported,
                     "PHOTOMETRIC=YCBCR not supported on a %d-band raster: "
-                    "only compatible of a 3-band (RGB) raster",
+                    "only compatible with 3-band (RGB) rasters",
                     l_nBands);
                 XTIFFClose(l_hTIFF);
                 l_fpL->CancelCreation();
@@ -9362,7 +9359,7 @@ CPLErr GTiffDataset::CreateMaskBand(int nFlagsIn)
     if (m_poMaskDS != nullptr)
     {
         ReportError(CE_Failure, CPLE_AppDefined,
-                    "This TIFF dataset has already an internal mask band");
+                    "This TIFF dataset already has an internal mask band");
         return CE_Failure;
     }
     else if (MustCreateInternalMask())
@@ -9473,7 +9470,7 @@ CPLErr GTiffRasterBand::CreateMaskBand(int nFlagsIn)
     if (m_poGDS->m_poMaskDS != nullptr)
     {
         ReportError(CE_Failure, CPLE_AppDefined,
-                    "This TIFF dataset has already an internal mask band");
+                    "This TIFF dataset already has an internal mask band");
         return CE_Failure;
     }
 

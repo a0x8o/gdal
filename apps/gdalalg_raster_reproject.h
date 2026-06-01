@@ -13,7 +13,7 @@
 #ifndef GDALALG_RASTER_REPROJECT_INCLUDED
 #define GDALALG_RASTER_REPROJECT_INCLUDED
 
-#include "gdalalg_raster_pipeline.h"
+#include "gdalrasterpipelinestepalgorithm.h"
 
 #include <limits>
 
@@ -44,7 +44,7 @@ class GDALRasterReprojectAlgorithm /* non final */
   private:
     bool RunStep(GDALPipelineStepRunContext &ctxt) override;
 
-    std::string m_srsCrs{};
+    std::string m_srcCrs{};
     std::string m_dstCrs{};
     std::string m_resampling{};
     std::vector<double> m_resolution{};

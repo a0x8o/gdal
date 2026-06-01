@@ -9468,7 +9468,7 @@ def test_tiff_write_too_many_tiles():
 
 
 @pytest.mark.require_creation_option("GTiff", "JPEG")
-def test_tiff_write_jpeg_incompatible_of_paletted():
+def test_tiff_write_jpeg_incompatible_with_paletted():
 
     src_ds = gdal.Open("data/test_average_palette.tif")
     with gdal.quiet_errors():
@@ -11880,25 +11880,25 @@ def test_tiff_write_colormap_256_mult_factor(tmp_vsimem):
             65501,
             1,
             ["COMPRESS=JPEG"],
-            "COMPRESS=JPEG is only compatible of un-tiled images whose width is lesser or equal to 65500 pixels",
+            "COMPRESS=JPEG is only compatible with un-tiled images whose width is lesser or equal to 65500 pixels",
         ),
         (
             1,
             65501,
             ["COMPRESS=JPEG", "BLOCKYSIZE=65501"],
-            "COMPRESS=JPEG is only compatible of images whose BLOCKYSIZE is lesser or equal to 65500 pixels",
+            "COMPRESS=JPEG is only compatible with images whose BLOCKYSIZE is lesser or equal to 65500 pixels",
         ),
         (
             1,
             1,
             ["COMPRESS=JPEG", "TILED=YES", "BLOCKXSIZE=65536"],
-            "COMPRESS=JPEG is only compatible of tiled images whose BLOCKXSIZE is lesser or equal to 65500 pixels",
+            "COMPRESS=JPEG is only compatible with tiled images whose BLOCKXSIZE is lesser or equal to 65500 pixels",
         ),
         (
             1,
             1,
             ["COMPRESS=JPEG", "TILED=YES", "BLOCKYSIZE=65536"],
-            "COMPRESS=JPEG is only compatible of images whose BLOCKYSIZE is lesser or equal to 65500 pixels",
+            "COMPRESS=JPEG is only compatible with images whose BLOCKYSIZE is lesser or equal to 65500 pixels",
         ),
     ],
 )
@@ -11921,25 +11921,25 @@ def test_tiff_write_too_large_jpeg(
             16384,
             1,
             ["COMPRESS=WEBP"],
-            "COMPRESS=WEBP is only compatible of un-tiled images whose width is lesser or equal to 16383 pixels",
+            "COMPRESS=WEBP is only compatible with un-tiled images whose width is lesser or equal to 16383 pixels",
         ),
         (
             1,
             16384,
             ["COMPRESS=WEBP", "BLOCKYSIZE=16384"],
-            "COMPRESS=WEBP is only compatible of images whose BLOCKYSIZE is lesser or equal to 16383 pixels",
+            "COMPRESS=WEBP is only compatible with images whose BLOCKYSIZE is lesser or equal to 16383 pixels",
         ),
         (
             1,
             1,
             ["COMPRESS=WEBP", "TILED=YES", "BLOCKXSIZE=16384"],
-            "COMPRESS=WEBP is only compatible of tiled images whose BLOCKXSIZE is lesser or equal to 16383 pixels",
+            "COMPRESS=WEBP is only compatible with tiled images whose BLOCKXSIZE is lesser or equal to 16383 pixels",
         ),
         (
             1,
             1,
             ["COMPRESS=WEBP", "TILED=YES", "BLOCKYSIZE=16384"],
-            "COMPRESS=WEBP is only compatible of images whose BLOCKYSIZE is lesser or equal to 16383 pixels",
+            "COMPRESS=WEBP is only compatible with images whose BLOCKYSIZE is lesser or equal to 16383 pixels",
         ),
     ],
 )
@@ -12640,7 +12640,7 @@ def test_tiff_cog_layout(tmp_vsimem):
 def test_tiff_no_get_sibling_files(tmp_vsimem):
 
     if "DEBUG=YES" not in gdal.VersionInfo("BUILD_INFO"):
-        pytest.skip("Only compatible of a GDAL build with -DDEBUG")
+        pytest.skip("Only compatible with a GDAL build with -DDEBUG")
 
     res = [False]
 
@@ -12676,3 +12676,23 @@ def test_tiff_no_get_sibling_files(tmp_vsimem):
             with gdal.Open(tmp_vsimem / "foo.tif") as ds:
                 ds.GetRasterBand(1).GetDefaultRAT()
     assert res[0]
+
+
+@pytest.mark.parametrize("width", [1, 2, 3, 4, 5, 7, 8, 100, 101, 103, 256])
+def test_tiff_write_10bit_roundtrip(tmp_vsimem, width):
+    """Verify optimized 10-bit packing produces correct output for various widths."""
+
+    gdaltest.importorskip_gdal_array()
+    np = pytest.importorskip("numpy")
+
+    fname = tmp_vsimem / f"test_10bit_{width}.tif"
+    ds = gdaltest.tiff_drv.Create(
+        fname, width, 1, 1, gdal.GDT_UInt16, options=["NBITS=10"]
+    )
+    data = np.arange(width, dtype=np.uint16) % 1024
+    ds.GetRasterBand(1).WriteArray(data.reshape(1, width))
+    ds = None  # flush to disk before re-opening
+
+    with gdal.Open(fname) as ds:
+        read = ds.GetRasterBand(1).ReadAsArray().flatten()
+    assert np.array_equal(data, read)

@@ -176,11 +176,11 @@ def test_hint_s3():
         gdal.Open("s3://bucket/object")
 
     with pytest.raises(Exception):
-        gdal.Open("/vsis3/i_do_not_exist/at_all")
+        gdal.Open("/vsis3/i_do_not_exist/at_all.tif")
     assert "may help it to be recognized" not in gdal.GetLastErrorMsg()
 
     with pytest.raises(Exception):
-        gdal.Open("/vsis3_streaming/i_do_not_exist/at_all")
+        gdal.Open("/vsis3_streaming/i_do_not_exist/at_all.tif")
     assert "may help it to be recognized" not in gdal.GetLastErrorMsg()
 
 
@@ -194,11 +194,11 @@ def test_hint_gs():
         gdal.Open("gs://bucket/object")
 
     with pytest.raises(Exception):
-        gdal.Open("/vsigs/i_do_not_exist/at_all")
+        gdal.Open("/vsigs/i_do_not_exist/at_all.tif")
     assert "may help it to be recognized" not in gdal.GetLastErrorMsg()
 
     with pytest.raises(Exception):
-        gdal.Open("/vsigs_streaming/i_do_not_exist/at_all")
+        gdal.Open("/vsigs_streaming/i_do_not_exist/at_all.tif")
     assert "may help it to be recognized" not in gdal.GetLastErrorMsg()
 
 
@@ -212,11 +212,11 @@ def test_hint_az():
         gdal.Open("az://bucket/object")
 
     with pytest.raises(Exception):
-        gdal.Open("/vsiaz/i_do_not_exist/at_all")
+        gdal.Open("/vsiaz/i_do_not_exist/at_all.tif")
     assert "may help it to be recognized" not in gdal.GetLastErrorMsg()
 
     with pytest.raises(Exception):
-        gdal.Open("/vsiaz_streaming/i_do_not_exist/at_all")
+        gdal.Open("/vsiaz_streaming/i_do_not_exist/at_all.tif")
     assert "may help it to be recognized" not in gdal.GetLastErrorMsg()
 
 
@@ -846,10 +846,8 @@ def test_gdal_EscapeString():
     assert gdal.EscapeString("a\rb", gdal.CPLES_CSV) == '"a\rb"'
 
 
+@pytest.mark.require_32bit()
 def test_gdal_EscapeString_errors():
-
-    if sys.maxsize > 2**32:
-        pytest.skip("Test not available on 64 bit")
 
     try:
         # Allocation will be < 4 GB, but will fail being > 2 GB
@@ -1319,7 +1317,7 @@ def test_basic_config_option_GDAL_CACHEMAX():
 
     with pytest.raises(
         Exception,
-        match="Setting GDAL_CACHEMAX has process-wide visibility, and is thus incompatible of the thread_local=True argument of gdal.config_option",
+        match="Setting GDAL_CACHEMAX has process-wide visibility, and is thus incompatible with the thread_local=True argument of gdal.config_option",
     ):
         with gdal.config_option("GDAL_CACHEMAX", 1):
             pass
@@ -1331,7 +1329,7 @@ def test_basic_config_option_GDAL_CACHEMAX():
 
     with pytest.raises(
         Exception,
-        match="Setting GDAL_CACHEMAX has process-wide visibility, and is thus incompatible of the thread_local=True argument of gdal.config_options",
+        match="Setting GDAL_CACHEMAX has process-wide visibility, and is thus incompatible with the thread_local=True argument of gdal.config_options",
     ):
         with gdal.config_options({"GDAL_CACHEMAX": 1}):
             pass

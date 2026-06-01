@@ -158,8 +158,8 @@ bool netCDFLayer::Create(CSLConstList papszOptions,
     m_nDefaultWidth = atoi(
         CSLFetchNameValueDef(papszOptions, "STRING_DEFAULT_WIDTH",
                              CPLSPrintf("%d", m_bAutoGrowStrings ? 10 : 80)));
-    m_bWriteGDALTags = CPL_TO_BOOL(
-        CSLFetchBoolean(m_poDS->papszCreationOptions, "WRITE_GDAL_TAGS", TRUE));
+    m_bWriteGDALTags =
+        m_poDS->aosCreationOptions.FetchBool("WRITE_GDAL_TAGS", true);
     m_bUseStringInNC4 =
         CPL_TO_BOOL(CSLFetchBoolean(papszOptions, "USE_STRING_IN_NC4", TRUE));
     m_bNCDumpCompat =
@@ -2654,7 +2654,7 @@ OGRErr netCDFLayer::CreateField(const OGRFieldDefn *poFieldDefn,
         fieldDesc.bIsDays = (eType == OFTDate);
         m_aoFieldDesc.push_back(fieldDesc);
 
-        // If we have an alternative name that is compatible of the
+        // If we have an alternative name that is compatible with the
         // standard_name attribute, then put it in it.
         // http://cfconventions.org/Data/cf-standard-names/docs/guidelines.html:
         // "Standard names consist of lower-letters, digits and underscores,

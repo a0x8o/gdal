@@ -838,6 +838,31 @@ class S102Checker:
                 BathymetryCoverage, "dataCodingFormat", expected_values
             )
 
+        if "interpolationType" in BathymetryCoverage.attrs:
+            expected_values = {
+                1: "nearestneighbor",
+                5: "bilinear",
+                6: "biquadratic",
+                7: "bicubic",
+                9: "barycentric",
+                10: "discrete",
+            }
+            self._validate_enumeration(
+                BathymetryCoverage, "interpolationType", expected_values
+            )
+
+        if "dataOffsetCode" in BathymetryCoverage.attrs:
+            expected_values = {
+                1: 'XMin, YMin ("Lower left") corner ("Cell origin")',
+                2: 'XMax, YMax ("Upper right") corner',
+                3: 'XMax, YMin ("Lower right") corner',
+                4: 'XMin, YMax ("Upper left") corner',
+                5: "Barycenter (centroid) of cell",
+            }
+            self._validate_enumeration(
+                BathymetryCoverage, "dataOffsetCode", expected_values
+            )
+
         horizontalPositionUncertainty = _get_float_attr_or_none(
             BathymetryCoverage, "horizontalPositionUncertainty"
         )
@@ -1427,7 +1452,7 @@ class S102Checker:
                 else:
                     self._log_check("102_Dev3014")
                     if startSequence != ["0", "0"]:
-                        # other tests are probably not compatible of a non (0,0) startSequence
+                        # other tests are probably not compatible with a non (0,0) startSequence
                         self._warning(
                             f"BathymetryCoverage feature instance group {instance.name}: Values in startSequence in instance group are incompatible with the scan direction in sequencingRule"
                         )

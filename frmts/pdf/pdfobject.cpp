@@ -19,6 +19,7 @@
 
 #include "gdal_pdf.h"
 
+#include <cassert>
 #include <limits>
 #include <type_traits>
 #include <vector>
@@ -401,11 +402,11 @@ GDALPDFDictionary::~GDALPDFDictionary()
 GDALPDFObject *GDALPDFDictionary::LookupObject(const char *pszPath)
 {
     GDALPDFObject *poCurObj = nullptr;
-    char **papszTokens = CSLTokenizeString2(pszPath, ".", 0);
-    for (int i = 0; papszTokens[i] != nullptr; i++)
+    CPLStringList aosTokens(CSLTokenizeString2(pszPath, ".", 0));
+    for (int i = 0; i < aosTokens.size(); i++)
     {
         int iElt = -1;
-        char *pszBracket = strchr(papszTokens[i], '[');
+        char *pszBracket = strchr(aosTokens[i], '[');
         if (pszBracket != nullptr)
         {
             iElt = atoi(pszBracket + 1);
@@ -414,35 +415,42 @@ GDALPDFObject *GDALPDFDictionary::LookupObject(const char *pszPath)
 
         if (i == 0)
         {
-            poCurObj = Get(papszTokens[i]);
+            poCurObj = Get(aosTokens[i]);
         }
         else
         {
             if (poCurObj->GetType() != PDFObjectType_Dictionary)
             {
-                poCurObj = nullptr;
-                break;
+                return nullptr;
             }
-            poCurObj = poCurObj->GetDictionary()->Get(papszTokens[i]);
+            auto poDict = poCurObj->GetDictionary();
+            assert(poDict);
+            poCurObj = poDict->Get(aosTokens[i]);
         }
 
         if (poCurObj == nullptr)
         {
-            poCurObj = nullptr;
-            break;
+            return nullptr;
         }
 
         if (iElt >= 0)
         {
             if (poCurObj->GetType() != PDFObjectType_Array)
             {
-                poCurObj = nullptr;
-                break;
+                return nullptr;
             }
-            poCurObj = poCurObj->GetArray()->Get(iElt);
+            auto poArray = poCurObj->GetArray();
+            assert(poArray);
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnull-dereference"
+#endif
+            poCurObj = poArray->Get(iElt);
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
         }
     }
-    CSLDestroy(papszTokens);
     return poCurObj;
 }
 
@@ -1335,8 +1343,15 @@ std::map<CPLString, GDALPDFObject *> &GDALPDFDictionaryPoppler::GetValues()
     int nLength = m_poDict->getLength();
     for (i = 0; i < nLength; i++)
     {
+#if POPPLER_MAJOR_VERSION > 26 ||                                              \
+    (POPPLER_MAJOR_VERSION == 26 && POPPLER_MINOR_VERSION > 5) ||              \
+    (POPPLER_MAJOR_VERSION == 26 && POPPLER_MINOR_VERSION == 5 &&              \
+     POPPLER_MICRO_VERSION > 0)
+        Get(m_poDict->getKey(i).c_str());
+#else
         const char *pszKey = m_poDict->getKey(i);
         Get(pszKey);
+#endif
     }
     return m_map;
 }

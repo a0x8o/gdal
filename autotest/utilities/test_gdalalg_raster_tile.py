@@ -1302,9 +1302,9 @@ def test_gdalalg_raster_tile_addalpha_dstnodata_exclusive(tmp_vsimem):
     alg["input"] = "../gcore/data/byte.tif"
     alg["output"] = tmp_vsimem
     alg["add-alpha"] = True
-    alg["dst-nodata"] = 0
+    alg["output-nodata"] = 0
     with pytest.raises(
-        Exception, match="'add-alpha' and 'dst-nodata' are mutually exclusive"
+        Exception, match="'add-alpha' and 'output-nodata' are mutually exclusive"
     ):
         alg.Run()
 
@@ -2235,10 +2235,11 @@ def test_gdalalg_raster_tile_pipeline(tmp_path):
             "GDAL_THRESHOLD_MIN_TILES_PER_JOB": "1",
         }
     ):
-        gdal.Run(
+        alg = gdal.Run(
             "raster pipeline",
             pipeline=f"mosaic ../gdrivers/data/small_world.tif ! tile {out_dirname} --min-zoom=0 --max-zoom=3",
         )
+        assert alg.Outputs() == {"output": None, "output-string": ""}
 
     assert len(gdal.ReadDirRecursive(out_dirname)) == 108
 
@@ -2281,3 +2282,56 @@ def test_gdalalg_raster_tile_pipeline_error(tmp_path):
                 input=src_ds,
                 pipeline=f"mosaic ! tile {out_dirname} --min-zoom=0 --max-zoom=3",
             )
+
+
+def test_gdalalg_raster_tile_overview_selection(tmp_vsimem):
+
+    src_ds = gdal.GetDriverByName("MEM").Create("", 512, 512, 1)
+    src_ds.GetRasterBand(1).Fill(255)
+    src_ds.BuildOverviews("NONE", [2])
+    src_ds.GetRasterBand(1).GetOverview(0).Fill(127)
+    srs = osr.SpatialReference()
+    srs.ImportFromEPSG(3857)
+    src_ds.SetSpatialRef(srs)
+    MAX_GM = 20037508.342789244
+    RES = 2 * MAX_GM / 512
+    src_ds.SetGeoTransform([-MAX_GM, RES, 0, MAX_GM, 0, -RES])
+
+    gdal.alg.raster.tile(input=src_ds, output=tmp_vsimem, max_zoom=0)
+
+    ds = gdal.Open(tmp_vsimem / "0/0/0.png")
+    assert ds.GetRasterBand(1).ComputeRasterMinMax() == (127, 127)
+
+
+def test_gdalalg_raster_tile_pipeline_materialize_explicit_filename(tmp_vsimem):
+
+    gdal.alg.pipeline(
+        pipeline=f"read ../gdrivers/data/small_world.tif ! materialize --output {tmp_vsimem}/tmp.tif ! tile {tmp_vsimem}"
+    )
+
+    ds = gdal.Open(tmp_vsimem / "0/0/0.png")
+    assert ds.GetRasterBand(1).ComputeRasterMinMax() == (0, 255)
+
+    ds = gdal.Open(tmp_vsimem / "tmp.tif")
+    assert ds.RasterXSize == 400
+
+
+def test_gdalalg_raster_tile_pipeline_materialize_no_explicit_filename(tmp_vsimem):
+
+    gdal.alg.pipeline(
+        pipeline=f"read ../gdrivers/data/small_world.tif ! materialize ! tile {tmp_vsimem}"
+    )
+
+    ds = gdal.Open(tmp_vsimem / "0/0/0.png")
+    assert ds.GetRasterBand(1).ComputeRasterMinMax() == (0, 255)
+
+
+def test_gdalalg_raster_tile_pipeline_materialize_not_second_to_lat(tmp_vsimem):
+
+    with pytest.raises(
+        Exception,
+        match="Cannot execute this pipeline in parallel mode due to the presence of a materialize step that has a 'output' argument and is not immediately before the last step",
+    ):
+        gdal.alg.pipeline(
+            pipeline=f"read ../gdrivers/data/small_world.tif ! materialize --output {tmp_vsimem}/tmp.tif ! edit ! tile {tmp_vsimem}"
+        )

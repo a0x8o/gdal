@@ -357,8 +357,8 @@ class netCDFDataset final : public GDALPamDataset
 #endif
     VSILFILE *fpVSIMEM = nullptr;
     int nSubDatasets;
-    char **papszSubDatasets;
-    char **papszMetadata;
+    CPLStringList aosSubDatasets;
+    CPLStringList aosMetadata;
 
     // Used to report metadata found in Sentinel 5
     std::map<std::string, CPLStringList> m_oMapDomainToJSon{};
@@ -403,7 +403,7 @@ class netCDFDataset final : public GDALPamDataset
     bool bAddedGridMappingRef;
 
     /* create vars */
-    char **papszCreationOptions;
+    CPLStringList aosCreationOptions;
     NetCDFCompressEnum eCompress;
     int nZLevel;
     bool bChunking;
@@ -523,8 +523,8 @@ class netCDFDataset final : public GDALPamDataset
 
     CPLErr
     FilterVars(int nCdfId, bool bKeepRasters, bool bKeepVectors,
-               char **papszIgnoreVars, int *pnRasterVars, int *pnGroupId,
-               int *pnVarId, int *pnIgnoredVars,
+               const CPLStringList &aosIgnoreVars, int *pnRasterVars,
+               int *pnGroupId, int *pnVarId, int *pnIgnoredVars,
                // key is (dim1Id, dim2Id, nc_type varType)
                // value is (groupId, varId)
                std::map<std::array<int, 3>, std::vector<std::pair<int, int>>>
@@ -792,6 +792,8 @@ CPLErr NCDFGetAttr(int nCdfId, int nVarId, const char *pszAttrName,
                    double *pdfValue);
 CPLErr NCDFGetAttr(int nCdfId, int nVarId, const char *pszAttrName,
                    char **pszValue);
+CPLErr NCDFGetAttr(int nCdfId, int nVarId, const char *pszAttrName,
+                   std::string &osValue);
 bool NCDFIsUnlimitedDim(bool bIsNC4, int cdfid, int nDimId);
 bool NCDFIsUserDefinedType(int ncid, int type);
 

@@ -56,8 +56,9 @@ GDALVectorIndexAlgorithm::GDALVectorIndexAlgorithm()
         &m_writeAbsolutePaths,
         _("Whether the path to the input datasets should be stored as an "
           "absolute path"));
-    AddArg("dst-crs", 0, _("Destination CRS"), &m_crs)
+    AddArg(GDAL_ARG_NAME_OUTPUT_CRS, 0, _("Output CRS"), &m_crs)
         .SetIsCRSArg()
+        .AddHiddenAlias("dst-crs")
         .AddHiddenAlias("t_srs");
 
     {
@@ -132,7 +133,7 @@ GDALVectorIndexAlgorithm::GDALVectorIndexAlgorithm()
             {
                 ReportError(
                     CE_Warning, CPLE_AppDefined,
-                    "--skip-different-crs ignored when --dst-crs specified");
+                    "--skip-different-crs ignored when --output-crs specified");
             }
 
             return true;
@@ -535,7 +536,7 @@ bool GDALVectorIndexAlgorithm::RunImpl(GDALProgressFunc pfnProgress,
                         poSrcLayer->GetDescription(), poSrcDS->GetDescription(),
                         m_skipDifferentCRS || !m_acceptDifferentCRS
                             ? ". Skipping it"
-                        : !m_skipDifferentCRS && m_calledFromOgrTIndex
+                        : m_calledFromOgrTIndex
                             ? ". You may specify -skip_differerence_srs to "
                               "skip it"
                             : "");

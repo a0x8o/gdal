@@ -12,7 +12,7 @@
 ###############################################################################
 
 import math
-import sys
+import struct
 
 import gdaltest
 import ogrtest
@@ -611,7 +611,7 @@ def test_gdalalg_raster_zonal_stats_output_format_detection(
     assert out_ds.GetDriver().GetName() == "CSV"
 
 
-@pytest.mark.parametrize("include_field", ["ALL", "NONE", ["PRFEDEA", "EAS_ID"]])
+@pytest.mark.parametrize("include_field", [None, "ALL", "NONE", ["PRFEDEA", "EAS_ID"]])
 def test_gdalalg_raster_zonal_stats_polygon_zones_include_fields(
     zonal, strategy, polyrast, include_field
 ):
@@ -624,33 +624,34 @@ def test_gdalalg_raster_zonal_stats_polygon_zones_include_fields(
     zonal["include-field"] = "does_not_exist"
     zonal["zones"] = "../ogr/data/poly.shp"
 
-    with pytest.raises(Exception, match="Field .* not found"):
-        zonal.Run()
-
-    zonal["include-field"] = include_field
-
-    if include_field == "ALL":
-        expected_fields = ["AREA", "EAS_ID", "PRFEDEA", "sum"]
-    elif include_field == "NONE":
-        expected_fields = ["sum"]
+    if include_field is None:
+        with pytest.raises(Exception, match="Field .* not found"):
+            zonal.Run()
     else:
-        expected_fields = ["PRFEDEA", "EAS_ID", "sum"]
+        zonal["include-field"] = include_field
 
-    assert zonal.Run()
+        if include_field == "ALL":
+            expected_fields = ["AREA", "EAS_ID", "PRFEDEA", "sum"]
+        elif include_field == "NONE":
+            expected_fields = ["sum"]
+        else:
+            expected_fields = ["PRFEDEA", "EAS_ID", "sum"]
 
-    out_ds = zonal.Output()
+        assert zonal.Run()
 
-    f = out_ds.GetLayer(0).GetNextFeature()
+        out_ds = zonal.Output()
 
-    assert field_names(f) == expected_fields
+        f = out_ds.GetLayer(0).GetNextFeature()
 
-    if "PRFEDEA" in expected_fields:
-        assert f["PRFEDEA"] == "35043411"
-    if "EAS_ID" in expected_fields:
-        assert f["EAS_ID"] == 168
-    if "AREA" in expected_fields:
-        assert f["AREA"] == 215229.266
-    assert f["sum"] == 369.0
+        assert field_names(f) == expected_fields
+
+        if "PRFEDEA" in expected_fields:
+            assert f["PRFEDEA"] == "35043411"
+        if "EAS_ID" in expected_fields:
+            assert f["EAS_ID"] == 168
+        if "AREA" in expected_fields:
+            assert f["AREA"] == 215229.266
+        assert f["sum"] == 369.0
 
 
 def test_gdalalg_raster_zonal_stats_polygon_zones_include_geom(
@@ -760,7 +761,7 @@ def test_gdalalg_raster_zonal_stats_polygon_zones_invalid_chunk_size(zonal):
         zonal["chunk-size"] = "512"
 
 
-@pytest.mark.skipif(sys.maxsize <= 1 << 32, reason="only works on 64 bit")
+@pytest.mark.require_64bit()
 def test_gdalalg_raster_zonal_stats_polygon_zones_large_chunk_size(zonal):
 
     zonal["input"] = "../gcore/data/byte.tif"
@@ -1330,3 +1331,36 @@ def test_gdalalg_raster_zonal_stats_center_xy_alloc(zonal, strategy, pixels):
     zonal["stat"] = ["count", "center_x", "center_y"]
 
     assert zonal.Run()  # no crash
+
+
+def test_gdalalg_raster_zonal_stats_zones_nodata(zonal):
+
+    src_ds = gdal.Open("../gcore/data/byte.tif")
+
+    zones_ds = gdal.GetDriverByName("MEM").Create(
+        "", src_ds.RasterXSize, src_ds.RasterYSize, 1, gdal.GDT_Float32
+    )
+    zones_ds.SetGeoTransform(src_ds.GetGeoTransform())
+    zones_ds.SetSpatialRef(src_ds.GetSpatialRef())
+    zones_ds.WriteRaster(0, 0, 1, 1, struct.pack("f", float("nan")))
+    zones_ds.WriteRaster(0, 1, 1, 1, struct.pack("f", float("nan")))
+
+    zonal["input"] = src_ds
+    zonal["zones"] = zones_ds
+    zonal["stat"] = "count"
+    zonal["output-format"] = "MEM"
+    zonal["output-layer"] = "myresult"
+
+    assert zonal.Run()
+
+    out_ds = zonal.Output()
+    lyr = out_ds.GetLayer(0)
+    assert lyr.GetFeatureCount() == 2
+
+    f = lyr.GetNextFeature()
+    assert math.isnan(f["value"])
+    assert f["count"] == 2
+
+    f = lyr.GetNextFeature()
+    assert f["value"] == 0
+    assert f["count"] == 398

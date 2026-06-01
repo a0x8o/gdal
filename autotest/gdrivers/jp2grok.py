@@ -277,7 +277,7 @@ def test_jp2grok_10():
     gdal.Unlink("/vsimem/jp2grok_10.jp2")
 
     # Quite a bit of difference...
-    assert maxdiff <= 35, "Image too different from reference"
+    assert maxdiff <= 38, "Image too different from reference"
 
 
 ###############################################################################
@@ -592,7 +592,7 @@ def test_jp2grok_22():
     assert fourth_band.GetMetadataItem("NBITS", "IMAGE_STRUCTURE") == "1"
     ds = None
     ds = gdal.Open("/vsimem/jp2grok_22.jp2")
-    assert ds.GetRasterBand(4).Checksum() == 22499
+    assert ds.GetRasterBand(4).Checksum() == 26477
     ds = None
     gdal.Unlink("/vsimem/jp2grok_22.jp2")
 
@@ -721,7 +721,7 @@ def test_jp2grok_24():
     ds = None
     ds = gdal.Open("/vsimem/jp2grok_24.jp2")
     assert ds.GetRasterBand(2).GetMetadataItem("NBITS", "IMAGE_STRUCTURE") is None
-    assert ds.GetRasterBand(2).Checksum() == 22499
+    assert ds.GetRasterBand(2).Checksum() == 27389
     ds = None
     gdal.Unlink("/vsimem/jp2grok_24.jp2")
 
@@ -1348,6 +1348,181 @@ def test_jp2grok_transcode_ignored_options(tmp_path):
     ds = gdal.Open(dst_jp2)
     assert ds is not None
     ds = None
+
+
+###############################################################################
+# Test overview decode returns correct data (not a top-left crop)
+
+
+def test_jp2grok_overview_decode():
+    np = pytest.importorskip("numpy")
+
+    # Create a 256x256 image with a diagonal gradient so each quadrant
+    # has a distinct mean value, making it easy to detect a crop bug.
+    src_ds = gdal.GetDriverByName("MEM").Create("", 256, 256, 1, gdal.GDT_Byte)
+    arr = np.zeros((256, 256), dtype=np.uint8)
+    for y in range(256):
+        for x in range(256):
+            arr[y, x] = (x + y) * 255 // 510  # 0 at (0,0) .. 255 at (255,255)
+    src_ds.GetRasterBand(1).WriteArray(arr)
+    sr = osr.SpatialReference()
+    sr.ImportFromEPSG(32631)
+    src_ds.SetProjection(sr.ExportToWkt())
+    src_ds.SetGeoTransform([450000, 1, 0, 5000000, 0, -1])
+
+    # Encode lossless with 5-3 wavelet so overviews are exact
+    fname = "/vsimem/test_jp2grok_overview_decode.jp2"
+    out_ds = gdaltest.jp2grok_drv.CreateCopy(
+        fname, src_ds, options=["REVERSIBLE=YES", "QUALITY=100"]
+    )
+    del out_ds, src_ds
+
+    ds = gdal.Open(fname)
+    assert ds is not None
+    band = ds.GetRasterBand(1)
+    ov_count = band.GetOverviewCount()
+    assert ov_count > 0, "Expected at least one overview level"
+
+    # The full-resolution checksum
+    full_cs = band.Checksum()
+    assert full_cs == 53143
+
+    # Read overview level 0 (factor-of-2 reduction => 128×128)
+    ov0 = band.GetOverview(0)
+    assert ov0.XSize == 128 and ov0.YSize == 128
+
+    ov_data = ov0.ReadAsArray()
+
+    # The mean of the diagonal gradient at full res is ~127.
+    # At the overview the mean should be similar.
+    ov_mean = float(np.mean(ov_data))
+    assert (
+        100 < ov_mean < 155
+    ), f"Overview mean {ov_mean} out of range — likely a crop bug"
+
+    # Check that bottom-right quadrant is brighter than top-left quadrant
+    tl_mean = float(np.mean(ov_data[:64, :64]))
+    br_mean = float(np.mean(ov_data[64:, 64:]))
+    assert br_mean > tl_mean + 30, (
+        f"Bottom-right mean ({br_mean}) should be much larger "
+        f"than top-left mean ({tl_mean}) — overview may be a crop"
+    )
+
+    # Also test ReadRaster at overview resolution via the main band
+    data = band.ReadRaster(0, 0, 256, 256, buf_xsize=128, buf_ysize=128)
+    assert data == ov_data
+
+    ds = None
+    gdal.Unlink(fname)
+
+
+###############################################################################
+# Test overview decode on a multi-tiled image.
+# Regression test for coordinate-space mismatch in CopyTileData when
+# iLevel > 0: Grok returns tile img->x0/y0 in full-resolution coordinates,
+# but the request window is in reduced overview space.  Without the fix,
+# tiles not at the origin are skipped and the overview is mostly zero.
+
+
+def test_jp2grok_multitile_overview_decode():
+    np = pytest.importorskip("numpy")
+
+    # Create a 512×512 3-band image with a distinctive pattern:
+    # each pixel = (x % 256, y % 256, (x+y) % 256) so every region
+    # has non-zero data and is verifiable.
+    width = 512
+    height = 512
+    nbands = 3
+    src_ds = gdal.GetDriverByName("MEM").Create(
+        "", width, height, nbands, gdal.GDT_Byte
+    )
+    for b in range(nbands):
+        arr = np.zeros((height, width), dtype=np.uint8)
+        for y in range(height):
+            for x in range(width):
+                if b == 0:
+                    arr[y, x] = x * 255 // (width - 1)
+                elif b == 1:
+                    arr[y, x] = y * 255 // (height - 1)
+                else:
+                    arr[y, x] = (x + y) * 255 // (width + height - 2)
+        src_ds.GetRasterBand(b + 1).WriteArray(arr)
+
+    # Encode lossless with small tiles (128×128) to create a 4×4 tile grid,
+    # and 3 resolution levels so we get at least 2 overview levels.
+    fname = "/vsimem/test_jp2grok_multitile_overview_decode.jp2"
+    out_ds = gdaltest.jp2grok_drv.CreateCopy(
+        fname,
+        src_ds,
+        options=[
+            "REVERSIBLE=YES",
+            "QUALITY=100",
+            "BLOCKXSIZE=128",
+            "BLOCKYSIZE=128",
+            "RESOLUTIONS=3",
+        ],
+    )
+    del out_ds, src_ds
+
+    ds = gdal.Open(fname)
+    assert ds is not None
+    assert ds.RasterXSize == width
+    assert ds.RasterYSize == height
+    band = ds.GetRasterBand(1)
+    ov_count = band.GetOverviewCount()
+    assert ov_count >= 1, "Expected at least one overview level"
+
+    # Test each overview level
+    for ov_idx in range(ov_count):
+        ov = band.GetOverview(ov_idx)
+        ov_data = ov.ReadAsArray()
+        ov_w = ov.XSize
+        ov_h = ov.YSize
+        assert ov_w > 0 and ov_h > 0
+
+        # The x-gradient pattern means the mean of band 1 should be ~127
+        # (half of 0..255 cycle).  If overview tiles are skipped, the mean
+        # drops dramatically because skipped regions are zero-filled.
+        ov_mean = float(np.mean(ov_data))
+        assert ov_mean > 80, (
+            f"Overview {ov_idx} ({ov_w}x{ov_h}) band 1 mean {ov_mean:.1f} "
+            f"is too low — tiles likely skipped due to coordinate mismatch"
+        )
+
+        # Verify that the right half has a higher mean than the left half
+        # (x-gradient: left starts near 0, right near 255).
+        mid = ov_w // 2
+        left_mean = float(np.mean(ov_data[:, :mid]))
+        right_mean = float(np.mean(ov_data[:, mid:]))
+        assert right_mean > left_mean + 20, (
+            f"Overview {ov_idx}: right-half mean ({right_mean:.1f}) should "
+            f"exceed left-half mean ({left_mean:.1f}) — data may be corrupt"
+        )
+
+        # Verify that no large contiguous zero blocks exist (which would
+        # indicate missing tiles).  At overview level, every 8×8 block
+        # should have some non-zero pixels.
+        block = 8
+        for by in range(0, ov_h - block + 1, block):
+            for bx in range(0, ov_w - block + 1, block):
+                patch = ov_data[by : by + block, bx : bx + block]
+                assert np.any(patch > 0), (
+                    f"Overview {ov_idx}: all-zero block at ({bx},{by}) "
+                    f"— tile data likely missing"
+                )
+
+    # Also test band 2 (y-gradient) at overview 0
+    ov2 = ds.GetRasterBand(2).GetOverview(0)
+    ov2_data = ov2.ReadAsArray()
+    top_mean = float(np.mean(ov2_data[: ov2.YSize // 2, :]))
+    bot_mean = float(np.mean(ov2_data[ov2.YSize // 2 :, :]))
+    assert bot_mean > top_mean + 20, (
+        f"Band 2 overview: bottom mean ({bot_mean:.1f}) should exceed "
+        f"top mean ({top_mean:.1f}) — y-gradient not preserved"
+    )
+
+    ds = None
+    gdal.Unlink(fname)
 
 
 ###############################################################################

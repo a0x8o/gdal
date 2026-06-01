@@ -609,9 +609,9 @@ static inline char *CPL_afl_friendly_strstr(const char *haystack,
 #endif
 
 #if defined(CPL_LSB)
-#define CPL_IS_LSB 1
+#define CPL_IS_LSB (1 == 1)
 #else
-#define CPL_IS_LSB 0
+#define CPL_IS_LSB (0 == 1)
 #endif
 /*! @endcond */
 
@@ -795,8 +795,38 @@ extern "C++"
  */
 #define CPL_LSBUINT16PTR(x) CPL_STATIC_CAST(GUInt16, CPL_LSBINT16PTR(x))
 
+#if defined(__cplusplus) && !defined(CPL_SUPRESS_CPLUSPLUS)
+extern "C++"
+{
+#include <cstdint>
+
+    /** Return a signed Int32 from the 4 bytes ordered in LSB order at address x */
+    template <class T> inline int32_t CPL_LSBSINT32PTR(const T *x)
+    {
+        static_assert(sizeof(T) == 1 || sizeof(T) == sizeof(int32_t),
+                      "sizeof(T) == 1 || sizeof(T) == sizeof(int32_t)");
+#if CPL_IS_LSB
+        {
+            int32_t signed_val;
+            memcpy(&signed_val, x, sizeof(int32_t));
+            return signed_val;
+        }
+#else
+        {
+            uint32_t unsigned_val;
+            memcpy(&unsigned_val, x, sizeof(int32_t));
+            unsigned_val = CPL_SWAP32(unsigned_val);
+            int32_t signed_val;
+            memcpy(&signed_val, &unsigned_val, sizeof(int32_t));
+            return signed_val;
+        }
+#endif
+    }
+}
+#else
 /** Return a signed Int32 from the 4 bytes ordered in LSB order at address x */
 #define CPL_LSBSINT32PTR(x) CPL_STATIC_CAST(GInt32, CPL_LSBINT32PTR(x))
+#endif
 
 /** Return a unsigned Int32 from the 4 bytes ordered in LSB order at address x
  */
@@ -1154,6 +1184,8 @@ extern "C++"
     template <class T> static void CPL_IGNORE_RET_VAL(const T &)
     {
     }
+
+    inline static bool CPL_TO_BOOL(bool x) = delete;
 
     inline static bool CPL_TO_BOOL(int x)
     {

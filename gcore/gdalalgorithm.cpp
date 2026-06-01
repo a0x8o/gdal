@@ -13,6 +13,7 @@
 #include "cpl_port.h"
 #include "cpl_conv.h"
 #include "cpl_error.h"
+#include "cpl_error_internal.h"
 #include "cpl_json.h"
 #include "cpl_levenshtein.h"
 #include "cpl_minixml.h"
@@ -22,6 +23,7 @@
 #include "gdalalg_abstract_pipeline.h"
 #include "gdal_priv.h"
 #include "gdal_thread_pool.h"
+#include "memdataset.h"
 #include "ogrsf_frmts.h"
 #include "ogr_spatialref.h"
 #include "vrtdataset.h"
@@ -462,7 +464,8 @@ static bool CheckCanSetDatasetObject(const GDALAlgorithmArg *arg)
 
 bool GDALAlgorithmArg::Set(GDALDataset *ds)
 {
-    if (m_decl.GetType() != GAAT_DATASET)
+    if (m_decl.GetType() != GAAT_DATASET &&
+        m_decl.GetType() != GAAT_DATASET_LIST)
     {
         CPLError(CE_Failure, CPLE_AppDefined,
                  "Calling Set(GDALDataset*, bool) on argument '%s' of type %s "
@@ -473,8 +476,18 @@ bool GDALAlgorithmArg::Set(GDALDataset *ds)
     if (!CheckCanSetDatasetObject(this))
         return false;
     m_explicitlySet = true;
-    auto &val = *std::get<GDALArgDatasetValue *>(m_value);
-    val.Set(ds);
+    if (m_decl.GetType() == GAAT_DATASET)
+    {
+        auto &val = *std::get<GDALArgDatasetValue *>(m_value);
+        val.Set(ds);
+    }
+    else
+    {
+        CPLAssert(m_decl.GetType() == GAAT_DATASET_LIST);
+        auto &val = *std::get<std::vector<GDALArgDatasetValue> *>(m_value);
+        val.resize(1);
+        val[0].Set(ds);
+    }
     return RunAllActions();
 }
 
@@ -521,7 +534,7 @@ bool GDALAlgorithmArg::SetFrom(const GDALArgDatasetValue &other)
                  GetName().c_str(), GDALAlgorithmArgTypeName(m_decl.GetType()));
         return false;
     }
-    if (!CheckCanSetDatasetObject(this))
+    if (other.GetDatasetRef() && !CheckCanSetDatasetObject(this))
         return false;
     m_explicitlySet = true;
     std::get<GDALArgDatasetValue *>(m_value)->SetFrom(other);
@@ -1649,7 +1662,7 @@ GDALInConstructionAlgorithmArg &GDALInConstructionAlgorithmArg::SetIsCRSArg(
             bool bIsRaster = false;
             OGREnvelope sDatasetLongLatEnv;
             std::string osCelestialBodyName;
-            if (GetName() == "dst-crs")
+            if (GetName() == GDAL_ARG_NAME_OUTPUT_CRS)
             {
                 auto inputArg = m_owner->GetArg(GDAL_ARG_NAME_INPUT);
                 if (inputArg && inputArg->GetType() == GAAT_DATASET_LIST)
@@ -2877,35 +2890,53 @@ bool GDALAlgorithm::ProcessDatasetArg(GDALAlgorithmArg *arg,
         }
 
         GDALDataset *poDS;
+        CPLErrorAccumulator oAccumulator;
         {
-            // The PostGISRaster may emit an error message, that is not
-            // relevant, if it is the vector driver that was intended
-            std::unique_ptr<CPLErrorStateBackuper> poBackuper;
-            if (cpl::starts_with(osDatasetName, "PG:") &&
-                (flags & (GDAL_OF_RASTER | GDAL_OF_VECTOR)) != 0)
-            {
-                poBackuper = std::make_unique<CPLErrorStateBackuper>(
-                    CPLQuietErrorHandler);
-            }
+            auto oContext = oAccumulator.InstallForCurrentScope();
 
-            CPL_IGNORE_RET_VAL(poBackuper);
             poDS = oIterDatasetNameToDataset != m_oMapDatasetNameToDataset.end()
                        ? oIterDatasetNameToDataset->second
                        : GDALDataset::Open(osDatasetName.c_str(), flags,
                                            aosAllowedDrivers.List(),
                                            aosOpenOptions.List());
 
+            if (!poDS && aosAllowedDrivers.empty() && aosOpenOptions.empty() &&
+                !arg->IsOutput() && arg->GetDatasetType() & GDAL_OF_VECTOR)
+            {
+                auto [poWktGeom, eErr] = OGRGeometryFactory::createFromWkt(
+                    osDatasetName.c_str(), nullptr);
+                if (eErr == OGRERR_NONE)
+                {
+                    auto poMemDS = std::make_unique<MEMDataset>();
+                    auto *poLayer = poMemDS->CreateLayer(
+                        "", poWktGeom->getSpatialReference(),
+                        poWktGeom->getGeometryType());
+
+                    auto poFeatureDefn = poLayer->GetLayerDefn();
+                    OGRFeature oFeature(poFeatureDefn);
+
+                    oFeature.SetGeometry(std::move(poWktGeom));
+                    if (poLayer->CreateFeature(&oFeature) == OGRERR_NONE)
+                    {
+                        poDS = poMemDS.release();
+                        oAccumulator.ClearErrors();
+                    }
+                }
+            }
+
             // Retry with PostGIS vector driver
-            if (!poDS && poBackuper &&
+            if (!poDS && (flags & (GDAL_OF_RASTER | GDAL_OF_VECTOR)) != 0 &&
+                cpl::starts_with(osDatasetName, "PG:") &&
                 GetGDALDriverManager()->GetDriverByName("PostGISRaster") &&
                 aosAllowedDrivers.empty() && aosOpenOptions.empty())
             {
-                poBackuper.reset();
+                oAccumulator.ClearErrors();
                 poDS = GDALDataset::Open(
                     osDatasetName.c_str(), flags & ~GDAL_OF_RASTER,
                     aosAllowedDrivers.List(), aosOpenOptions.List());
             }
         }
+        oAccumulator.ReplayErrors();
 
         if (poDS)
         {
@@ -5152,37 +5183,57 @@ void GDALAlgorithm::SetAutoCompleteFunctionForLayerName(
 
 void GDALAlgorithm::SetAutoCompleteFunctionForFieldName(
     GDALInConstructionAlgorithmArg &fieldArg,
-    GDALInConstructionAlgorithmArg &layerNameArg,
-    std::vector<GDALArgDatasetValue> &datasetArg)
+    const GDALAlgorithmArg *layerNameArg, bool attributeFields,
+    bool geometryFields, std::vector<GDALArgDatasetValue> &datasetArg)
 {
 
     fieldArg.SetAutoCompleteFunction(
-        [&datasetArg, &layerNameArg](const std::string &currentValue)
+        [&datasetArg, layerNameArg, attributeFields,
+         geometryFields](const std::string &currentValue)
         {
             std::set<std::string> ret;
             if (!datasetArg.empty())
             {
                 CPLErrorStateBackuper oBackuper(CPLQuietErrorHandler);
 
-                auto getLayerFields = [&ret, &currentValue](OGRLayer *poLayer)
+                const auto getLayerFields =
+                    [&ret, &currentValue, attributeFields,
+                     geometryFields](const OGRLayer *poLayer)
                 {
-                    auto poDefn = poLayer->GetLayerDefn();
-                    const int nFieldCount = poDefn->GetFieldCount();
-                    for (int iField = 0; iField < nFieldCount; iField++)
+                    const auto poDefn = poLayer->GetLayerDefn();
+                    if (attributeFields)
                     {
-                        const char *fieldName =
-                            poDefn->GetFieldDefn(iField)->GetNameRef();
-                        if (currentValue == fieldName)
+                        for (const auto poFieldDefn : poDefn->GetFields())
                         {
-                            ret.clear();
+                            const char *fieldName = poFieldDefn->GetNameRef();
+                            if (currentValue == fieldName)
+                            {
+                                ret.clear();
+                                ret.insert(fieldName);
+                                break;
+                            }
                             ret.insert(fieldName);
-                            break;
                         }
-                        ret.insert(fieldName);
+                    }
+                    if (geometryFields)
+                    {
+                        for (const auto poFieldDefn : poDefn->GetGeomFields())
+                        {
+                            const char *fieldName = poFieldDefn->GetNameRef();
+                            if (fieldName[0] == 0)
+                                fieldName = "OGR_GEOMETRY";
+                            if (currentValue == fieldName)
+                            {
+                                ret.clear();
+                                ret.insert(fieldName);
+                                break;
+                            }
+                            ret.insert(fieldName);
+                        }
                     }
                 };
 
-                GDALArgDatasetValue &dsVal = datasetArg[0];
+                const GDALArgDatasetValue &dsVal = datasetArg[0];
 
                 if (!dsVal.GetName().empty())
                 {
@@ -5191,22 +5242,39 @@ void GDALAlgorithm::SetAutoCompleteFunctionForFieldName(
                                           GDAL_OF_VECTOR | GDAL_OF_READONLY));
                     if (poDS)
                     {
-                        const auto &layerName = layerNameArg.Get<std::string>();
-                        if (layerName.empty())
+                        std::vector<std::string> layerNames;
+                        if (layerNameArg && layerNameArg->IsExplicitlySet())
+                        {
+                            if (layerNameArg->GetType() == GAAT_STRING_LIST)
+                            {
+                                layerNames =
+                                    layerNameArg
+                                        ->Get<std::vector<std::string>>();
+                            }
+                            else if (layerNameArg->GetType() == GAAT_STRING)
+                            {
+                                layerNames.push_back(
+                                    layerNameArg->Get<std::string>());
+                            }
+                        }
+                        if (layerNames.empty())
                         {
                             // Loop through all layers
-                            for (auto &&poLayer : poDS->GetLayers())
+                            for (const auto *poLayer : poDS->GetLayers())
                             {
                                 getLayerFields(poLayer);
                             }
                         }
                         else
                         {
-                            const auto poLayer = poDS->GetLayerByName(
-                                layerNameArg.Get<std::string>().c_str());
-                            if (poLayer)
+                            for (const std::string &layerName : layerNames)
                             {
-                                getLayerFields(poLayer);
+                                const auto poLayer =
+                                    poDS->GetLayerByName(layerName.c_str());
+                                if (poLayer)
+                                {
+                                    getLayerFields(poLayer);
+                                }
                             }
                         }
                     }
@@ -6208,6 +6276,14 @@ bool GDALAlgorithm::Run(GDALProgressFunc pfnProgress, void *pProgressData)
 
     if (!ValidateArguments())
         return false;
+
+    if (m_alreadyRun)
+    {
+        ReportError(CE_Failure, CPLE_AppDefined,
+                    "Run() can be called only once per algorithm instance");
+        return false;
+    }
+    m_alreadyRun = true;
 
     switch (ProcessGDALGOutput())
     {
@@ -7453,6 +7529,36 @@ void GDALAlgorithm::ExtractLastOptionAndValue(std::vector<std::string> &args,
     }
 }
 
+/************************************************************************/
+/*                 GDALAlgorithm::GetArgDependencies()                  */
+/************************************************************************/
+
+std::vector<std::string>
+GDALAlgorithm::GetArgDependencies(const std::string &osName) const
+{
+    const auto arg = GetArg(osName, false);
+    if (!arg)
+    {
+        ReportError(CE_Failure, CPLE_AppDefined, "Argument '%s' does not exist",
+                    osName.c_str());
+        return {};
+    }
+    std::vector<std::string> dependencies = arg->GetDirectDependencies();
+    if (const auto &mutualDependencyGroup = arg->GetMutualDependencyGroup();
+        !mutualDependencyGroup.empty())
+    {
+        for (const auto &otherArg : m_args)
+        {
+            if (otherArg.get() == arg ||
+                mutualDependencyGroup.compare(
+                    otherArg->GetMutualDependencyGroup()) != 0)
+                continue;
+            dependencies.push_back(otherArg->GetName());
+        }
+    }
+    return dependencies;
+}
+
 //! @cond Doxygen_Suppress
 
 /************************************************************************/
@@ -7650,6 +7756,8 @@ GDALAlgorithmH GDALAlgorithmGetActualAlgorithm(GDALAlgorithmH hAlg)
 
 /** Execute the algorithm, starting with ValidateArguments() and then
  * calling RunImpl().
+ *
+ * This function must be called at most once per instance.
  *
  * @param hAlg Handle to an algorithm. Must NOT be null.
  * @param pfnProgress Progress callback. May be null.

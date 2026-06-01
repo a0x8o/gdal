@@ -131,7 +131,8 @@ GDALRasterTileAlgorithm::GDALRasterTileAlgorithm(bool standaloneStep)
                                           .SetAddDefaultArguments(false)
                                           .SetInputDatasetAlias("dataset"))
 {
-    AddProgressArg();
+    if (standaloneStep)
+        AddProgressArg();
     AddArg("spawned", 0, _("Whether this is a spawned worker"),
            &m_spawned)
         .SetHidden();  // Used in spawn mode
@@ -180,7 +181,7 @@ GDALRasterTileAlgorithm::GDALRasterTileAlgorithm(bool standaloneStep)
         .AddMetadataItem(GAAMDI_VRT_COMPATIBLE, {"false"});
     AddCreationOptionsArg(&m_creationOptions);
 
-    AddArg(GDAL_ARG_NAME_OUTPUT, 'o', _("Output directory"), &m_output)
+    AddArg(GDAL_ARG_NAME_OUTPUT, 'o', _("Output directory"), &m_outputDir)
         .SetRequired()
         .SetIsInput()
         .SetMinCharCount(1)
@@ -213,6 +214,13 @@ GDALRasterTileAlgorithm::GDALRasterTileAlgorithm(bool standaloneStep)
 
     AddArg("min-zoom", 0, _("Minimum zoom level"), &m_minZoomLevel)
         .SetMinValueIncluded(0);
+
+    // Only used by PMTiles driver for now
+    AddArg("min-zoom-single-tile", 0,
+           _("Determine minimum zoom level to produce a single tile"),
+           &m_minZoomLevelSingleTile)
+        .SetHidden();
+
     AddArg("max-zoom", 0, _("Maximum zoom level"), &m_maxZoomLevel)
         .SetMinValueIncluded(0);
 
@@ -258,7 +266,8 @@ GDALRasterTileAlgorithm::GDALRasterTileAlgorithm(bool standaloneStep)
            &m_noalpha)
         .SetMutualExclusionGroup("alpha");
     auto &dstNoDataArg =
-        AddArg("dst-nodata", 0, _("Destination nodata value"), &m_dstNoData);
+        AddArg("output-nodata", 0, _("Output nodata value"), &m_dstNoData)
+            .AddHiddenAlias("dst-nodata");
     AddArg("skip-blank", 0, _("Do not generate blank tiles"), &m_skipBlank);
 
     {
@@ -376,7 +385,7 @@ GDALRasterTileAlgorithm::GDALRasterTileAlgorithm(bool standaloneStep)
             {
                 ReportError(
                     CE_Failure, CPLE_IllegalArg,
-                    "'add-alpha' and 'dst-nodata' are mutually exclusive");
+                    "'add-alpha' and 'output-nodata' are mutually exclusive");
                 return false;
             }
 
@@ -405,6 +414,18 @@ GDALRasterTileAlgorithm::GDALRasterTileAlgorithm(bool standaloneStep)
 
             return true;
         });
+}
+
+/************************************************************************/
+/*                      ~GDALRasterTileAlgorithm()                      */
+/************************************************************************/
+
+GDALRasterTileAlgorithm::~GDALRasterTileAlgorithm()
+{
+    if (m_poSrcOvrDS)
+    {
+        m_poSrcOvrDS->ReleaseRef();
+    }
 }
 
 /************************************************************************/
@@ -3587,7 +3608,7 @@ bool GDALRasterTileAlgorithm::IsCompatibleOfSpawn(const char *&pszErrorMsg)
                       "with spawn parallelization method";
         return false;
     }
-    if (cpl::starts_with(m_output, "/vsimem/"))
+    if (cpl::starts_with(m_outputDir, "/vsimem/"))
     {
         pszErrorMsg = "/vsimem/ output directory not supported with spawn "
                       "parallelization method";
@@ -4465,7 +4486,7 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
                         "with fork parallelization method");
             return false;
         }
-        if (cpl::starts_with(m_output, "/vsimem/"))
+        if (cpl::starts_with(m_outputDir, "/vsimem/"))
         {
             ReportError(CE_Failure, CPLE_AppDefined,
                         "/vsimem/ output directory not supported with fork "
@@ -4823,8 +4844,6 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
                 m_maxZoomLevel--;
         }
     }
-    if (m_minZoomLevel < 0)
-        m_minZoomLevel = m_maxZoomLevel;
 
     auto tileMatrix = tileMatrixList[m_maxZoomLevel];
     int nMinTileX = 0;
@@ -4925,6 +4944,17 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
                nMinTileY * tileMatrix.mResY * tileMatrix.mTileHeight;
     dstGT[4] = 0;
     dstGT[5] = -tileMatrix.mResY;
+
+    if (m_minZoomLevelSingleTile)
+    {
+        const int nMaxDim = std::max(nXSize, nYSize);
+        const int nOvrCount = static_cast<int>(
+            std::ceil(std::max(0.0, std::log2(static_cast<double>(nMaxDim) /
+                                              tileMatrix.mTileWidth))));
+        m_minZoomLevel = std::max(0, m_maxZoomLevel - nOvrCount);
+    }
+    else if (m_minZoomLevel < 0)
+        m_minZoomLevel = m_maxZoomLevel;
 
     /* -------------------------------------------------------------------- */
     /*      Setup warp options.                                             */
@@ -5053,11 +5083,44 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
         return false;
     }
 
+    /* -------------------------------------------------------------------- */
+    /*      Select source overview                                          */
+    /* -------------------------------------------------------------------- */
+
+    const int nDstXSize = (nMaxTileX - nMinTileX + 1) * tileMatrix.mTileWidth;
+    const int nDstYSize = (nMaxTileY - nMinTileY + 1) * tileMatrix.mTileHeight;
+
+    const int nSrcOvrCount = m_poSrcDS->GetRasterBand(1)->GetOverviewCount();
+    if (nSrcOvrCount > 0 &&
+        m_poSrcDS->GetRasterXSize() > tileMatrix.mTileWidth &&
+        m_poSrcDS->GetRasterYSize() > tileMatrix.mTileHeight)
+    {
+        const double dfTargetRatioX =
+            static_cast<double>(m_poSrcDS->GetRasterXSize()) / nDstXSize;
+        const double dfTargetRatioY =
+            static_cast<double>(m_poSrcDS->GetRasterYSize()) / nDstYSize;
+        // take the minimum of these ratios #7019
+        const double dfTargetRatio = std::min(dfTargetRatioX, dfTargetRatioY);
+        if (dfTargetRatio > 1.0)
+        {
+            const int iBestOvr = GDALBandGetBestOverviewLevel(
+                m_poSrcDS->GetRasterBand(1), dfTargetRatio,
+                /* dfOversamplingThreshold = */ 1.0);
+            if (iBestOvr >= 0)
+            {
+                CPLDebug("WARP", "Selecting overview level %d", iBestOvr);
+                m_poSrcOvrDS =
+                    GDALCreateOverviewDataset(m_poSrcDS, iBestOvr,
+                                              /* bThisLevelOnly = */ false);
+                m_poSrcDS = m_poSrcOvrDS;
+            }
+        }
+    }
+
     FakeMaxZoomDataset oFakeMaxZoomDS(
-        (nMaxTileX - nMinTileX + 1) * tileMatrix.mTileWidth,
-        (nMaxTileY - nMinTileY + 1) * tileMatrix.mTileHeight, nDstBands,
-        tileMatrix.mTileWidth, tileMatrix.mTileHeight, psWO->eWorkingDataType,
-        dstGT, oSRS_TMS, dstBuffer);
+        nDstXSize, nDstYSize, nDstBands, tileMatrix.mTileWidth,
+        tileMatrix.mTileHeight, psWO->eWorkingDataType, dstGT, oSRS_TMS,
+        dstBuffer);
     CPL_IGNORE_RET_VAL(oFakeMaxZoomDS.GetSpatialRef());
 
     psWO->hSrcDS = GDALDataset::ToHandle(m_poSrcDS);
@@ -5183,12 +5246,12 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
         return aosCreationOptions;
     };
 
-    VSIMkdir(m_output.c_str(), 0755);
+    VSIMkdir(m_outputDir.c_str(), 0755);
     VSIStatBufL sStat;
-    if (VSIStatL(m_output.c_str(), &sStat) != 0 || !VSI_ISDIR(sStat.st_mode))
+    if (VSIStatL(m_outputDir.c_str(), &sStat) != 0 || !VSI_ISDIR(sStat.st_mode))
     {
         ReportError(CE_Failure, CPLE_FileIO,
-                    "Cannot create output directory %s", m_output.c_str());
+                    "Cannot create output directory %s", m_outputDir.c_str());
         return false;
     }
 
@@ -5234,8 +5297,8 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
     {
         if (m_url.back() != '/')
             m_url += '/';
-        std::string out_path = m_output;
-        if (m_output.back() == '/')
+        std::string out_path = m_outputDir;
+        if (m_outputDir.back() == '/')
             out_path.pop_back();
         m_url += CPLGetFilename(out_path.c_str());
     }
@@ -5277,7 +5340,7 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
         }
         (void)bSrcIsFineForFork;
 #ifdef FORK_ALLOWED
-        if (bSrcIsFineForFork && !cpl::starts_with(m_output, "/vsimem/"))
+        if (bSrcIsFineForFork && !cpl::starts_with(m_outputDir, "/vsimem/"))
         {
             if (CPLGetCurrentThreadCount() == 1)
             {
@@ -5480,7 +5543,7 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
                                             *(resources->poFakeMaxZoomDS
                                                   ->GetSpatialRef()),
                                             psWO->eWorkingDataType, tileMatrix,
-                                            m_output, nDstBands,
+                                            m_outputDir, nDstBands,
                                             psWO->padfDstNoDataReal
                                                 ? &(psWO->padfDstNoDataReal[0])
                                                 : nullptr,
@@ -5560,7 +5623,8 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
                     bRet = GenerateTile(
                         m_poSrcDS, m_poDstDriver, pszExtension,
                         aosCreationOptions.List(), oWO, oSRS_TMS,
-                        psWO->eWorkingDataType, tileMatrix, m_output, nDstBands,
+                        psWO->eWorkingDataType, tileMatrix, m_outputDir,
+                        nDstBands,
                         psWO->padfDstNoDataReal ? &(psWO->padfDstNoDataReal[0])
                                                 : nullptr,
                         m_maxZoomLevel, iX, iY, m_convention, nMinTileX,
@@ -5610,7 +5674,7 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
                         GetFileY(iY, poTMS->tileMatrixList()[m_maxZoomLevel],
                                  m_convention);
                     std::string osFilename = CPLFormFilenameSafe(
-                        m_output.c_str(), CPLSPrintf("%d", m_maxZoomLevel),
+                        m_outputDir.c_str(), CPLSPrintf("%d", m_maxZoomLevel),
                         nullptr);
                     osFilename = CPLFormFilenameSafe(
                         osFilename.c_str(), CPLSPrintf("%d", iX), nullptr);
@@ -5619,10 +5683,10 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
                         CPLSPrintf("%d.%s", nFileY, pszExtension), nullptr);
                     if (VSIStatL(osFilename.c_str(), &sStat) == 0)
                     {
-                        GenerateKML(m_output, m_title, iX, iY, m_maxZoomLevel,
-                                    kmlTileSize, pszExtension, m_url,
-                                    poTMS.get(), bInvertAxisTMS, m_convention,
-                                    poCTToWGS84.get(), {});
+                        GenerateKML(m_outputDir, m_title, iX, iY,
+                                    m_maxZoomLevel, kmlTileSize, pszExtension,
+                                    m_url, poTMS.get(), bInvertAxisTMS,
+                                    m_convention, poCTToWGS84.get(), {});
                     }
                 }
             }
@@ -5635,6 +5699,11 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
     for (int i = 1; i <= m_poSrcDS->GetRasterCount(); ++i)
         aeColorInterp.push_back(
             m_poSrcDS->GetRasterBand(i)->GetColorInterpretation());
+    if (m_poSrcOvrDS)
+    {
+        m_poSrcOvrDS->ReleaseRef();
+        m_poSrcOvrDS = nullptr;
+    }
     if (m_inputDataset[0].HasDatasetBeenOpenedByAlgorithm())
     {
         m_inputDataset[0].Close();
@@ -5754,8 +5823,8 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
 #endif
 
             MosaicDataset oSrcDS(
-                CPLFormFilenameSafe(m_output.c_str(), CPLSPrintf("%d", iZ + 1),
-                                    nullptr),
+                CPLFormFilenameSafe(m_outputDir.c_str(),
+                                    CPLSPrintf("%d", iZ + 1), nullptr),
                 pszExtension, m_format, aeColorInterp, srcTileMatrix, oSRS_TMS,
                 nSrcMinTileX, nSrcMinTileY, nSrcMaxTileX, nSrcMaxTileY,
                 m_convention, nDstBands, psWO->eWorkingDataType,
@@ -5859,10 +5928,10 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
                                                 aosCreationOptions.List(),
                                                 aosWarpOptions.List(),
                                                 m_overviewResampling,
-                                                ovrTileMatrix, m_output, iZ, iX,
-                                                iY, m_convention, m_skipBlank,
-                                                bUserAskedForAlpha, m_auxXML,
-                                                m_resume))
+                                                ovrTileMatrix, m_outputDir, iZ,
+                                                iX, iY, m_convention,
+                                                m_skipBlank, bUserAskedForAlpha,
+                                                m_auxXML, m_resume))
                                         {
                                             oResourceManager.SetError();
                                             bFailure = true;
@@ -5934,8 +6003,8 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
                         bRet = GenerateOverviewTile(
                             oSrcDS, m_poDstDriver, m_format, pszExtension,
                             aosCreationOptions.List(), aosWarpOptions.List(),
-                            m_overviewResampling, ovrTileMatrix, m_output, iZ,
-                            iX, iY, m_convention, m_skipBlank,
+                            m_overviewResampling, ovrTileMatrix, m_outputDir,
+                            iZ, iX, iY, m_convention, m_skipBlank,
                             bUserAskedForAlpha, m_auxXML, m_resume);
 
                         if (m_spawned)
@@ -5981,7 +6050,7 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
                     int nFileY =
                         GetFileY(iY, poTMS->tileMatrixList()[iZ], m_convention);
                     std::string osFilename = CPLFormFilenameSafe(
-                        m_output.c_str(), CPLSPrintf("%d", iZ), nullptr);
+                        m_outputDir.c_str(), CPLSPrintf("%d", iZ), nullptr);
                     osFilename = CPLFormFilenameSafe(
                         osFilename.c_str(), CPLSPrintf("%d", iX), nullptr);
                     osFilename = CPLFormFilenameSafe(
@@ -6000,8 +6069,8 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
                                              poTMS->tileMatrixList()[iZ + 1],
                                              m_convention);
                                 osFilename = CPLFormFilenameSafe(
-                                    m_output.c_str(), CPLSPrintf("%d", iZ + 1),
-                                    nullptr);
+                                    m_outputDir.c_str(),
+                                    CPLSPrintf("%d", iZ + 1), nullptr);
                                 osFilename = CPLFormFilenameSafe(
                                     osFilename.c_str(),
                                     CPLSPrintf("%d", iX * 2 + iChildX),
@@ -6021,9 +6090,9 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
                             }
                         }
 
-                        GenerateKML(m_output, m_title, iX, iY, iZ, kmlTileSize,
-                                    pszExtension, m_url, poTMS.get(),
-                                    bInvertAxisTMS, m_convention,
+                        GenerateKML(m_outputDir, m_title, iX, iY, iZ,
+                                    kmlTileSize, pszExtension, m_url,
+                                    poTMS.get(), bInvertAxisTMS, m_convention,
                                     poCTToWGS84.get(), children);
                     }
                 }
@@ -6055,7 +6124,7 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
                 &dfWestLon, &dfSouthLat, &dfEastLon, &dfNorthLat, 21);
         }
 
-        GenerateLeaflet(m_output, m_title, dfSouthLat, dfWestLon, dfNorthLat,
+        GenerateLeaflet(m_outputDir, m_title, dfSouthLat, dfWestLon, dfNorthLat,
                         dfEastLon, m_minZoomLevel, m_maxZoomLevel,
                         tileMatrix.mTileWidth, pszExtension, m_url, m_copyright,
                         m_convention == "xyz");
@@ -6063,7 +6132,7 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
 
     if (m_ovrZoomLevel < 0 && bRet && IsWebViewerEnabled("openlayers"))
     {
-        GenerateOpenLayers(m_output, m_title, adfExtent[0], adfExtent[1],
+        GenerateOpenLayers(m_outputDir, m_title, adfExtent[0], adfExtent[1],
                            adfExtent[2], adfExtent[3], m_minZoomLevel,
                            m_maxZoomLevel, tileMatrix.mTileWidth, pszExtension,
                            m_url, m_copyright, *(poTMS.get()), bInvertAxisTMS,
@@ -6073,9 +6142,10 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
     if (m_ovrZoomLevel < 0 && bRet && IsWebViewerEnabled("mapml") &&
         poTMS->identifier() != "raster" && m_convention == "xyz")
     {
-        GenerateMapML(m_output, m_mapmlTemplate, m_title, nMinTileX, nMinTileY,
-                      nMaxTileX, nMaxTileY, m_minZoomLevel, m_maxZoomLevel,
-                      pszExtension, m_url, m_copyright, *(poTMS.get()));
+        GenerateMapML(m_outputDir, m_mapmlTemplate, m_title, nMinTileX,
+                      nMinTileY, nMaxTileX, nMaxTileY, m_minZoomLevel,
+                      m_maxZoomLevel, pszExtension, m_url, m_copyright,
+                      *(poTMS.get()));
     }
 
     if (m_ovrZoomLevel < 0 && bRet && IsWebViewerEnabled("stac") &&
@@ -6105,7 +6175,7 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
                                   &dfEastLon, &dfNorthLat, 21);
         }
 
-        GenerateSTAC(m_output, m_title, dfWestLon, dfSouthLat, dfEastLon,
+        GenerateSTAC(m_outputDir, m_title, dfWestLon, dfSouthLat, dfEastLon,
                      dfNorthLat, m_metadata, aoBandMetadata, m_minZoomLevel,
                      m_maxZoomLevel, pszExtension, m_format, m_url, m_copyright,
                      oSRS_TMS, *(poTMS.get()), bInvertAxisTMS, m_tileSize,
@@ -6133,7 +6203,7 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
                 int nFileY = GetFileY(
                     iY, poTMS->tileMatrixList()[m_minZoomLevel], m_convention);
                 std::string osFilename = CPLFormFilenameSafe(
-                    m_output.c_str(), CPLSPrintf("%d", m_minZoomLevel),
+                    m_outputDir.c_str(), CPLSPrintf("%d", m_minZoomLevel),
                     nullptr);
                 osFilename = CPLFormFilenameSafe(osFilename.c_str(),
                                                  CPLSPrintf("%d", iX), nullptr);
@@ -6150,7 +6220,7 @@ bool GDALRasterTileAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
                 }
             }
         }
-        GenerateKML(m_output, m_title, -1, -1, -1, kmlTileSize, pszExtension,
+        GenerateKML(m_outputDir, m_title, -1, -1, -1, kmlTileSize, pszExtension,
                     m_url, poTMS.get(), bInvertAxisTMS, m_convention,
                     poCTToWGS84.get(), children);
     }

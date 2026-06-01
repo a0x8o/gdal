@@ -196,6 +196,7 @@ bDstToSrc
 bedrijven
 behaviours
 Belge
+benchmarking
 Benchmarking
 Bergh
 bExactMatch
@@ -306,6 +307,7 @@ Cadcorp
 calc
 Calc
 calloc
+cancelled
 capi
 cardinality
 Cardinality
@@ -1196,8 +1198,8 @@ gpsbabel
 gpx
 gradians
 Grantor
-graylevel
 graticule
+graylevel
 grayscale
 Grayscale
 grc
@@ -2531,6 +2533,7 @@ positionName
 posix
 Posix
 posList
+poSR
 poSrcDS
 poSrcFDefn
 poSrcFeature
@@ -2559,6 +2562,7 @@ ppoReturn
 pppppppppppp
 pProgressArg
 ppszAreaName
+ppszData
 ppszDetailedFormat
 ppszDstText
 ppszFailureReason
@@ -2583,6 +2587,7 @@ precompiled
 precompute
 predefine
 predelete
+prefetch
 preinstalled
 preload
 premultiplication

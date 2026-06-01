@@ -4189,7 +4189,11 @@ OGRArrowLayer::SetBatch(const std::shared_ptr<arrow::RecordBatch> &poBatch)
     if (m_poBatch)
     {
         m_poBatchColumns = m_poBatch->columns();
-        SanityCheckOfSetBatch();
+        if (!SanityCheckOfSetBatch())
+        {
+            m_poBatch.reset();
+            m_poBatchColumns.clear();
+        }
     }
 
     if (m_poBatch && m_poFilterGeom && !m_bBaseArrowIgnoreSpatialFilterRect)
@@ -4298,17 +4302,27 @@ OGRArrowLayer::SetBatch(const std::shared_ptr<arrow::RecordBatch> &poBatch)
 /*                       SanityCheckOfSetBatch()                        */
 /************************************************************************/
 
-inline void OGRArrowLayer::SanityCheckOfSetBatch() const
+inline bool OGRArrowLayer::SanityCheckOfSetBatch() const
 {
-#ifdef DEBUG
     CPLAssert(m_poBatch);
+
+    // Sanity checks
+    const auto nExpectedBatchColumns =
+        (m_bIgnoredFields ? m_nExpectedBatchColumns : m_poSchema->num_fields());
+    if (m_poBatch->num_columns() != nExpectedBatchColumns)
+    {
+        CPLError(
+            CE_Failure, CPLE_AppDefined,
+            "BUG! m_poBatch->num_columns() (=%d) != nExpectedBatchColumns(=%d)",
+            static_cast<int>(m_poBatch->num_columns()),
+            static_cast<int>(nExpectedBatchColumns));
+        return false;
+    }
+
+#ifdef DEBUG
 
     const auto &poColumns = m_poBatch->columns();
 
-    // Sanity checks
-    CPLAssert(m_poBatch->num_columns() == (m_bIgnoredFields
-                                               ? m_nExpectedBatchColumns
-                                               : m_poSchema->num_fields()));
     const auto &fields = m_poSchema->fields();
 
     for (int i = 0; i < m_poFeatureDefn->GetFieldCount(); ++i)
@@ -4350,9 +4364,9 @@ inline void OGRArrowLayer::SanityCheckOfSetBatch() const
         CPLAssert(fields[m_anMapGeomFieldIndexToArrowColumn[i]]->type()->id() ==
                   poColumns[iCol]->type_id());
     }
-#else
-    CPL_IGNORE_RET_VAL(m_nExpectedBatchColumns);
 #endif
+
+    return true;
 }
 
 /************************************************************************/
@@ -5571,7 +5585,7 @@ inline bool OGRArrowLayer::UseRecordBatchBaseImplementation() const
                 poFieldDefn->GetType() == OFTDateTime)
             {
                 CPLDebug("ARROW",
-                         "DATETIME_AS_STRING=YES not compatible of fast "
+                         "DATETIME_AS_STRING=YES not compatible with fast "
                          "Arrow implementation");
                 return true;
             }
@@ -5589,7 +5603,7 @@ inline bool OGRArrowLayer::UseRecordBatchBaseImplementation() const
                 m_aeGeomEncoding[i] != OGRArrowGeomEncoding::WKB &&
                 m_aeGeomEncoding[i] != OGRArrowGeomEncoding::WKT)
             {
-                CPLDebug("ARROW", "Geometry encoding not compatible of fast "
+                CPLDebug("ARROW", "Geometry encoding not compatible with fast "
                                   "Arrow implementation");
                 return true;
             }

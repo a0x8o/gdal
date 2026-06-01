@@ -876,6 +876,54 @@ static int PixarLogDecode(TIFF *tif, uint8_t *op, tmsize_t occ, uint16_t s)
 
     llen = (tmsize_t)sp->stride * td->td_imagewidth;
 
+    /* Fix: ABGR with stride=3 expands 3 samples to 4 output bytes per pixel */
+    if (sp->user_datafmt == PIXARLOGDATAFMT_8BITABGR && sp->stride == 3)
+    {
+        tmsize_t required = (tmsize_t)td->td_imagewidth * 4;
+        tmsize_t max_rows;
+        tmsize_t max_nsamples;
+
+        /*
+         * Ensure at least one expanded output row fits.
+         */
+        if (occ < required)
+        {
+            TIFFErrorExtR(tif, module,
+                          "Output buffer too small for PixarLog ABGR data");
+            memset(op, 0, (size_t)occ);
+            return (0);
+        }
+
+        /*
+         * The caller-provided output buffer size must represent a whole
+         * number of expanded ABGR scanlines.
+         */
+        if (occ % required)
+        {
+            TIFFErrorExtR(
+                tif, module,
+                "Fractional scanline not supported for PixarLog ABGR data");
+            memset(op, 0, (size_t)occ);
+            return (0);
+        }
+
+        /*
+         * PixarLogDecode() may process multiple rows per call
+         * (e.g. strip decoding). Limit nsamples so the total
+         * output written by the loop below never exceeds occ.
+         */
+        max_rows = occ / required;
+        max_nsamples = max_rows * llen;
+
+        if (nsamples > max_nsamples)
+        {
+            TIFFErrorExtR(tif, module,
+                          "Output buffer too small for PixarLog ABGR data");
+            memset(op, 0, (size_t)occ);
+            return (0);
+        }
+    }
+
     (void)s;
     assert(sp != NULL);
 
@@ -991,7 +1039,13 @@ static int PixarLogDecode(TIFF *tif, uint8_t *op, tmsize_t occ, uint16_t s)
             case PIXARLOGDATAFMT_8BITABGR:
                 horizontalAccumulate8abgr(up, llen, sp->stride,
                                           (unsigned char *)op, sp->ToLinear8);
-                op += (unsigned long)llen * sizeof(unsigned char);
+
+                /* For stride == 3 (RGB), horizontalAccumulate8abgr expands to 4
+                 * bytes/pixel (ABGR) */
+                if (sp->stride == 3)
+                    op += (unsigned long)td->td_imagewidth * 4;
+                else
+                    op += (unsigned long)llen * sizeof(unsigned char);
                 break;
             default:
                 TIFFErrorExtR(tif, module, "Unsupported bits/sample: %" PRIu16,
@@ -1619,6 +1673,16 @@ static const TIFFField pixarlogFields[] = {
     {TIFFTAG_PIXARLOGQUALITY, 0, 0, TIFF_ANY, 0, TIFF_SETGET_INT, FIELD_PSEUDO,
      FALSE, FALSE, "", NULL}};
 
+static uint64_t PixarLogGetMaxCompressionRatio(TIFF *tif)
+{
+    (void)tif;
+    /* cf https://zlib.net/zlib_tech.html */
+    const uint64_t MAX_DEFLATE_RATIO = 1032;
+
+    /* security margin as I don't understand what this codec does */
+    return MAX_DEFLATE_RATIO * (uint64_t)4;
+}
+
 int TIFFInitPixarLog(TIFF *tif, int scheme)
 {
     static const char module[] = "TIFFInitPixarLog";
@@ -1666,6 +1730,7 @@ int TIFFInitPixarLog(TIFF *tif, int scheme)
     tif->tif_encodetile = PixarLogEncode;
     tif->tif_close = PixarLogClose;
     tif->tif_cleanup = PixarLogCleanup;
+    tif->tif_getmaxcompressionratio = PixarLogGetMaxCompressionRatio;
 
     /* Override SetField so we can handle our private pseudo-tag */
     sp->vgetparent = tif->tif_tagmethods.vgetfield;

@@ -79,8 +79,8 @@ def test_gdalalg_vector_reproject_active_layer():
 
     assert alg.ParseCommandLineArguments(
         [
-            "--src-crs=EPSG:4326",
-            "--dst-crs=EPSG:32631",
+            "--input-crs=EPSG:4326",
+            "--output-crs=EPSG:32631",
             "--of",
             "MEM",
             "--output",
@@ -109,8 +109,8 @@ def test_gdalalg_vector_reproject_complete_dst_crs():
     out = gdaltest.runexternal(
         f"{gdal_path} completion gdal vector reproject ../ogr/data/poly.shp --dst-crs=EPSG:"
     )
-    assert "4326\\ --" in out
-    assert "2193\\ --" not in out  # NZGD2000
+    assert "4326 --" in out
+    assert "2193 --" not in out  # NZGD2000
 
 
 ###############################################################################
@@ -195,3 +195,17 @@ def test_gdalalg_vector_reproject_test_ogrsf(tmp_path):
     assert "INFO" in ret
     assert "ERROR" not in ret
     assert "FAILURE" not in ret
+
+
+def test_gdalalg_vector_reproject_on_aspatial_layer():
+
+    src_ds = gdal.GetDriverByName("MEM").Create("", 0, 0, 0, gdal.GDT_Unknown)
+    src_lyr = src_ds.CreateLayer("the_layer", geom_type=ogr.wkbNone)
+    src_lyr.CreateFeature(ogr.Feature(src_lyr.GetLayerDefn()))
+
+    with gdal.alg.vector.reproject(
+        input=src_ds, output="", output_format="MEM", output_crs="EPSG:4326"
+    ) as alg:
+        ds = alg.Output()
+        lyr = ds.GetLayer(0)
+        assert lyr.GetFeatureCount() == 1

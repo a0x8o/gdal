@@ -72,6 +72,10 @@ class GDALVectorClipAlgorithmLayer final : public GDALVectorPipelineOutputLayer
     GDALVectorClipAlgorithmLayer(OGRLayer &oSrcLayer,
                                  std::unique_ptr<OGRGeometry> poClipGeom)
         : GDALVectorPipelineOutputLayer(oSrcLayer),
+          // Clone the SRS as the input geometry might use one that will be
+          // hard deleted.
+          m_poSRSClone(OGRSpatialReferenceRefCountedPtr::makeClone(
+              poClipGeom->getSpatialReference())),
           m_poClipGeom(std::move(poClipGeom)),
           m_eSrcLayerGeomType(oSrcLayer.GetGeomType()),
           m_eFlattenSrcLayerGeomType(wkbFlatten(m_eSrcLayerGeomType)),
@@ -79,6 +83,7 @@ class GDALVectorClipAlgorithmLayer final : public GDALVectorPipelineOutputLayer
               m_eFlattenSrcLayerGeomType, wkbGeometryCollection))),
           m_poFeatureDefn(oSrcLayer.GetLayerDefn()->Clone())
     {
+        m_poClipGeom->assignSpatialReference(m_poSRSClone.get());
         SetDescription(oSrcLayer.GetDescription());
         SetMetadata(oSrcLayer.GetMetadata());
         oSrcLayer.SetSpatialFilter(m_poClipGeom.get());
@@ -164,6 +169,7 @@ class GDALVectorClipAlgorithmLayer final : public GDALVectorPipelineOutputLayer
     }
 
   private:
+    OGRSpatialReferenceRefCountedPtr const m_poSRSClone{};
     std::unique_ptr<OGRGeometry> const m_poClipGeom{};
     const OGRwkbGeometryType m_eSrcLayerGeomType;
     const OGRwkbGeometryType m_eFlattenSrcLayerGeomType;
@@ -187,11 +193,9 @@ bool GDALVectorClipAlgorithm::RunStep(GDALPipelineStepRunContext &)
     CPLAssert(m_outputDataset.GetName().empty());
     CPLAssert(!m_outputDataset.GetDatasetRef());
 
-    const int nLayerCount = poSrcDS->GetLayerCount();
     bool bSrcLayerHasSRS = false;
-    for (int i = 0; i < nLayerCount; ++i)
+    for (const auto *poSrcLayer : poSrcDS->GetLayers())
     {
-        auto poSrcLayer = poSrcDS->GetLayer(i);
         if (poSrcLayer &&
             (m_activeLayer.empty() ||
              m_activeLayer == poSrcLayer->GetDescription()) &&
@@ -216,8 +220,10 @@ bool GDALVectorClipAlgorithm::RunStep(GDALPipelineStepRunContext &)
         return false;
     }
 
+    const OGRSpatialReference *clipSRS = poClipGeom->getSpatialReference();
+
     auto poLikeDS = m_likeDataset.GetDatasetRef();
-    if (bSrcLayerHasSRS && !poClipGeom->getSpatialReference() && poLikeDS &&
+    if (bSrcLayerHasSRS && !clipSRS && poLikeDS &&
         poLikeDS->GetLayerCount() == 0)
     {
         ReportError(CE_Warning, CPLE_AppDefined,
@@ -228,27 +234,23 @@ bool GDALVectorClipAlgorithm::RunStep(GDALPipelineStepRunContext &)
 
     auto outDS = std::make_unique<GDALVectorPipelineOutputDataset>(*poSrcDS);
 
-    for (int i = 0; i < nLayerCount; ++i)
+    for (auto *poSrcLayer : poSrcDS->GetLayers())
     {
-        const auto poSrcLayer = poSrcDS->GetLayer(i);
         if (poSrcLayer == nullptr)
         {
             return false;
         }
 
-        if (m_activeLayer.empty() ||
+        if ((m_activeLayer.empty() && poSrcLayer->GetGeomType() != wkbNone) ||
             m_activeLayer == poSrcLayer->GetDescription())
         {
-            const OGRSpatialReference *clipSRS =
-                poClipGeom->getSpatialReference();
             const OGRSpatialReference *layerSRS = poSrcLayer->GetSpatialRef();
 
             auto poClipGeomForLayer =
                 std::unique_ptr<OGRGeometry>(poClipGeom->clone());
             if (clipSRS && layerSRS && !clipSRS->IsSame(layerSRS))
             {
-                if (poClipGeomForLayer->transformTo(
-                        poSrcLayer->GetSpatialRef()) != OGRERR_NONE)
+                if (poClipGeomForLayer->transformTo(layerSRS) != OGRERR_NONE)
                 {
                     ReportError(CE_Failure, CPLE_AppDefined,
                                 "Could not transform clipping geometry to "

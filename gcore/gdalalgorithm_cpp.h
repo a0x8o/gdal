@@ -73,6 +73,9 @@ constexpr const char *GAAMDI_EXTRA_FORMATS = "extra_formats";
 /** Name of the argument for an input dataset. */
 constexpr const char *GDAL_ARG_NAME_INPUT = "input";
 
+/** Name of the argument for an input CRS. */
+constexpr const char *GDAL_ARG_NAME_INPUT_CRS = "input-crs";
+
 /** Name of the argument for the input format. */
 constexpr const char *GDAL_ARG_NAME_INPUT_FORMAT = "input-format";
 
@@ -88,8 +91,11 @@ constexpr const char *GDAL_ARG_NAME_OUTPUT = "output";
 /** Name of the argument for an output string. */
 constexpr const char *GDAL_ARG_NAME_OUTPUT_STRING = "output-string";
 
-/** Name of the boolean argument to request outtputing directly on stdout. */
+/** Name of the boolean argument to request outputting directly on stdout. */
 constexpr const char *GDAL_ARG_NAME_STDOUT = "stdout";
+
+/** Name of the argument for an output CRS. */
+constexpr const char *GDAL_ARG_NAME_OUTPUT_CRS = "output-crs";
 
 /** Name of the argument for an output format. */
 constexpr const char *GDAL_ARG_NAME_OUTPUT_FORMAT = "output-format";
@@ -2553,30 +2559,8 @@ class CPL_DLL GDALAlgorithmRegistry
 
     /** Return a possibly empty list of names the specified argument
      *  depends on, this includes both direct and mutual dependencies */
-    std::vector<std::string> GetArgDependencies(const std::string &osName) const
-    {
-        const auto arg = GetArg(osName, false);
-        if (!arg)
-        {
-            ReportError(CE_Failure, CPLE_AppDefined,
-                        "Argument '%s' does not exist", osName.c_str());
-            return {};
-        }
-        std::vector<std::string> dependencies = arg->GetDirectDependencies();
-        if (const auto mutualDependencyGroup = arg->GetMutualDependencyGroup();
-            !mutualDependencyGroup.empty())
-        {
-            for (const auto &otherArg : m_args)
-            {
-                if (otherArg.get() == arg ||
-                    mutualDependencyGroup.compare(
-                        otherArg->GetMutualDependencyGroup()) != 0)
-                    continue;
-                dependencies.push_back(otherArg->GetName());
-            }
-        }
-        return dependencies;
-    }
+    std::vector<std::string>
+    GetArgDependencies(const std::string &osName) const;
 
     /** Set the calling path to this algorithm.
      *
@@ -2649,6 +2633,8 @@ class CPL_DLL GDALAlgorithmRegistry
 
     /** Execute the algorithm, starting with ValidateArguments() and then
      * calling RunImpl().
+     *
+     * This method must be called at most once per instance.
      */
     bool Run(GDALProgressFunc pfnProgress = nullptr,
              void *pProgressData = nullptr);
@@ -2829,6 +2815,9 @@ class CPL_DLL GDALAlgorithmRegistry
 
     /** Whether this algorithm should be hidden (but can be instantiated if name known) */
     bool m_hidden = false;
+
+    /** Whether the Run() method has already been invoked */
+    bool m_alreadyRun = false;
 
     /** Map a dataset name to its object (used for nested pipelines) */
     std::map<std::string, GDALDataset *> m_oMapDatasetNameToDataset{};
@@ -3051,8 +3040,8 @@ class CPL_DLL GDALAlgorithmRegistry
     /** Register an auto complete function for a field name argument */
     static void SetAutoCompleteFunctionForFieldName(
         GDALInConstructionAlgorithmArg &fieldArg,
-        GDALInConstructionAlgorithmArg &layerNameArg,
-        std::vector<GDALArgDatasetValue> &datasetArg);
+        const GDALAlgorithmArg *layerNameArg, bool attributeFields,
+        bool geometryFields, std::vector<GDALArgDatasetValue> &datasetArg);
 
     /** Add a field name argument */
     GDALInConstructionAlgorithmArg &

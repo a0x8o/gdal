@@ -1,5 +1,7 @@
 .. _gdal_raster_zonal_stats:
 
+.. program:: gdal_raster_zonal_stats
+
 ================================================================================
 ``gdal raster zonal-stats``
 ================================================================================
@@ -62,8 +64,6 @@ Supported stats
       - Array with coverage fraction of each cell that intersects the polygon
     * - frac
       - Fraction of covered cells that are occupied by each distinct raster value, as provided by ``unique``.
-    * - majority
-      - The raster value occupying the greatest number of cells, taking into account cell coverage fractions but not weighting raster values.
     * - max
       - Maximum value of cells that intersect the polygon, not taking coverage fractions or weighting raster values into account.
     * - max_center_x
@@ -80,6 +80,8 @@ Supported stats
       - Cell center y-coordinate for the cell containing the minimum value intersected by the polygon. The center of this cell may or may not be inside the polygon.
     * - minority
       - The raster value occupying the least number of cells, taking into account cell coverage fractions but not weighting raster values.
+    * - mode
+      - The raster value occupying the greatest number of cells, taking into account cell coverage fractions but not weighting raster values.
     * - stdev
       - Population standard deviation of cell values that intersect the polygon, taking into account coverage fraction.
     * - sum
@@ -216,7 +218,7 @@ Examples
             --output-format CSV \
             --output /vsistdout/
 
-    or, using the zone vector dataset as the piped dataset using the ``_`` placeholder dataset name:
+    or, using the zone vector dataset as the piped dataset using the ``_PIPE_`` placeholder dataset name:
 
    .. code-block:: bash
 
@@ -224,7 +226,7 @@ Examples
           buffer 200 ! \
           zonal-stats \
             --input dem.tif
-            --zones _ \
+            --zones _PIPE_ \
             --stat mean ! \
           write \
             --output-format CSV \
@@ -244,5 +246,5 @@ Examples
           make-point \
             --x max_center_x \
             --y max_center_y \
-            --dst-crs EPSG:4326 ! \
+            --output-crs EPSG:4326 ! \
           write out.geojson

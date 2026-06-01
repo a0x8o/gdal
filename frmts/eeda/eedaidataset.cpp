@@ -324,7 +324,7 @@ bool GDALEEDAIRasterBand::DecodeNPYArray(const GByte *pabyData, int nDataLen,
             size_t nOffsetBand =
                 10 + nHeaderLen +
                 (static_cast<size_t>(iYBlock) * nBlockYSize * nReqXSize +
-                 iXBlock * nBlockXSize) *
+                 static_cast<size_t>(iXBlock) * nBlockXSize) *
                     nTotalDataTypeSize;
 
             for (int i = 1; i <= poGDS->GetRasterCount(); i++)
@@ -1314,7 +1314,7 @@ bool GDALEEDAIDataset::Open(GDALOpenInfo *poOpenInfo)
                 oSetUserBandNames.end())
             {
                 CPLError(CE_Warning, CPLE_AppDefined,
-                         "Band %s is not compatible of other bands",
+                         "Band %s is not compatible with other bands",
                          aoBandDesc[i].osName.c_str());
             }
             aoMapBandNames[aoBandDesc[i].osName] = -1;

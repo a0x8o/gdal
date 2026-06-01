@@ -114,6 +114,8 @@ int VSICurlUninstallReadCbk(VSILFILE * /* fp */)
 
 constexpr const char *const VSICURL_PREFIXES[] = {"/vsicurl/", "/vsicurl?"};
 
+extern "C" bool CPL_DLL GDALIsInGlobalDestructorFromDLLMain();
+
 /***********************************************************ù************/
 /*                    VSICurlAuthParametersChanged()                    */
 /************************************************************************/
@@ -539,7 +541,7 @@ VSICurlHandle::~VSICurlHandle()
     }
     if (m_hCurlMultiHandleForAdviseRead)
     {
-        curl_multi_cleanup(m_hCurlMultiHandleForAdviseRead);
+        VSICURLMultiCleanup(m_hCurlMultiHandleForAdviseRead);
     }
 
     if (!m_bCached)
@@ -1271,8 +1273,14 @@ retry:
 
     oFileProp.eExists = EXIST_UNKNOWN;
 
-    long mtime = 0;
-    curl_easy_getinfo(hCurlHandle, CURLINFO_FILETIME, &mtime);
+    curl_off_t filetime = -1;
+    GIntBig mtime = 0;
+    if (curl_easy_getinfo(hCurlHandle, CURLINFO_FILETIME_T, &filetime) ==
+            CURLE_OK &&
+        filetime != -1)
+    {
+        mtime = static_cast<GIntBig>(filetime);
+    }
 
     if (osVerb == "GET")
         NetworkStatisticsLogger::LogGET(sWriteFuncData.nSize);
@@ -1464,7 +1472,7 @@ retry:
             return aosHeaders;
         };
 
-        if (response_code < 400)
+        if (response_code < 300)
         {
             curl_off_t nSizeTmp = 0;
             const CURLcode code = curl_easy_getinfo(
@@ -1473,7 +1481,6 @@ retry:
             dfSize = static_cast<double>(nSizeTmp);
             if (code == 0)
             {
-                oFileProp.eExists = EXIST_YES;
                 if (dfSize < 0)
                 {
                     if (osVerb == "HEAD" && !bRetryWithGet &&
@@ -1508,10 +1515,32 @@ retry:
                         curl_easy_cleanup(hCurlHandle);
                         goto retry;
                     }
-                    oFileProp.fileSize = 0;
+
+                    if (poFS->GetFSPrefix() == "/vsicurl/" ||
+                        poFS->GetFSPrefix() == "/vsicurl?")
+                    {
+                        const CPLStringList aosHeaders(
+                            TokenizeHeaders(sWriteFuncHeaderData.pBuffer));
+                        if (strcmp(aosHeaders.FetchNameValueDef(
+                                       "transfer-encoding", ""),
+                                   "chunked") == 0)
+                        {
+                            CPLError(
+                                CE_Failure, CPLE_AppDefined,
+                                "Server does not seem to support range "
+                                "requests. "
+                                "Maybe retry with /vsicurl_streaming/ if the "
+                                "read "
+                                "access pattern is compatible with sequential "
+                                "reading, or download the file entirely");
+                        }
+                    }
                 }
                 else
+                {
+                    oFileProp.eExists = EXIST_YES;
                     oFileProp.fileSize = static_cast<GUIntBig>(dfSize);
+                }
             }
         }
 
@@ -6455,6 +6484,16 @@ void VSICURLDestroyCacheFileProp()
 
 void VSICURLMultiCleanup(CURLM *hCurlMultiHandle)
 {
+#if defined(CURL_AT_LEAST_VERSION) && defined(_WIN32)
+    // Since curl 8.20.0, auxiliary threads are used for DNS resolution
+    // Trying to join them when detaching the DLL results in a hang.
+    // See https://github.com/curl/curl/issues/21466#issuecomment-4372138595
+#if CURL_AT_LEAST_VERSION(8, 20, 0)
+    if (GDALIsInGlobalDestructorFromDLLMain())
+        curl_multi_setopt(hCurlMultiHandle, CURLMOPT_QUICK_EXIT, 1L);
+#endif
+#endif
+
     void *old_handler = CPLHTTPIgnoreSigPipe();
     curl_multi_cleanup(hCurlMultiHandle);
     CPLHTTPRestoreSigPipeHandler(old_handler);

@@ -1410,8 +1410,8 @@ const OGRSpatialReference *GDALDataset::GetSpatialRefVectorOnly() const
                 bInit = true;
                 poGlobalSRS = poSRS;
             }
-            else if ((poSRS && !poGlobalSRS) || (!poSRS && poGlobalSRS) ||
-                     (poSRS && poGlobalSRS && !poSRS->IsSame(poGlobalSRS)))
+            else if (((poSRS != nullptr) != (poGlobalSRS != nullptr)) ||
+                     (poSRS && !poSRS->IsSame(poGlobalSRS)))
             {
                 CPLDebug("GDAL",
                          "Not all geometry fields or layers have the same CRS");
@@ -2516,8 +2516,9 @@ CPLErr GDALDataset::BuildOverviews(const char *pszResampling, int nOverviews,
 
             CPLString osDriver;
             osDriver.Printf("driver %s", poDriver->GetDescription());
-            GDALValidateOptions(pszOptionList, aosOptions.List(),
-                                "overview creation option", osDriver);
+            GDALValidateOptions(GDALDriver::ToHandle(poDriver), pszOptionList,
+                                aosOptions.List(), "overview creation option",
+                                osDriver);
         }
     }
 
@@ -3188,7 +3189,8 @@ CPLErr GDALDataset::RasterIO(GDALRWFlag eRWFlag, int nXOff, int nYOff,
     /*      Do some validation of parameters.                               */
     /* -------------------------------------------------------------------- */
 
-    if (CPL_UNLIKELY(eRWFlag != GF_Read && eRWFlag != GF_Write))
+    if (CPL_UNLIKELY(static_cast<int>(eRWFlag) != static_cast<int>(GF_Read) &&
+                     static_cast<int>(eRWFlag) != static_cast<int>(GF_Write)))
     {
         ReportError(
             CE_Failure, CPLE_IllegalArg,
@@ -6141,8 +6143,8 @@ int GDALDataset::ValidateLayerCreationOptions(const char *const *papszLCO)
     }
     CPLString osDataset;
     osDataset.Printf("dataset %s", GetDescription());
-    return GDALValidateOptions(pszOptionList, papszLCO, "layer creation option",
-                               osDataset);
+    return GDALValidateOptions(GDALDriver::ToHandle(poDriver), pszOptionList,
+                               papszLCO, "layer creation option", osDataset);
 }
 
 //! @endcond

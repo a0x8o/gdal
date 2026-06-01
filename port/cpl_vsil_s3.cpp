@@ -576,7 +576,7 @@ bool VSIDIRS3::IssueListDir()
         }
 
         struct curl_slist *headers =
-            VSICurlSetOptions(hCurlHandle, poHandleHelper->GetURL().c_str(),
+            VSICurlSetOptions(hCurlHandle, l_poHandlerHelper->GetURL().c_str(),
                               aosHTTPOptions.List());
 
         headers = l_poHandlerHelper->GetCurlHeaders("GET", headers);
@@ -4818,7 +4818,7 @@ bool IVSIS3LikeFSHandler::Sync(const char *pszSource, const char *pszTarget,
                 osTarget = CPLFormFilenameSafe(
                     osTarget.c_str(), CPLGetFilename(pszSource), nullptr);
                 bTargetIsFile = VSIStatL(osTarget.c_str(), &sTarget) == 0 &&
-                                !CPL_TO_BOOL(VSI_ISDIR(sTarget.st_mode));
+                                !VSI_ISDIR(sTarget.st_mode);
             }
         }
 

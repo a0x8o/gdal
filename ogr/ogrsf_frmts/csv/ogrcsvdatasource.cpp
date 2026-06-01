@@ -504,7 +504,7 @@ bool OGRCSVDataSource::Open(const char *pszFilename, bool bUpdateIn,
 
 {
     pszName = CPLStrdup(pszFilename);
-    bUpdate = CPL_TO_BOOL(bUpdateIn);
+    bUpdate = bUpdateIn;
 
     if (bUpdate && bForceOpen && EQUAL(pszFilename, "/vsistdout/"))
         return TRUE;
@@ -1142,13 +1142,19 @@ OGRCSVDataSource::ICreateLayer(const char *pszLayerName,
                 return nullptr;
             }
         }
-        else
+        else if (!EQUAL(pszGeometry, "NONE"))
         {
             CPLError(CE_Failure, CPLE_AppDefined,
                      "Unsupported value %s for creation option GEOMETRY",
                      pszGeometry);
             return nullptr;
         }
+    }
+    else if (eGType != wkbUnknown && eGType != wkbNone)
+    {
+        CPLError(CE_Warning, CPLE_AppDefined,
+                 "Requested to create spatial CSV layer but GEOMETRY layer "
+                 "creation option not set. No geometry will be output.");
     }
 
     // Should we create a CSVT file?

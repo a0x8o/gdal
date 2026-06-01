@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 using OSGeo.GDAL;
@@ -23,6 +24,7 @@ namespace testapp
             TestUnicodeDatasetLayerName();
             TestUnicodeFieldDefs();
             TestUnicodeVrtFiles();
+            TestCSharpExceptions();
         }
 
         private static void AssertEqual(string expected, string actual, string funcName)
@@ -64,19 +66,23 @@ namespace testapp
         private static void TestXMLNodeStrings()
         {
             Console.WriteLine("Test creating and serializing XMLNode with Unicode strings.");
-            XMLNode node = new XMLNode(XMLNodeType.CXT_Element, "TestElement");
-            node.SetXMLValue(".", UnicodeString);
-            string serializedXml = node.SerializeXMLTree();
-            string expectedXml = $"<TestElement>{UnicodeString}</TestElement>";
-            AssertEqual(expectedXml, serializedXml?.TrimEnd('\n'), $"{nameof(XMLNode)}.{nameof(node.SerializeXMLTree)}");
+            using (XMLNode node = new XMLNode(XMLNodeType.CXT_Element, "TestElement"))
+            {
+                node.SetXMLValue(".", UnicodeString);
+                string serializedXml = node.SerializeXMLTree();
+                string expectedXml = $"<TestElement>{UnicodeString}</TestElement>";
+                AssertEqual(expectedXml, serializedXml?.TrimEnd('\n'), $"{nameof(XMLNode)}.{nameof(node.SerializeXMLTree)}");
+            }
         }
         private static void TestUnicodeStringProperties()
         {
             Console.WriteLine("Testing C# Property setting and getting with Unicode strings.");
-            GCP gcp = new GCP(0, 0, 0, 0, 0, UnicodeString, "Id");
-            AssertEqual(gcp.Info, UnicodeString, $"{nameof(GCP)}.{nameof(gcp.Info)}");
-            gcp.Id = UnicodeString;
-            AssertEqual(gcp.Id, UnicodeString, $"{nameof(GCP)}.{nameof(gcp.Id)}");
+            using (GCP gcp = new GCP(0, 0, 0, 0, 0, UnicodeString, "Id"))
+            {
+                AssertEqual(gcp.Info, UnicodeString, $"{nameof(GCP)}.{nameof(gcp.Info)}");
+                gcp.Id = UnicodeString;
+                AssertEqual(gcp.Id, UnicodeString, $"{nameof(GCP)}.{nameof(gcp.Id)}");
+            }
         }
         private static void TestStringsByReference()
         {
@@ -109,14 +115,18 @@ namespace testapp
                 File.Delete(fileName);
             using (OSGeo.OGR.Driver shpDriver = Ogr.GetDriverByName("OpenFileGDB"))
             {
-                using (DataSource shpSrc = shpDriver.CreateDataSource(fileName, null))
-                    shpSrc.CreateLayer("图层", null, wkbGeometryType.wkbPoint, null).Dispose();
+                if (shpDriver != null)
+                    using (DataSource shpSrc = shpDriver.CreateDataSource(fileName, null))
+                        shpSrc.CreateLayer("图层", null, wkbGeometryType.wkbPoint, null).Dispose();
             }
             using (DataSource shpSrc = Ogr.Open(fileName, 0))
             {
-                AssertEqual(fileName, shpSrc.GetName(), $"{nameof(DataSource)}.{nameof(shpSrc.GetName)}");
-                using (Layer shpLyr = shpSrc.GetLayerByName("图层"))
-                    AssertEqual("图层", shpLyr.GetName(), $"{nameof(Layer)}.{nameof(shpSrc.GetName)}");
+                if (shpSrc != null)
+                {
+                    AssertEqual(fileName, shpSrc.GetName(), $"{nameof(DataSource)}.{nameof(shpSrc.GetName)}");
+                    using (Layer shpLyr = shpSrc.GetLayerByName("图层"))
+                        AssertEqual("图层", shpLyr.GetName(), $"{nameof(Layer)}.{nameof(shpSrc.GetName)}");
+                }
             }
         }
         private static void TestUnicodeFieldDefs()
@@ -135,25 +145,21 @@ namespace testapp
                 File.Delete(fileName);
 
             using (OSGeo.OGR.Driver shpDriver = Ogr.GetDriverByName("ESRI Shapefile"))
+            using (DataSource shpSrc = shpDriver.CreateDataSource(fileName, null))
+            using (Layer shpLyr = shpSrc.CreateLayer(UnicodeString, null, wkbGeometryType.wkbPoint, new string[] { "ENCODING=UTF-8" }))
+            using (FeatureDefn layerDef = shpLyr.GetLayerDefn())
             {
-                using (DataSource shpSrc = shpDriver.CreateDataSource(fileName, null))
-                using (Layer shpLyr = shpSrc.CreateLayer(UnicodeString, null, wkbGeometryType.wkbPoint, new string[] { "ENCODING=UTF-8" }))
-                {
-                    using (FeatureDefn layerDef = shpLyr.GetLayerDefn())
-                    {
-                        using (FieldDefn fieldDef = new FieldDefn("图层", FieldType.OFTString))
-                            if (shpLyr.CreateField(fieldDef, 1) != 0)
-                                throw new Exception("Failed to create a field definition on layer.");
+                using (FieldDefn fieldDef = new FieldDefn("图层", FieldType.OFTString))
+                    if (shpLyr.CreateField(fieldDef, 1) != 0)
+                        throw new Exception("Failed to create a field definition on layer.");
 
-                        foreach (string nameString in nameFieldValues)
-                        {
-                            using (Feature feature = new Feature(layerDef))
-                            {
-                                feature.SetField("图层", nameString);
-                                if (shpLyr.CreateFeature(feature) != 0)
-                                    throw new Exception("Failed to create feature on layer.");
-                            }
-                        }
+                foreach (string nameString in nameFieldValues)
+                {
+                    using (Feature feature = new Feature(layerDef))
+                    {
+                        feature.SetField("图层", nameString);
+                        if (shpLyr.CreateFeature(feature) != 0)
+                            throw new Exception("Failed to create feature on layer.");
                     }
                 }
             }
@@ -228,6 +234,96 @@ namespace testapp
                 AssertEqual(fileName2, list[2], $"{nameof(Dataset)}.{nameof(vrt.GetFileList)}()[2]");
             }
         }
+        private static void TestCSharpExceptions()
+        {
+            Console.WriteLine("Testing C# exceptions with Unicode messages.");
+            const int SWIG_CSharpApplicationException = 0;
+            const int SWIG_CSharpArithmeticException = 1;
+            const int SWIG_CSharpDivideByZeroException = 2;
+            const int SWIG_CSharpIndexOutOfRangeException = 3;
+            const int SWIG_CSharpInvalidCastException = 4;
+            const int SWIG_CSharpInvalidOperationException = 5;
+            const int SWIG_CSharpIOException = 6;
+            const int SWIG_CSharpNullReferenceException = 7;
+            const int SWIG_CSharpOutOfMemoryException = 8;
+            const int SWIG_CSharpOverflowException = 9;
+            const int SWIG_CSharpSystemException = 10;
+            Dictionary<int, Type> exs = new()
+            {
+                { SWIG_CSharpApplicationException, typeof(System.ApplicationException)  },
+                { SWIG_CSharpArithmeticException, typeof(System.ArithmeticException)  },
+                { SWIG_CSharpDivideByZeroException, typeof(System.DivideByZeroException)  },
+                { SWIG_CSharpIndexOutOfRangeException, typeof(System.IndexOutOfRangeException)  },
+                { SWIG_CSharpInvalidCastException, typeof(System.InvalidCastException)  },
+                { SWIG_CSharpInvalidOperationException, typeof(System.InvalidOperationException)  },
+                { SWIG_CSharpIOException, typeof(System.IO.IOException)  },
+                { SWIG_CSharpNullReferenceException, typeof(System.NullReferenceException)  },
+                { SWIG_CSharpOutOfMemoryException, typeof(System.OutOfMemoryException)  },
+                { SWIG_CSharpOverflowException, typeof(System.OverflowException)  },
+                { SWIG_CSharpSystemException, typeof(System.SystemException)  },
+                { int.MinValue, typeof(System.ApplicationException)  },
+                { int.MaxValue, typeof(System.ApplicationException)  }
+            };
+
+            var testException = GetPrivateGdalMethod<Action<int, string>>("TestSwigSetException");
+            foreach (var code in exs.Keys)
+            {
+                try
+                {
+                    testException(code, UnicodeString);
+                }
+                catch (Exception ex)
+                {
+                    var exType = exs[code];
+                    if (ex.GetType() != exs[code])
+                    {
+                        throw new Exception($"SWIG error code {code} did not throw {exType.Name}.", ex);
+                    }
+                    AssertEqual(UnicodeString, ex.Message, exs[code].Name);
+                }
+            }
+
+            Console.WriteLine("Testing C# exceptions with Unicode messages.");
+            const int SWIG_CSharpArgumentException = 0;
+            const int SWIG_CSharpArgumentNullException = 1;
+            const int SWIG_CSharpArgumentOutOfRangeException = 2;
+            Dictionary<int, Type> argumentExceptions = new()
+            {
+                { SWIG_CSharpArgumentException, typeof(System.ArgumentException)  },
+                { SWIG_CSharpArgumentNullException, typeof(System.ArgumentNullException)  },
+                { SWIG_CSharpArgumentOutOfRangeException, typeof(System.ArgumentOutOfRangeException)  },
+                { int.MinValue, typeof(System.ArgumentException)  },
+                { int.MaxValue, typeof(System.ArgumentException)  }
+            };
+
+            var testArgException = GetPrivateGdalMethod<Action<int, string, string>>("TestSwigSetArgumentException");
+            foreach (var code in argumentExceptions.Keys)
+            {
+                try
+                {
+                    testArgException(code, UnicodeString, UnicodeString);
+                }
+                catch (ArgumentException ex)
+                {
+                    var exType = argumentExceptions[code];
+                    if (ex.GetType() != exType)
+                    {
+                        throw new Exception($"SWIG error code {code} did not throw {exType.Name}.", ex);
+                    }
+                    AssertEqual(UnicodeString, ex.ParamName, exType.Name);
+
+                    //ArgumentException Messages are in form of "<message> (Parameter '<parameter_name>')"
+                    if (ex.Message.Length < UnicodeString.Length)
+                        throw new Exception("Exception message is too short to contain " + nameof(UnicodeString), ex);
+                    AssertEqual(UnicodeString, ex.Message.Substring(0, UnicodeString.Length), exType.Name);
+                }
+            }
+        }
+
+        private static TDelegate GetPrivateGdalMethod<TDelegate>(string methodName) where TDelegate : Delegate
+            => typeof(Gdal).GetMethod(methodName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+            ?.CreateDelegate<TDelegate>()
+            ?? throw new MissingMethodException($"Could not get non-public, static method {methodName} from {nameof(Gdal)}");
     }
 }
 

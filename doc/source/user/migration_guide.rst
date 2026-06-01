@@ -4,6 +4,14 @@
 Migration guide
 ================================================================================
 
+From GDAL 3.13 to GDAL 3.14
+---------------------------
+
+- Changes impacting C++ users:
+
+    * All methods accepting or returning ``OGRBoolean`` (aliased to ``int``)
+      have been changed to use ``bool`` instead.
+
 From GDAL 3.12 to GDAL 3.13
 ---------------------------
 
@@ -42,6 +50,12 @@ From GDAL 3.12 to GDAL 3.13
     This will require users that stored the return value of those functions in
     ``char **`` to use ``CSLConstList`` instead. Such change is compatible with
     earlier GDAL versions.
+
+- GDAL CLI changes:
+
+  * Several command-line arguments in the unified GDAL CLI were renamed from a
+    --src/--dst pattern to an --input/--output pattern. The old argument names
+    are still accepted by command line tools, C, C++ and Python API.
 
 - Behavior changes:
 

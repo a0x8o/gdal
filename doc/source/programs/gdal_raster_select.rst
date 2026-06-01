@@ -1,5 +1,7 @@
 .. _gdal_raster_select:
 
+.. program:: gdal_raster_select
+
 ================================================================================
 ``gdal raster select``
 ================================================================================
@@ -103,6 +105,7 @@ Examples
 
 .. example::
    :title: Convert a RGBA dataset to a YCbCR JPEG compressed GeoTIFF
+   :id: gdal-raster-select-rgba
 
    .. code-block:: bash
 

@@ -13,7 +13,7 @@
 #ifndef GDALALG_VECTOR_EXPORT_SCHEMA_INCLUDED
 #define GDALALG_VECTOR_EXPORT_SCHEMA_INCLUDED
 
-#include "gdalalg_vector_pipeline.h"
+#include "gdalvectorpipelinestepalgorithm.h"
 
 //! @cond Doxygen_Suppress
 
@@ -42,6 +42,7 @@ class GDALVectorExportSchemaAlgorithm /* non final */
     bool RunStep(GDALPipelineStepRunContext &ctxt) override;
 
     std::vector<std::string> m_layerNames{};
+    std::string m_outputFileName{};
 };
 
 /************************************************************************/

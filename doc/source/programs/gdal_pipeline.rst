@@ -1,5 +1,7 @@
 .. _gdal_pipeline:
 
+.. program:: gdal_pipeline
+
 ================================================================================
 ``gdal pipeline``
 ================================================================================
@@ -44,50 +46,93 @@ all other steps can potentially be used several times in a pipeline.
 
         $ gdal pipeline ! read in.tif ! footprint ! buffer 20 ! write out.gpkg --overwrite
 
+Steps
+-----
+
 For steps that have both *raster* data type as input and output, consult :ref:`gdal_raster_pipeline`.
 For steps that have both *vector* data type as input and output, consult :ref:`gdal_vector_pipeline`.
 
-The following steps accept raster input and generate vector output:
+The table below lists steps that convert between raster and vector data.
 
-* contour
+.. list-table::
+   :header-rows: 1
+   :widths: 40 60
+
+   * - Step
+     - Direction
+   * - :ref:`contour <pipeline-contour>`
+     - Raster → Vector
+   * - :ref:`footprint <pipeline-footprint>`
+     - Raster → Vector
+   * - :ref:`pixel-info <pipeline-pixel-info>`
+     - Raster → Vector
+   * - :ref:`polygonize <pipeline-polygonize>`
+     - Raster → Vector
+   * - :ref:`grid <pipeline-grid>`
+     - Vector → Raster
+   * - :ref:`rasterize <pipeline-rasterize>`
+     - Vector → Raster
+   * - :ref:`tee <pipeline-tee>`
+     - Vector → Raster
+
+.. _pipeline-contour:
+
+contour
+*******
 
 .. program-output:: gdal pipeline --help-doc=contour
 
 Details for options can be found in :ref:`gdal_raster_contour`.
 
-* footprint
+.. _pipeline-footprint:
+
+footprint
+*********
 
 .. program-output:: gdal pipeline --help-doc=footprint
 
 Details for options can be found in :ref:`gdal_raster_footprint`.
 
-* pixel-info
+.. _pipeline-grid:
 
-.. program-output:: gdal pipeline --help-doc=pixel-info
-
-Details for options can be found in :ref:`gdal_raster_pixel_info`.
-
-* polygonize
-
-.. program-output:: gdal pipeline --help-doc=polygonize
-
-Details for options can be found in :ref:`gdal_raster_polygonize`.
-
-The following steps accept raster vector and generate raster output:
-
-* grid
+grid
+****
 
 .. program-output:: gdal pipeline --help-doc=grid
 
 Details for options can be found in :ref:`gdal_vector_grid`.
 
-* rasterize
+.. _pipeline-pixel-info:
+
+pixel-info
+**********
+
+.. program-output:: gdal pipeline --help-doc=pixel-info
+
+Details for options can be found in :ref:`gdal_raster_pixel_info`.
+
+.. _pipeline-polygonize:
+
+polygonize
+**********
+
+.. program-output:: gdal pipeline --help-doc=polygonize
+
+Details for options can be found in :ref:`gdal_raster_polygonize`.
+
+.. _pipeline-rasterize:
+
+rasterize
+*********
 
 .. program-output:: gdal pipeline --help-doc=rasterize
 
 Details for options can be found in :ref:`gdal_vector_rasterize`.
 
-* tee
+.. _pipeline-tee:
+
+tee
+***
 
 .. program-output:: gdal pipeline --help-doc=tee-raster
 
@@ -148,7 +193,7 @@ Let's imagine we have a :file:`raster_reproject.gdalg.json` with the following c
 
     {
         "type": "gdal_streamed_alg",
-        "command_line": "gdal pipeline ! read in.tif ! reproject --dst-crs=EPSG:4326 ! edit --metadata=CHANGES=reprojected"
+        "command_line": "gdal pipeline ! read in.tif ! reproject --output-crs=EPSG:4326 ! edit --metadata=CHANGES=reprojected"
     }
 
 It is possible to run it with the following command line, overriding the
@@ -178,7 +223,7 @@ For example, given:
 
     {
         "type": "gdal_streamed_alg",
-        "command_line": "gdal pipeline ! read in.tif ! edit --metadata=before=value ! reproject --dst-crs=EPSG:4326 ! edit --metadata=CHANGES=reprojected"
+        "command_line": "gdal pipeline ! read in.tif ! edit --metadata=before=value ! reproject --output-crs=EPSG:4326 ! edit --metadata=CHANGES=reprojected"
     }
 
 the following command line may be used:
@@ -194,8 +239,8 @@ Execution of pipelines and argument substitutions can also be done in Python wit
 
     gdal.Run("pipeline", pipeline="raster_reproject.gdalg.json", output="out.tif", arguments={"edit[0].metadata": "before=modified"})
 
-Placeholder dataset name ``_``
-------------------------------
+Placeholder dataset name ``_PIPE_``
+-----------------------------------
 
 .. versionadded:: 3.13
 
@@ -205,7 +250,8 @@ dataset from the previous step. In some cases, it might be desirable to pipe
 the output dataset from the previous step into one of the other input dataset
 arguments instead.
 
-This can be achieved by using the placeholder dataset name ``_`` (underscore) as
+This can be achieved by using the placeholder dataset name ``_PIPE_`` (PIPE with
+leading and trailing underscore character) as
 the value for the alternate dataset argument, while explicitly specifying the
 input positional dataset argument.
 
@@ -217,7 +263,7 @@ input positional dataset argument.
       gdal pipeline read points.geojson ! buffer 200 ! \
           zonal-stats \
             --input dem.tif
-            --zones _ \
+            --zones _PIPE_ \
             --stat mean ! \
           write \
             --output-format CSV \
@@ -226,12 +272,6 @@ input positional dataset argument.
 
 It is also possible to achieve the same result by using a input nested pipeline
 as described below.
-
-.. warning::
-
-    Be careful to use the underscore character ``_``, and not the dash character ``-``.
-    The later tries to read the dataset from the standard input stream.
-
 
 .. _gdal_nested_pipeline:
 
@@ -358,14 +398,14 @@ Examples
 
    .. code-block:: bash
 
-        $ gdal pipeline ! read in.gpkg ! rasterize --size 1000,1000 ! reproject --dst-crs EPSG:4326 ! write out.tif --overwrite
+        $ gdal pipeline ! read in.gpkg ! rasterize --size 1000,1000 ! reproject --output-crs EPSG:4326 ! write out.tif --overwrite
 
 .. example::
    :title: Use an existing pipeline that rasterizes and reprojects, but change its input file and target CRS, and specify the output file
 
    .. code-block:: bash
 
-        $ gdal pipeline raster_reproject.gdalg.json --input=my.gpkg --output=out.tif --dst-crs=EPSG:32631
+        $ gdal pipeline raster_reproject.gdalg.json --input=my.gpkg --output=out.tif --output-crs=EPSG:32631
 
 .. example::
    :title: Buffer a line dataset to create a new polygon dataset

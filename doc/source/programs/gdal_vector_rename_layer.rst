@@ -1,5 +1,7 @@
 .. _gdal_vector_rename_layer:
 
+.. program:: gdal_vector_rename_layer
+
 ================================================================================
 ``gdal vector rename-layer``
 ================================================================================
@@ -78,7 +80,7 @@ Program Specific Options
 
 .. option:: --filename-compatible
 
-    Force layer names to be compatible of file names for Linux, Windows or MacOS,
+    Force layer names to be compatible with file names for Linux, Windows or MacOS,
     independently from the operating system on which this command is run.
 
 .. option:: --reserved-characters <RESERVED-CHARACTERS>

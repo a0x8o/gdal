@@ -1,5 +1,7 @@
 .. _gdal_vector_set_geom_type:
 
+.. program:: gdal_vector_set_geom_type
+
 ================================================================================
 ``gdal vector set-geom-type``
 ================================================================================
@@ -77,7 +79,7 @@ Program-Specific Options
    Force geometries to linear/non-curve geometry types, approximating arcs with
    linear segments. The linear approximation can be controlled with configuration
    options :config:`OGR_ARC_STEPSIZE` and :config:`OGR_ARC_MAX_GAP`
-   (specified using :option:`--config`).
+   (specified using :option:`vector_common_options --config`).
    e.g. ``COMPOUNDCURVE`` ==> ``LINESTRING``.
    This option is mutually exclusive with :option:`--curve`.
 
@@ -107,6 +109,7 @@ Program-Specific Options
 
 Standard Options
 ----------------
+
 
 .. collapse:: Details
 
@@ -151,14 +154,15 @@ Examples
 --------
 
 .. example::
-   :title: Convert a shapefile mixing polygons and multipolygons to a GeoPackage with multipolygons.
+   :title: Convert a shapefile mixing polygons and multipolygons to a GeoPackage with multipolygons
+   :id: gdal-vector-set-geom-type-multi
 
    .. code-block:: bash
 
         $ gdal vector set-geom-type --geometry-type=MULTIPOLYGON in.shp out.gpkg --overwrite
 
 .. example::
-   :title: Convert a GeoPackage with curve geometries to a Shapefile (that does not support them).
+   :title: Convert a GeoPackage with curve geometries to a Shapefile (that does not support them)
 
    .. code-block:: bash
 

@@ -8,6 +8,7 @@ RUN apt-get update && \
     autoconf \
     automake \
     bash \
+    bash-completion \
     ccache \
     cmake \
     clang \
@@ -73,7 +74,8 @@ RUN apt-get update && \
     swig \
     unixodbc-dev \
     wget \
-    zip
+    zip \
+    zsh
 
 # Removing "libpoppler-dev libpoppler-private-dev" from above list to build from source
 
@@ -201,7 +203,7 @@ RUN curl -LO -fsS https://apache.jfrog.io/artifactory/arrow/ubuntu/pool/noble/ma
     && dpkg -i libadbc-driver-snowflake-dev_22-1_amd64.deb
 
 # Install libduckdb
-RUN curl -LO -fsS https://github.com/duckdb/duckdb/releases/download/v1.5.1/libduckdb-linux-amd64.zip \
+RUN curl -LO -fsS https://github.com/duckdb/duckdb/releases/download/v1.5.2/libduckdb-linux-amd64.zip \
     && unzip libduckdb-linux-amd64.zip libduckdb.so \
     && mv libduckdb.so /usr/lib/x86_64-linux-gnu \
     && rm -f libduckdb-linux-amd64.zip
@@ -230,7 +232,7 @@ RUN curl -LO -fsS https://github.com/apache/arrow/archive/refs/heads/main.zip \
     && rm -rf arrow-main
 
 # Build Grok JPEG 2000 library
-ARG GROK_VERSION=v20.2.8
+ARG GROK_VERSION=v20.3.3
 
 RUN git clone --recursive --depth 1 --branch ${GROK_VERSION} \
     https://github.com/GrokImageCompression/grok.git grok-git && \

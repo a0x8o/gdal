@@ -1953,6 +1953,8 @@ def runexternal(
         command = cmd
     else:
         command = shlex.split(cmd)
+        if cmd.endswith('STRIP-ME"'):
+            command[-1] = '"' + command[-1][0 : -len("STRIP-ME")]
     if strin is None:
         p = subprocess.Popen(command, stdout=subprocess.PIPE)
     else:
@@ -2164,7 +2166,7 @@ def error_raised(type, match=""):
     else:
         assert any(
             [err["level"] == type and match in err["message"] for err in errors]
-        ), f'Did not receive an error of type {err_levels[type]} matching "{match}. Received: {received}'
+        ), f'Did not receive an error of type {err_levels[type]} matching "{match}". Received: {received}'
 
 
 ###############################################################################
@@ -2179,11 +2181,15 @@ def gdal_has_vrt_expression_dialect(dialect):
 ###############################################################################
 
 
-def importorskip_gdal_array():
+def importorskip(lib):
     pytest_version = [int(x) for x in pytest.__version__.split(".")]
     if pytest_version >= [8, 2, 0]:
-        return pytest.importorskip("osgeo.gdal_array", exc_type=ImportError)
-    return pytest.importorskip("osgeo.gdal_array")
+        return pytest.importorskip(lib, exc_type=ImportError)
+    return pytest.importorskip(lib)
+
+
+def importorskip_gdal_array():
+    return importorskip("osgeo.gdal_array")
 
 
 ###############################################################################
@@ -2215,3 +2221,16 @@ def wkt_ds(wkts, *, geom_type=None, epsg=None):
         lyr.CreateFeature(f)
 
     return ds
+
+
+###############################################################################
+# Run cmd_line, which must be 'gdal completion' + arguments, and return its
+# output parsed as a list
+
+
+def run_and_parse_completion_output(cmd_line):
+    res = runexternal(cmd_line)
+    sep = "\r\n" if "\r\n" in res else "\n"
+    if res and res.endswith(sep):
+        res = res[0 : -len(sep)]
+    return res.split(sep)

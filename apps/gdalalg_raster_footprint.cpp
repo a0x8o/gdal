@@ -34,10 +34,9 @@ GDALRasterFootprintAlgorithm::GDALRasterFootprintAlgorithm(bool standaloneStep)
               .SetStandaloneStep(standaloneStep)
               .SetOutputFormatCreateCapability(GDAL_DCAP_CREATE))
 {
-    AddProgressArg();
-
     if (standaloneStep)
     {
+        AddProgressArg();
         AddOpenOptionsArg(&m_openOptions).SetAvailableInPipelineStep(false);
         AddInputFormatsArg(&m_inputFormats)
             .AddMetadataItem(GAAMDI_REQUIRED_CAPABILITIES, {GDAL_DCAP_RASTER})
@@ -84,16 +83,18 @@ GDALRasterFootprintAlgorithm::GDALRasterFootprintAlgorithm(bool standaloneStep)
            &m_overview)
         .SetMutualExclusionGroup("overview-srcnodata")
         .SetMinValueIncluded(0);
-    AddArg("src-nodata", 0, _("Set nodata values for input bands."),
+    AddArg("input-nodata", 0, _("Set nodata values for input bands."),
            &m_srcNoData)
         .SetMinCount(1)
         .SetRepeatedArgAllowed(false)
+        .AddHiddenAlias("src-nodata")
         .SetMutualExclusionGroup("overview-srcnodata");
     AddArg("coordinate-system", 0, _("Target coordinate system"),
            &m_coordinateSystem)
         .SetChoices("georeferenced", "pixel");
-    AddArg("dst-crs", 0, _("Destination CRS"), &m_dstCrs)
+    AddArg(GDAL_ARG_NAME_OUTPUT_CRS, 0, _("Output CRS"), &m_dstCrs)
         .SetIsCRSArg()
+        .AddHiddenAlias("dst-crs")
         .AddHiddenAlias("t_srs");
     AddArg("split-multipolygons", 0,
            _("Whether to split multipolygons as several features each with one "
@@ -352,10 +353,9 @@ bool GDALRasterFootprintAlgorithm::RunStep(GDALPipelineStepRunContext &ctxt)
             GDALDataset::ToHandle(m_outputDataset.GetDatasetRef());
         auto poRetDS = GDALDataset::FromHandle(GDALFootprint(
             outputFilename.c_str(), hDstDS, hSrcDS, psOptions.get(), nullptr));
-        bOK = poRetDS != nullptr;
-        if (bOK && !hDstDS)
+        if ((bOK = (poRetDS != nullptr)) && !hDstDS)
         {
-            if (poRetDS && !m_standaloneStep && !outputFilename.empty())
+            if (!m_standaloneStep && !outputFilename.empty())
             {
                 bOK = poRetDS->FlushCache() == CE_None;
 #if !defined(__APPLE__)

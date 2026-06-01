@@ -281,11 +281,22 @@ def test_gdalalg_set_field_type_completion(tmp_path):
         f"{gdal_path} completion gdal vector set-field-type --input ../ogr/data/poly.shp --field-name"
     )
     assert "EAS_ID" in out
+    assert "OGR_GEOMETRY" not in out
 
     out = gdaltest.runexternal(
         f"{gdal_path} completion gdal pipeline read ../ogr/data/poly.shp ! set-field-type --field-name "
     )
     assert "EAS_ID" in out
+
+    out = gdaltest.runexternal(
+        f"{gdal_path} completion gdal pipeline read ../ogr/data/poly.shp ! set-field-type --active-layer poly --field-name "
+    )
+    assert "EAS_ID" in out
+
+    out = gdaltest.runexternal(
+        f"{gdal_path} completion gdal pipeline read ../ogr/data/poly.shp ! set-field-type --active-layer invalid --field-name "
+    )
+    assert "EAS_ID" not in out
 
     # No completion when there is a tee operator as this can be a slow operation
     out = gdaltest.runexternal(
@@ -422,8 +433,8 @@ def test_gdalalg_set_field_type_src_field_type():
         "vector",
         "set-field-type",
         input=src_ds,
-        src_field_type="String",
-        dst_field_type="Integer",
+        input_field_type="String",
+        output_field_type="Integer",
         output_format="MEM",
     )
     ds = alg.Output()
