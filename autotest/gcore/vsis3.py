@@ -17,7 +17,6 @@ import os
 import os.path
 import stat
 import sys
-import tempfile
 import urllib
 
 import gdaltest
@@ -983,6 +982,43 @@ def test_vsis3_2(aws_test_config_as_config_options_or_credentials, webserver_por
         gdal.VSIFCloseL(f)
 
     assert data == "bar"
+
+
+###############################################################################
+
+
+@gdaltest.enable_exceptions()
+def test_vsis3_permanent_redirect_and_region_change(aws_test_config, webserver_port):
+
+    handler = webserver.SequentialHandler()
+    handler.add(
+        "GET",
+        "/test_vsis3_permanent_redirect_and_region_change/?delimiter=%2F&list-type=2",
+        301,
+        {"Content-type": "application/xml"},
+        f"""<?xml version="1.0" encoding="UTF-8"?>
+            <Error><Code>PermanentRedirect</Code><Message>The bucket you are attempting to access must be addressed using the specified endpoint. Please send all future requests to this endpoint.</Message><Endpoint>localhost:{webserver_port}</Endpoint><Bucket>test_vsis3_permanent_redirect_and_region_change</Bucket></Error>""",
+    )
+    handler.add(
+        "GET",
+        "/test_vsis3_permanent_redirect_and_region_change/?delimiter=%2F&list-type=2",
+        200,
+        {"Content-type": "application/xml"},
+        """<?xml version="1.0" encoding="UTF-8"?>
+            <ListBucketResult>
+                <Prefix></Prefix>
+                <Contents>
+                    <Key>test.bin</Key>
+                    <LastModified>1970-01-01T00:00:01.000Z</LastModified>
+                    <Size>123456</Size>
+                </Contents>
+            </ListBucketResult>""",
+    )
+    with webserver.install_http_handler(handler):
+        with gdal.VSIFile(
+            "/vsis3/test_vsis3_permanent_redirect_and_region_change/test.bin", "rb"
+        ):
+            pass
 
 
 ###############################################################################
@@ -5356,11 +5392,10 @@ aws_secret_access_key = bar
 # Read credentials from sts AssumeRoleWithWebIdentity
 @pytest.mark.skipif(sys.platform not in ("linux", "win32"), reason="Incorrect platform")
 def test_vsis3_read_credentials_sts_assume_role_with_web_identity(
-    aws_test_config, webserver_port
+    aws_test_config, webserver_port, tmp_path
 ):
-    fp = tempfile.NamedTemporaryFile(delete=False)
-    fp.write(b"token")
-    fp.close()
+    with open(tmp_path / "token.txt", "wb") as fp:
+        fp.write(b"token")
 
     aws_role_arn = "arn:aws:iam:role/test"
     aws_role_arn_encoded = urllib.parse.quote_plus(aws_role_arn)
@@ -7167,12 +7202,12 @@ region = us-east-1
 # Test credential_process with invalid JSON
 
 
-def test_vsis3_credential_process_invalid_json(tmp_vsimem, aws_test_config):
+def test_vsis3_credential_process_invalid_json(tmp_vsimem, aws_test_config, tmp_path):
     script_content = """#!/usr/bin/env python3
 print('invalid json response')
 """
 
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
+    with open(tmp_path / "script.py", "w") as f:
         f.write(script_content)
         script_path = f.name
 
@@ -7211,7 +7246,7 @@ region = us-east-1
 # Test credential_process with missing required fields
 
 
-def test_vsis3_credential_process_missing_fields(tmp_vsimem, aws_test_config):
+def test_vsis3_credential_process_missing_fields(tmp_vsimem, aws_test_config, tmp_path):
 
     script_content = """#!/usr/bin/env python3
 import json
@@ -7219,7 +7254,7 @@ credentials = {"AccessKeyId": "test_key"}
 print(json.dumps(credentials))
 """
 
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
+    with open(tmp_path / "script.py", "w") as f:
         f.write(script_content)
         script_path = f.name
 
