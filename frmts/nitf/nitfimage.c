@@ -694,7 +694,16 @@ NITFImage *NITFImageAccess(NITFFile *psFile, int iSegment)
 
             nOffset += nUserTREBytes;
 
-            sscanf(psImage->pachTRE + 6, "%*5d%n", &nFirstTagUsedLength);
+            /* pachTRE is a raw copy of the header and is not NUL-terminated,
+               so sscanf() would read past its end. Parse the 5-byte tag
+               length field from a NUL-terminated copy. nTREBytes is > 11
+               here (nUserTREBytes > 14), so bytes 6..10 are present. */
+            {
+                char szFirstTagLength[6];
+                memcpy(szFirstTagLength, psImage->pachTRE + 6, 5);
+                szFirstTagLength[5] = '\0';
+                sscanf(szFirstTagLength, "%*5d%n", &nFirstTagUsedLength);
+            }
             if (nFirstTagUsedLength != 5)
             {
                 CPLError(CE_Warning, CPLE_AppDefined,
@@ -2985,7 +2994,7 @@ int NITFReadICHIPB(NITFImage *psImage, NITFICHIPBInfo *psICHIP)
     }
     else
     {
-        fprintf(stdout, "Chip is already de-warped?\n");
+        CPLError(CE_Warning, CPLE_AppDefined, "Chip is already de-warped?");
     }
 
     return TRUE;

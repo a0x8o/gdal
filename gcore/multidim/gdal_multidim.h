@@ -391,14 +391,33 @@ class CPL_DLL GDALGroup : public GDALIHasAttribute
                 CSLConstList papszOptions = nullptr) const;
 
     std::vector<std::string> GetMDArrayFullNamesRecursive(
-        CSLConstList papszGroupOptions = nullptr,
-        CSLConstList papszArrayOptions = nullptr) const;
+        CSLConstList papszGroupDiscoverOptions = nullptr,
+        CSLConstList papszArrayDiscoverOptions = nullptr,
+        CSLConstList papszGroupOpenOptions = nullptr) const;
+
+    std::vector<std::shared_ptr<GDALMDArray>>
+    GetMDArrays(CSLConstList papszDiscoverOptions = nullptr,
+                CSLConstList papszOpenOptions = nullptr) const;
+
+    std::vector<std::shared_ptr<GDALMDArray>>
+    GetMDArraysRecursive(CSLConstList papszGroupDiscoverOptions = nullptr,
+                         CSLConstList papszArrayDiscoverOptions = nullptr,
+                         CSLConstList papszGroupOpenOptions = nullptr,
+                         CSLConstList papszArrayOpenOptions = nullptr) const;
 
     virtual std::vector<std::string>
     GetGroupNames(CSLConstList papszOptions = nullptr) const;
     virtual std::shared_ptr<GDALGroup>
     OpenGroup(const std::string &osName,
               CSLConstList papszOptions = nullptr) const;
+
+    std::vector<std::shared_ptr<GDALGroup>>
+    GetGroups(CSLConstList papszDiscoverOptions = nullptr,
+              CSLConstList papszOpenOptions = nullptr) const;
+
+    std::vector<std::shared_ptr<GDALGroup>>
+    GetGroupsRecursive(CSLConstList papszDiscoverOptions = nullptr,
+                       CSLConstList papszOpenOptions = nullptr) const;
 
     virtual std::vector<std::string>
     GetVectorLayerNames(CSLConstList papszOptions = nullptr) const;
@@ -408,6 +427,13 @@ class CPL_DLL GDALGroup : public GDALIHasAttribute
 
     virtual std::vector<std::shared_ptr<GDALDimension>>
     GetDimensions(CSLConstList papszOptions = nullptr) const;
+
+    std::vector<std::shared_ptr<GDALDimension>>
+    GetDimensionsRecursive(CSLConstList papszDimensionDiscoverOptions = nullptr,
+                           CSLConstList papszGroupDiscoverOptions = nullptr,
+                           CSLConstList papszArrayDiscoverOptions = nullptr,
+                           CSLConstList papszGroupOpenOptions = nullptr,
+                           CSLConstList papszArrayOpenOptions = nullptr) const;
 
     virtual std::shared_ptr<GDALGroup>
     CreateGroup(const std::string &osName, CSLConstList papszOptions = nullptr);
@@ -1006,6 +1032,8 @@ class CPL_DLL GDALMDArray : virtual public GDALAbstractMDArray,
     virtual bool SetScale(double dfScale,
                           GDALDataType eStorageType = GDT_Unknown);
 
+    std::shared_ptr<GDALMDArray> GetSelf() const;
+
     std::shared_ptr<GDALMDArray> GetView(const std::string &viewExpr) const;
 
     std::shared_ptr<GDALMDArray> operator[](const std::string &fieldName) const;
@@ -1117,6 +1145,22 @@ class CPL_DLL GDALMDArray : virtual public GDALAbstractMDArray,
                                   GDALProgressFunc pfnProgress,
                                   void *pProgressData,
                                   CSLConstList papszOptions);
+
+    bool HasSameShapeAs(const GDALMDArray &other) const;
+
+    static void CopyContiguousBufferToBuffer(
+        const size_t nDims, const size_t *count, const void *pSrcBuffer,
+        const GDALExtendedDataType &srcType, void *pDstBuffer,
+        const GDALExtendedDataType &dstType, const GPtrDiff_t *dstStride);
+
+    std::shared_ptr<GDALMDArray> operator+(
+        const std::shared_ptr<GDALMDArray> &other) const CPL_WARN_UNUSED_RESULT;
+    std::shared_ptr<GDALMDArray> operator-(
+        const std::shared_ptr<GDALMDArray> &other) const CPL_WARN_UNUSED_RESULT;
+    std::shared_ptr<GDALMDArray> operator*(
+        const std::shared_ptr<GDALMDArray> &other) const CPL_WARN_UNUSED_RESULT;
+    std::shared_ptr<GDALMDArray> operator/(
+        const std::shared_ptr<GDALMDArray> &other) const CPL_WARN_UNUSED_RESULT;
 
     //! @cond Doxygen_Suppress
     static constexpr GUInt64 COPY_COST = 1000;

@@ -584,8 +584,8 @@ std::shared_ptr<VRTMDArray> VRTGroup::CreateVRTMDArray(
         if (poFoundDim == nullptr || poFoundDim->GetSize() != poDim->GetSize())
         {
             CPLError(CE_Failure, CPLE_AppDefined,
-                     "One input dimension is not a VRTDimension "
-                     "or a VRTDimension of this dataset");
+                     "One input dimension is not a VRTDimension, "
+                     "or is not a VRTDimension of this dataset");
             return nullptr;
         }
     }
@@ -650,6 +650,11 @@ static GDALExtendedDataType ParseDataType(const CPLXMLNode *psNode)
     else
     {
         const auto eDT = GDALGetDataTypeByName(psType->psChild->pszValue);
+        if (eDT == GDT_Unknown)
+        {
+            CPLError(CE_Failure, CPLE_AppDefined, "Unknown DataType: %s",
+                     psType->psChild->pszValue);
+        }
         dt = GDALExtendedDataType::Create(eDT);
     }
     return dt;
@@ -2662,8 +2667,11 @@ bool VRTMDArray::CopyFrom(GDALDataset *poSrcDS, const GDALMDArray *poSrcArray,
 
     if (poSrcDS)
     {
+        auto poVRTRootGroup = GetRootVRTGroup();
         const auto nDims(GetDimensionCount());
-        if (nDims == 1 && m_dims[0]->GetSize() > 2 &&
+        if ((!poVRTRootGroup ||
+             poVRTRootGroup->GetGuessRegularlySpacedArrays()) &&
+            nDims == 1 && m_dims[0]->GetSize() > 2 &&
             m_dims[0]->GetSize() < 10 * 1000 * 1000)
         {
             std::vector<double> adfTmp(

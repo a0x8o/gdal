@@ -1405,6 +1405,26 @@ def test_stats_minmax_all_invalid_mask(datatype):
 ###############################################################################
 
 
+def test_stats_minmax_integer_nodata_comparison_exact():
+
+    gdaltest.importorskip_gdal_array()
+    np = pytest.importorskip("numpy")
+
+    data = np.array([[0, 4000000005], [4000000010, 4000000030]], dtype=np.uint32)
+
+    ds = gdal.GetDriverByName("MEM").Create("", 2, 2, 1, gdal.GDT_UInt32)
+    ds.GetRasterBand(1).WriteArray(data)
+    ds.GetRasterBand(1).SetNoDataValue(4000000000)
+
+    rmin, rmax = ds.GetRasterBand(1).ComputeRasterMinMax()
+
+    assert rmin == 0
+    assert rmax == 4000000030
+
+
+###############################################################################
+
+
 def test_stats_GetInterBandCovarianceMatrix(tmp_vsimem):
 
     gdal.FileFromMemBuffer(
@@ -1764,3 +1784,16 @@ def test_stats_ComputeInterBandCovarianceMatrix_interrupt():
         ds.ComputeInterBandCovarianceMatrix(
             write_into_metadata=False, callback=my_progress
         )
+
+
+###############################################################################
+
+
+def test_stats_compute_stats_do_not_set():
+
+    ds = gdal.GetDriverByName("MEM").Create("", 1, 1, 1)
+    ds.GetRasterBand(1).Fill(1)
+    assert ds.GetRasterBand(1).ComputeStatistics(
+        False, options={"SET_STATISTICS": False}
+    ) == [1.0, 1.0, 1.0, 0.0]
+    assert ds.GetRasterBand(1).GetMetadata() == {}

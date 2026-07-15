@@ -3123,6 +3123,17 @@ def test_nitf_73():
 
 
 ###############################################################################
+# Test reading an image subheader whose user TRE data is not NUL-terminated
+# (heap-buffer-overflow read in NITFImageAccess when parsing the first tag).
+
+
+def test_nitf_image_tre_oob_read():
+
+    with gdal.quiet_errors():
+        gdal.Open("data/nitf/image_tre_oob.ntf")
+
+
+###############################################################################
 # Test cases for CCLSTA
 #  - Simple case
 
@@ -5956,7 +5967,7 @@ def test_nitf_metadata_validation_tre(tmp_vsimem):
         )
     gdal.ErrorReset()
     with gdal.quiet_errors():
-        ds = gdal.OpenEx(filename, open_options=["VALIDATE=YES"])
+        ds = gdal.Open(filename, open_options=["VALIDATE=YES"])
     assert gdal.GetLastErrorMsg() != ""
     md = ds.GetMetadata("xml:TRE")[0]
     assert md == """<tres>
@@ -5980,7 +5991,7 @@ def test_nitf_metadata_validation_tre(tmp_vsimem):
 """
 
     with gdal.quiet_errors():
-        ds = gdal.OpenEx(
+        ds = gdal.Open(
             filename, open_options=["VALIDATE=YES", "FAIL_IF_VALIDATION_ERROR=YES"]
         )
     assert ds is None
@@ -6001,7 +6012,7 @@ def test_nitf_metadata_validation_des(tmp_vsimem):
         )
     gdal.ErrorReset()
     with gdal.quiet_errors():
-        ds = gdal.OpenEx(filename, open_options=["VALIDATE=YES"])
+        ds = gdal.Open(filename, open_options=["VALIDATE=YES"])
     assert gdal.GetLastErrorMsg() != ""
     md = ds.GetMetadata("xml:DES")[0]
     assert md == """<des_list>
@@ -6035,7 +6046,7 @@ def test_nitf_metadata_validation_des(tmp_vsimem):
 """
 
     with gdal.quiet_errors():
-        ds = gdal.OpenEx(
+        ds = gdal.Open(
             filename, open_options=["VALIDATE=YES", "FAIL_IF_VALIDATION_ERROR=YES"]
         )
     assert ds is None
@@ -7520,6 +7531,7 @@ def test_nitf_create_copy_cadrg_color_table_per_frame(
     creationOptions = [
         "PRODUCT_TYPE=CADRG",
         "SCALE=10000000",
+        "IC=C4",  # just to test bugfix for https://github.com/OSGeo/gdal/issues/14709
     ]
     if color_table_per_frame:
         creationOptions.append("COLOR_TABLE_PER_FRAME=YES")

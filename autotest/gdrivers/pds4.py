@@ -165,7 +165,7 @@ def validate_xml(filename):
         force_download=True,
     )
 
-    ds = gdal.OpenEx(
+    ds = gdal.Open(
         "GMLAS:" + filename,
         open_options=[
             "VALIDATE=YES",
@@ -886,11 +886,15 @@ def test_pds4_13():
     assert ds is None
 
     with gdal.quiet_errors():
-        ds = gdal.Open("PDS4:data/pds4/byte_pds4_cart_1700_multi_sds.xml:3:1")
+        ds = gdal.Open(
+            "PDS4:data/pds4/byte_pds4_cart_1700_multi_sds.xml:3:1", gdal.OF_RASTER
+        )
     assert ds is None
 
     with gdal.quiet_errors():
-        ds = gdal.Open("PDS4:data/pds4/byte_pds4_cart_1700_multi_sds.xml:1:3")
+        ds = gdal.Open(
+            "PDS4:data/pds4/byte_pds4_cart_1700_multi_sds.xml:1:3", gdal.OF_RASTER
+        )
     assert ds is None
 
 
@@ -981,7 +985,7 @@ def test_pds4_14():
 </Product_Observational>""",
     )
     with gdal.quiet_errors():
-        ds = gdal.Open(filename)
+        ds = gdal.Open(filename, gdal.OF_RASTER)
     assert ds is None
 
     gdal.FileFromMemBuffer(
@@ -1018,7 +1022,7 @@ def test_pds4_14():
 </Product_Observational>""",
     )
     with gdal.quiet_errors():
-        ds = gdal.Open(filename)
+        ds = gdal.Open(filename, gdal.OF_RASTER)
     assert ds is None
 
     gdal.FileFromMemBuffer(
@@ -1050,7 +1054,7 @@ def test_pds4_14():
 </Product_Observational>""",
     )
     with gdal.quiet_errors():
-        ds = gdal.Open(filename)
+        ds = gdal.Open(filename, gdal.OF_RASTER)
     assert ds is None
 
     gdal.FileFromMemBuffer(
@@ -2005,3 +2009,36 @@ def test_pds4_array_3D_with_untypical_band_names(tmp_vsimem):
     assert ds.RasterXSize == 4
     assert ds.GetRasterBand(1).GetNoDataValue() == -999.0
     assert ds.GetMetadataItem("INTERLEAVE", "IMAGE_STRUCTURE") == "BAND"
+
+
+###############################################################################
+# Test support for browse products
+
+
+@pytest.mark.require_driver("PNG")
+def test_pds4_browse_product_png():
+
+    ds = gdal.Open("data/pds4/M044416018SE_browse.xml")
+    assert ds.RasterXSize == 10
+    assert ds.RasterYSize == 20
+    assert ds.GetRasterBand(1).Checksum() == 2435
+    assert len(ds.GetFileList()) == 2
+    assert ds.GetMetadata("xml:PDS4") is not None
+    assert ds.GetGeoTransform(can_return_null=True) is None
+    assert ds.GetSpatialRef() is None
+
+
+###############################################################################
+# Test support for browse products
+
+
+@pytest.mark.require_driver("GTIFF")
+def test_pds4_browse_product_tiff():
+
+    ds = gdal.Open("data/pds4/M044416018S_map_raw.xml")
+    assert ds.RasterXSize == 26454
+    assert ds.RasterYSize == 82056
+    assert len(ds.GetFileList()) == 2
+    assert ds.GetMetadata("xml:PDS4") is not None
+    assert ds.GetGeoTransform(can_return_null=True) is not None
+    assert ds.GetSpatialRef() is not None

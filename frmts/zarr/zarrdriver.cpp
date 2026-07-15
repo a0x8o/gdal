@@ -120,9 +120,9 @@ static bool ExploreGroup(const std::shared_ptr<GDALGroup> &poGroup,
 const char *ZarrDataset::GetMetadataItem(const char *pszName,
                                          const char *pszDomain)
 {
-    if (pszDomain != nullptr && EQUAL(pszDomain, "SUBDATASETS"))
+    if (pszDomain != nullptr && EQUAL(pszDomain, GDAL_MDD_SUBDATASETS))
         return m_aosSubdatasets.FetchNameValue(pszName);
-    if (pszDomain != nullptr && EQUAL(pszDomain, "IMAGE_STRUCTURE"))
+    if (pszDomain != nullptr && EQUAL(pszDomain, GDAL_MDD_IMAGE_STRUCTURE))
         return GDALDataset::GetMetadataItem(pszName, pszDomain);
     return nullptr;
 }
@@ -133,9 +133,9 @@ const char *ZarrDataset::GetMetadataItem(const char *pszName,
 
 CSLConstList ZarrDataset::GetMetadata(const char *pszDomain)
 {
-    if (pszDomain != nullptr && EQUAL(pszDomain, "SUBDATASETS"))
+    if (pszDomain != nullptr && EQUAL(pszDomain, GDAL_MDD_SUBDATASETS))
         return m_aosSubdatasets.List();
-    if (pszDomain != nullptr && EQUAL(pszDomain, "IMAGE_STRUCTURE"))
+    if (pszDomain != nullptr && EQUAL(pszDomain, GDAL_MDD_IMAGE_STRUCTURE))
         return GDALDataset::GetMetadata(pszDomain);
     return nullptr;
 }
@@ -716,7 +716,8 @@ GDALDataset *ZarrDataset::Open(GDALOpenInfo *poOpenInfo)
         }
         if (!poDS->m_aosSubdatasets.empty())
         {
-            poNewDS->SetMetadata(poDS->m_aosSubdatasets.List(), "SUBDATASETS");
+            poNewDS->SetMetadata(poDS->m_aosSubdatasets.List(),
+                                 GDAL_MDD_SUBDATASETS);
         }
         return poNewDS.release();
     }
@@ -1102,7 +1103,7 @@ void ZarrDriver::InitMetadata()
                 CPLCreateXMLNode(oTree.get(), CXT_Element, "Option");
             CPLAddXMLAttributeAndValue(psFormat, "name", "FORMAT");
             CPLAddXMLAttributeAndValue(psFormat, "type", "string-select");
-            CPLAddXMLAttributeAndValue(psFormat, "default", "ZARR_V2");
+            CPLAddXMLAttributeAndValue(psFormat, "default", "ZARR_V3");
             {
                 auto poValueNode =
                     CPLCreateXMLNode(psFormat, CXT_Element, "Value");
@@ -1139,7 +1140,8 @@ void ZarrDriver::InitMetadata()
 
             auto psInterleaveNode =
                 CPLCreateXMLNode(oTree.get(), CXT_Element, "Option");
-            CPLAddXMLAttributeAndValue(psInterleaveNode, "name", "INTERLEAVE");
+            CPLAddXMLAttributeAndValue(psInterleaveNode, "name",
+                                       GDALMD_INTERLEAVE);
             CPLAddXMLAttributeAndValue(psInterleaveNode, "type",
                                        "string-select");
             CPLAddXMLAttributeAndValue(psInterleaveNode, "default", "BAND");
@@ -1181,7 +1183,7 @@ ZarrDataset::CreateMultiDimensional(const char *pszFilename,
                                     CSLConstList papszOptions)
 {
     const char *pszFormat =
-        CSLFetchNameValueDef(papszOptions, "FORMAT", "ZARR_V2");
+        CSLFetchNameValueDef(papszOptions, "FORMAT", "ZARR_V3");
     std::shared_ptr<ZarrGroupBase> poRG;
     auto poSharedResource =
         ZarrSharedResource::Create(pszFilename, /*bUpdatable=*/true);
@@ -1273,7 +1275,7 @@ GDALDataset *ZarrDataset::Create(const char *pszName, int nXSize, int nYSize,
         }
 
         const char *pszFormat =
-            CSLFetchNameValueDef(papszOptions, "FORMAT", "ZARR_V2");
+            CSLFetchNameValueDef(papszOptions, "FORMAT", "ZARR_V3");
         auto poSharedResource =
             ZarrSharedResource::Create(pszName, /*bUpdatable=*/true);
         const bool bCreateZMetadata = CPLTestBool(CSLFetchNameValueDef(
@@ -1411,8 +1413,8 @@ GDALDataset *ZarrDataset::Create(const char *pszName, int nXSize, int nYSize,
 
     const bool bSingleArray =
         CPLTestBool(CSLFetchNameValueDef(papszOptions, "SINGLE_ARRAY", "YES"));
-    const bool bBandInterleave =
-        EQUAL(CSLFetchNameValueDef(papszOptions, "INTERLEAVE", "BAND"), "BAND");
+    const bool bBandInterleave = EQUAL(
+        CSLFetchNameValueDef(papszOptions, GDALMD_INTERLEAVE, "BAND"), "BAND");
     std::shared_ptr<GDALDimension> poBandDim(
         (bSingleArray && nBandsIn > 1)
             ? poRG->CreateDimension("Band", std::string(), std::string(),
@@ -1444,8 +1446,9 @@ GDALDataset *ZarrDataset::Create(const char *pszName, int nXSize, int nYSize,
             CleanupCreatedFiles();
             return nullptr;
         }
-        poDS->SetMetadataItem("INTERLEAVE", bBandInterleave ? "BAND" : "PIXEL",
-                              "IMAGE_STRUCTURE");
+        poDS->SetMetadataItem(GDALMD_INTERLEAVE,
+                              bBandInterleave ? "BAND" : "PIXEL",
+                              GDAL_MDD_IMAGE_STRUCTURE);
         if (bBandInterleave)
         {
             const char *pszBlockSize =
@@ -1457,8 +1460,8 @@ GDALDataset *ZarrDataset::Create(const char *pszName, int nXSize, int nYSize,
                 if (aosTokens.size() == 3 && atoi(aosTokens[0]) == nBandsIn)
                 {
                     // Actually expose as pixel interleaved
-                    poDS->SetMetadataItem("INTERLEAVE", "PIXEL",
-                                          "IMAGE_STRUCTURE");
+                    poDS->SetMetadataItem(GDALMD_INTERLEAVE, "PIXEL",
+                                          GDAL_MDD_IMAGE_STRUCTURE);
                 }
             }
         }
@@ -2229,6 +2232,7 @@ class ZARRAddGeoreferencingConventionAlgorithm final : public GDALAlgorithm
                           "dataset"),
               "/programs/gdal_driver_zarr_add_georeferencing_convention.html")
     {
+        AddProgressArg(/* hidden = */ true);
         AddInputDatasetArg(&m_dataset,
                            GDAL_OF_MULTIDIM_RASTER | GDAL_OF_UPDATE);
         AddArg("convention", 0, _("Georeferencing convention"),
@@ -2309,6 +2313,10 @@ void GDALRegister_Zarr()
 
     GDALDriver *poDriver = new ZarrDriver();
     ZARRDriverSetCommonMetadata(poDriver);
+
+#ifdef HAVE_PCODEC
+    poDriver->SetMetadataItem("HAVE_PCODEC", "YES");
+#endif
 
     poDriver->pfnOpen = ZarrDataset::Open;
     poDriver->pfnCreateMultiDimensional = ZarrDataset::CreateMultiDimensional;

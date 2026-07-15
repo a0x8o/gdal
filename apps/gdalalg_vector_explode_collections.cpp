@@ -78,7 +78,7 @@ class GDALVectorExplodeCollectionsAlgorithmLayer final
 
     CPL_DISALLOW_COPY_ASSIGN(GDALVectorExplodeCollectionsAlgorithmLayer)
 
-    void TranslateFeature(
+    bool TranslateFeature(
         std::unique_ptr<OGRFeature> poSrcFeature,
         std::vector<std::unique_ptr<OGRFeature>> &apoOutFeatures) override;
 
@@ -163,7 +163,7 @@ GDALVectorExplodeCollectionsAlgorithmLayer::
 /*                          TranslateFeature()                          */
 /************************************************************************/
 
-void GDALVectorExplodeCollectionsAlgorithmLayer::TranslateFeature(
+bool GDALVectorExplodeCollectionsAlgorithmLayer::TranslateFeature(
     std::unique_ptr<OGRFeature> poSrcFeature,
     std::vector<std::unique_ptr<OGRFeature>> &apoOutFeatures)
 {
@@ -222,7 +222,9 @@ void GDALVectorExplodeCollectionsAlgorithmLayer::TranslateFeature(
                             poNewFeature->SetFDefnUnsafe(m_poFeatureDefn.get());
                             poNewFeature->SetFID(m_nextFID);
                             ++m_nextFID;
-                            apoOutFeatures.push_back(std::move(poNewFeature));
+                            if (PassesFilters(poNewFeature.get()))
+                                apoOutFeatures.push_back(
+                                    std::move(poNewFeature));
                         }
                         else
                         {
@@ -252,9 +254,12 @@ void GDALVectorExplodeCollectionsAlgorithmLayer::TranslateFeature(
             poCurFeature->SetFDefnUnsafe(m_poFeatureDefn.get());
             poCurFeature->SetFID(m_nextFID);
             ++m_nextFID;
-            apoOutFeatures.push_back(std::move(poCurFeature));
+            if (PassesFilters(poCurFeature.get()))
+                apoOutFeatures.push_back(std::move(poCurFeature));
         }
     }
+
+    return true;
 }
 
 }  // namespace

@@ -28,6 +28,7 @@
  * Scanline-oriented Write Support
  */
 #include "tiffiop.h"
+#include <assert.h>
 #include <stdio.h>
 
 #define NOSTRIP ((uint32_t)(-1)) /* undefined state */
@@ -82,8 +83,16 @@ int TIFFWriteScanline(TIFF *tif, void *buf, uint32_t row, uint16_t sample)
     /*
      * Calculate strip and check for crossings.
      */
+    if (td->td_rowsperstrip == 0)
+    {
+        TIFFErrorExtR(tif, module,
+                      "Cannot compute strip: RowsPerStrip is zero");
+        return (-1);
+    }
     if (td->td_planarconfig == PLANARCONFIG_SEPARATE)
     {
+        uint64_t sample_offset;
+        uint64_t strip64;
         if (sample >= td->td_samplesperpixel)
         {
             TIFFErrorExtR(tif, module, "%lu: Sample out of range, max %lu",
@@ -91,7 +100,18 @@ int TIFFWriteScanline(TIFF *tif, void *buf, uint32_t row, uint16_t sample)
                           (unsigned long)td->td_samplesperpixel);
             return (-1);
         }
-        strip = sample * td->td_stripsperimage + row / td->td_rowsperstrip;
+        sample_offset =
+            _TIFFMultiply64(tif, sample, td->td_stripsperimage, module);
+        if (sample_offset == 0 && sample != 0 && td->td_stripsperimage != 0)
+            return (-1);
+        strip64 =
+            _TIFFAdd64(tif, sample_offset, row / td->td_rowsperstrip, module);
+        if (strip64 == 0 &&
+            (sample_offset != 0 || (row / td->td_rowsperstrip) != 0))
+            return (-1);
+        strip = _TIFFCastUInt64ToUInt32(tif, strip64, module);
+        if (strip == 0 && strip64 != 0)
+            return (-1);
     }
     else
         strip = row / td->td_rowsperstrip;
@@ -158,6 +178,11 @@ int TIFFWriteScanline(TIFF *tif, void *buf, uint32_t row, uint16_t sample)
              * backup to the start and then decode
              * forward (below).
              */
+            /* Coverity Scan warns about a potential division by zero given
+             * an above check against zero, but I believe this is a false
+             * positive.
+             */
+            assert(td->td_stripsperimage != 0);
             tif->tif_dir.td_row =
                 (strip % td->td_stripsperimage) * td->td_rowsperstrip;
             tif->tif_rawcp = tif->tif_rawdata;
@@ -752,22 +777,24 @@ static int TIFFGrowStrips(TIFF *tif, uint32_t delta, const char *module)
         tif, td->td_stripoffset_p,
         (tmsize_t)(((size_t)td->td_nstrips + (size_t)delta) *
                    sizeof(uint64_t)));
+    /*
+     * Update td_stripoffset_p immediately so the old pointer is not left
+     * dangling if the second realloc fails.
+     */
+    if (new_stripoffset)
+        td->td_stripoffset_p = new_stripoffset;
     new_stripbytecount = (uint64_t *)_TIFFreallocExt(
         tif, td->td_stripbytecount_p,
         (tmsize_t)(((size_t)td->td_nstrips + (size_t)delta) *
                    sizeof(uint64_t)));
+    if (new_stripbytecount)
+        td->td_stripbytecount_p = new_stripbytecount;
     if (new_stripoffset == NULL || new_stripbytecount == NULL)
     {
-        if (new_stripoffset)
-            _TIFFfreeExt(tif, new_stripoffset);
-        if (new_stripbytecount)
-            _TIFFfreeExt(tif, new_stripbytecount);
         td->td_nstrips = 0;
         TIFFErrorExtR(tif, module, "No space to expand strip arrays");
         return (0);
     }
-    td->td_stripoffset_p = new_stripoffset;
-    td->td_stripbytecount_p = new_stripbytecount;
     _TIFFmemset(td->td_stripoffset_p + td->td_nstrips, 0,
                 (tmsize_t)((size_t)delta * sizeof(uint64_t)));
     _TIFFmemset(td->td_stripbytecount_p + td->td_nstrips, 0,
@@ -909,13 +936,15 @@ static int TIFFAppendToStrip(TIFF *tif, uint32_t strip, uint8_t *data,
         /* Move data written by previous calls to us at end of file */
         while (toCopy > 0)
         {
+            tmsize_t chunkSize =
+                toCopy < (uint64_t)tempSize ? (tmsize_t)toCopy : tempSize;
             if (!SeekOK(tif, offsetRead))
             {
                 TIFFErrorExtR(tif, module, "Seek error");
                 _TIFFfreeExt(tif, temp);
                 return (0);
             }
-            if (!ReadOK(tif, temp, tempSize))
+            if (!ReadOK(tif, temp, chunkSize))
             {
                 TIFFErrorExtR(tif, module, "Cannot read");
                 _TIFFfreeExt(tif, temp);
@@ -927,16 +956,16 @@ static int TIFFAppendToStrip(TIFF *tif, uint32_t strip, uint8_t *data,
                 _TIFFfreeExt(tif, temp);
                 return (0);
             }
-            if (!WriteOK(tif, temp, tempSize))
+            if (!WriteOK(tif, temp, chunkSize))
             {
                 TIFFErrorExtR(tif, module, "Cannot write");
                 _TIFFfreeExt(tif, temp);
                 return (0);
             }
-            offsetRead += (uint64_t)tempSize;
-            offsetWrite += (uint64_t)tempSize;
-            td->td_stripbytecount_p[strip] += (uint64_t)tempSize;
-            toCopy -= (uint64_t)tempSize;
+            offsetRead += (uint64_t)chunkSize;
+            offsetWrite += (uint64_t)chunkSize;
+            td->td_stripbytecount_p[strip] += (uint64_t)chunkSize;
+            toCopy -= (uint64_t)chunkSize;
         }
         _TIFFfreeExt(tif, temp);
 

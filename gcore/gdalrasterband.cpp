@@ -2926,7 +2926,7 @@ double GDALRasterBand::GetMaximum(int *pbSuccess)
         {
             EnablePixelTypeSignedByteWarning(false);
             const char *pszPixelType =
-                GetMetadataItem("PIXELTYPE", "IMAGE_STRUCTURE");
+                GetMetadataItem("PIXELTYPE", GDAL_MDD_IMAGE_STRUCTURE);
             EnablePixelTypeSignedByteWarning(true);
             if (pszPixelType != nullptr && EQUAL(pszPixelType, "SIGNEDBYTE"))
                 return 127;
@@ -3035,7 +3035,7 @@ double GDALRasterBand::GetMinimum(int *pbSuccess)
         {
             EnablePixelTypeSignedByteWarning(false);
             const char *pszPixelType =
-                GetMetadataItem("PIXELTYPE", "IMAGE_STRUCTURE");
+                GetMetadataItem("PIXELTYPE", GDAL_MDD_IMAGE_STRUCTURE);
             EnablePixelTypeSignedByteWarning(true);
             if (pszPixelType != nullptr && EQUAL(pszPixelType, "SIGNEDBYTE"))
                 return -128;
@@ -4298,7 +4298,7 @@ CPLErr GDALRasterBand::GetHistogram(double dfMin, double dfMax, int nBuckets,
     {
         EnablePixelTypeSignedByteWarning(false);
         const char *pszPixelType =
-            GetMetadataItem("PIXELTYPE", "IMAGE_STRUCTURE");
+            GetMetadataItem("PIXELTYPE", GDAL_MDD_IMAGE_STRUCTURE);
         EnablePixelTypeSignedByteWarning(true);
         bSignedByte =
             pszPixelType != nullptr && EQUAL(pszPixelType, "SIGNEDBYTE");
@@ -4502,7 +4502,10 @@ CPLErr GDALRasterBand::GetHistogram(double dfMin, double dfMax, int nBuckets,
 
                 if (eDataType != GDT_Float16 && eDataType != GDT_Float32 &&
                     sNoDataValues.bGotNoDataValue &&
-                    ARE_REAL_EQUAL(dfValue, sNoDataValues.dfNoDataValue))
+                    (GDALDataTypeIsInteger(eDataType)
+                         ? dfValue == sNoDataValues.dfNoDataValue
+                         : ARE_REAL_EQUAL(dfValue,
+                                          sNoDataValues.dfNoDataValue)))
                     continue;
 
                 // Given that dfValue and dfMin are not NaN, and dfScale > 0 and
@@ -4771,7 +4774,10 @@ CPLErr GDALRasterBand::GetHistogram(double dfMin, double dfMax, int nBuckets,
 
                     if (eDataType != GDT_Float16 && eDataType != GDT_Float32 &&
                         sNoDataValues.bGotNoDataValue &&
-                        ARE_REAL_EQUAL(dfValue, sNoDataValues.dfNoDataValue))
+                        (GDALDataTypeIsInteger(eDataType)
+                             ? dfValue == sNoDataValues.dfNoDataValue
+                             : ARE_REAL_EQUAL(dfValue,
+                                              sNoDataValues.dfNoDataValue)))
                         continue;
 
                     // Given that dfValue and dfMin are not NaN, and dfScale > 0
@@ -4955,7 +4961,7 @@ CPLErr GDALRasterBand::GetDefaultHistogram(double *pdfMin, double *pdfMax,
     {
         EnablePixelTypeSignedByteWarning(false);
         const char *pszPixelType =
-            GetMetadataItem("PIXELTYPE", "IMAGE_STRUCTURE");
+            GetMetadataItem("PIXELTYPE", GDAL_MDD_IMAGE_STRUCTURE);
         EnablePixelTypeSignedByteWarning(true);
         bSignedByte =
             pszPixelType != nullptr && EQUAL(pszPixelType, "SIGNEDBYTE");
@@ -5305,7 +5311,7 @@ CPLErr GDALRasterBand::GetStatistics(int bApproxOK, int bForce, double *pdfMin,
         return CE_Warning;
     else
         return ComputeStatistics(bApproxOK, pdfMin, pdfMax, pdfMean, pdfStdDev,
-                                 GDALDummyProgress, nullptr);
+                                 GDALDummyProgress, nullptr, nullptr);
 }
 
 /************************************************************************/
@@ -6488,7 +6494,9 @@ static inline double GetPixelValue(GDALDataType eDataType, bool bSignedByte,
     }
 
     if (sNoDataValues.bGotNoDataValue &&
-        ARE_REAL_EQUAL(dfValue, sNoDataValues.dfNoDataValue))
+        (GDALDataTypeIsInteger(eDataType)
+             ? dfValue == sNoDataValues.dfNoDataValue
+             : ARE_REAL_EQUAL(dfValue, sNoDataValues.dfNoDataValue)))
     {
         bValid = false;
         return 0.0;
@@ -7101,7 +7109,8 @@ struct StatisticsTaskFloat32
  *
  * Cached statistics can be cleared with GDALDataset::ClearStatistics().
  *
- * This method is the same as the C function GDALComputeRasterStatistics().
+ * This method is the same as the C functions GDALComputeRasterStatistics()
+ * and GDALComputeRasterStatisticsEx().
  *
  * @param bApproxOK If TRUE statistics may be computed based on overviews
  * or a subset of all tiles.
@@ -7119,6 +7128,10 @@ struct StatisticsTaskFloat32
  *
  * @param pProgressData application data to pass to the progress function.
  *
+ * @param papszOptions (added in 3.14) NULL, or NULL terminated list of options.
+ *                     Currently supported option is SET_STATISTICS=FALSE to
+ *                     avoid setting statistics in metadata items.
+ *
  * @return CE_None on success, or CE_Failure if an error occurs or processing
  * is terminated by the user.
  */
@@ -7127,11 +7140,15 @@ CPLErr GDALRasterBand::ComputeStatistics(int bApproxOK, double *pdfMin,
                                          double *pdfMax, double *pdfMean,
                                          double *pdfStdDev,
                                          GDALProgressFunc pfnProgress,
-                                         void *pProgressData)
+                                         void *pProgressData,
+                                         CSLConstList papszOptions)
 
 {
     if (pfnProgress == nullptr)
         pfnProgress = GDALDummyProgress;
+
+    const bool bSetStatistics =
+        CPLFetchBool(papszOptions, "SET_STATISTICS", true);
 
     /* -------------------------------------------------------------------- */
     /*      If we have overview bands, use them for statistics.             */
@@ -7143,10 +7160,10 @@ CPLErr GDALRasterBand::ComputeStatistics(int bApproxOK, double *pdfMin,
 
         if (poBand != this)
         {
-            CPLErr eErr = poBand->ComputeStatistics(FALSE, pdfMin, pdfMax,
-                                                    pdfMean, pdfStdDev,
-                                                    pfnProgress, pProgressData);
-            if (eErr == CE_None)
+            CPLErr eErr = poBand->ComputeStatistics(
+                FALSE, pdfMin, pdfMax, pdfMean, pdfStdDev, pfnProgress,
+                pProgressData, papszOptions);
+            if (eErr == CE_None && bSetStatistics)
             {
                 if (pdfMin && pdfMax && pdfMean && pdfStdDev)
                 {
@@ -7208,7 +7225,7 @@ CPLErr GDALRasterBand::ComputeStatistics(int bApproxOK, double *pdfMin,
     {
         EnablePixelTypeSignedByteWarning(false);
         const char *pszPixelType =
-            GetMetadataItem("PIXELTYPE", "IMAGE_STRUCTURE");
+            GetMetadataItem("PIXELTYPE", GDAL_MDD_IMAGE_STRUCTURE);
         EnablePixelTypeSignedByteWarning(true);
         bSignedByte =
             pszPixelType != nullptr && EQUAL(pszPixelType, "SIGNEDBYTE");
@@ -7597,20 +7614,23 @@ CPLErr GDALRasterBand::ComputeStatistics(int bApproxOK, double *pdfMin,
             }
 
             /// Save computed information
-            if (nValidCount > 0)
+            if (bSetStatistics)
             {
-                if (bApproxOK)
+                if (nValidCount > 0)
                 {
-                    SetMetadataItem("STATISTICS_APPROXIMATE", "YES");
+                    if (bApproxOK)
+                    {
+                        SetMetadataItem("STATISTICS_APPROXIMATE", "YES");
+                    }
+                    else if (GetMetadataItem("STATISTICS_APPROXIMATE"))
+                    {
+                        SetMetadataItem("STATISTICS_APPROXIMATE", nullptr);
+                    }
+                    SetStatistics(nMin, nMax, dfMean, dfStdDev);
                 }
-                else if (GetMetadataItem("STATISTICS_APPROXIMATE"))
-                {
-                    SetMetadataItem("STATISTICS_APPROXIMATE", nullptr);
-                }
-                SetStatistics(nMin, nMax, dfMean, dfStdDev);
-            }
 
-            SetValidPercent(nSampleCount, nValidCount);
+                SetValidPercent(nSampleCount, nValidCount);
+            }
 
             /* --------------------------------------------------------------------
              */
@@ -8140,15 +8160,18 @@ CPLErr GDALRasterBand::ComputeStatistics(int bApproxOK, double *pdfMin,
 
     if (nValidCount > 0)
     {
-        if (bApproxOK)
+        if (bSetStatistics)
         {
-            SetMetadataItem("STATISTICS_APPROXIMATE", "YES");
+            if (bApproxOK)
+            {
+                SetMetadataItem("STATISTICS_APPROXIMATE", "YES");
+            }
+            else if (GetMetadataItem("STATISTICS_APPROXIMATE"))
+            {
+                SetMetadataItem("STATISTICS_APPROXIMATE", nullptr);
+            }
+            SetStatistics(dfMin, dfMax, dfMean, dfStdDev);
         }
-        else if (GetMetadataItem("STATISTICS_APPROXIMATE"))
-        {
-            SetMetadataItem("STATISTICS_APPROXIMATE", nullptr);
-        }
-        SetStatistics(dfMin, dfMax, dfMean, dfStdDev);
     }
     else
     {
@@ -8156,7 +8179,8 @@ CPLErr GDALRasterBand::ComputeStatistics(int bApproxOK, double *pdfMin,
         dfMax = 0.0;
     }
 
-    SetValidPercent(nSampleCount, nValidCount);
+    if (bSetStatistics)
+        SetValidPercent(nSampleCount, nValidCount);
 
     /* -------------------------------------------------------------------- */
     /*      Record results.                                                 */
@@ -8188,6 +8212,7 @@ CPLErr GDALRasterBand::ComputeStatistics(int bApproxOK, double *pdfMin,
 /**
  * \brief Compute image statistics.
  *
+ * @see GDALComputeRasterStatisticsEx()
  * @see GDALRasterBand::ComputeStatistics()
  */
 
@@ -8204,7 +8229,37 @@ CPLErr CPL_STDCALL GDALComputeRasterStatistics(GDALRasterBandH hBand,
     GDALRasterBand *poBand = GDALRasterBand::FromHandle(hBand);
 
     return poBand->ComputeStatistics(bApproxOK, pdfMin, pdfMax, pdfMean,
-                                     pdfStdDev, pfnProgress, pProgressData);
+                                     pdfStdDev, pfnProgress, pProgressData,
+                                     nullptr);
+}
+
+/************************************************************************/
+/*                   GDALComputeRasterStatisticsEx()                    */
+/************************************************************************/
+
+/**
+ * \brief Compute image statistics.
+ *
+ * @see GDALRasterBand::ComputeStatistics()
+ *
+ * @since 3.14
+ */
+
+CPLErr GDALComputeRasterStatisticsEx(GDALRasterBandH hBand, int bApproxOK,
+                                     double *pdfMin, double *pdfMax,
+                                     double *pdfMean, double *pdfStdDev,
+                                     GDALProgressFunc pfnProgress,
+                                     void *pProgressData,
+                                     CSLConstList papszOptions)
+
+{
+    VALIDATE_POINTER1(hBand, "GDALComputeRasterStatisticsEx", CE_Failure);
+
+    GDALRasterBand *poBand = GDALRasterBand::FromHandle(hBand);
+
+    return poBand->ComputeStatistics(bApproxOK, pdfMin, pdfMax, pdfMean,
+                                     pdfStdDev, pfnProgress, pProgressData,
+                                     papszOptions);
 }
 
 /************************************************************************/
@@ -8611,7 +8666,7 @@ CPLErr GDALRasterBand::ComputeRasterMinMax(int bApproxOK, double *adfMinMax)
     {
         EnablePixelTypeSignedByteWarning(false);
         const char *pszPixelType =
-            GetMetadataItem("PIXELTYPE", "IMAGE_STRUCTURE");
+            GetMetadataItem("PIXELTYPE", GDAL_MDD_IMAGE_STRUCTURE);
         EnablePixelTypeSignedByteWarning(true);
         bSignedByte =
             pszPixelType != nullptr && EQUAL(pszPixelType, "SIGNEDBYTE");
@@ -8977,7 +9032,7 @@ CPLErr GDALRasterBand::ComputeRasterMinMaxLocation(double *pdfMin,
     {
         EnablePixelTypeSignedByteWarning(false);
         const char *pszPixelType =
-            GetMetadataItem("PIXELTYPE", "IMAGE_STRUCTURE");
+            GetMetadataItem("PIXELTYPE", GDAL_MDD_IMAGE_STRUCTURE);
         EnablePixelTypeSignedByteWarning(true);
         bSignedByte =
             pszPixelType != nullptr && EQUAL(pszPixelType, "SIGNEDBYTE");
@@ -10008,7 +10063,7 @@ bool GDALRasterBand::HasConflictingMaskSources(
                 *posDetailMessage += poDS->GetDescription();
             }
             *posDetailMessage += " has several conflicting mask sources:\n";
-            if (bHasExternalMask)
+            if (bHasBinaryMaskBand)
                 *posDetailMessage += "- internal binary mask band\n";
             if (bHasExternalMask)
                 *posDetailMessage += "- external mask band (.msk)\n";
@@ -10782,7 +10837,7 @@ const char *GDALRasterBand::GetMetadataItem(const char *pszName,
 {
     // TODO (GDAL 4.0?): remove this when GDAL 3.7 has been widely adopted.
     if (m_bEnablePixelTypeSignedByteWarning && eDataType == GDT_UInt8 &&
-        pszDomain != nullptr && EQUAL(pszDomain, "IMAGE_STRUCTURE") &&
+        pszDomain != nullptr && EQUAL(pszDomain, GDAL_MDD_IMAGE_STRUCTURE) &&
         EQUAL(pszName, "PIXELTYPE"))
     {
         CPLError(CE_Warning, CPLE_AppDefined,

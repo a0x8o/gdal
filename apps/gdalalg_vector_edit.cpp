@@ -186,7 +186,7 @@ class GDALVectorEditAlgorithmLayer final : public GDALVectorPipelineOutputLayer
         return m_poFeatureDefn.get();
     }
 
-    void TranslateFeature(
+    bool TranslateFeature(
         std::unique_ptr<OGRFeature> poSrcFeature,
         std::vector<std::unique_ptr<OGRFeature>> &apoOutFeatures) override
     {
@@ -203,6 +203,8 @@ class GDALVectorEditAlgorithmLayer final : public GDALVectorPipelineOutputLayer
         if (m_unsetFID)
             poSrcFeature->SetFID(OGRNullFID);
         apoOutFeatures.push_back(std::move(poSrcFeature));
+
+        return true;
     }
 
     int TestCapability(const char *pszCap) const override
@@ -308,12 +310,24 @@ bool GDALVectorEditAlgorithm::RunStep(GDALPipelineStepRunContext &)
         ret = (poSrcLayer != nullptr);
         if (ret)
         {
-            outDS->AddLayer(*poSrcLayer,
-                            std::make_unique<GDALVectorEditAlgorithmLayer>(
-                                *poSrcLayer, m_activeLayer, m_outputLayerName,
-                                bChangeGeomType, eType, m_overrideCrs,
-                                m_layerMetadata, m_unsetLayerMetadata,
-                                m_unsetFID));
+            // Capture errors from VRT layers such as WFS
+            // (see issue GH # https://github.com/OSGeo/gdal/issues/14826)
+            const auto errorCount{CPLGetErrorCounter()};
+            // Force layer definition to be read to trigger errors
+            poSrcLayer->GetLayerDefn();
+            if (CPLGetErrorCounter() != errorCount)
+            {
+                ret = false;
+            }
+            else
+            {
+                outDS->AddLayer(*poSrcLayer,
+                                std::make_unique<GDALVectorEditAlgorithmLayer>(
+                                    *poSrcLayer, m_activeLayer,
+                                    m_outputLayerName, bChangeGeomType, eType,
+                                    m_overrideCrs, m_layerMetadata,
+                                    m_unsetLayerMetadata, m_unsetFID));
+            }
         }
     }
 

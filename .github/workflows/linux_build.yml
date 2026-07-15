@@ -187,7 +187,7 @@ jobs:
           sudo sysctl vm.mmap_rnd_bits=28
 
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
 
@@ -261,7 +261,7 @@ jobs:
       # different architecture.
       - name: Restore build cache
         id: restore-cache
-        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ github.workspace }}/.ccache
           key: ${{ matrix.id }}-${{ steps.get-arch.outputs.arch }}-${{ github.ref_name }}-${{ github.sha }}
@@ -295,6 +295,7 @@ jobs:
 
           # For cache
           mkdir -p .gdal
+          mkdir -p .cargo
 
           mkdir -p build-${{ matrix.id }}
           docker run --name gdal-build \
@@ -307,6 +308,7 @@ jobs:
             -e "GDAL_SOURCE_DIR=$(pwd)" \
             -u $(id -u ${USER}):$(id -g ${USER}) \
             -v $(pwd)/.gdal:/.gdal:rw \
+            -v $(pwd)/.cargo:/.cargo:rw \
             -v $(pwd):$(pwd):rw \
             -v ${{ github.workspace }}/.ccache:/.ccache:rw \
             --workdir $(pwd)/build-${{ matrix.id }} \
@@ -322,7 +324,7 @@ jobs:
             ccache -s
 
       - name: Save build cache
-        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         # Do not write to cache on pull_request events to prevent cache poisoning.
         # Fork PRs can otherwise overwrite shared cache keys used by main branch runs
         # and as we have "packages: write" that could potentially lead to compromising
@@ -373,6 +375,7 @@ jobs:
             --add-host=host.docker.internal:host-gateway \
             --rm \
             -v $(pwd)/.gdal:/.gdal \
+            -v $(pwd)/.cargo:/.cargo:rw \
             -v $(pwd)/.duckdb:/.duckdb \
             -v $(pwd):$(pwd) \
             --workdir $(pwd)/build-${{ matrix.id }} \

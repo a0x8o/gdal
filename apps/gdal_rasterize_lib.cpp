@@ -538,7 +538,7 @@ static CPLErr ProcessLayer(OGRLayerH hSrcLayer, bool bSRSIsSet,
 
         if (hDstSRS)
             hDstSRS = OSRClone(hDstSRS);
-        else if (GDALGetMetadata(hDstDS, "RPC") != nullptr)
+        else if (GDALGetMetadata(hDstDS, GDAL_MDD_RPC) != nullptr)
         {
             hDstSRS = OSRNewSpatialReference(nullptr);
             CPL_IGNORE_RET_VAL(
@@ -678,16 +678,16 @@ static CPLErr ProcessLayer(OGRLayerH hSrcLayer, bool bSRSIsSet,
                     {
                         const char *pszAttribute =
                             OGR_F_GetFieldAsString(hFeat, iBurnField);
-                        char *end;
-                        dfBurnValue = CPLStrtod(pszAttribute, &end);
 
-                        while (isspace(*end) && *end != '\0')
+                        if (auto parsed =
+                                cpl::strict_parse<double>(pszAttribute);
+                            parsed.has_value())
                         {
-                            end++;
+                            dfBurnValue = parsed.value();
                         }
-
-                        if (*end != '\0')
+                        else
                         {
+                            dfBurnValue = 0;
                             CPLErrorOnce(
                                 CE_Warning, CPLE_AppDefined,
                                 "Failed to parse attribute value %s of feature "
@@ -774,7 +774,7 @@ static CPLErr ProcessLayer(OGRLayerH hSrcLayer, bool bSRSIsSet,
         CPLStringList aosTransformerOptions(CSLDuplicate(papszTO));
         GDALGeoTransform gt;
         if (poDS->GetGeoTransform(gt) != CE_None && poDS->GetGCPCount() == 0 &&
-            poDS->GetMetadata("RPC") == nullptr)
+            poDS->GetMetadata(GDAL_MDD_RPC) == nullptr)
         {
             aosTransformerOptions.SetNameValue("DST_METHOD", "NO_GEOTRANSFORM");
         }

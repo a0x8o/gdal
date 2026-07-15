@@ -316,7 +316,7 @@ def test_jp2grok_11():
     assert jp2_bands_data == gtiff_bands_data
     assert jp2_fourth_band_data == gtiff_fourth_band_data
 
-    ds = gdal.OpenEx(
+    ds = gdal.Open(
         "data/jpeg2000/stefan_full_rgba_alpha_1bit.jp2",
         open_options=["1BIT_ALPHA_PROMOTION=NO"],
     )
@@ -587,7 +587,7 @@ def test_jp2grok_22():
     del out_ds
     src_ds = None
     assert gdal.VSIStatL("/vsimem/jp2grok_22.jp2.aux.xml") is None
-    ds = gdal.OpenEx("/vsimem/jp2grok_22.jp2", open_options=["1BIT_ALPHA_PROMOTION=NO"])
+    ds = gdal.Open("/vsimem/jp2grok_22.jp2", open_options=["1BIT_ALPHA_PROMOTION=NO"])
     fourth_band = ds.GetRasterBand(4)
     assert fourth_band.GetMetadataItem("NBITS", "IMAGE_STRUCTURE") == "1"
     ds = None
@@ -714,7 +714,7 @@ def test_jp2grok_24():
     del out_ds
     src_ds = None
     assert gdal.VSIStatL("/vsimem/jp2grok_24.jp2.aux.xml") is None
-    ds = gdal.OpenEx("/vsimem/jp2grok_24.jp2", open_options=["1BIT_ALPHA_PROMOTION=NO"])
+    ds = gdal.Open("/vsimem/jp2grok_24.jp2", open_options=["1BIT_ALPHA_PROMOTION=NO"])
     assert ds.GetRasterBand(1).GetColorInterpretation() == gdal.GCI_GrayIndex
     assert ds.GetRasterBand(2).GetColorInterpretation() == gdal.GCI_AlphaBand
     assert ds.GetRasterBand(2).GetMetadataItem("NBITS", "IMAGE_STRUCTURE") == "1"
@@ -853,7 +853,7 @@ def test_jp2grok_26():
         "/vsimem/jp2grok_26.jp2", src_ds, options=["INSPIRE_TG=YES", "ALPHA=YES"]
     )
     out_ds = None
-    ds = gdal.OpenEx("/vsimem/jp2grok_26.jp2", open_options=["1BIT_ALPHA_PROMOTION=NO"])
+    ds = gdal.Open("/vsimem/jp2grok_26.jp2", open_options=["1BIT_ALPHA_PROMOTION=NO"])
     assert ds.GetRasterBand(4).GetColorInterpretation() == gdal.GCI_AlphaBand
     assert ds.GetRasterBand(4).GetMetadataItem("NBITS", "IMAGE_STRUCTURE") == "1"
     ds = None
@@ -1066,6 +1066,30 @@ def test_jp2grok_multitile_multirow(tmp_vsimem):
         ), f"Band {b + 1} data mismatch after multi-row tile decompress"
     ds = None
     src_ds = None
+
+
+###############################################################################
+# Test DirectRasterIO decompression path into a Float32/Float64 buffer
+
+
+def test_jp2grok_directrasterio_float():
+    gdaltest.importorskip_gdal_array()
+    np = pytest.importorskip("numpy")
+
+    ds = gdal.Open("data/jpeg2000/byte.jp2")
+    assert ds is not None
+
+    arr_f32 = ds.GetRasterBand(1).ReadAsArray(buf_type=gdal.GDT_Float32)
+    assert arr_f32.dtype == np.float32
+
+    arr_u8 = ds.GetRasterBand(1).ReadAsArray()
+    assert np.array_equal(arr_f32, arr_u8.astype(np.float32))
+
+    arr_f64 = ds.GetRasterBand(1).ReadAsArray(buf_type=gdal.GDT_Float64)
+    assert arr_f64.dtype == np.float64
+
+    arr_u8 = ds.GetRasterBand(1).ReadAsArray()
+    assert np.array_equal(arr_f64, arr_u8.astype(np.float64))
 
 
 ###############################################################################
@@ -1538,3 +1562,170 @@ def test_jp2grok_driver_metadata():
     assert drv.GetMetadataItem(gdal.DCAP_CREATECOPY) == "YES"
     assert "jp2" in drv.GetMetadataItem(gdal.DMD_EXTENSIONS)
     assert "j2k" in drv.GetMetadataItem(gdal.DMD_EXTENSIONS)
+
+
+###############################################################################
+# Sync-decompress fallback (no AdviseRead before a partial read).
+#
+# Without AdviseRead the async path locks decode window to first
+# swath, so later reads outside initial decode window returned zeros.
+# The driver now falls back to a per-swath synchronous decode.
+# Multi-tile-row sources are used so we detect these zeros if still broken.
+
+SYNC_SRC = "data/jpeg2000/513x513.jp2"
+
+
+def _truth(src):
+    # Reference pixels from use of correct AdviseRead async path.
+    ds = gdal.Open(src)
+    ds.AdviseRead(0, 0, ds.RasterXSize, ds.RasterYSize)
+    return ds.GetRasterBand(1).ReadAsArray()
+
+
+def test_jp2grok_sync_fallback_full_image():
+    # Full-image read without AdviseRead - must match async result.
+    np = pytest.importorskip("numpy")
+    ds = gdal.Open(SYNC_SRC)
+    got = ds.GetRasterBand(1).ReadAsArray()
+    assert np.array_equal(got, _truth(SYNC_SRC))
+
+
+def test_jp2grok_sync_fallback_many_swaths():
+    # Disjoint partial reads recreate codec and must match truth.
+    np = pytest.importorskip("numpy")
+    truth = _truth(SYNC_SRC)
+    ds = gdal.Open(SYNC_SRC)
+    band = ds.GetRasterBand(1)
+    for x in (0, 150, 300):
+        for y in (0, 150, 300):
+            got = band.ReadAsArray(x, y, 100, 100)
+            assert np.array_equal(got, truth[y : y + 100, x : x + 100])
+
+
+def test_jp2grok_advise_read_keeps_async_path():
+    # With AdviseRead the driver stays async: no warning, correct pixels.
+    np = pytest.importorskip("numpy")
+    truth = _truth(SYNC_SRC)
+    ds = gdal.Open(SYNC_SRC)
+    ds.AdviseRead(0, 0, 200, 200)
+    gdal.ErrorReset()
+    got = ds.GetRasterBand(1).ReadAsArray(0, 0, 200, 200)
+    assert np.array_equal(got, truth[0:200, 0:200])
+
+
+def test_jp2grok_vrt_read_no_advise():
+    # VRT SimpleSource reads via RasterIO without AdviseRead; this exercises
+    # fallback through the VRT front end.
+    pytest.importorskip("numpy")
+    src = "data/jpeg2000/tile_size_16.jp2"
+    vrt = f"""<VRTDataset rasterXSize="256" rasterYSize="256">
+  <VRTRasterBand dataType="Byte" band="1">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="0">{src}</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SrcRect xOff="0" yOff="0" xSize="256" ySize="256" />
+      <DstRect xOff="0" yOff="0" xSize="256" ySize="256" />
+    </SimpleSource>
+  </VRTRasterBand>
+</VRTDataset>"""
+    ds = gdal.Open(vrt)
+    arr = ds.GetRasterBand(1).ReadAsArray()
+    assert arr[:128].max() > 0 and arr[128:].max() > 0
+
+
+def test_jp2grok_translate_scale_multi_tile_row():
+    # gdal_translate -scale wraps source in a VRT and
+    # reads it without AdviseRead. Identity scale preserves pixels, so the
+    # output must match source below first tile row.
+    np = pytest.importorskip("numpy")
+    truth = _truth(SYNC_SRC)
+    src_ds = gdal.Open(SYNC_SRC)
+    smin, smax, _, _ = src_ds.GetRasterBand(1).GetStatistics(False, True)
+    out = "/vsimem/jp2grok_scale.tif"
+    ds = gdal.Translate(
+        out, SYNC_SRC, format="GTiff", scaleParams=[[smin, smax, smin, smax]]
+    )
+    assert ds.RasterYSize == 513
+    assert np.array_equal(ds.GetRasterBand(1).ReadAsArray(), truth)
+    ds = None
+    gdal.Unlink(out)
+
+
+def test_jp2grok_statistics_16bit_multi_tile():
+    # 16-bit uses Grok's int32_t code path
+    # GetStatistics reads with ReadBlock, using full/partial tiles.
+    np = pytest.importorskip("numpy")
+    arr = (np.arange(300 * 300, dtype=np.uint16) % 4096).reshape(300, 300)
+    src_ds = gdal.GetDriverByName("MEM").Create("", 300, 300, 1, gdal.GDT_UInt16)
+    src_ds.GetRasterBand(1).WriteArray(arr)
+    out = "/vsimem/jp2grok_16bit_tiled.jp2"
+    gdal.GetDriverByName("JP2Grok").CreateCopy(
+        out,
+        src_ds,
+        options=["REVERSIBLE=YES", "QUALITY=100", "BLOCKXSIZE=128", "BLOCKYSIZE=128"],
+    )
+    ds = gdal.Open(out)
+    assert ds.GetRasterBand(1).GetBlockSize() == [128, 128]
+    smin, smax, smean, _ = ds.GetRasterBand(1).GetStatistics(False, True)
+    assert (smin, smax) == (float(arr.min()), float(arr.max()))
+    assert smean == pytest.approx(float(arr.mean()))
+    ds = None
+    gdal.Unlink(out)
+
+
+def _jp2grok_checksums_in_subprocess(src, num_threads):
+    # The driver resolves Grok's thread count once per process (std::call_once),
+    # so single-threaded mode must be exercised in a fresh process
+    import subprocess
+
+    code = (
+        "import sys; from osgeo import gdal; gdal.UseExceptions();"
+        "ds = gdal.Open(sys.argv[1], allowed_drivers=['JP2Grok']);"
+        "print(' '.join(str(ds.GetRasterBand(b + 1).Checksum())"
+        " for b in range(ds.RasterCount)))"
+    )
+    env = dict(os.environ)
+    env["GDAL_NUM_THREADS"] = str(num_threads)
+    out = subprocess.check_output(
+        [sys.executable, "-c", code, os.path.abspath(src)], env=env
+    )
+    return out.decode().strip()
+
+
+@pytest.mark.parametrize(
+    "src", ["data/jpeg2000/byte.jp2", "data/jpeg2000/tile_size_16.jp2"]
+)
+def test_jp2grok_single_threaded_matches_multi(src):
+    # GDAL_NUM_THREADS=1 runs Grok fully single-threaded
+    # output must match multi-threaded decode.
+    if not os.path.exists(src):
+        pytest.skip(f"{src} not available")
+    st = _jp2grok_checksums_in_subprocess(src, 1)
+    mt = _jp2grok_checksums_in_subprocess(src, 8)
+    assert st == mt
+
+
+def test_jp2grok_reuse_dataset_consecutive_reads():
+    # Two reads on the same dataset instance must both be correct: the
+    # single-shot codec is rebuilt for the second operation.
+    np = pytest.importorskip("numpy")
+    truth = _truth(SYNC_SRC)
+    ds = gdal.Open(SYNC_SRC)
+    out1 = gdal.Translate("", ds, format="MEM")
+    out2 = gdal.Translate("", ds, format="MEM")
+    assert np.array_equal(out1.GetRasterBand(1).ReadAsArray(), truth)
+    assert np.array_equal(out2.GetRasterBand(1).ReadAsArray(), truth)
+
+
+def test_jp2grok_partial_reads_after_full_no_advise():
+    # Full read (drains the codec) then partial reads on the same instance
+    # without a new AdviseRead: each must rebuild/reuse correctly.
+    np = pytest.importorskip("numpy")
+    truth = _truth(SYNC_SRC)
+    ds = gdal.Open(SYNC_SRC)
+    full = gdal.Translate("", ds, format="MEM")
+    assert np.array_equal(full.GetRasterBand(1).ReadAsArray(), truth)
+    band = ds.GetRasterBand(1)
+    for x, y, w, h in [(0, 0, 100, 100), (200, 200, 100, 100), (0, 400, 100, 100)]:
+        got = band.ReadAsArray(x, y, w, h)
+        assert np.array_equal(got, truth[y : y + h, x : x + w])

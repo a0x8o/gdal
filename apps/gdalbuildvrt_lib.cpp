@@ -442,12 +442,9 @@ static CPLString GetProjectionName(const char *pszProjection)
 
     OGRSpatialReference oSRS;
     oSRS.SetFromUserInput(pszProjection);
-    const char *pszRet = nullptr;
-    if (oSRS.IsProjected())
-        pszRet = oSRS.GetAttrValue("PROJCS");
-    else if (oSRS.IsGeographic())
-        pszRet = oSRS.GetAttrValue("GEOGCS");
-    return pszRet ? pszRet : "(null)";
+
+    const char *pszName = oSRS.GetName();
+    return pszName ? pszName : "(null)";
 }
 
 /************************************************************************/
@@ -478,7 +475,7 @@ std::string VRTBuilder::AnalyseRaster(GDALDatasetH hDS,
 {
     GDALDataset *poDS = GDALDataset::FromHandle(hDS);
     const char *dsFileName = poDS->GetDescription();
-    CSLConstList papszMetadata = poDS->GetMetadata("SUBDATASETS");
+    CSLConstList papszMetadata = poDS->GetMetadata(GDAL_MDD_SUBDATASETS);
     if (CSLCount(papszMetadata) > 0 && poDS->GetRasterCount() == 0)
     {
         ppszInputFilenames = static_cast<char **>(CPLRealloc(
@@ -847,7 +844,7 @@ std::string VRTBuilder::AnalyseRaster(GDALDatasetH hDS,
                 CPLString osGot = GetProjectionName(proj);
                 return m_osProgramName +
                        CPLSPrintf(" does not support heterogeneous "
-                                  "projection: expected %s, got %s.",
+                                  "projection: expected \"%s\", got \"%s\".",
                                   osExpected.c_str(), osGot.c_str());
             }
         }
@@ -1181,6 +1178,20 @@ static void WriteAbsolutePath(VRTSimpleSource *poSource, const char *dsFileName)
 }
 
 /************************************************************************/
+/*                       IsTransientSrcDataset()                        */
+/************************************************************************/
+
+static bool IsTransientSrcDataset(const char *dsFileName, GDALDatasetH hDS)
+{
+    auto hDriver = GDALGetDatasetDriver(hDS);
+    return !hDriver || dsFileName[0] == '\0' ||  // could be a unnamed VRT file
+                                                 // Inner pipeline
+           (dsFileName[0] == '[' &&
+            dsFileName[strlen(dsFileName) - 1] == ']') ||
+           EQUAL(GDALGetDescription(hDriver), "MEM");
+}
+
+/************************************************************************/
 /*                         CreateVRTSeparate()                          */
 /************************************************************************/
 
@@ -1221,10 +1232,7 @@ void VRTBuilder::CreateVRTSeparate(VRTDataset *poVRTDS)
         GDALDatasetH hSourceDS;
         bool bDropRef = false;
         if (nSrcDSCount == nInputFiles &&
-            GDALGetDatasetDriver(pahSrcDS[i]) != nullptr &&
-            (dsFileName[0] == '\0' ||  // could be a unnamed VRT file
-             EQUAL(GDALGetDescription(GDALGetDatasetDriver(pahSrcDS[i])),
-                   "MEM")))
+            IsTransientSrcDataset(dsFileName, pahSrcDS[i]))
         {
             hSourceDS = pahSrcDS[i];
         }
@@ -1505,10 +1513,7 @@ void VRTBuilder::CreateVRTNonSeparate(VRTDataset *poVRTDS)
         bool bDropRef = false;
 
         if (nSrcDSCount == nInputFiles &&
-            GDALGetDatasetDriver(pahSrcDS[i]) != nullptr &&
-            (dsFileName[0] == '\0' ||  // could be a unnamed VRT file
-             EQUAL(GDALGetDescription(GDALGetDatasetDriver(pahSrcDS[i])),
-                   "MEM")))
+            IsTransientSrcDataset(dsFileName, pahSrcDS[i]))
         {
             hSourceDS = pahSrcDS[i];
         }

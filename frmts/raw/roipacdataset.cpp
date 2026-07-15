@@ -316,7 +316,7 @@ GDALDataset *ROIPACDataset::Open(GDALOpenInfo *poOpenInfo)
     int nPixelOffset = 0;
     int nLineOffset = 0;
     vsi_l_offset nBandOffset = 0;
-    const int nDTSize = GDALGetDataTypeSizeBytes(eDataType);
+    const int nDTSize = std::max(1, GDALGetDataTypeSizeBytes(eDataType));
     bool bIntOverflow = false;
     if (eInterleave == LINE)
     {
@@ -650,7 +650,8 @@ GDALDataset *ROIPACDataset::Create(const char *pszFilename, int nXSize,
     CPL_IGNORE_RET_VAL(VSIFPrintfL(fp, "%-40s %d\n", "FILE_LENGTH", nYSize));
     CPL_IGNORE_RET_VAL(VSIFCloseL(fp));
 
-    return GDALDataset::FromHandle(GDALOpen(pszFilename, GA_Update));
+    GDALOpenInfo oOpenInfo(pszFilename, GA_Update);
+    return Open(&oOpenInfo);
 }
 
 /************************************************************************/

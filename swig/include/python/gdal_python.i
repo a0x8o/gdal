@@ -2306,7 +2306,7 @@ def ExecuteSQL(self, statement, spatialFilter=None, dialect="", keep_ref_on_ds=F
 
     .. testsetup::
 
-       >>> src_ds = gdal.OpenEx("poly.shp", gdal.OF_VECTOR)
+       >>> src_ds = gdal.Open("poly.shp", gdal.OF_VECTOR)
        >>> ds = gdal.GetDriverByName("MEM").CreateVector("")
        >>> _ = ds.CopyLayer(src_ds.GetLayer(0), "layer")
 
@@ -2319,7 +2319,7 @@ def ExecuteSQL(self, statement, spatialFilter=None, dialect="", keep_ref_on_ds=F
     2. Use keep_ref_on_ds=True to return an object that keeps a reference to its dataset:
 
     >>> def get_sql_lyr():
-    ...     return gdal.OpenEx("poly.shp", gdal.OF_VECTOR).ExecuteSQL("SELECT * FROM poly", keep_ref_on_ds=True)
+    ...     return gdal.Open("poly.shp", gdal.OF_VECTOR).ExecuteSQL("SELECT * FROM poly", keep_ref_on_ds=True)
     ...
     >>> with get_sql_lyr() as lyr:
     ...     print(lyr.GetFeatureCount())
@@ -3032,6 +3032,83 @@ def GetMDArrayNames(self, options = []) -> "list[str]":
         return _gdal.MDArray_SetNoDataValueUInt64(self, value)
 
     return _gdal.MDArray_SetNoDataValueDouble(self, value)
+
+  @staticmethod
+  def _get_as_mdarray_if_possible(o):
+        if hasattr(o, "shape") and not isinstance(o, MDArray):
+            from osgeo import gdal_array
+            ds = gdal_array.OpenMultiDimensionalNumPyArray(o)
+            return ds.GetRootGroup().OpenMDArray("array")
+        else:
+            return o
+
+  def __add__(self, other):
+      """Add this array to another array
+
+         The resulting array is lazily evaluated.
+      """
+      other = MDArray._get_as_mdarray_if_possible(other)
+      return _gdal.MDArray_BinaryOpArray(self, GRABO_ADD, other)
+
+  # Define __array_priority__ so that numpy doesn't just forward us the first
+  # value of the array
+  __array_priority__ = 1000
+
+  def __radd__(self, other):
+      """Add this array to another array
+
+         The resulting array is lazily evaluated.
+      """
+      other = MDArray._get_as_mdarray_if_possible(other)
+      return _gdal.MDArray_BinaryOpArray(other, GRABO_ADD, self)
+
+  def __sub__(self, other):
+      """Subtract this array with another array
+
+         The resulting array is lazily evaluated.
+      """
+      other = MDArray._get_as_mdarray_if_possible(other)
+      return _gdal.MDArray_BinaryOpArray(self, GRABO_SUB, other)
+
+  def __rsub__(self, other):
+      """Subtract this array with another array
+
+         The resulting array is lazily evaluated.
+      """
+      other = MDArray._get_as_mdarray_if_possible(other)
+      return _gdal.MDArray_BinaryOpArray(other, GRABO_SUB, self)
+
+  def __mul__(self, other):
+      """Multiply this array with another array
+
+         The resulting array is lazily evaluated.
+      """
+      other = MDArray._get_as_mdarray_if_possible(other)
+      return _gdal.MDArray_BinaryOpArray(self, GRABO_MUL, other)
+
+  def __rmul__(self, other):
+      """Multiply this array with another array
+
+         The resulting array is lazily evaluated.
+      """
+      other = MDArray._get_as_mdarray_if_possible(other)
+      return _gdal.MDArray_BinaryOpArray(other, GRABO_MUL, self)
+
+  def __truediv__(self, other):
+      """Divide this array by another array
+
+         The resulting array is lazily evaluated.
+      """
+      other = MDArray._get_as_mdarray_if_possible(other)
+      return _gdal.MDArray_BinaryOpArray(self, GRABO_DIV, other)
+
+  def __rtruediv__(self, other):
+      """Divide this array by another array
+
+         The resulting array is lazily evaluated.
+      """
+      other = MDArray._get_as_mdarray_if_possible(other)
+      return _gdal.MDArray_BinaryOpArray(other, GRABO_DIV, self)
 %}
 
 }
@@ -3224,9 +3301,9 @@ def Open(self, utf8_string, update=False):
     Dataset or None
         ``None`` on error
     """
-    return OpenEx(utf8_string,
-                  OF_VECTOR | (OF_UPDATE if update else 0),
-                  [self.GetDescription()])
+    return Open(utf8_string,
+                OF_VECTOR | (OF_UPDATE if update else 0),
+                [self.GetDescription()])
 
 def GetName(self):
     """
@@ -3348,7 +3425,7 @@ def Info(ds, **kwargs):
         (opts, format, deserialize) = kwargs['options']
 
     if isinstance(ds, (str, os.PathLike)):
-        ds = OpenEx(ds, allowed_drivers = allowed_drivers, open_options = open_options)
+        ds = Open(ds, allowed_drivers = allowed_drivers, open_options = open_options)
     ret = InfoInternal(ds, opts)
     if format == 'json' and deserialize:
         import json
@@ -3468,7 +3545,7 @@ def VectorInfo(ds, **kwargs):
         (opts, format, deserialize) = kwargs['options']
 
     if isinstance(ds, (str, os.PathLike)):
-        ds = OpenEx(ds, OF_VERBOSE_ERROR | OF_VECTOR, allowed_drivers = allowed_drivers, open_options = open_options)
+        ds = Open(ds, OF_VERBOSE_ERROR | OF_VECTOR, allowed_drivers = allowed_drivers, open_options = open_options)
     ret = VectorInfoInternal(ds, opts)
     if format == 'json' and deserialize:
         import json
@@ -3522,7 +3599,7 @@ def MultiDimInfo(ds, **kwargs):
         as_text = True
 
     if isinstance(ds, (str, os.PathLike)):
-        ds = OpenEx(ds, OF_VERBOSE_ERROR | OF_MULTIDIM_RASTER, allowed_drivers = allowed_drivers, open_options = open_options)
+        ds = Open(ds, OF_VERBOSE_ERROR | OF_MULTIDIM_RASTER, allowed_drivers = allowed_drivers, open_options = open_options)
     ret = MultiDimInfoInternal(ds, opts)
     if not as_text:
         import json
@@ -3811,7 +3888,7 @@ def Translate(destName, srcDS, **kwargs):
         (opts, callback, callback_data) = kwargs['options']
 
     if isinstance(srcDS, (str, os.PathLike)):
-        srcDS = OpenEx(filenamePrefix + str(srcDS), allowed_drivers = allowed_drivers, open_options = open_options)
+        srcDS = Open(filenamePrefix + str(srcDS), allowed_drivers = allowed_drivers, open_options = open_options)
 
     return TranslateInternal(destName, srcDS, opts, callback, callback_data)
 
@@ -4100,12 +4177,12 @@ def Warp(destNameOrDestDS, srcDSOrSrcDSTab, **kwargs):
         (opts, callback, callback_data) = kwargs['options']
 
     if isinstance(srcDSOrSrcDSTab, (str, os.PathLike)):
-        srcDSTab = [OpenEx(srcDSOrSrcDSTab, allowed_drivers = allowed_drivers, open_options = open_options)]
+        srcDSTab = [Open(srcDSOrSrcDSTab, allowed_drivers = allowed_drivers, open_options = open_options)]
     elif isinstance(srcDSOrSrcDSTab, list):
         srcDSTab = []
         for elt in srcDSOrSrcDSTab:
             if isinstance(elt, (str, os.PathLike)):
-                srcDSTab.append(OpenEx(elt, allowed_drivers = allowed_drivers, open_options = open_options))
+                srcDSTab.append(Open(elt, allowed_drivers = allowed_drivers, open_options = open_options))
             else:
                 srcDSTab.append(elt)
     else:
@@ -4528,7 +4605,7 @@ def VectorTranslate(destNameOrDestDS, srcDS, **kwargs):
         (opts, callback, callback_data) = kwargs['options']
 
     if isinstance(srcDS, (str, os.PathLike)):
-        srcDS = OpenEx(srcDS, gdalconst.OF_VECTOR, allowed_drivers = allowed_drivers, open_options = open_options)
+        srcDS = Open(srcDS, gdalconst.OF_VECTOR, allowed_drivers = allowed_drivers, open_options = open_options)
 
     if isinstance(destNameOrDestDS, (str, os.PathLike)):
         return wrapper_GDALVectorTranslateDestName(destNameOrDestDS, srcDS, opts, callback, callback_data)
@@ -4794,7 +4871,7 @@ def Nearblack(destNameOrDestDS, srcDS, **kwargs):
         (opts, callback, callback_data) = kwargs['options']
 
     if isinstance(srcDS, (str, os.PathLike)):
-        srcDS = OpenEx(srcDS, allowed_drivers = allowed_drivers, open_options = open_options)
+        srcDS = Open(srcDS, allowed_drivers = allowed_drivers, open_options = open_options)
 
     if isinstance(destNameOrDestDS, (str, os.PathLike)):
         return wrapper_GDALNearblackDestName(destNameOrDestDS, srcDS, opts, callback, callback_data)
@@ -4942,7 +5019,7 @@ def Grid(destName, srcDS, **kwargs):
         (opts, callback, callback_data) = kwargs['options']
 
     if isinstance(srcDS, (str, os.PathLike)):
-        srcDS = OpenEx(srcDS, gdalconst.OF_VECTOR, allowed_drivers = allowed_drivers, open_options = open_options)
+        srcDS = Open(srcDS, gdalconst.OF_VECTOR, allowed_drivers = allowed_drivers, open_options = open_options)
 
     return GridInternal(destName, srcDS, opts, callback, callback_data)
 
@@ -5101,7 +5178,7 @@ def Contour(destNameOrDestDS, srcDS, **kwargs):
         (opts, callback, callback_data) = kwargs['options']
 
     if isinstance(srcDS, (str, os.PathLike)):
-        srcDS = OpenEx(srcDS, allowed_drivers = allowed_drivers, open_options = open_options)
+        srcDS = Open(srcDS, allowed_drivers = allowed_drivers, open_options = open_options)
 
     if isinstance(destNameOrDestDS, (str, os.PathLike)):
         return wrapper_GDALContourDestName(destNameOrDestDS, srcDS, opts, callback, callback_data)
@@ -5302,7 +5379,7 @@ def Rasterize(destNameOrDestDS, srcDS, **kwargs):
     else:
         (opts, callback, callback_data) = kwargs['options']
     if isinstance(srcDS, (str, os.PathLike)):
-        srcDS = OpenEx(srcDS, gdalconst.OF_VECTOR, allowed_drivers = allowed_drivers, open_options = open_options)
+        srcDS = Open(srcDS, gdalconst.OF_VECTOR, allowed_drivers = allowed_drivers, open_options = open_options)
 
     if isinstance(destNameOrDestDS, (str, os.PathLike)):
         return wrapper_GDALRasterizeDestName(destNameOrDestDS, srcDS, opts, callback, callback_data)
@@ -5499,7 +5576,7 @@ def Footprint(destNameOrDestDS, srcDS, **kwargs):
         (opts, callback, callback_data) = kwargs['options']
 
     if isinstance(srcDS, (str, os.PathLike)):
-        srcDS = OpenEx(srcDS, gdalconst.OF_RASTER, allowed_drivers = allowed_drivers, open_options = open_options)
+        srcDS = Open(srcDS, gdalconst.OF_RASTER, allowed_drivers = allowed_drivers, open_options = open_options)
 
     if inline_geojson_requested or wkt_requested:
         import uuid
@@ -5519,7 +5596,7 @@ def Footprint(destNameOrDestDS, srcDS, **kwargs):
                 return json.loads(data)
             else:
                 assert wkt_requested
-                ds = OpenEx(temp_filename)
+                ds = Open(temp_filename)
                 lyr = ds.GetLayer(0)
                 wkts = []
                 for f in lyr:
@@ -6015,12 +6092,12 @@ def MultiDimTranslate(destName, srcDSOrSrcDSTab, **kwargs):
     import os
 
     if isinstance(srcDSOrSrcDSTab, (str, os.PathLike)):
-        srcDSTab = [OpenEx(srcDSOrSrcDSTab, OF_VERBOSE_ERROR | OF_RASTER | OF_MULTIDIM_RASTER, allowed_drivers = allowed_drivers, open_options = open_options)]
+        srcDSTab = [Open(srcDSOrSrcDSTab, OF_VERBOSE_ERROR | OF_RASTER | OF_MULTIDIM_RASTER, allowed_drivers = allowed_drivers, open_options = open_options)]
     elif isinstance(srcDSOrSrcDSTab, list):
         srcDSTab = []
         for elt in srcDSOrSrcDSTab:
             if isinstance(elt, str):
-                srcDSTab.append(OpenEx(elt, OF_VERBOSE_ERROR | OF_RASTER | OF_MULTIDIM_RASTER, allowed_drivers = allowed_drivers, open_options = open_options))
+                srcDSTab.append(Open(elt, OF_VERBOSE_ERROR | OF_RASTER | OF_MULTIDIM_RASTER, allowed_drivers = allowed_drivers, open_options = open_options))
             else:
                 srcDSTab.append(elt)
     else:

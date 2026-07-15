@@ -22,6 +22,8 @@
 #include "gdalalg_vector_read.h"
 #include "gdalalg_tee.h"
 
+#include "vrtdataset.h"
+
 #include <algorithm>
 #include <cassert>
 
@@ -188,12 +190,16 @@ bool GDALAbstractPipelineAlgorithm::CheckFirstAndLastStep(
         for (const auto &stepName : GetStepRegistry().GetNames())
         {
             auto alg = GetStepAlg(stepName);
-            if (alg && alg->CanBeLastStep() &&
-                stepName != GDALRasterWriteAlgorithm::NAME)
+            if (alg && alg->CanBeLastStep())
             {
-                setLastStepNames.insert(CPLString(stepName)
-                                            .replaceAll(RASTER_SUFFIX, "")
-                                            .replaceAll(VECTOR_SUFFIX, ""));
+                const CPLString nameWithoutSuffix =
+                    CPLString(stepName)
+                        .replaceAll(RASTER_SUFFIX, "")
+                        .replaceAll(VECTOR_SUFFIX, "");
+                if (nameWithoutSuffix != GDALRasterWriteAlgorithm::NAME)
+                {
+                    setLastStepNames.insert(nameWithoutSuffix);
+                }
             }
         }
         std::vector<std::string> lastStepNames{GDALRasterWriteAlgorithm::NAME};
@@ -243,7 +249,7 @@ static int GetDatasetType(GDALDataset *poDS)
 
     if (poDS->GetLayerCount() == 0 &&
         (poDS->GetRasterCount() > 0 ||
-         poDS->GetMetadata("SUBDATASETS") != nullptr))
+         poDS->GetMetadata(GDAL_MDD_SUBDATASETS) != nullptr))
     {
         return GDAL_OF_RASTER;
     }
@@ -1567,6 +1573,9 @@ std::string GDALAbstractPipelineAlgorithm::BuildNestedPipeline(
         curAlg->m_oMapDatasetNameToDataset[datasetNameOut] = poDS;
 
         poDS->SetDescription(argsStr.c_str());
+        auto poVRTDataset = dynamic_cast<VRTDataset *>(poDS);
+        if (poVRTDataset)
+            poVRTDataset->SetWritable(false);
     }
 
     m_apoNestedPipelines.emplace_back(std::move(nestedPipeline));

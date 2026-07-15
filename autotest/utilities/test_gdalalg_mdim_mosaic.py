@@ -317,7 +317,7 @@ def test_gdalalg_mdim_mosaic_labelled_axis_2D_array(tmp_path):
         input=[tmp_path / "test1.nc", tmp_path / "test2.nc"],
         output=tmp_path / "out.nc",
     )
-    with gdal.OpenEx(tmp_path / "out.nc", gdal.OF_MULTIDIM_RASTER) as ds:
+    with gdal.Open(tmp_path / "out.nc", gdal.OF_MULTIDIM_RASTER) as ds:
         ar = ds.GetRootGroup().OpenMDArray("test")
         dims = ar.GetDimensions()
         assert dims[0].GetName() == "z"
@@ -756,7 +756,7 @@ def test_gdalalg_mdim_mosaic_error_no_indexing_var(tmp_path):
         array="test",
         output_format="VRT",
     )
-    with gdal.OpenEx(tmp_path / "test1.zarr", gdal.OF_MULTIDIM_RASTER) as ds:
+    with gdal.Open(tmp_path / "test1.zarr", gdal.OF_MULTIDIM_RASTER) as ds:
         ar = ds.GetRootGroup().OpenMDArray("test")
         dims = ar.GetDimensions()
         assert dims[0].GetName() == "z"
@@ -1088,7 +1088,7 @@ def test_gdalalg_mdim_mosaic_copy_blocksize_not_same(tmp_path):
 
     gdal.Run("mdim", "mosaic", input=tmp_path / "test*.nc", output=tmp_path / "out.nc")
 
-    with gdal.OpenEx(tmp_path / "out.nc", gdal.OF_MULTIDIM_RASTER) as ds:
+    with gdal.Open(tmp_path / "out.nc", gdal.OF_MULTIDIM_RASTER) as ds:
         assert ds.GetRootGroup().OpenMDArray("test").GetBlockSize() == [0, 0]
 
 
@@ -1113,7 +1113,7 @@ def test_gdalalg_mdim_mosaic_two_sources(tmp_path):
         output=tmp_path / "out.vrt",
     )
 
-    with gdal.OpenEx(tmp_path / "out.vrt", gdal.OF_MULTIDIM_RASTER) as ds:
+    with gdal.Open(tmp_path / "out.vrt", gdal.OF_MULTIDIM_RASTER) as ds:
         assert (
             ds.GetRootGroup()
             .OpenMDArray("Band1")
@@ -1130,7 +1130,7 @@ def test_gdalalg_mdim_mosaic_two_sources(tmp_path):
         overwrite=True,
     )
 
-    with gdal.OpenEx(tmp_path / "out.vrt", gdal.OF_MULTIDIM_RASTER) as ds:
+    with gdal.Open(tmp_path / "out.vrt", gdal.OF_MULTIDIM_RASTER) as ds:
         assert (
             ds.GetRootGroup()
             .OpenMDArray("Band1")
@@ -1139,3 +1139,88 @@ def test_gdalalg_mdim_mosaic_two_sources(tmp_path):
             .Checksum()
             == 4855
         )
+
+
+def test_gdalalg_mdim_mosaic_pipeline(tmp_path):
+
+    with gdal.alg.mdim.pipeline(
+        pipeline="mosaic ../gdrivers/data/netcdf/byte.nc"
+    ) as alg:
+        ds = alg.Output()
+        assert ds.GetRootGroup().OpenMDArray("Band1")
+
+    with gdal.alg.mdim.pipeline(
+        pipeline=f"mosaic ../gdrivers/data/netcdf/byte.nc ! write {tmp_path}/out.vrt"
+    ):
+        pass
+    with gdal.Open(tmp_path / "out.vrt", gdal.OF_MULTIDIM_RASTER) as ds:
+        assert ds.GetRootGroup().OpenMDArray("Band1")
+
+    with gdal.alg.mdim.pipeline(
+        pipeline=f"mosaic ../gdrivers/data/netcdf/byte.nc ! write {tmp_path}/out.nc"
+    ):
+        pass
+    with gdal.Open(tmp_path / "out.nc", gdal.OF_MULTIDIM_RASTER) as ds:
+        assert ds.GetRootGroup().OpenMDArray("Band1")
+
+
+def test_gdalalg_mdim_mosaic_preserves_indexing_var_unit(tmp_path):
+    UNIT = "days since 2000-01-01 00:00:00"
+
+    def create_sources():
+        with gdal.GetDriverByName("netCDF").CreateMultiDimensional(
+            tmp_path / "test1.nc"
+        ) as ds:
+            rg = ds.GetRootGroup()
+            z = rg.CreateDimension("z", "TEMPORAL", "", 1)
+            z_ar = rg.CreateMDArray(
+                "z", [z], gdal.ExtendedDataType.Create(gdal.GDT_Float64)
+            )
+            z_ar.SetUnit(UNIT)
+            z_ar.CreateAttribute(
+                "long_name", [1], gdal.ExtendedDataType.CreateString()
+            ).WriteString("time")
+            z_ar.Write([10.0])
+            ar = rg.CreateMDArray(
+                "test", [z], gdal.ExtendedDataType.Create(gdal.GDT_UInt8)
+            )
+            ar.Write(array.array("B", [3]))
+
+        with gdal.GetDriverByName("netCDF").CreateMultiDimensional(
+            tmp_path / "test2.nc"
+        ) as ds:
+            rg = ds.GetRootGroup()
+            z = rg.CreateDimension("z", "TEMPORAL", "", 1)
+            z_ar = rg.CreateMDArray(
+                "z", [z], gdal.ExtendedDataType.Create(gdal.GDT_Float64)
+            )
+            z_ar.SetUnit(UNIT)
+            z_ar.CreateAttribute(
+                "long_name", [1], gdal.ExtendedDataType.CreateString()
+            ).WriteString("time")
+            z_ar.Write([20.0])
+            ar = rg.CreateMDArray(
+                "test", [z], gdal.ExtendedDataType.Create(gdal.GDT_UInt8)
+            )
+            ar.Write(array.array("B", [4]))
+
+    create_sources()
+    # mosaic
+    with gdal.Run(
+        "mdim",
+        "mosaic",
+        input=tmp_path / "test*.nc",
+        output=tmp_path / "m.vrt",
+        array="test",
+        output_format="VRT",
+    ) as alg:
+        idx = (
+            alg.Output()
+            .GetRootGroup()
+            .OpenMDArray("test")
+            .GetDimensions()[0]
+            .GetIndexingVariable()
+        )
+        assert idx.GetUnit() == UNIT
+        # plain attributes
+        assert "long_name" in [a.GetName() for a in idx.GetAttributes()]

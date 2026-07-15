@@ -213,6 +213,9 @@ void CPL_STDCALL GDALAllRegister()
 #if defined(DEFERRED_MONGODBV3_DRIVER)
     DeclareDeferredOGRMongoDBv3Plugin();
 #endif
+#if defined(DEFERRED_LERC_DRIVER)
+    DeclareDeferredLERCPlugin();
+#endif
 #if defined(DEFERRED_MRF_DRIVER)
     DeclareDeferredMRFPlugin();
 #endif
@@ -302,6 +305,9 @@ void CPL_STDCALL GDALAllRegister()
 #endif
 #if defined(DEFERRED_ZARR_DRIVER)
     DeclareDeferredZarrPlugin();
+#endif
+#if defined(DEFERRED_ICECHUNK_DRIVER)
+    DeclareDeferredIcechunkPlugin();
 #endif
 #if defined(DEFERRED_XODR_DRIVER)
     DeclareDeferredOGRXODRPlugin();
@@ -614,6 +620,10 @@ void CPL_STDCALL GDALAllRegister()
     GDALRegister_SENTINEL2();
 #endif
 
+#ifdef FRMT_lerc
+    GDALRegister_LERC();
+#endif
+
 #ifdef FRMT_mrf
     GDALRegister_MRF();
 #endif
@@ -804,6 +814,10 @@ void CPL_STDCALL GDALAllRegister()
 
 #ifdef FRMT_zarr
     GDALRegister_Zarr();
+#endif
+
+#ifdef FRMT_icechunk
+    GDALRegister_Icechunk();
 #endif
 
 #ifdef FRMT_rcm

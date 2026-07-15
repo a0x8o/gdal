@@ -202,7 +202,7 @@ def test_gdalalg_vector_sort_invalid_method(alg):
 @pytest.mark.parametrize("geometry_field", (None, "", "swapped_geom"))
 def test_gdalalg_vector_sort_multiple_geom_fields(alg, geometry_field):
 
-    poly_ds = gdal.OpenEx("../ogr/data/poly.shp", gdal.OF_VECTOR)
+    poly_ds = gdal.Open("../ogr/data/poly.shp", gdal.OF_VECTOR)
 
     ds = gdal.GetDriverByName("MEM").CreateVector("")
     lyr = ds.CreateLayer("source", geom_type=ogr.wkbPolygon)
@@ -266,3 +266,18 @@ def test_gdalalg_vector_sort_test_ogrsf(tmp_path):
     assert "INFO" in ret
     assert "ERROR" not in ret
     assert "FAILURE" not in ret
+
+
+@pytest.mark.require_driver("OSM")
+def test_gdalalg_vector_sort_pipeline_layer_interleaved(tmp_vsimem):
+
+    with gdal.alg.vector.pipeline(
+        input="../ogr/data/osm/test.pbf",
+        pipeline='read --layer lines  ! sort ! filter --where "highway IS NOT NULL" ! write --format=MEM --output=""',
+    ) as alg:
+        ds = alg.Output()
+        lyr = ds.GetLayer(0)
+        assert lyr.GetFeatureCount() == 1
+        f = lyr.GetNextFeature()
+        assert f["osm_id"] == "1"
+        assert f["highway"] == "motorway"

@@ -152,12 +152,11 @@ class GDALTest:
         else:
             wrk_filename = "data/" + self.filename
 
-        if self.open_options:
-            ds = gdal.OpenEx(
-                wrk_filename, gdal.OF_RASTER, open_options=self.open_options
-            )
-        else:
-            ds = gdal.Open(wrk_filename, gdal.GA_ReadOnly)
+        ds = gdal.Open(
+            wrk_filename,
+            gdal.OF_RASTER,
+            open_options=self.open_options if self.open_options else [],
+        )
 
         assert ds is not None, "Failed to open dataset: " + wrk_filename
 
@@ -208,7 +207,11 @@ class GDALTest:
                 main_virtual_filename = "/vsimem/tmp_testOpen/" + os.path.basename(
                     fl[0]
                 )
-                virtual_ds = gdal.Open(main_virtual_filename)
+                virtual_ds = gdal.Open(
+                    main_virtual_filename,
+                    gdal.OF_RASTER,
+                    open_options=self.open_options if self.open_options else [],
+                )
                 virtual_ds_is_None = virtual_ds is None
                 virtual_ds = None
 
@@ -238,8 +241,10 @@ class GDALTest:
                         drivers += [drv_name]
                 other_ds = None
                 with gdal.ExceptionMgr(useExceptions=False):
-                    other_ds = gdal.OpenEx(
-                        main_virtual_filename, gdal.OF_RASTER, allowed_drivers=drivers
+                    other_ds = gdal.Open(
+                        main_virtual_filename,
+                        gdal.OF_RASTER | gdal.OF_SILENT_ERROR,
+                        allowed_drivers=drivers,
                     )
                 other_ds_is_None = other_ds is None
                 other_ds_driver_name = None
@@ -387,11 +392,11 @@ class GDALTest:
             wrk_filename = "data/" + self.filename
 
         if self.open_options:
-            src_ds = gdal.OpenEx(
+            src_ds = gdal.Open(
                 wrk_filename, gdal.OF_RASTER, open_options=self.open_options
             )
         else:
-            src_ds = gdal.Open(wrk_filename, gdal.GA_ReadOnly)
+            src_ds = gdal.Open(wrk_filename, gdal.OF_RASTER)
 
         if self.band > 0:
             minmax = src_ds.GetRasterBand(self.band).ComputeRasterMinMax()
@@ -469,11 +474,11 @@ class GDALTest:
         # hopefully it's closed now!
 
         if dest_open_options is not None:
-            new_ds = gdal.OpenEx(
+            new_ds = gdal.Open(
                 new_filename, gdal.OF_RASTER, open_options=dest_open_options
             )
         else:
-            new_ds = gdal.Open(new_filename)
+            new_ds = gdal.Open(new_filename, gdal.OF_RASTER)
         assert new_ds is not None, "Failed to open dataset: " + new_filename
 
         if self.band > 0:
@@ -571,11 +576,11 @@ class GDALTest:
             wrk_filename = "data/" + self.filename
 
         if self.open_options:
-            src_ds = gdal.OpenEx(
+            src_ds = gdal.Open(
                 wrk_filename, gdal.OF_RASTER, open_options=self.open_options
             )
         else:
-            src_ds = gdal.Open(wrk_filename, gdal.GA_ReadOnly)
+            src_ds = gdal.Open(wrk_filename, gdal.OF_RASTER)
 
         xsize = src_ds.RasterXSize
         ysize = src_ds.RasterYSize
@@ -627,11 +632,11 @@ class GDALTest:
         new_ds = None
 
         if dest_open_options is not None:
-            new_ds = gdal.OpenEx(
+            new_ds = gdal.Open(
                 new_filename, gdal.OF_RASTER, open_options=dest_open_options
             )
         else:
-            new_ds = gdal.Open(new_filename)
+            new_ds = gdal.Open(new_filename, gdal.OF_RASTER)
         assert new_ds is not None, "Failed to open dataset: " + new_filename
 
         for band in range(1, out_bands + 1):
@@ -660,11 +665,11 @@ class GDALTest:
 
         wrk_filename = "data/" + self.filename
         if self.open_options:
-            src_ds = gdal.OpenEx(
+            src_ds = gdal.Open(
                 wrk_filename, gdal.OF_RASTER, open_options=self.open_options
             )
         else:
-            src_ds = gdal.Open(wrk_filename, gdal.GA_ReadOnly)
+            src_ds = gdal.Open(wrk_filename, gdal.OF_RASTER)
 
         xsize = src_ds.RasterXSize
         ysize = src_ds.RasterYSize
@@ -690,7 +695,7 @@ class GDALTest:
         src_ds = None
         new_ds = None
 
-        new_ds = gdal.Open(new_filename)
+        new_ds = gdal.Open(new_filename, gdal.OF_RASTER)
         assert new_ds is not None, "Failed to open dataset: " + new_filename
 
         eps = 0.00000001
@@ -718,11 +723,11 @@ class GDALTest:
 
         wrk_filename = "data/" + self.filename
         if self.open_options:
-            src_ds = gdal.OpenEx(
+            src_ds = gdal.Open(
                 wrk_filename, gdal.OF_RASTER, open_options=self.open_options
             )
         else:
-            src_ds = gdal.Open(wrk_filename, gdal.GA_ReadOnly)
+            src_ds = gdal.Open(wrk_filename, gdal.OF_RASTER)
 
         xsize = src_ds.RasterXSize
         ysize = src_ds.RasterYSize
@@ -756,7 +761,7 @@ class GDALTest:
         src_ds = None
         new_ds = None
 
-        new_ds = gdal.Open(new_filename)
+        new_ds = gdal.Open(new_filename, gdal.OF_RASTER)
         assert new_ds is not None, "Failed to open dataset: " + new_filename
 
         expected_osr = osr.SpatialReference()
@@ -784,11 +789,11 @@ class GDALTest:
 
         wrk_filename = "data/" + self.filename
         if self.open_options:
-            src_ds = gdal.OpenEx(
+            src_ds = gdal.Open(
                 wrk_filename, gdal.OF_RASTER, open_options=self.open_options
             )
         else:
-            src_ds = gdal.Open(wrk_filename, gdal.GA_ReadOnly)
+            src_ds = gdal.Open(wrk_filename, gdal.OF_RASTER)
 
         xsize = src_ds.RasterXSize
         ysize = src_ds.RasterYSize
@@ -835,11 +840,11 @@ class GDALTest:
 
         wrk_filename = "data/" + self.filename
         if self.open_options:
-            src_ds = gdal.OpenEx(
+            src_ds = gdal.Open(
                 wrk_filename, gdal.OF_RASTER, open_options=self.open_options
             )
         else:
-            src_ds = gdal.Open(wrk_filename, gdal.GA_ReadOnly)
+            src_ds = gdal.Open(wrk_filename, gdal.OF_RASTER)
 
         xsize = src_ds.RasterXSize
         ysize = src_ds.RasterYSize
@@ -872,9 +877,9 @@ class GDALTest:
         new_ds = None
 
         if delete:
-            mode = gdal.GA_Update
+            mode = gdal.OF_RASTER | gdal.OF_UPDATE
         else:
-            mode = gdal.GA_ReadOnly
+            mode = gdal.OF_RASTER
         new_ds = gdal.Open(new_filename, mode)
         assert new_ds is not None, "Failed to open dataset: " + new_filename
 
@@ -890,7 +895,7 @@ class GDALTest:
         new_ds = None
 
         if delete:
-            new_ds = gdal.Open(new_filename)
+            new_ds = gdal.Open(new_filename, gdal.OF_RASTER)
             assert (
                 new_ds.GetRasterBand(1).GetNoDataValue() is None
             ), "Got nodata value whereas none was expected"
@@ -907,11 +912,11 @@ class GDALTest:
 
         wrk_filename = "data/" + self.filename
         if self.open_options:
-            src_ds = gdal.OpenEx(
+            src_ds = gdal.Open(
                 wrk_filename, gdal.OF_RASTER, open_options=self.open_options
             )
         else:
-            src_ds = gdal.Open(wrk_filename, gdal.GA_ReadOnly)
+            src_ds = gdal.Open(wrk_filename, gdal.OF_RASTER)
 
         xsize = src_ds.RasterXSize
         ysize = src_ds.RasterYSize
@@ -935,7 +940,7 @@ class GDALTest:
         src_ds = None
         new_ds = None
 
-        new_ds = gdal.Open(new_filename)
+        new_ds = gdal.Open(new_filename, gdal.OF_RASTER)
         assert new_ds is not None, "Failed to open dataset: " + new_filename
 
         assert (
@@ -952,11 +957,11 @@ class GDALTest:
 
         wrk_filename = "data/" + self.filename
         if self.open_options:
-            src_ds = gdal.OpenEx(
+            src_ds = gdal.Open(
                 wrk_filename, gdal.OF_RASTER, open_options=self.open_options
             )
         else:
-            src_ds = gdal.Open(wrk_filename, gdal.GA_ReadOnly)
+            src_ds = gdal.Open(wrk_filename, gdal.OF_RASTER)
 
         xsize = src_ds.RasterXSize
         ysize = src_ds.RasterYSize
@@ -982,7 +987,7 @@ class GDALTest:
         src_ds = None
         new_ds = None
 
-        new_ds = gdal.Open(new_filename)
+        new_ds = gdal.Open(new_filename, gdal.OF_RASTER)
         assert new_ds is not None, "Failed to open dataset: " + new_filename
 
         new_unit = new_ds.GetRasterBand(1).GetUnitType()
@@ -1990,7 +1995,12 @@ def _read_in_thread(f, q):
 
 
 def runexternal_out_and_err(
-    cmd, check_memleak=True, encoding="ascii", stdin=None, close_stdin=False
+    cmd,
+    check_memleak=True,
+    encoding="ascii",
+    stdin=None,
+    close_stdin=False,
+    append_returncode_to_stderr=False,
 ):
     # pylint: disable=unused-argument
     if sys.platform == "win32":
@@ -2028,6 +2038,9 @@ def runexternal_out_and_err(
     waitcode = p.wait()
     if waitcode != 0:
         ret_stderr = f"{ret_stderr}\nERROR ret code = {waitcode}"
+
+    if append_returncode_to_stderr:
+        ret_stderr = f"{ret_stderr}\nReturn code = {p.returncode}"
 
     return (ret_stdout, ret_stderr)
 
@@ -2118,7 +2131,7 @@ def reopen(ds, update=False, open_options=None):
     if open_options is None:
         open_options = {}
 
-    return gdal.OpenEx(
+    return gdal.Open(
         ds_loc,
         flags,
         allowed_drivers=[ds_drv.GetDescription()],
@@ -2234,3 +2247,37 @@ def run_and_parse_completion_output(cmd_line):
     if res and res.endswith(sep):
         res = res[0 : -len(sep)]
     return res.split(sep)
+
+
+###############################################################################
+#
+
+
+def algorithm_check_ogrsf(alg, tmp_path):
+
+    if gdal.GetDriverByName("GDALG") is None:
+        pytest.skip("requires GDALG driver")
+
+    import test_cli_utilities
+
+    if test_cli_utilities.get_test_ogrsf_path() is None:
+        pytest.skip("test_ogrsf not available")
+
+    gdalg_filename = tmp_path / "tmp.gdalg.json"
+
+    alg["output"] = gdalg_filename
+    alg["output-format"] = "GDALG"
+
+    assert alg.Run()
+
+    gdalg_contents = json.load(open(gdalg_filename))
+    gdalg_contents["relative_paths_relative_to_this_file"] = False
+    json.dump(gdalg_contents, open(gdalg_filename, "w"))
+
+    ret = runexternal(
+        test_cli_utilities.get_test_ogrsf_path() + f" -ro {gdalg_filename}"
+    )
+
+    assert "INFO" in ret
+    assert "ERROR" not in ret
+    assert "FAILURE" not in ret

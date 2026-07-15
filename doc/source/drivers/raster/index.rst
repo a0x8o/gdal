@@ -88,6 +88,7 @@ Raster drivers
    heif
    hf2
    hfa
+   icechunk
    idrisi
    ilwis
    iris
@@ -111,6 +112,7 @@ Raster drivers
    lan
    l1b
    lcp
+   lerc
    leveller
    libertiff
    loslas

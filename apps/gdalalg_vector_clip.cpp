@@ -94,7 +94,7 @@ class GDALVectorClipAlgorithmLayer final : public GDALVectorPipelineOutputLayer
         return m_poFeatureDefn.get();
     }
 
-    void TranslateFeature(
+    bool TranslateFeature(
         std::unique_ptr<OGRFeature> poSrcFeature,
         std::vector<std::unique_ptr<OGRFeature>> &apoOutFeatures) override
     {
@@ -102,19 +102,37 @@ class GDALVectorClipAlgorithmLayer final : public GDALVectorPipelineOutputLayer
         auto poGeom = poSrcFeature->GetGeometryRef();
 
         if (poGeom == nullptr)
-            return;
+            return true;
 
         poIntersection.reset(poGeom->Intersection(m_poClipGeom.get()));
         if (!poIntersection)
-            return;
+            return false;
         poIntersection->assignSpatialReference(
             m_poFeatureDefn->GetGeomFieldDefn(0)->GetSpatialRef());
 
         poSrcFeature->SetFDefnUnsafe(m_poFeatureDefn.get());
 
+        auto eFeatGeomType = wkbFlatten(poIntersection->getGeometryType());
+
+        // Promote non-curve geometries to curve layer geometry type if needed.
+        if (OGR_GT_IsNonLinear(m_eFlattenSrcLayerGeomType) &&
+            !OGR_GT_IsNonLinear(eFeatGeomType))
+        {
+            poIntersection = OGRGeometryFactory::forceTo(
+                std::move(poIntersection), m_eSrcLayerGeomType);
+            eFeatGeomType = wkbFlatten(poIntersection->getGeometryType());
+            if (eFeatGeomType == m_eFlattenSrcLayerGeomType)
+            {
+                poSrcFeature->SetGeometry(std::move(poIntersection));
+                if (PassesFilters(poSrcFeature.get()))
+                {
+                    apoOutFeatures.push_back(std::move(poSrcFeature));
+                }
+                return true;
+            }
+        }
+
         const auto eSrcGeomType = wkbFlatten(poGeom->getGeometryType());
-        const auto eFeatGeomType =
-            wkbFlatten(poIntersection->getGeometryType());
         if (eFeatGeomType != eSrcGeomType &&
             m_eFlattenSrcLayerGeomType != wkbUnknown &&
             m_eFlattenSrcLayerGeomType != eFeatGeomType)
@@ -132,7 +150,10 @@ class GDALVectorClipAlgorithmLayer final : public GDALVectorPipelineOutputLayer
                     auto poDstFeature =
                         std::unique_ptr<OGRFeature>(poSrcFeature->Clone());
                     poDstFeature->SetGeometry(poSubGeom);
-                    apoOutFeatures.push_back(std::move(poDstFeature));
+                    if (PassesFilters(poDstFeature.get()))
+                    {
+                        apoOutFeatures.push_back(std::move(poDstFeature));
+                    }
                 }
             }
             else if (OGR_GT_GetCollection(eFeatGeomType) ==
@@ -141,14 +162,20 @@ class GDALVectorClipAlgorithmLayer final : public GDALVectorPipelineOutputLayer
                 poIntersection = OGRGeometryFactory::forceTo(
                     std::move(poIntersection), m_eSrcLayerGeomType);
                 poSrcFeature->SetGeometry(std::move(poIntersection));
-                apoOutFeatures.push_back(std::move(poSrcFeature));
+                if (PassesFilters(poSrcFeature.get()))
+                {
+                    apoOutFeatures.push_back(std::move(poSrcFeature));
+                }
             }
             else if (m_eFlattenSrcLayerGeomType == wkbGeometryCollection)
             {
                 auto poGeomColl = std::make_unique<OGRGeometryCollection>();
                 poGeomColl->addGeometry(std::move(poIntersection));
                 poSrcFeature->SetGeometry(std::move(poGeomColl));
-                apoOutFeatures.push_back(std::move(poSrcFeature));
+                if (PassesFilters(poSrcFeature.get()))
+                {
+                    apoOutFeatures.push_back(std::move(poSrcFeature));
+                }
             }
             // else discard geometries of incompatible type with the
             // layer geometry type
@@ -156,8 +183,13 @@ class GDALVectorClipAlgorithmLayer final : public GDALVectorPipelineOutputLayer
         else
         {
             poSrcFeature->SetGeometry(std::move(poIntersection));
-            apoOutFeatures.push_back(std::move(poSrcFeature));
+            if (PassesFilters(poSrcFeature.get()))
+            {
+                apoOutFeatures.push_back(std::move(poSrcFeature));
+            }
         }
+
+        return true;
     }
 
     int TestCapability(const char *pszCap) const override

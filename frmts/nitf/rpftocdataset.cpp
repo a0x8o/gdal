@@ -718,7 +718,7 @@ void RPFTOCDataset::AddSubDataset(const char *pszFilename,
 CSLConstList RPFTOCDataset::GetMetadata(const char *pszDomain)
 
 {
-    if (pszDomain != nullptr && EQUAL(pszDomain, "SUBDATASETS"))
+    if (pszDomain != nullptr && EQUAL(pszDomain, GDAL_MDD_SUBDATASETS))
         return papszSubDatasets;
 
     return GDALPamDataset::GetMetadata(pszDomain);
@@ -1407,6 +1407,7 @@ class RPFTOCAlgorithmCreate final : public GDALAlgorithm
 RPFTOCAlgorithmCreate::RPFTOCAlgorithmCreate()
     : GDALAlgorithm(NAME, DESCRIPTION, HELP_URL)
 {
+    AddProgressArg(/* hidden = */ true);
     AddArg(GDAL_ARG_NAME_INPUT, 'i', _("Input directory"), &m_input)
         .SetRequired()
         .SetPositional();

@@ -12,6 +12,7 @@
 
 #include "cpl_port.h"
 #include "cpl_conv.h"
+#include "cpl_enumerate.h"
 #include "cpl_error.h"
 #include "cpl_error_internal.h"
 #include "cpl_json.h"
@@ -25,6 +26,7 @@
 #include "gdal_thread_pool.h"
 #include "memdataset.h"
 #include "ogrsf_frmts.h"
+#include "ogr_p.h"
 #include "ogr_spatialref.h"
 #include "vrtdataset.h"
 
@@ -2177,6 +2179,30 @@ bool GDALAlgorithm::ParseArgument(
 }
 
 /************************************************************************/
+/*                     FormatSuggestionsAsString()                      */
+/************************************************************************/
+
+static std::string
+FormatSuggestionsAsString(const std::vector<std::string> &suggestions,
+                          bool addDashDashPrefix)
+{
+    std::string ret;
+    for (auto [i, suggestion] : cpl::enumerate(suggestions))
+    {
+        if (i > 0)
+        {
+            ret += (i + 1 < suggestions.size()) ? ", " : " or ";
+        }
+        ret += '\'';
+        if (addDashDashPrefix)
+            ret += "--";
+        ret += suggestion;
+        ret += '\'';
+    }
+    return ret;
+}
+
+/************************************************************************/
 /*              GDALAlgorithm::ParseCommandLineArguments()              */
 /************************************************************************/
 
@@ -2279,13 +2305,16 @@ bool GDALAlgorithm::ParseCommandLineArguments(
             }
             if (iterArg == m_mapLongNameToArg.end())
             {
-                const std::string bestCandidate =
-                    GetSuggestionForArgumentName(nameWithoutDash);
-                if (!bestCandidate.empty())
+                const auto suggestions =
+                    GetSuggestionsForArgumentName(nameWithoutDash);
+                if (!suggestions.empty())
                 {
                     ReportError(CE_Failure, CPLE_IllegalArg,
-                                "Option '%s' is unknown. Do you mean '--%s'?",
-                                name.c_str(), bestCandidate.c_str());
+                                "Option '%s' is unknown. Do you mean %s?",
+                                name.c_str(),
+                                FormatSuggestionsAsString(
+                                    suggestions, /* addDashDashPrefix = */ true)
+                                    .c_str());
                 }
                 else
                 {
@@ -2322,15 +2351,18 @@ bool GDALAlgorithm::ParseCommandLineArguments(
                     }
                     else
                     {
-                        const std::string bestCandidate =
-                            GetSuggestionForArgumentName(nameWithoutDash);
-                        if (!bestCandidate.empty())
+                        const auto suggestions =
+                            GetSuggestionsForArgumentName(nameWithoutDash);
+                        if (!suggestions.empty())
                         {
                             ReportError(
                                 CE_Failure, CPLE_IllegalArg,
                                 "Short name option '%s' is unknown. Do you "
-                                "mean '--%s' (with leading double dash) ?",
-                                name.c_str(), bestCandidate.c_str());
+                                "mean %s (with leading double dash) ?",
+                                name.c_str(),
+                                FormatSuggestionsAsString(
+                                    suggestions, /* addDashDashPrefix = */ true)
+                                    .c_str());
                         }
                         else
                         {
@@ -2909,7 +2941,7 @@ bool GDALAlgorithm::ProcessDatasetArg(GDALAlgorithmArg *arg,
                 {
                     auto poMemDS = std::make_unique<MEMDataset>();
                     auto *poLayer = poMemDS->CreateLayer(
-                        "", poWktGeom->getSpatialReference(),
+                        "layer", poWktGeom->getSpatialReference(),
                         poWktGeom->getGeometryType());
 
                     auto poFeatureDefn = poLayer->GetLayerDefn();
@@ -3519,6 +3551,34 @@ GDALAlgorithm::GetSuggestionForArgumentName(const std::string &osName) const
 }
 
 /************************************************************************/
+/*            GDALAlgorithm::GetSuggestionsForArgumentName()            */
+/************************************************************************/
+
+std::vector<std::string>
+GDALAlgorithm::GetSuggestionsForArgumentName(const std::string &osName) const
+{
+    std::vector<std::string> ret;
+    std::string suggestion = GetSuggestionForArgumentName(osName);
+    if (!suggestion.empty())
+    {
+        ret.push_back(std::move(suggestion));
+    }
+    else if (osName.size() >= 3)
+    {
+        // e.g "crs" for reproject will match "input-crs" and "target-crs"
+        const std::string dashName = std::string("-").append(osName);
+        for (const auto &arg : m_args)
+        {
+            if (cpl::ends_with(arg->GetName(), dashName))
+            {
+                ret.push_back(arg->GetName());
+            }
+        }
+    }
+    return ret;
+}
+
+/************************************************************************/
 /*         GDALAlgorithm::IsKnownOutputRelatedBooleanArgName()          */
 /************************************************************************/
 
@@ -3602,12 +3662,15 @@ GDALAlgorithmArg *GDALAlgorithm::GetArg(const std::string &osName,
 
     if (suggestionAllowed)
     {
-        const std::string bestCandidate = GetSuggestionForArgumentName(osName);
-        if (!bestCandidate.empty())
+        const auto suggestions = GetSuggestionsForArgumentName(osName);
+        if (!suggestions.empty())
         {
             CPLError(CE_Failure, CPLE_AppDefined,
-                     "Argument '%s' is unknown. Do you mean '%s'?",
-                     osName.c_str(), bestCandidate.c_str());
+                     "Argument '%s' is unknown. Do you mean %s?",
+                     osName.c_str(),
+                     FormatSuggestionsAsString(suggestions,
+                                               /* addDashDashPrefix = */ false)
+                         .c_str());
         }
     }
 
@@ -5184,28 +5247,37 @@ void GDALAlgorithm::SetAutoCompleteFunctionForLayerName(
 void GDALAlgorithm::SetAutoCompleteFunctionForFieldName(
     GDALInConstructionAlgorithmArg &fieldArg,
     const GDALAlgorithmArg *layerNameArg, bool attributeFields,
-    bool geometryFields, std::vector<GDALArgDatasetValue> &datasetArg)
+    bool geometryFields, std::vector<GDALArgDatasetValue> &datasetArg,
+    const std::vector<std::string> &extraValues,
+    std::function<bool(const OGRFieldDefn *)> filterFn)
 {
 
     fieldArg.SetAutoCompleteFunction(
-        [&datasetArg, layerNameArg, attributeFields,
-         geometryFields](const std::string &currentValue)
+        [&datasetArg, layerNameArg, attributeFields, geometryFields,
+         extraValues,
+         filterFn = std::move(filterFn)](const std::string &currentValue)
         {
-            std::set<std::string> ret;
+            std::set<std::string> ret{};
             if (!datasetArg.empty())
             {
                 CPLErrorStateBackuper oBackuper(CPLQuietErrorHandler);
 
                 const auto getLayerFields =
-                    [&ret, &currentValue, attributeFields,
-                     geometryFields](const OGRLayer *poLayer)
+                    [&ret, &currentValue, attributeFields, geometryFields,
+                     &extraValues, &filterFn](const OGRLayer *poLayer)
                 {
                     const auto poDefn = poLayer->GetLayerDefn();
                     if (attributeFields)
                     {
                         for (const auto poFieldDefn : poDefn->GetFields())
                         {
+                            if (filterFn && !filterFn(poFieldDefn))
+                            {
+                                continue;
+                            }
+
                             const char *fieldName = poFieldDefn->GetNameRef();
+
                             if (currentValue == fieldName)
                             {
                                 ret.clear();
@@ -5221,7 +5293,7 @@ void GDALAlgorithm::SetAutoCompleteFunctionForFieldName(
                         {
                             const char *fieldName = poFieldDefn->GetNameRef();
                             if (fieldName[0] == 0)
-                                fieldName = "OGR_GEOMETRY";
+                                fieldName = OGR_GEOMETRY_DEFAULT_NON_EMPTY_NAME;
                             if (currentValue == fieldName)
                             {
                                 ret.clear();
@@ -5230,6 +5302,16 @@ void GDALAlgorithm::SetAutoCompleteFunctionForFieldName(
                             }
                             ret.insert(fieldName);
                         }
+                    }
+                    for (const auto &value : extraValues)
+                    {
+                        if (currentValue == value)
+                        {
+                            ret.clear();
+                            ret.insert(value);
+                            break;
+                        }
+                        ret.insert(value);
                     }
                 };
 
@@ -5872,6 +5954,11 @@ GDALAlgorithm::AddCreationOptionsArg(std::vector<std::string> *pValue,
                 datasetType = outputArg->GetDatasetType();
             }
 
+            const char *pszMDCreationOptionList =
+                (datasetType == GDAL_OF_MULTIDIM_RASTER)
+                    ? GDAL_DMD_MULTIDIM_DATASET_CREATIONOPTIONLIST
+                    : GDAL_DMD_CREATIONOPTIONLIST;
+
             auto outputFormat = GetArg(GDAL_ARG_NAME_OUTPUT_FORMAT);
             if (outputFormat && outputFormat->GetType() == GAAT_STRING &&
                 outputFormat->IsExplicitlySet())
@@ -5881,7 +5968,7 @@ GDALAlgorithm::AddCreationOptionsArg(std::vector<std::string> *pValue,
                 if (poDriver)
                 {
                     AddOptionsSuggestions(
-                        poDriver->GetMetadataItem(GDAL_DMD_CREATIONOPTIONLIST),
+                        poDriver->GetMetadataItem(pszMDCreationOptionList),
                         datasetType, currentValue, oRet);
                 }
                 return oRet;
@@ -5922,7 +6009,7 @@ GDALAlgorithm::AddCreationOptionsArg(std::vector<std::string> *pValue,
                                         oVisitedExtensions.insert(pszExt);
                                         if (AddOptionsSuggestions(
                                                 poDriver->GetMetadataItem(
-                                                    GDAL_DMD_CREATIONOPTIONLIST),
+                                                    pszMDCreationOptionList),
                                                 datasetType, currentValue,
                                                 oRet))
                                         {
@@ -6232,13 +6319,16 @@ GDALAlgorithm::AddPixelFunctionArgsArg(std::vector<std::string> *pValue,
 /*                   GDALAlgorithm::AddProgressArg()                    */
 /************************************************************************/
 
-void GDALAlgorithm::AddProgressArg()
+void GDALAlgorithm::AddProgressArg(bool hidden)
 {
-    AddArg(GDAL_ARG_NAME_QUIET, 'q',
-           _("Quiet mode (no progress bar or warning message)"), &m_quiet)
-        .SetAvailableInPipelineStep(false)
-        .SetCategory(GAAC_COMMON)
-        .AddAction([this]() { m_progressBarRequested = false; });
+    auto &arg =
+        AddArg(GDAL_ARG_NAME_QUIET, 'q',
+               _("Quiet mode (no progress bar or warning message)"), &m_quiet)
+            .SetAvailableInPipelineStep(false)
+            .SetCategory(GAAC_COMMON)
+            .AddAction([this]() { m_progressBarRequested = false; });
+    if (hidden)
+        arg.SetHidden();
 
     AddArg("progress", 0, _("Display progress bar"), &m_progressBarRequested)
         .SetAvailableInPipelineStep(false)

@@ -7,7 +7,7 @@
 # Public domain
 # or licensed under MIT (LICENSE.TXT) Copyright 2019 Even Rouault <even.rouault@spatialys.com>
 
-ARG ALPINE_VERSION=3.23
+ARG ALPINE_VERSION=3.24
 FROM alpine:${ALPINE_VERSION} AS builder
 
 # Derived from osgeo/proj by Howard Butler <howard@hobu.co>
@@ -33,6 +33,7 @@ RUN apk add --no-cache \
     basisu-dev \
     blosc-dev \
     brunsli-dev \
+    cargo \
     ccache \
     cfitsio-dev \
     cmake \
@@ -293,6 +294,7 @@ RUN --mount=type=cache,id=alpine-normal-gdal,target=$HOME/.cache \
         -DOpenDrive_DIR=/usr/lib/ \
         -DOGR_ENABLE_DRIVER_XODR_PLUGIN=TRUE \
         -DGDAL_USE_EXPRTK:BOOL=ON \
+        -DGDAL_USE_PCODEC=ON \
     && ninja \
     && DESTDIR="/build" ninja install \
     && (ninja multireadtest && cp apps/multireadtest /build/usr/bin) \
@@ -427,6 +429,7 @@ COPY --from=builder --link  /build_proj/usr/lib/ /usr/lib/
 
 COPY --from=builder --link  /build/usr/share/bash-completion/ /usr/share/bash-completion/
 COPY --from=builder --link  /build/usr/share/gdal/ /usr/share/gdal/
+COPY --from=builder --link  /build/usr/share/doc/ /usr/share/doc/
 COPY --from=builder --link  /build/usr/include/ /usr/include/
 COPY --from=builder --link  /build_gdal_python/usr/ /usr/
 COPY --from=builder --link  /build_gdal_version_changing/usr/ /usr/

@@ -107,6 +107,7 @@ exclude_patterns = [
     "api/python/modules.rst",
     "gdal_rtd/README.md",
     "user/geometry_validity_examples.rst",
+    "programs/nodata_handling_gdaladdo_gdal_translate.rst",
 ]
 
 # Prevents double hyphen (--) to be replaced by Unicode long dash character
@@ -289,6 +290,8 @@ nitpick_ignore_regex = [
     # Deprecated classes
     (".*", "classOGRDataSource"),
     (".*", "classOGRSFDriver"),
+    # Public class referenced by importFromISISPVL but not in the API doc tree
+    (".*", "classCPLJSONObject"),
     # Internal GDAL types
     (".*", "classAxisMappingCoordinateTransformation"),
     (".*", "classCompositeCT"),
@@ -492,6 +495,13 @@ man_pages = [
         1,
     ),
     (
+        "programs/gdal_mdim_compare",
+        "gdal-mdim-compare",
+        "Compare two multidimensional datasets",
+        [author_evenr],
+        1,
+    ),
+    (
         "programs/gdal_mdim_convert",
         "gdal-mdim-convert",
         "Convert a multidimensional dataset",
@@ -502,6 +512,34 @@ man_pages = [
         "programs/gdal_mdim_mosaic",
         "gdal-mdim-mosaic",
         "Build a mosaic, either virtual (VRT) or materialized, from multidimensional datasets",
+        [author_evenr],
+        1,
+    ),
+    (
+        "programs/gdal_mdim_pipeline",
+        "gdal-mdim-pipeline",
+        "Process a multidimensional dataset applying several steps",
+        [author_evenr],
+        1,
+    ),
+    (
+        "programs/gdal_mdim_read",
+        "gdal-mdim-read",
+        "Read a multidimensional dataset (pipeline only)",
+        [author_evenr],
+        1,
+    ),
+    (
+        "programs/gdal_mdim_reproject",
+        "gdal-mdim-reproject",
+        "Reproject a multidimensional dataset",
+        [author_evenr],
+        1,
+    ),
+    (
+        "programs/gdal_mdim_write",
+        "gdal-mdim-write",
+        "Write a multidimensional dataset (pipeline only)",
         [author_evenr],
         1,
     ),
@@ -951,6 +989,13 @@ man_pages = [
         "gdal-vector-filter",
         "Filter a vector dataset",
         [author_evenr],
+        1,
+    ),
+    (
+        "programs/gdal_vector_explode",
+        "gdal-vector-explode",
+        "Explode fields or geometries of a vector dataset",
+        [author_dbaston],
         1,
     ),
     (

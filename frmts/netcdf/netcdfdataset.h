@@ -210,17 +210,17 @@ static const char *const papszCFLatitudeAttribValues[] = {CF_DEGREES_NORTH,
                                                           nullptr};
 
 static const char *const papszCFProjectionXVarNames[] = {CF_PROJ_X_VAR_NAME,
-                                                         "xc", nullptr};
-static const char *const papszCFProjectionXAttribNames[] = {CF_STD_NAME,
-                                                            CF_AXIS, nullptr};
-static const char *const papszCFProjectionXAttribValues[] = {CF_PROJ_X_COORD,
-                                                             "X", nullptr};
+                                                         "xc", "rlon", nullptr};
+static const char *const papszCFProjectionXAttribNames[] = {
+    CF_STD_NAME, CF_AXIS, CF_STD_NAME, nullptr};
+static const char *const papszCFProjectionXAttribValues[] = {
+    CF_PROJ_X_COORD, "X", "grid_longitude", nullptr};
 static const char *const papszCFProjectionYVarNames[] = {CF_PROJ_Y_VAR_NAME,
-                                                         "yc", nullptr};
-static const char *const papszCFProjectionYAttribNames[] = {CF_STD_NAME,
-                                                            CF_AXIS, nullptr};
-static const char *const papszCFProjectionYAttribValues[] = {CF_PROJ_Y_COORD,
-                                                             "Y", nullptr};
+                                                         "yc", "rlat", nullptr};
+static const char *const papszCFProjectionYAttribNames[] = {
+    CF_STD_NAME, CF_AXIS, CF_STD_NAME, nullptr};
+static const char *const papszCFProjectionYAttribValues[] = {
+    CF_PROJ_Y_COORD, "Y", "grid_latitude", nullptr};
 
 static const char *const papszCFVerticalAttribNames[] = {CF_AXIS, "positive",
                                                          "positive", nullptr};
@@ -477,7 +477,7 @@ class netCDFDataset final : public GDALPamDataset
                           const char *pszAttr) const;
     const char *FetchAttr(int nGroupId, int nVarId, const char *pszAttr) const;
 
-    void ProcessCreationOptions();
+    bool ProcessCreationOptions();
     int DefVarDeflate(int nVarId, bool bChunkingArg = true) const;
     CPLErr AddProjectionVars(bool bDefsOnly, GDALProgressFunc pfnProgress,
                              void *pProgressData);

@@ -32,6 +32,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -2516,6 +2517,11 @@ class CPL_DLL GDALAlgorithmRegistry
     /** Return a likely matching argument using a Damerau-Levenshtein distance */
     std::string GetSuggestionForArgumentName(const std::string &osName) const;
 
+    /** Return likely matching arguments using a Damerau-Levenshtein distance
+     * and additional heuristics. */
+    std::vector<std::string>
+    GetSuggestionsForArgumentName(const std::string &osName) const;
+
     /** Return an argument from its long name, short name or an alias */
     GDALAlgorithmArg *GetArg(const std::string &osName,
                              bool suggestionAllowed = false)
@@ -3041,7 +3047,9 @@ class CPL_DLL GDALAlgorithmRegistry
     static void SetAutoCompleteFunctionForFieldName(
         GDALInConstructionAlgorithmArg &fieldArg,
         const GDALAlgorithmArg *layerNameArg, bool attributeFields,
-        bool geometryFields, std::vector<GDALArgDatasetValue> &datasetArg);
+        bool geometryFields, std::vector<GDALArgDatasetValue> &datasetArg,
+        const std::vector<std::string> &extraValues = {},
+        std::function<bool(const OGRFieldDefn *)> filterFn = {});
 
     /** Add a field name argument */
     GDALInConstructionAlgorithmArg &
@@ -3115,7 +3123,7 @@ class CPL_DLL GDALAlgorithmRegistry
                             const char *helpMessage = nullptr);
 
     /** Add \--quiet (and hidden \--progress) argument. */
-    void AddProgressArg();
+    void AddProgressArg(bool hidden = false);
 
     /** Register an action that is executed by the ValidateArguments()
      * method. If the provided function returns false, validation fails.

@@ -250,7 +250,7 @@ def test_ogr2ogr_11(ogr2ogr_path, tmp_path):
     )
 
     ds = ogr.Open(output_shp)
-    assert ds.GetLayer(0).GetLayerDefn().GetGeomType() == ogr.wkbPolygon25D
+    assert ds.GetLayer(0).GetLayerDefn().GetGeomType() == ogr.wkbMultiPolygon25D
 
 
 ###############################################################################
@@ -266,7 +266,7 @@ def test_ogr2ogr_12(ogr2ogr_path, tmp_path):
     )
 
     ds = ogr.Open(output_shp)
-    assert ds.GetLayer(0).GetLayerDefn().GetGeomType() == ogr.wkbPolygon25D
+    assert ds.GetLayer(0).GetLayerDefn().GetGeomType() == ogr.wkbMultiPolygon25D
 
 
 ###############################################################################
@@ -307,7 +307,9 @@ def test_ogr2ogr_14(ogr2ogr_path, tmp_path):
     ds = ogr.Open(output_shp)
     assert ds is not None and ds.GetLayer(0).GetFeatureCount() == 10
     feat = ds.GetLayer(0).GetNextFeature()
-    assert feat.GetGeometryRef().GetGeometryRef(0).GetPointCount() == 36
+    assert (
+        feat.GetGeometryRef().GetGeometryRef(0).GetGeometryRef(0).GetPointCount() == 36
+    )
 
 
 ###############################################################################
@@ -912,7 +914,7 @@ def test_ogr2ogr_33(ogr2ogr_path, tmp_path):
         ogr2ogr_path + f" -explodecollections {dst_shp} {src_csv} -select foo"
     )
 
-    ds = ogr.Open(dst_shp)
+    ds = gdal.Open(dst_shp, open_options=["PROMOTE_TO_MULTI=NO"])
     lyr = ds.GetLayer(0)
     assert lyr.GetFeatureCount() == 3, "-explodecollections failed"
 
@@ -1180,9 +1182,9 @@ def test_ogr2ogr_43(ogr2ogr_path, tmp_path, dim):
     ds = ogr.Open(output_shp)
     lyr = ds.GetLayerByIndex(0)
     if dim == 3:
-        assert lyr.GetGeomType() == ogr.wkbPolygon25D
+        assert lyr.GetGeomType() == ogr.wkbMultiPolygon25D
     elif dim == 2:
-        assert lyr.GetGeomType() == ogr.wkbPolygon
+        assert lyr.GetGeomType() == ogr.wkbMultiPolygon
 
 
 ###############################################################################
@@ -2184,7 +2186,7 @@ def test_ogr2ogr_65(ogr2ogr_path, tmp_path):
     dst_csv = str(tmp_path / "out.csv")
 
     gdaltest.runexternal(f"{ogr2ogr_path} {dst_csv} ../ogr/data/poly.shp")
-    ds = gdal.OpenEx(dst_csv)
+    ds = gdal.Open(dst_csv)
     assert ds.GetDriver().ShortName == "CSV"
     ds = None
 
@@ -2310,3 +2312,30 @@ def test_ogr2ogr_parquet_dataset_limit(ogr2ogr_path, tmp_path):
 
     ds = ogr.Open(out_filename)
     assert ds.GetLayer(0).GetFeatureCount() == 1
+
+
+###############################################################################
+# Test https://github.com/OSGeo/gdal/issues/14826
+
+
+@pytest.mark.require_driver("CSV")
+@pytest.mark.require_driver("WFS")
+@pytest.mark.require_driver("VRT")
+def test_ogr2ogr_invalid_wfs_vrt(ogr2ogr_path, tmp_path):
+
+    out_filename = str(tmp_path / "out.csv")
+    vrt_filename = str(tmp_path / "out.vrt")
+    with open(vrt_filename, "wt") as f:
+        f.write("""<OGRVRTDataSource>
+  <OGRVRTLayer name="layer">
+     <SrcDataSource>WFS:http://this-is-an-unreachable.url</SrcDataSource>
+  </OGRVRTLayer>
+</OGRVRTDataSource>""")
+
+    ret, err = gdaltest.runexternal_out_and_err(
+        ogr2ogr_path + f" {out_filename} {vrt_filename}",
+        append_returncode_to_stderr=True,
+    )
+    assert "Return code = 0" not in err
+    assert "Could not resolve host:" in err
+    assert "Error retrieving the source layer definition" in err

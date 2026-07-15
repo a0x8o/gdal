@@ -357,6 +357,12 @@ struct GRKCodecWrapper
         return comp->stride;
     }
 
+    // Grok decodes low-precision components into int16_t buffers
+    static GDALDataType getDataType(jp2_image_comp *comp)
+    {
+        return comp->data_type == GRK_INT_16 ? GDT_Int16 : GDT_Int32;
+    }
+
     /**
      * @brief Opens a @ref VSILFILE virtual file
      *
@@ -1939,6 +1945,16 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
     bool initializedAsync = false;  ///< True after first grk_decompress() call
     PostPreload cachedPostPreload_{};    ///< Cached first-call tile grid info
     bool hasCachedPostPreload_ = false;  ///< True after first decompressAsynch
+    bool bSwathOnlyWarned_ = false;      ///< Throttle no-AdviseRead warning
+    bool bAdviseReadCalled_ = false;     ///< True if AdviseRead() was invoked
+    bool bSyncFallback_ = false;         ///< True when sync fallback taken
+    bool bDecodeConsumed_ = false;   ///< grk_decompress() has run; codec spent
+    bool bCachePersistent_ = false;  ///< cached decode kept tiles (CACHE_IMAGE)
+    int cacheServedY1_ = 0;          ///< bottom row drained from cached decode
+    int decWinX0_ = 0;  ///< cached decode window (this level coords)
+    int decWinY0_ = 0;
+    int decWinX1_ = 0;
+    int decWinY1_ = 0;
     VSILFILE *m_ovFp = nullptr;  ///< Private file handle for overview codec
 
     /**
@@ -2023,6 +2039,10 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
         fullDecompress_ = (nXOff == m_nX0 && nYOff == m_nY0 &&
                            nXSize == nParentXSize && nYSize == nParentYSize);
         initializedAsync = false;
+        // New region: drop the prior decode's result cache.
+        hasCachedPostPreload_ = false;
+        bSyncFallback_ = false;
+        bAdviseReadCalled_ = true;
 
         return CE_None;
     }
@@ -2118,9 +2138,12 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
                                GSpacing nPixelSpace, GSpacing nLineSpace,
                                GSpacing nBandSpace, int nPromoteAlphaBandIdx)
     {
-        // Get tile position and size from component 0 (full resolution)
-        const int tileXOff = img->x0;
-        const int tileYOff = img->y0;
+        // Use origin AND size from component 0.  For partial (dw_reduced)
+        // decompression, img->x0/y0 describe the full tile canvas bounds while
+        // comps[0].x0/y0/w/h describe the cropped decode window; mixing
+        // the two can produce a corrupt output
+        const int tileXOff = static_cast<int>(img->comps[0].x0);
+        const int tileYOff = static_cast<int>(img->comps[0].y0);
         const int tileWidth = static_cast<int>(img->comps[0].w);
         const int tileHeight = static_cast<int>(img->comps[0].h);
 
@@ -2190,6 +2213,18 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
                             for (int x = 0; x < copyWidth; ++x)
                                 dst32[x] = src[x];
                         }
+                        else if (eBufType == GDT_Float32)
+                        {
+                            auto dstF = reinterpret_cast<float *>(dst);
+                            for (int x = 0; x < copyWidth; ++x)
+                                dstF[x] = static_cast<float>(src[x]);
+                        }
+                        else if (eBufType == GDT_Float64)
+                        {
+                            auto dstD = reinterpret_cast<double *>(dst);
+                            for (int x = 0; x < copyWidth; ++x)
+                                dstD[x] = static_cast<double>(src[x]);
+                        }
                     }
                     else
                     {
@@ -2211,6 +2246,18 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
                         {
                             for (int x = 0; x < copyWidth; ++x)
                                 dst[x] = static_cast<GByte>(src[x]);
+                        }
+                        else if (eBufType == GDT_Float32)
+                        {
+                            auto dstF = reinterpret_cast<float *>(dst);
+                            for (int x = 0; x < copyWidth; ++x)
+                                dstF[x] = static_cast<float>(src[x]);
+                        }
+                        else if (eBufType == GDT_Float64)
+                        {
+                            auto dstD = reinterpret_cast<double *>(dst);
+                            for (int x = 0; x < copyWidth; ++x)
+                                dstD[x] = static_cast<double>(src[x]);
                         }
                     }
                 }
@@ -2285,6 +2332,16 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
                         static_cast<GUInt32 *>(pData)[dstOffset / 4] =
                             static_cast<GUInt32>(value);
                     }
+                    else if (eBufType == GDT_Float32)
+                    {
+                        static_cast<float *>(pData)[dstOffset / 4] =
+                            static_cast<float>(value);
+                    }
+                    else if (eBufType == GDT_Float64)
+                    {
+                        static_cast<double *>(pData)[dstOffset / 8] =
+                            static_cast<double>(value);
+                    }
                 }
             }
         }
@@ -2321,8 +2378,9 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
         // trigger post-processing (wait(nullptr) -> postMulti_).
         const int nTotalTiles = (postPreload.tile_x1 - postPreload.tile_x0) *
                                 (postPreload.tile_y1 - postPreload.tile_y0);
-        bool canUseFastPath =
-            (nTotalTiles > 1 && m_codec && m_codec->psImage && iLevel == 0);
+        bool canUseFastPath = (nTotalTiles > 1 && m_codec && m_codec->psImage &&
+                               iLevel == 0 && eBufType != GDT_Float32 &&
+                               eBufType != GDT_Float64 && !bSyncFallback_);
         if (canUseFastPath)
         {
             for (int i = 0; i < nBandCount && canUseFastPath; ++i)
@@ -2499,7 +2557,8 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
         // Validate buffer data type
         if (eBufType != GDT_Byte && eBufType != GDT_Int16 &&
             eBufType != GDT_UInt16 && eBufType != GDT_Int32 &&
-            eBufType != GDT_UInt32)
+            eBufType != GDT_UInt32 && eBufType != GDT_Float32 &&
+            eBufType != GDT_Float64)
         {
             CPLError(CE_Failure, CPLE_NotSupported,
                      "DirectRasterIO: unsupported buffer data type %s",
@@ -2611,6 +2670,71 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
     }
 
     /**
+     * @brief Rebuilds m_codec for a fresh decode (codec is single-shot).
+     * @return true on success; false (m_codec == nullptr) on failure.
+     */
+    bool reinitCodec(void)
+    {
+        delete m_codec;
+        m_codec = new GRKCodecWrapper();
+
+        if (GrokCanRead(m_osFilename.c_str()))
+        {
+            if (m_ovFp)
+            {
+                VSIFCloseL(m_ovFp);
+                m_ovFp = nullptr;
+            }
+            m_codec->open(nullptr, nCodeStreamStart);
+        }
+        else
+        {
+            VSILFILE *fp = fp_;
+            if (iLevel > 0)
+            {
+                // Overview: fresh private handle resets file position.
+                if (m_ovFp)
+                {
+                    VSIFCloseL(m_ovFp);
+                    m_ovFp = nullptr;
+                }
+                m_ovFp = VSIFOpenL(m_osFilename.c_str(), "rb");
+                if (!m_ovFp)
+                {
+                    CPLError(CE_Failure, CPLE_OpenFailed,
+                             "reinitCodec: reopen failed");
+                    delete m_codec;
+                    m_codec = nullptr;
+                    return false;
+                }
+                fp = m_ovFp;
+            }
+            m_codec->open(fp, nCodeStreamStart);
+        }
+
+        uint32_t nTileW = 0, nTileH = 0;
+        int numRes = 0;
+        if (!m_codec->setUpDecompress(GetNumThreads(), m_osFilename.c_str(),
+                                      nCodeStreamLength, &nTileW, &nTileH,
+                                      &numRes))
+        {
+            delete m_codec;
+            m_codec = nullptr;
+            CPLError(CE_Failure, CPLE_AppDefined,
+                     "reinitCodec: codec reinit failed");
+            return false;
+        }
+        CPLErrorReset();
+
+        initializedAsync = false;
+        hasCachedPostPreload_ = false;
+        bSyncFallback_ = false;
+        bDecodeConsumed_ = false;
+        cacheServedY1_ = 0;
+        return true;
+    }
+
+    /**
      * @brief Initializes or reuses Grok async decompression.
      *
      * On first call (initializedAsync=false), configures decompress params
@@ -2682,6 +2806,20 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
             CPLErrorReset();
         }
 
+        // Reuse the cache only for resident tiles: a non-persistent decode
+        // drains forward, so a backward/out-of-window swath needs a rebuild.
+        if (hasCachedPostPreload_)
+        {
+            const int reqY1 = swath_y0 + swath_height;
+            const bool within =
+                swath_x0 >= decWinX0_ && swath_y0 >= decWinY0_ &&
+                swath_x0 + swath_width <= decWinX1_ && reqY1 <= decWinY1_;
+            const bool reusable =
+                within && (bCachePersistent_ || swath_y0 >= cacheServedY1_);
+            if (!reusable && !reinitCodec())
+                return rc;
+        }
+
         // After the first decompress completes, tile data stays in the
         // codec's tile cache.  Call grk_decompress_wait() for each
         // swath to get correct tile coordinates and trigger tile
@@ -2711,17 +2849,20 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
                     (swath_y0 + swath_height + th - 1) / th);
             }
 
-            // Call grk_decompress_wait with swath coordinates to
-            // trigger TileCompletion row-based tile cleanup.
-            // This avoids re-calling grk_decompress() which would
-            // create a new TileCompletion that never gets notified.
-            grk_wait_swath sw = {};
-            sw.x0 = cached.x0;
-            sw.y0 = cached.y0;
-            sw.x1 = cached.x1;
-            sw.y1 = cached.y1;
-            grk_decompress_wait(m_codec->pCodec, &sw);
+            // Sync fallback already decoded all; no async queue to wait on.
+            if (!bSyncFallback_)
+            {
+                // grk_decompress_wait() triggers row-based tile cleanup.
+                grk_wait_swath sw = {};
+                sw.x0 = cached.x0;
+                sw.y0 = cached.y0;
+                sw.x1 = cached.x1;
+                sw.y1 = cached.y1;
+                grk_decompress_wait(m_codec->pCodec, &sw);
+            }
 
+            cacheServedY1_ =
+                std::max(cacheServedY1_, static_cast<int>(cached.y1));
             return cached;
         }
 
@@ -2734,8 +2875,111 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
         const bool needPersistentTiles =
             (!this->bSingleTiled && nBandCount > 0 && nBandCount < nTotalComps);
 
+        // Partial read with no AdviseRead: async locks the decode window to
+        // the first swath, corrupting later out-of-window reads. Fall back to
+        // synchronous per-swath decode (slower, but order-safe). Full-image
+        // reads are already safe on the async path.
+        const int nFullX = nParentXSize >> iLevel;
+        const int nFullY = nParentYSize >> iLevel;
+        const bool bPartial = (swath_x0 != 0 || swath_y0 != 0 ||
+                               swath_width < nFullX || swath_height < nFullY);
+        const bool bMissingAdviseRead =
+            bPartial && !this->fullDecompress_ && !bAdviseReadCalled_ &&
+            area_x0_ == 0 && area_y0_ == 0 && area_x1_ == 0 && area_y1_ == 0;
+
+        if (bMissingAdviseRead)
+        {
+            if (!bSwathOnlyWarned_)
+            {
+                bSwathOnlyWarned_ = true;
+                CPLDebug("GROK",
+                         "JP2Grok : partial read of '%s' without prior "
+                         "AdviseRead. Falling back to synchronous "
+                         "per-swath decompression for correctness. "
+                         "Call GDALDataset::AdviseRead() with the "
+                         "target window before the first "
+                         "RasterIO/ReadBlock to recover async "
+                         "performance.",
+                         m_osFilename.c_str());
+            }
+
+            // grk_decompress_update() only works pre-decode; recreate the
+            // codec to retarget the swath.
+            if (initializedAsync && !reinitCodec())
+                return rc;
+
+            grk_decompress_parameters decompressParams = {};
+            decompressParams.asynchronous = false;
+            decompressParams.simulate_synchronous = false;
+            decompressParams.decompress_callback = nullptr;
+            decompressParams.decompress_callback_user_data = nullptr;
+            // Keep tile images cached for CopyTiles.
+            decompressParams.core.tile_cache_strategy = GRK_TILE_CACHE_IMAGE;
+            if (!this->bSingleTiled)
+                decompressParams.core.skip_allocate_composite = true;
+            decompressParams.core.reduce = iLevel;
+            // Decode only the requested swath window (reduced coords).
+            decompressParams.dw_reduced = true;
+            decompressParams.dw_x0 = swath_x0;
+            decompressParams.dw_y0 = swath_y0;
+            decompressParams.dw_x1 = swath_x0 + swath_width;
+            decompressParams.dw_y1 = swath_y0 + swath_height;
+
+            if (!grk_decompress_update(&decompressParams, m_codec->pCodec))
+            {
+                CPLError(CE_Failure, CPLE_AppDefined,
+                         "grk_decompress_update() failed (sync fallback)");
+                return rc;
+            }
+            if (!grk_decompress(m_codec->pCodec, nullptr))
+            {
+                CPLError(CE_Failure, CPLE_AppDefined,
+                         "grk_decompress() failed (sync fallback)");
+                return rc;
+            }
+            initializedAsync = true;
+            bSyncFallback_ = true;
+            bDecodeConsumed_ = true;
+
+            // PostPreload for the swath; CopyTiles runs tile-by-tile, so
+            // rowCopyDone_ stays false.
+            rc.asynch_ = true;
+            rc.rowCopyDone_ = false;
+            rc.x0 = swath_x0;
+            rc.y0 = swath_y0;
+            rc.x1 = swath_x0 + swath_width;
+            rc.y1 = swath_y0 + swath_height;
+
+            const uint32_t tw = m_nTileWidth ? m_nTileWidth : 1;
+            const uint32_t th = m_nTileHeight ? m_nTileHeight : 1;
+            // Size the tile grid from reduced full-image dims; psImage->x1 is
+            // unreliable in sync mode for overview codecs.
+            const uint32_t reducedFullW =
+                static_cast<uint32_t>(nParentXSize >> iLevel);
+            const uint32_t reducedFullH =
+                static_cast<uint32_t>(nParentYSize >> iLevel);
+            rc.num_tile_cols =
+                static_cast<uint16_t>((reducedFullW + tw - 1) / tw);
+            rc.tile_x0 = static_cast<uint16_t>(swath_x0 / tw);
+            rc.tile_y0 = static_cast<uint16_t>(swath_y0 / th);
+            rc.tile_x1 = static_cast<uint16_t>(
+                std::min<uint32_t>((swath_x0 + swath_width + tw - 1) / tw,
+                                   (reducedFullW + tw - 1) / tw));
+            rc.tile_y1 = static_cast<uint16_t>(
+                std::min<uint32_t>((swath_y0 + swath_height + th - 1) / th,
+                                   (reducedFullH + th - 1) / th));
+
+            // Don't cache: the next swath must recreate the codec for its
+            // own window.
+            return rc;
+        }
+
         if (!initializedAsync)
         {
+            // Spent codec from a prior decode cannot be retargeted; rebuild.
+            if (bDecodeConsumed_ && !reinitCodec())
+                return rc;
+
             grk_decompress_parameters decompressParams = {};
             decompressParams.asynchronous = true;
             decompressParams.simulate_synchronous = true;
@@ -2758,6 +3002,8 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
                 if (area_x0_ == 0 && area_y0_ == 0 && area_x1_ == 0 &&
                     area_y1_ == 0)
                 {
+                    // No AdviseRead, but this swath covers the full image;
+                    // use it as the decode window.
                     decompressParams.dw_x0 = swath_x0;
                     decompressParams.dw_y0 = swath_y0;
                     decompressParams.dw_x1 = swath_x0 + swath_width;
@@ -2770,6 +3016,24 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
                     decompressParams.dw_x1 = area_x1_;
                     decompressParams.dw_y1 = area_y1_;
                 }
+            }
+
+            // Record decoded window + tile strategy for cache-reuse checks.
+            bCachePersistent_ = needPersistentTiles;
+            cacheServedY1_ = 0;
+            if (this->fullDecompress_)
+            {
+                decWinX0_ = 0;
+                decWinY0_ = 0;
+                decWinX1_ = nFullX;
+                decWinY1_ = nFullY;
+            }
+            else
+            {
+                decWinX0_ = static_cast<int>(decompressParams.dw_x0);
+                decWinY0_ = static_cast<int>(decompressParams.dw_y0);
+                decWinX1_ = static_cast<int>(decompressParams.dw_x1);
+                decWinY1_ = static_cast<int>(decompressParams.dw_y1);
             }
 
             if (!grk_decompress_update(&decompressParams, m_codec->pCodec))
@@ -2785,6 +3049,7 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
                 return rc;
             }
             initializedAsync = true;
+            bDecodeConsumed_ = true;
         }
 
         // For multi-tile images, wait row-by-row to advance
@@ -2865,6 +3130,7 @@ struct JP2GRKDatasetBase : public JP2DatasetBase
 
         cachedPostPreload_ = rc;
         hasCachedPostPreload_ = true;
+        cacheServedY1_ = std::max(cacheServedY1_, static_cast<int>(rc.y1));
 
         return rc;
     }

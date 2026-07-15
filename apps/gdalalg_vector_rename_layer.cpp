@@ -110,12 +110,13 @@ class GDALVectorRenameLayerAlgorithmLayer final
 
     CPL_DISALLOW_COPY_ASSIGN(GDALVectorRenameLayerAlgorithmLayer)
 
-    void TranslateFeature(
+    bool TranslateFeature(
         std::unique_ptr<OGRFeature> poSrcFeature,
         std::vector<std::unique_ptr<OGRFeature>> &apoOutFeatures) override
     {
         poSrcFeature->SetFDefnUnsafe(m_poFeatureDefn.get());
         apoOutFeatures.push_back(std::move(poSrcFeature));
+        return true;
     }
 
   public:
@@ -301,9 +302,8 @@ bool GDALVectorRenameLayerAlgorithm::RunStep(GDALPipelineStepRunContext &)
     std::map<std::string, int> oMapCountNames;
     bool bNonUniqueNames = false;
     const int nLayerCount = poSrcDS->GetLayerCount();
-    for (int i = 0; i < nLayerCount; ++i)
+    for (const OGRLayer *poSrcLayer : poSrcDS->GetLayers())
     {
-        const OGRLayer *poSrcLayer = poSrcDS->GetLayer(i);
         if ((m_inputLayerName == poSrcLayer->GetDescription() ||
              nLayerCount == 1) &&
             !m_outputLayerName.empty())
@@ -409,9 +409,9 @@ bool GDALVectorRenameLayerAlgorithm::RunStep(GDALPipelineStepRunContext &)
         *poSrcDS, aosNames);
 
     // Final pass to create output layers
-    for (int i = 0; i < nLayerCount; ++i)
+    size_t i = 0;
+    for (OGRLayer *poSrcLayer : poSrcDS->GetLayers())
     {
-        OGRLayer *poSrcLayer = poSrcDS->GetLayer(i);
         if (poSrcLayer->GetDescription() != aosNames[i])
         {
             auto poLayer =
@@ -426,6 +426,7 @@ bool GDALVectorRenameLayerAlgorithm::RunStep(GDALPipelineStepRunContext &)
                 std::make_unique<GDALVectorPipelinePassthroughLayer>(
                     *poSrcLayer));
         }
+        ++i;
     }
 
     m_outputDataset.Set(std::move(outDS));

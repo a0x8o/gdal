@@ -339,8 +339,16 @@ def test_ogr_dgn_encoding(tmp_path):
         f = lyr.GetNextFeature()
         assert f["Text"] == "\xe9ven"  # ISO-8859-1
 
-    with gdal.OpenEx(filename, open_options=["ENCODING=ISO-8859-1"]) as ds:
+    with gdal.Open(filename, open_options=["ENCODING=ISO-8859-1"]) as ds:
         lyr = ds.GetLayer(0)
         assert lyr.TestCapability(ogr.OLCStringsAsUTF8) == 1
         f = lyr.GetNextFeature()
         assert f["Text"] == "\xc3\xa9ven"  # UTF-8
+
+
+def test_ogr_dgn_knot_oob():
+
+    ds = ogr.Open("data/dgn/knot_oob.dgn")
+    lyr = ds.GetLayer(0)
+    with pytest.raises(Exception, match="attr_bytes < 0"):
+        lyr.GetNextFeature()

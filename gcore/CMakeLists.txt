@@ -65,6 +65,7 @@ target_sources(gcore PRIVATE
   multidim/gdalmultidim_array_gltorthorectification.cpp
   multidim/gdalmultidim_array_gridded.cpp
   multidim/gdalmultidim_array_mask.cpp
+  multidim/gdalmultidim_array_maths.cpp
   multidim/gdalmultidim_array_meshgrid.cpp
   multidim/gdalmultidim_array_regularly_spaced.cpp
   multidim/gdalmultidim_array_resampled.cpp
@@ -111,6 +112,12 @@ set_property(TARGET gcore PROPERTY POSITION_INDEPENDENT_CODE ${GDAL_OBJECT_LIBRA
 if (GDAL_ENABLE_DRIVER_GTIFF)
   target_include_directories(gcore PRIVATE $<TARGET_PROPERTY:gdal_GTIFF,SOURCE_DIR>)
   target_compile_definitions(gcore PRIVATE -DHAVE_TIFF)
+
+  if (GDAL_USE_TIFF_INTERNAL)
+      target_include_directories(gcore PRIVATE $<TARGET_PROPERTY:libtiff,SOURCE_DIR>)
+  else()
+      target_include_directories(gcore PRIVATE $<TARGET_PROPERTY:TIFF::TIFF,INTERFACE_INCLUDE_DIRECTORIES>)
+  endif()
 endif()
 
 if (GDAL_ENABLE_ALGORITHMS)

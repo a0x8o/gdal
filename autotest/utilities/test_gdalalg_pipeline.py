@@ -53,7 +53,7 @@ def test_gdalalg_pipeline_read_and_write_vector(tmp_vsimem):
     )
     assert last_pct[0] == 1.0
 
-    with gdal.OpenEx(out_filename) as ds:
+    with gdal.Open(out_filename) as ds:
         assert ds.GetLayer(0).GetFeatureCount() == 10
 
 
@@ -84,13 +84,13 @@ def test_gdalalg_pipeline_read_and_write_raster(tmp_vsimem):
         )
     assert last_pct[0] == 1.0
 
-    with gdal.OpenEx(out_filename) as ds:
+    with gdal.Open(out_filename) as ds:
         assert ds.GetRasterBand(1).Checksum() == 4672
 
 
 def test_gdalalg_pipeline_read_and_write_vector_from_object():
 
-    src_ds = gdal.OpenEx("../ogr/data/poly.shp")
+    src_ds = gdal.Open("../ogr/data/poly.shp")
     with gdal.Run(
         "pipeline",
         input=src_ds,
@@ -318,7 +318,7 @@ def test_gdal_pipeline_vector_output_to_gdalg(tmp_path, gdal_path):
     }
 
     if gdal.GetDriverByName("GDALG"):
-        ds = gdal.OpenEx(out_filename)
+        ds = gdal.Open(out_filename)
         assert ds.GetLayer(0).GetFeatureCount() == 10
 
 
@@ -835,6 +835,18 @@ def test_gdalalg_pipeline_nested_nominal():
         ]
 
 
+def test_gdalalg_pipeline_inner_pipeline_vrt(tmp_path):
+    """Test bugfix for https://github.com/OSGeo/gdal/issues/14732"""
+
+    shutil.copy("data/color_file.txt", tmp_path)
+
+    with gdal.alg.pipeline(
+        pipeline=f"read ../gcore/data/byte.tif ! blend --overlay [ read ../gcore/data/byte.tif ! color-map --color-map {tmp_path}/color_file.txt ]"
+    ) as alg:
+        ds = alg.Output()
+        assert ds.GetRasterBand(1).Checksum() == 4475
+
+
 def test_gdalalg_pipeline_nested_serialize_to_gdalg(tmp_vsimem):
 
     out_filename = tmp_vsimem / "out.gdalg.json"
@@ -1114,6 +1126,14 @@ def test_gdalalg_pipeline_invalid_last_step(gdal_path):
     )
 
     assert "Last step should be 'write', " in err
+    # Ensure there are no duplicated steps
+    pos = err.find("Last step should be ")
+    err = err[pos + len("Last step should be ") :]
+    err = err.replace("\r\n", "\n")
+    err = err[0 : err.find("\n")]
+    steps = err.replace(" or ", ", ")
+    steps = steps.split(", ")
+    assert len(steps) == len(set(steps))
 
 
 def test_gdalalg_pipeline_tee_output_string(tmp_vsimem):
@@ -1289,7 +1309,7 @@ def test_gdalalg_pipeline_raster_and_clip_vector(tmp_vsimem, tmp_path):
         pipeline=f"read ../gcore/data/byte.tif ! clip --input {byte_shp} --like _PIPE_ ! write {tmp_vsimem}/out.shp"
     )
 
-    with gdal.OpenEx(byte_shp) as src_ds, gdal.OpenEx(tmp_vsimem / "out.shp") as ds:
+    with gdal.Open(byte_shp) as src_ds, gdal.Open(tmp_vsimem / "out.shp") as ds:
         assert ds.GetLayer(0).GetFeatureCount() == src_ds.GetLayer(0).GetFeatureCount()
 
 
@@ -1305,7 +1325,7 @@ def test_gdalalg_pipeline_raster_and_clip_vector_from_inner_pipeline(
         pipeline=f"read ../gcore/data/byte.tif ! clip --input [ read {byte_shp} ] --like _PIPE_ ! write {tmp_vsimem}/out.shp"
     )
 
-    with gdal.OpenEx(byte_shp) as src_ds, gdal.OpenEx(tmp_vsimem / "out.shp") as ds:
+    with gdal.Open(byte_shp) as src_ds, gdal.Open(tmp_vsimem / "out.shp") as ds:
         assert ds.GetLayer(0).GetFeatureCount() == src_ds.GetLayer(0).GetFeatureCount()
 
 

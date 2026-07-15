@@ -239,6 +239,9 @@ struct GDALWarpAppOptions
 
     /*! Used when using a temporary TIFF file while warping */
     bool bDeleteOutputFileOnceCreated = false;
+
+    /*! set to true to customize error messages when called from "new" (GDAL 3.11) CLI or Algorithm API */
+    bool bInvokedFromGdalAlgorithm = false;
 };
 
 static CPLErr
@@ -396,12 +399,13 @@ static CPLString GetSrcDSProjection(GDALDatasetH hDS, CSLConstList papszTO)
     {
         pszProjection = GDALGetGCPProjection(hDS);
     }
-    else if (GDALGetMetadata(hDS, "RPC") != nullptr &&
-             (pszMethod == nullptr || EQUAL(pszMethod, "RPC")))
+    else if (GDALGetMetadata(hDS, GDAL_MDD_RPC) != nullptr &&
+             (pszMethod == nullptr || EQUAL(pszMethod, GDAL_MDD_RPC)))
     {
         pszProjection = SRS_WKT_WGS84_LAT_LONG;
     }
-    else if ((papszMD = GDALGetMetadata(hDS, "GEOLOCATION")) != nullptr &&
+    else if ((papszMD = GDALGetMetadata(hDS, GDAL_MDD_GEOLOCATION)) !=
+                 nullptr &&
              (pszMethod == nullptr || EQUAL(pszMethod, "GEOLOC_ARRAY")))
     {
         pszProjection = CSLFetchNameValue(papszMD, "SRS");
@@ -919,9 +923,14 @@ static bool DealWithCOGOptions(CPLStringList &aosCreateOptions, int nSrcCount,
             oSRS2.SetFromUserInput(osTargetSRS.c_str());
             if (!oSRS1.IsSame(&oSRS2))
             {
+                const char *pszOutputArg = psOptions->bInvokedFromGdalAlgorithm
+                                               ? "--output-crs"
+                                               : "-t_srs";
+
                 CPLError(CE_Failure, CPLE_AppDefined,
                          "Target SRS implied by COG creation options is not "
-                         "the same as the one specified by -t_srs");
+                         "the same as the one specified by %s",
+                         pszOutputArg);
                 return false;
             }
         }
@@ -2234,8 +2243,9 @@ static bool AdjustOutputExtentForRPC(GDALDatasetH hSrcDS, GDALDatasetH hDstDS,
 {
     if (CPLTestBool(CSLFetchNameValueDef(psWO->papszWarpOptions,
                                          "SKIP_NOSOURCE", "NO")) &&
-        GDALGetMetadata(hSrcDS, "RPC") != nullptr &&
-        EQUAL(FetchSrcMethod(psOptions->aosTransformerOptions, "RPC"), "RPC") &&
+        GDALGetMetadata(hSrcDS, GDAL_MDD_RPC) != nullptr &&
+        EQUAL(FetchSrcMethod(psOptions->aosTransformerOptions, GDAL_MDD_RPC),
+              GDAL_MDD_RPC) &&
         CPLTestBool(
             CPLGetConfigOption("RESTRICT_OUTPUT_DATASET_UPDATE", "YES")))
     {
@@ -2547,8 +2557,9 @@ GDALWarpDirect(const char *pszDest, GDALDatasetH hDstDS, int nSrcCount,
 
         // For RPC warping add a few extra source pixels by default
         // (probably mostly needed in the RPC DEM case)
-        if (iSrc == 0 && (GDALGetMetadata(hSrcDS, "RPC") != nullptr &&
-                          (pszMethod == nullptr || EQUAL(pszMethod, "RPC"))))
+        if (iSrc == 0 &&
+            (GDALGetMetadata(hSrcDS, GDAL_MDD_RPC) != nullptr &&
+             (pszMethod == nullptr || EQUAL(pszMethod, GDAL_MDD_RPC))))
         {
             if (!psOptions->aosWarpOptions.FetchNameValue("SOURCE_EXTRA"))
             {
@@ -3395,7 +3406,7 @@ static GDALDatasetH GDALWarpCreateOutput(
             ((GetMaxLat() > MAX_LAT && GetMinLat() < MAX_LAT) ||
              (GetMaxLat() > -MAX_LAT && GetMinLat() < -MAX_LAT)) &&
             GDALGetMetadata(hSrcDS, "GEOLOC_ARRAY") == nullptr &&
-            GDALGetMetadata(hSrcDS, "RPC") == nullptr)
+            GDALGetMetadata(hSrcDS, GDAL_MDD_RPC) == nullptr)
         {
             auto poCT = std::unique_ptr<OGRCoordinateTransformation>(
                 OGRCreateCoordinateTransformation(&oSrcSRS, &oDstSRS));
@@ -4096,7 +4107,7 @@ static GDALDatasetH GDALWarpCreateOutput(
             adfThisGeoTransformTmp[2] == 0 && adfThisGeoTransformTmp[4] == 0 &&
             adfThisGeoTransformTmp[5] < 0 &&
             GDALGetMetadata(hSrcDS, "GEOLOC_ARRAY") == nullptr &&
-            GDALGetMetadata(hSrcDS, "RPC") == nullptr)
+            GDALGetMetadata(hSrcDS, GDAL_MDD_RPC) == nullptr)
         {
             bool bIsSameHorizontal = osThisSourceSRS == osThisTargetSRS;
             if (!bIsSameHorizontal)
@@ -4598,7 +4609,7 @@ static GDALDatasetH GDALWarpCreateOutput(
             {
                 const char *pszAlpha =
                     GDALGetMetadataItem(GDALGetRasterBand(pahSrcDS[0], 4),
-                                        "ALPHA", "IMAGE_STRUCTURE");
+                                        "ALPHA", GDAL_MDD_IMAGE_STRUCTURE);
                 if (pszAlpha)
                 {
                     aosCreateOptions.SetNameValue("ALPHA", pszAlpha);
@@ -4772,13 +4783,24 @@ static GDALDatasetH GDALWarpCreateOutput(
                     if (OGRProjCTDifferentOperationsUsed(
                             psRTI->poReverseTransform))
                     {
+                        const char *pszTransformOption =
+                            psOptions->bInvokedFromGdalAlgorithm
+                                ? "--transform-option"
+                                : "-to";
+                        const char *pszCoordinateOperation =
+                            psOptions->bInvokedFromGdalAlgorithm
+                                ? ""
+                                : ", or specify a particular coordinate "
+                                  "operation with -ct";
+
                         CPLError(
                             CE_Warning, CPLE_AppDefined,
                             "Several coordinate operations are going to be "
                             "used. Artifacts may appear. You may consider "
-                            "using the -to ALLOW_BALLPARK=NO and/or "
-                            "-to ONLY_BEST=YES transform options, or specify "
-                            "a particular coordinate operation with -ct");
+                            "using the %s ALLOW_BALLPARK=NO and/or "
+                            "%s ONLY_BEST=YES transform options%s",
+                            pszTransformOption, pszTransformOption,
+                            pszCoordinateOperation);
                     }
 
                     // Stop recording
@@ -5146,8 +5168,8 @@ static CPLErr TransformCutlineToSource(GDALDataset *poSrcDS,
     /* -------------------------------------------------------------------- */
     bool bMayNeedDensify = true;
     if (poRasterSRS && poCutlineSRS && poRasterSRS->IsSame(poCutlineSRS) &&
-        poSrcDS->GetGCPCount() == 0 && !poSrcDS->GetMetadata("RPC") &&
-        !poSrcDS->GetMetadata("GEOLOCATION") &&
+        poSrcDS->GetGCPCount() == 0 && !poSrcDS->GetMetadata(GDAL_MDD_RPC) &&
+        !poSrcDS->GetMetadata(GDAL_MDD_GEOLOCATION) &&
         !CSLFetchNameValue(papszTO_In, "GEOLOC_ARRAY") &&
         !CSLFetchNameValue(papszTO_In, "SRC_GEOLOC_ARRAY"))
     {
@@ -5708,7 +5730,7 @@ GDALWarpAppOptionsGetParser(GDALWarpAppOptions *psOptions,
                 {
                     CheckSingleMethod();
                     psOptions->aosTransformerOptions.SetNameValue("SRC_METHOD",
-                                                                  "RPC");
+                                                                  GDAL_MDD_RPC);
                 })
             .help(_("Force use of RPCs."));
 
@@ -6032,6 +6054,11 @@ GDALWarpAppOptionsGetParser(GDALWarpAppOptions *psOptions,
         .append()
         .store_into(psOptions->anDstBands)
         .help(_("Specify the output band number in which to warp."));
+
+    // Undocumented option used by gdal vector * algorithms
+    argParser->add_argument("--invoked-from-gdal-algorithm")
+        .store_into(psOptions->bInvokedFromGdalAlgorithm)
+        .hidden();
 
     if (psOptionsForBinary)
     {
