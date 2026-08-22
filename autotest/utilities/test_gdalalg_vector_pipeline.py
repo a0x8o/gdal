@@ -713,7 +713,7 @@ def test_gdalalg_vector_pipeline_reproject_no_arg(tmp_vsimem):
     pipeline = get_pipeline_alg()
     with pytest.raises(
         Exception,
-        match="reproject: Required argument 'output-crs' has not been specified",
+        match="reproject: Must specify --output-crs or --like",
     ):
         pipeline.ParseRunAndFinalize(
             [
@@ -968,7 +968,7 @@ def test_gdalalg_vector_pipeline_help():
     out = gdaltest.runexternal(
         f"{gdal_path} vector pipeline read foo.shp ! select --help"
     )
-    assert out.startswith("Usage: select [OPTIONS] [<FIELDS>]")
+    assert out.startswith("Usage: select [OPTIONS]")
 
 
 def test_gdalalg_vector_pipeline_skip_errors(tmp_vsimem):

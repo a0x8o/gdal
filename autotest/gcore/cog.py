@@ -2269,3 +2269,44 @@ def test_cog_algorithm_driver_cog_validate():
         Exception, match="data/byte.tif is NOT a valid cloud optimized GeoTIFF"
     ):
         gdal.alg.driver.cog.validate(dataset="data/byte.tif")
+
+
+###############################################################################
+
+
+def test_cog_build_overviews(tmp_vsimem):
+
+    with gdal.config_option("GDAL_NUM_THREADS", "2"):
+        with gdal.GetDriverByName("COG").Create(
+            tmp_vsimem / "cog_ovw.tif",
+            1000,
+            1000,
+            3,
+            gdal.GDT_UInt8,
+            dict(OVERVIEWS="NONE"),
+        ) as ds:
+            ds.WriteRaster(0, 0, 1000, 1000, b"\xff" * (1000 * 1000 * 3))
+            ds.BuildOverviews("NEAR", [2])
+            assert ds.GetRasterBand(1).GetOverview(0).ComputeRasterMinMax(False) == (
+                255,
+                255,
+            )
+
+
+###############################################################################
+
+
+def test_cog_create_float32(tmp_vsimem):
+    with gdal.GetDriverByName("COG").Create(
+        tmp_vsimem / "tmp.tif",
+        1,
+        1,
+        1,
+        gdal.GDT_Float32,
+        dict(OVERVIEWS="NONE"),
+    ) as ds:
+        assert ds.GetRasterBand(1).DataType == gdal.GDT_Float32
+        ds.GetRasterBand(1).WriteRaster(0, 0, 1, 1, struct.pack("f", 1.5))
+    ds = gdal.Open(tmp_vsimem / "tmp.tif")
+    assert ds.GetRasterBand(1).DataType == gdal.GDT_Float32
+    assert ds.GetRasterBand(1).ComputeRasterMinMax(False) == (1.5, 1.5)

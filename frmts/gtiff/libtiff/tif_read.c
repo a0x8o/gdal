@@ -1487,7 +1487,13 @@ int TIFFReadBufferSetup(TIFF *tif, void *bp, tmsize_t size)
 {
     static const char module[] = "TIFFReadBufferSetup";
 
-    assert((tif->tif_flags & TIFF_NOREADRAW) == 0);
+    if (tif->tif_flags & TIFF_NOREADRAW)
+    {
+        TIFFErrorExtR(tif, module,
+                      "Compression scheme does not support access to raw "
+                      "uncompressed data");
+        return (0);
+    }
     tif->tif_flags &= ~TIFF_BUFFERMMAP;
 
     if (tif->tif_rawdata)
@@ -1587,6 +1593,7 @@ static int TIFFStartTile(TIFF *tif, uint32_t tile)
     static const char module[] = "TIFFStartTile";
     TIFFDirectory *td = &tif->tif_dir;
     uint32_t howmany32;
+    uint32_t tilemod;
 
     if ((tif->tif_flags & TIFF_CODERSETUP) == 0)
     {
@@ -1606,14 +1613,41 @@ static int TIFFStartTile(TIFF *tif, uint32_t tile)
         TIFFErrorExtR(tif, module, "Zero tiles");
         return 0;
     }
-    tif->tif_dir.td_row = (tile % howmany32) * td->td_tilelength;
+    tilemod = tile % howmany32;
+    if (td->td_tilelength == 0)
+    {
+        TIFFErrorExtR(tif, module, "Zero tilelength");
+        return 0;
+    }
+    if (tilemod == 0)
+    {
+        tif->tif_dir.td_row = 0;
+    }
+    else
+    {
+        tif->tif_dir.td_row =
+            _TIFFMultiply32(tif, tilemod, td->td_tilelength, module);
+        if (tif->tif_dir.td_row == 0)
+            return 0;
+    }
     howmany32 = TIFFhowmany_32(td->td_imagelength, td->td_tilelength);
     if (howmany32 == 0)
     {
         TIFFErrorExtR(tif, module, "Zero tiles");
         return 0;
     }
-    tif->tif_dir.td_col = (tile % howmany32) * td->td_tilewidth;
+    tilemod = tile % howmany32;
+    if (tilemod == 0)
+    {
+        tif->tif_dir.td_col = 0;
+    }
+    else
+    {
+        tif->tif_dir.td_col =
+            _TIFFMultiply32(tif, tilemod, td->td_tilewidth, module);
+        if (tif->tif_dir.td_col == 0)
+            return 0;
+    }
     tif->tif_flags &= ~TIFF_BUF4WRITE;
     if (tif->tif_flags & TIFF_NOREADRAW)
     {

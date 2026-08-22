@@ -1677,8 +1677,7 @@ CPLHTTPResult *CPLHTTPFetchEx(const char *pszURL, CSLConstList papszOptions,
                 psResult->nStatus = 0;
                 bSkipError = true;
             }
-            else if (CPLTestBool(
-                         CPLGetConfigOption("CPL_CURL_IGNORE_ERROR", "NO")))
+            else if (CPLTestConfigOption("CPL_CURL_IGNORE_ERROR"))
             {
                 psResult->nStatus = 0;
                 bSkipError = true;
@@ -1724,7 +1723,7 @@ CPLHTTPResult *CPLHTTPFetchEx(const char *pszURL, CSLConstList papszOptions,
 /*                        CPLMultiPerformWait()                         */
 /************************************************************************/
 
-bool CPLMultiPerformWait(void *hCurlMultiHandleIn, int & /*repeats*/)
+bool CPLMultiPerformWait(void *hCurlMultiHandleIn)
 {
     CURLM *hCurlMultiHandle = static_cast<CURLM *>(hCurlMultiHandleIn);
 
@@ -1940,7 +1939,6 @@ CPLHTTPResult **CPLHTTPMultiFetch(const char *const *papszURL, int nURLCount,
         curl_multi_add_handle(hCurlMultiHandle, asHandles[iCurRequest]);
     }
 
-    int repeats = 0;
     void *old_handler = CPLHTTPIgnoreSigPipe();
     while (true)
     {
@@ -1977,7 +1975,7 @@ CPLHTTPResult **CPLHTTPMultiFetch(const char *const *papszURL, int nURLCount,
         } while (msg);
 
         if (!bRequestsAdded)
-            CPLMultiPerformWait(hCurlMultiHandle, repeats);
+            CPLMultiPerformWait(hCurlMultiHandle);
     }
     CPLHTTPRestoreSigPipeHandler(old_handler);
 
@@ -2096,7 +2094,7 @@ static int CPLHTTPCurlDebugFunction(CURL *handle, curl_infotype type,
         pszDebugKey = "CURL_INFO_HEADER_IN";
     }
     else if (type == CURLINFO_DATA_IN &&
-             CPLTestBool(CPLGetConfigOption("CPL_CURL_VERBOSE_DATA_IN", "NO")))
+             CPLTestConfigOption("CPL_CURL_VERBOSE_DATA_IN"))
     {
         pszDebugKey = "CURL_INFO_DATA_IN";
     }
@@ -2131,7 +2129,7 @@ void *CPLHTTPSetOptions(void *pcurl, const char *pszURL,
 
     unchecked_curl_easy_setopt(http_handle, CURLOPT_URL, pszURL);
 
-    if (CPLTestBool(CPLGetConfigOption("CPL_CURL_VERBOSE", "NO")))
+    if (CPLTestConfigOption("CPL_CURL_VERBOSE"))
     {
         unchecked_curl_easy_setopt(http_handle, CURLOPT_VERBOSE, 1);
 

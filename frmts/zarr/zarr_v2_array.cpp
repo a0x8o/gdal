@@ -1936,15 +1936,11 @@ ZarrV2Group::LoadArray(const std::string &osArrayName,
                 GDALCopyWords(&nNoDataValue, GDT_Int64, 0, &abyNoData[0],
                               oType.GetNumericDataType(), 0, 1);
             }
-            else if (oType.GetNumericDataType() == GDT_UInt64 &&
-                     /* we can't really deal with nodata value between */
-                     /* int64::max and uint64::max due to json-c limitations */
-                     dfNoDataValue >= 0)
+            else if (oType.GetNumericDataType() == GDT_UInt64)
             {
-                const int64_t nNoDataValue =
-                    static_cast<int64_t>(oFillValue.ToLong());
+                const uint64_t nNoDataValue = oFillValue.ToUInt64();
                 abyNoData.resize(oType.GetSize());
-                GDALCopyWords(&nNoDataValue, GDT_Int64, 0, &abyNoData[0],
+                GDALCopyWords(&nNoDataValue, GDT_UInt64, 0, &abyNoData[0],
                               oType.GetNumericDataType(), 0, 1);
             }
             else
@@ -2032,10 +2028,8 @@ ZarrV2Group::LoadArray(const std::string &osArrayName,
                 CPLError(CE_Failure, CPLE_AppDefined, "Missing filter id");
                 return nullptr;
             }
-            if (!EQUAL(osFilterId.c_str(), "shuffle") &&
-                !EQUAL(osFilterId.c_str(), "quantize") &&
-                !EQUAL(osFilterId.c_str(), "fixedscaleoffset") &&
-                !EQUAL(osFilterId.c_str(), "bitround"))
+            if (osFilterId != "shuffle" && osFilterId != "quantize" &&
+                osFilterId != "fixedscaleoffset" && osFilterId != "bitround")
             {
                 const auto psFilterCompressor =
                     CPLGetCompressor(osFilterId.c_str());
