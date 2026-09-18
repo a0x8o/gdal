@@ -957,7 +957,8 @@ OGRFeature *OGRSQLiteLayer::GetNextRawFeature()
                 poFeature->SetGeomFieldDirectly(iField, poGeometry);
             }
         }
-        else if (!(nSQLite3Type == SQLITE_TEXT || nSQLite3Type == SQLITE_BLOB))
+        else if (!(nSQLite3Type == SQLITE_TEXT || nSQLite3Type == SQLITE_BLOB ||
+                   nSQLite3Type == SQLITE_NULL))
         {
             bUnexpectedType = true;
         }
@@ -3596,7 +3597,7 @@ OGRErr OGRSQLiteLayer::ExportSpatiaLiteGeometry(
 /*                           TestCapability()                           */
 /************************************************************************/
 
-int OGRSQLiteLayer::TestCapability(const char *pszCap) const
+bool OGRSQLiteLayer::TestCapability(const char *pszCap) const
 
 {
     if (EQUAL(pszCap, OLCRandomRead))

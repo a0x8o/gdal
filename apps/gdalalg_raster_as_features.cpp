@@ -107,6 +107,10 @@ class GDALRasterAsFeaturesLayer final
           m_includeRowCol(options.includeRowCol),
           m_excludeNoDataPixels(options.skipNoData)
     {
+        // Features are read lazily from m_ds, so keep it alive as long as
+        // this layer is.
+        m_ds.Reference();
+
         // TODO: Handle Int64, UInt64
         m_ds.GetGeoTransform(m_gt);
 
@@ -167,6 +171,11 @@ class GDALRasterAsFeaturesLayer final
         GDALRasterAsFeaturesLayer::ResetReading();
     }
 
+    ~GDALRasterAsFeaturesLayer() override
+    {
+        m_ds.ReleaseRef();
+    }
+
     void ResetReading() override
     {
         if (m_ds.GetRasterCount() > 0)
@@ -178,7 +187,7 @@ class GDALRasterAsFeaturesLayer final
         }
     }
 
-    int TestCapability(const char *pszCap) const override
+    bool TestCapability(const char *pszCap) const override
     {
         return EQUAL(pszCap, OLCFastFeatureCount) &&
                m_poFilterGeom == nullptr && m_poAttrQuery == nullptr &&

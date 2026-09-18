@@ -507,6 +507,10 @@ inline void OGRArrowWriterLayer::CreateSchemaCommon()
 
                         oMetadataDoc.GetRoot().Add("crs", oCRSRoot);
                     }
+                    else
+                    {
+                        oMetadataDoc.GetRoot().Add("crs", "srid:0");
+                    }
 
                     if (m_bEdgesSpherical)
                     {
@@ -2387,7 +2391,7 @@ inline GIntBig OGRArrowWriterLayer::GetFeatureCount(int bForce)
 /*                           TestCapability()                           */
 /************************************************************************/
 
-inline int OGRArrowWriterLayer::TestCapability(const char *pszCap) const
+inline bool OGRArrowWriterLayer::TestCapability(const char *pszCap) const
 {
     if (EQUAL(pszCap, OLCCreateField) || EQUAL(pszCap, OLCCreateGeomField))
         return m_poSchema == nullptr;

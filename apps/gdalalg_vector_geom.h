@@ -83,7 +83,7 @@ class GDALVectorGeomOneToOneAlgorithmLayer /* non final */
         return TranslateFeature(std::move(poSrcFeature)).release();
     }
 
-    int TestCapability(const char *pszCap) const override
+    bool TestCapability(const char *pszCap) const override
     {
         if (EQUAL(pszCap, OLCRandomRead) || EQUAL(pszCap, OLCCurveGeometries) ||
             EQUAL(pszCap, OLCMeasuredGeometries) ||
@@ -167,7 +167,8 @@ class GDALGeosNonStreamingAlgorithmLayer
 
     std::unique_ptr<OGRFeature> GetNextProcessedFeature() override;
 
-    virtual bool ProcessGeos() = 0;
+    virtual bool ProcessGeos(GDALProgressFunc pfnProgress,
+                             void *pProgressData) = 0;
 
     /// Whether the operation should fail if non-polygonal geometries are present
     virtual bool PolygonsOnly() const = 0;

@@ -25,6 +25,7 @@ from osgeo import gdal, ogr, osr
 pytestmark = pytest.mark.require_driver("Parquet")
 
 GEOPARQUET_1_1_0_JSON_SCHEMA = "data/parquet/schema_1_1_0.json"
+GEOPARQUET_2_0_0_JSON_SCHEMA = "data/parquet/schema_2_0_0.json"
 
 
 ###############################################################################
@@ -60,14 +61,14 @@ def _has_validate():
     return True
 
 
-def _validate(filename, check_data=False):
+def _validate(filename, check_data=False, local_schema=GEOPARQUET_1_1_0_JSON_SCHEMA):
     if not _has_validate():
         return
 
     import validate_geoparquet
 
     ret = validate_geoparquet.check(
-        filename, check_data=check_data, local_schema=GEOPARQUET_1_1_0_JSON_SCHEMA
+        filename, check_data=check_data, local_schema=local_schema
     )
     assert not ret
 
@@ -634,10 +635,10 @@ def test_ogr_parquet_test_ogrsf_all_geoms_with_arrow_dataset():
     [(False, None, None, True), (False, None, None, "ONLY"), (True, 2, "fid", False)],
 )
 def test_ogr_parquet_write_from_another_dataset(
-    use_vsi, row_group_size, fid, use_parquet_geo_types
+    tmp_path, use_vsi, row_group_size, fid, use_parquet_geo_types
 ):
 
-    outfilename = "/vsimem/out.parquet" if use_vsi else "tmp/out.parquet"
+    outfilename = "/vsimem/out.parquet" if use_vsi else str(tmp_path / "out.parquet")
     layerCreationOptions = []
     if row_group_size:
         layerCreationOptions.append("ROW_GROUP_SIZE=" + str(row_group_size))
@@ -2982,7 +2983,7 @@ def test_ogr_parquet_check_geom_column_schema_metadata():
 
 ###############################################################################
 # Check that we recognize the geometry field just from the presence of
-# a ARROW:extension:name == ogc.wkb column on it
+# an ARROW:extension:name == ogc.wkb column on it
 
 
 def test_ogr_parquet_recognize_geo_from_arrow_extension_name():
@@ -4584,6 +4585,137 @@ def test_ogr_parquet_test_ogrsf_parquet_geometry():
 
     assert "INFO" in ret
     assert "ERROR" not in ret
+
+
+###############################################################################
+
+
+@pytest.mark.skipif(
+    not _parquet_has_geo_types(),
+    reason="requires libarrow >= 21",
+)
+def test_ogr_parquet_write_geoparquet_2_0_error(tmp_vsimem):
+
+    with gdal.GetDriverByName("Parquet").CreateVector(tmp_vsimem / "out.parquet") as ds:
+        with pytest.raises(
+            Exception,
+            match="GEOPARQUET_VERSION = 2.0 is not compatible with USE_PARQUET_GEO_TYPES = NO",
+        ):
+            ds.CreateLayer(
+                "test",
+                srs=osr.SpatialReference(epsg=4326),
+                options=["GEOPARQUET_VERSION=2.0", "USE_PARQUET_GEO_TYPES=NO"],
+            )
+
+
+###############################################################################
+
+
+@pytest.mark.skipif(
+    not _parquet_has_geo_types(),
+    reason="requires libarrow >= 21",
+)
+def test_ogr_parquet_write_geoparquet_2_0_epsg_4326(tmp_vsimem):
+
+    with gdal.GetDriverByName("Parquet").CreateVector(tmp_vsimem / "out.parquet") as ds:
+        lyr = ds.CreateLayer(
+            "test",
+            srs=osr.SpatialReference(epsg=4326),
+            options=["GEOPARQUET_VERSION=2.0"],
+        )
+        lyr.SetMetadataItem("EDGES", "SPHERICAL")
+
+    _validate(tmp_vsimem / "out.parquet", local_schema=GEOPARQUET_2_0_0_JSON_SCHEMA)
+
+    with gdal.Open(tmp_vsimem / "out.parquet") as ds:
+        lyr = ds.GetLayer(0)
+        assert lyr.GetSpatialRef().GetAuthorityCode() == "4326"
+        assert lyr.GetMetadataItem("EDGES") == "SPHERICAL"
+
+        geo = lyr.GetMetadataItem("geo", "_PARQUET_METADATA_")
+        assert geo is not None
+        j = json.loads(geo)
+        assert j is not None
+        assert "version" in j
+        assert j["version"] == "2.0.0"
+        assert "primary_column" in j
+        assert j["primary_column"] == "geometry"
+        assert "columns" in j
+        assert "geometry" in j["columns"]
+        assert "encoding" in j["columns"]["geometry"]
+        assert "crs" not in j["columns"]["geometry"]
+        assert j["columns"]["geometry"]["encoding"] == "WKB"
+        assert "covering" not in j["columns"]["geometry"]
+
+        assert lyr.GetMetadataItem("geometry", "_PARQUET_GEO_CRS_") == ""
+
+
+###############################################################################
+
+
+@pytest.mark.skipif(
+    not _parquet_has_geo_types(),
+    reason="requires libarrow >= 21",
+)
+def test_ogr_parquet_write_geoparquet_2_0_epsg_32631(tmp_vsimem):
+
+    with gdal.GetDriverByName("Parquet").CreateVector(tmp_vsimem / "out.parquet") as ds:
+        ds.CreateLayer(
+            "test",
+            srs=osr.SpatialReference(epsg=32631),
+            options=["GEOPARQUET_VERSION=2.0"],
+        )
+
+    _validate(tmp_vsimem / "out.parquet", local_schema=GEOPARQUET_2_0_0_JSON_SCHEMA)
+
+    with gdal.Open(tmp_vsimem / "out.parquet") as ds:
+        lyr = ds.GetLayer(0)
+        assert lyr.GetSpatialRef().GetAuthorityCode() == "32631"
+        assert lyr.GetMetadataItem("EDGES") is None
+
+        geo = lyr.GetMetadataItem("geo", "_PARQUET_METADATA_")
+        assert geo is not None
+        j = json.loads(geo)
+        assert j is not None
+        assert "version" in j
+        assert j["version"] == "2.0.0"
+        assert "crs" in j["columns"]["geometry"]
+
+        assert '"type":"ProjectedCRS"' in lyr.GetMetadataItem(
+            "geometry", "_PARQUET_GEO_CRS_"
+        )
+
+
+###############################################################################
+
+
+@pytest.mark.skipif(
+    not _parquet_has_geo_types(),
+    reason="requires libarrow >= 21",
+)
+def test_ogr_parquet_write_geoparquet_2_0_no_crs(tmp_vsimem):
+
+    with gdal.GetDriverByName("Parquet").CreateVector(tmp_vsimem / "out.parquet") as ds:
+        ds.CreateLayer(
+            "test",
+            options=["GEOPARQUET_VERSION=2.0"],
+        )
+
+    _validate(tmp_vsimem / "out.parquet", local_schema=GEOPARQUET_2_0_0_JSON_SCHEMA)
+
+    with gdal.Open(tmp_vsimem / "out.parquet") as ds:
+        lyr = ds.GetLayer(0)
+        assert lyr.GetSpatialRef() is None
+
+        geo = lyr.GetMetadataItem("geo", "_PARQUET_METADATA_")
+        assert geo is not None
+        j = json.loads(geo)
+        assert j is not None
+        assert "version" in j
+        assert j["version"] == "2.0.0"
+        assert j["columns"]["geometry"]["crs"] is None
+
+        assert lyr.GetMetadataItem("geometry", "_PARQUET_GEO_CRS_") == "srid:0"
 
 
 ###############################################################################
